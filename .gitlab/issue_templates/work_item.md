@@ -1,14 +1,20 @@
 ### Description
 
+As a **role**, I want **feature** so that **reason**.
+
 (Describe the work that needs to be done)
 
 ### Acceptance Criteria
 
 (What does this work item have to be able to do be considered "complete"?)
 
-### What feature is this for?
+### Tasks
 
-(Link to the tracking feature here, e.g. *Enter "Closes #**num here**, #**number here**, etc."*)
+- [ ] **What little pieces of work do I need to do**
+- [ ] **To complete this Work Item's User Story?**
 
-*(Remember to update this time estimate!)*
-/spend 3d 5h 10m
+(Remember to add the related feature issue, update this time estimate,
+and delete this instruction line)
+/estimate 3d 5h 10m
+
+/label ~"Work Item"

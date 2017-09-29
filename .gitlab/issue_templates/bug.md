@@ -27,4 +27,7 @@ logs, and code as it's very hard to read otherwise.)
 
 (If you can, link to the line of code that might be responsible for the problem)
 
+(Remember to update this time estimate!)
+/estimate 3d 5h 10m
+
 label ~"Bug"
