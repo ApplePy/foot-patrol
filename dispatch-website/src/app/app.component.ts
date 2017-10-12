@@ -6,5 +6,11 @@ import { Component } from '@angular/core';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent {
-  title = 'app';
+  title = 'Foot-Patrol Dispatcher Website';
+}
+export class Request {
+  id: number;
+  name: string;
+  location: string; //change this to the correct type when we determine what that is
+  time: number; //change this to the correct type. probably a time type lying around somewhere
 }
