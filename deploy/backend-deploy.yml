@@ -1,0 +1,60 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: capstone-backend-deploy-$CI_ENVIRONMENT_SLUG
+  namespace: capstone-deploy
+  labels:
+      name: capstone-backend
+      app: $CI_ENVIRONMENT_SLUG
+spec:
+  replicas: 2
+  minReadySeconds: 10
+  strategy:
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        name: capstone-backend
+        app: $CI_ENVIRONMENT_SLUG
+    spec:
+      containers:
+      - image: registry.incode.ca/capstone/foot-patrol/backend:$CI_ENVIRONMENT_SLUG
+        imagePullPolicy: Always
+        name: capstone-backend
+        ports:
+        - containerPort: 4200
+      restartPolicy: Always
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: capstone-backend-svc-$CI_ENVIRONMENT_SLUG
+  labels:
+    name: capstone-backend
+    app: $CI_ENVIRONMENT_SLUG
+spec:
+  ports:
+  - port: 4200
+    targetPort: 4200
+    protocol: TCP
+  selector:
+    name: capstone-backend
+    app: $CI_ENVIRONMENT_SLUG
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: capstone-backend-ingress-$CI_ENVIRONMENT_SLUG
+  labels:
+    name: capstone-backend
+    app: $CI_ENVIRONMENT_SLUG
+spec:
+  rules:
+  - host: $CI_ENVIRONMENT_SLUG.incode.ca
+    http:
+      paths:
+      - backend:
+          serviceName: capstone-backend-svc-$CI_ENVIRONMENT_SLUG
+          servicePort: 4200
+        path: /
+
