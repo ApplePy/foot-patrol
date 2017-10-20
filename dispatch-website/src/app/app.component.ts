@@ -1,31 +1,40 @@
 import { Component } from '@angular/core';
 import {Request} from './request';
+import {FtpRequestService} from './ftp-request.service';
+import {OnInit} from '@angular/core';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css']
 })
-export class AppComponent {
+export class AppComponent implements OnInit {
   title = 'Foot-Patrol Dispatcher Website';
   
-  requestOverflow: boolean;
+  constructor(private ftpRequestService: FtpRequestService){}
 
-  storedRequests: Request[];
-
-  displayRequests: Request[]=[
-    {id:1, name: 'test1', location: 'Building 1', time: 1130},
-    {id:2, name: 'test2', location: 'Building 2', time: 230},
-    {id:3, name: 'test3', location: 'Building 3', time: 1700}
-  ];
-
-  getFPrequests(newRequests){
-    if(newRequests.size()>10){this.requestOverflow=true;}
-    for(var i=0;i<10;i++){
-        this.displayRequests[i]=newRequests[i];
-    }
+  ngOnInit(): void{
+    this.getFPrequests();
   }
 
+  requestOverflow: boolean;
+  
+  displayRequests: Request[]=[ ];
+
+  getFPrequests():void{
+    this.ftpRequestService.getRequests().then(requests =>{
+      if(requests.length>10){this.requestOverflow=true;
+        for(var i=0;i<10;i++){
+          this.displayRequests[i]=requests[i];
+        }
+      }
+      else{
+        for(var i=0;i<requests.length;i++){
+          this.displayRequests[i]=requests[i];
+        }
+      }
+    });
+  }  
 }
 
 
