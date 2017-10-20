@@ -6,11 +6,11 @@
 
 </div>
 <h2>Requests</h2>
-<ul class="requests">
-  <li *ngFor="let request of requests">
-    {{request.id}}
-    {{request.name}}
-    {{request.location}}
-    {{request.time}}
+<ul class="displayRequests">
+  <li *ngFor="let request of displayRequests">
+    <p>Request id: {{request.id}}</p>
+    <p>Name: {{request.name}}</p>
+    <p>Location: {{request.location}}</p>
+    <p>Time: {{request.time}}</p>
   </li>
 </ul>

@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import {Request} from './request';
 
 @Component({
   selector: 'app-root',
@@ -8,18 +9,26 @@ import { Component } from '@angular/core';
 export class AppComponent {
   title = 'Foot-Patrol Dispatcher Website';
   
-  requests: Request[]=[
-    {id:1, name: 'test1', location: '345 254', time: 1130},
-    {id:2, name: 'test2', location: '1233 456', time: 230},
-    {id:3, name: 'test3', location: '789 101112', time: 1700}
+  requestOverflow: boolean;
+
+  storedRequests: Request[];
+
+  displayRequests: Request[]=[
+    {id:1, name: 'test1', location: 'Building 1', time: 1130},
+    {id:2, name: 'test2', location: 'Building 2', time: 230},
+    {id:3, name: 'test3', location: 'Building 3', time: 1700}
   ];
+
+  getFPrequests(newRequests){
+    if(newRequests.size()>10){this.requestOverflow=true;}
+    for(var i=0;i<10;i++){
+        this.displayRequests[i]=newRequests[i];
+    }
+  }
+
 }
-export class Request {
-  id: number;
-  name: string;
-  location: string; //change this to the correct type when we determine what that is
-  time: number; //change this to the correct type. probably a time type lying around somewhere
-}
+
+
 
 
 
