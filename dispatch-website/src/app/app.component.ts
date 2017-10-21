@@ -25,12 +25,12 @@ export class AppComponent implements OnInit {
     this.ftpRequestService.getRequests().then(requests =>{
       if(requests.length>10){this.requestOverflow=true;
         for(var i=0;i<10;i++){
-          this.displayRequests[i]=requests[i];
+          this.displayRequests.push(requests[i]);
         }
       }
       else{
         for(var i=0;i<requests.length;i++){
-          this.displayRequests[i]=requests[i];
+          this.displayRequests.push(requests[i]);
         }
       }
     });
