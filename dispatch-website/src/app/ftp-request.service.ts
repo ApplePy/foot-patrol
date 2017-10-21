@@ -1,6 +1,9 @@
 import { Injectable } from '@angular/core';
+import {Headers, Http} from '@angular/http';
+
+import 'rxjs/add/operator/toPromise';
+
 import {Request} from './request';
-import {Http} from '@angular/http';
 
 @Injectable()
 export class FtpRequestService {
@@ -15,6 +18,17 @@ export class FtpRequestService {
   ]
 
   getRequests(): Promise<Request[]> { 
+    /*return this.http.get(this.requestURL)
+            .toPromise()
+            .then(response => response.json().data as Request[])
+            .catch(this.handleError);
+    */
     return Promise.resolve(this.Requests);
    } 
+
+   private handleError(error: any): Promise<any> {
+    console.error('An error occurred', error); 
+    return Promise.reject(error.message || error);
+  }
+
 }

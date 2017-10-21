@@ -20,21 +20,28 @@ export class AppComponent implements OnInit {
   requestOverflow: boolean;
   
   displayRequests: Request[]=[ ];
+  storedRequests: Request[]=[];
 
   getFPrequests():void{
     this.ftpRequestService.getRequests().then(requests =>{
-      if(requests.length>10){this.requestOverflow=true;
+      if(requests.length>10){
+        this.requestOverflow=true;
         for(var i=0;i<10;i++){
-          this.displayRequests.push(requests[i]);
+          this.storedRequests.push(requests[i]);
         }
       }
       else{
         for(var i=0;i<requests.length;i++){
-          this.displayRequests.push(requests[i]);
+          this.storedRequests.push(requests[i]);
         }
       }
+      //iterate backward though stored requests when adding requests to displayRequests
+      i=0;
+      var j=this.storedRequests.length;
+      while(--j>=0){this.displayRequests[i++]=this.storedRequests[j];}
     });
   }  
+
 }
 
 
