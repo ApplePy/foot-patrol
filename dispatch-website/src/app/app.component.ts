@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import {Request} from './request';
 import {FtpRequestService} from './ftp-request.service';
 import {OnInit} from '@angular/core';
+import {FormsModule} from '@angular/forms';
 
 @Component({
   selector: 'app-root',

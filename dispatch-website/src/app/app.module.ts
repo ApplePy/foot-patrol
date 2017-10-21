@@ -3,6 +3,7 @@ import { NgModule } from '@angular/core';
 import {FtpRequestService} from './ftp-request.service';
 import { AppComponent } from './app.component';
 import {HttpModule} from '@angular/http';
+import {FormsModule} from '@angular/forms';
 
 @NgModule({
   declarations: [
@@ -10,7 +11,8 @@ import {HttpModule} from '@angular/http';
   ],
   imports: [
     BrowserModule,
-    HttpModule
+    HttpModule,
+    FormsModule
   ],
   providers: [FtpRequestService],
   bootstrap: [AppComponent]
