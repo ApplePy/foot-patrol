@@ -12,7 +12,7 @@ export class FtpRequestService {
   constructor(private http:Http) { }
 
   //requests 1 and 2 and swap are for testing
-  /*Requests1: Request[]=[
+  Requests1: Request[]=[
     {id:1, name: 'test1', location: 'Building 1', time: 1130},
     {id:2, name: 'test2', location: 'Building 2', time: 230}
   ]
@@ -23,24 +23,24 @@ export class FtpRequestService {
   ]
 
   swap: boolean=true;
-*/
+
   getRequests(): Promise<Request[]> { 
     //for actual use, uncomment this code
-    return this.http.get(this.requestURL)
+    /*return this.http.get(this.requestURL)
             .toPromise()
             .then(response => response.json().data as Request[])
             .catch(this.handleError);
     
-
+*/
     //these statements are here for testing
-    /*if(this.swap){   
+    if(this.swap){   
       this.swap=false;
       return Promise.resolve(this.Requests1);
     }
     else{
       this.swap=true;
       return Promise.resolve(this.Requests2);      
-    }*/
+    }
    } 
 
    private handleError(error: any): Promise<any> {

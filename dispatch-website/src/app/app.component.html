@@ -1,16 +1,7 @@
 <!--The content below is only a placeholder and can be replaced.-->
 <div style="text-align:center">
   <h1>
-    {{title}}!
+    {{title}}
   </h1>
-
 </div>
-<h2>Requests</h2>
-<ul class="displayRequests">
-  <li *ngFor="let request of displayRequests">
-    <p>Request id: {{request.id}} <input type="checkbox" [(ngModel)]="request.complete"><br/>
-    Name: {{request.name}} <br/>
-    Location: {{request.location}} <br/>
-    Time: {{request.time}}</p>
-  </li>
-</ul>
+<app-request-list></app-request-list>
