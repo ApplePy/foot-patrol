@@ -1,6 +1,8 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-
+import { NgModule } from '@angular/core';
 import { RequestListComponent } from './request-list.component';
+import {FormsModule} from '@angular/forms';
+import {HttpModule} from '@angular/http';
 
 describe('RequestListComponent', () => {
   let component: RequestListComponent;
@@ -8,7 +10,12 @@ describe('RequestListComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ RequestListComponent ]
+      imports: [
+        FormsModule, 
+        HttpModule
+      ],
+      declarations: [ RequestListComponent ],
+      providers: [HttpModule]
     })
     .compileComponents();
   }));

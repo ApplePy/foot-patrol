@@ -1,11 +1,16 @@
 import { TestBed, inject } from '@angular/core/testing';
-
+import {HttpModule} from '@angular/http';
 import { FtpRequestService } from './ftp-request.service';
 
 describe('FtpRequestService', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [FtpRequestService]
+      providers: [FtpRequestService,
+      HttpModule
+      ],
+      imports: [
+        HttpModule
+      ]
     });
   });
 
