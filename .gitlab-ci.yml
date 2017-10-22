@@ -1,0 +1,365 @@
+# Pick zero or more services to be used on all builds.
+# Only needed when using a docker container to run your tests in.
+# Check out: http://docs.gitlab.com/ce/ci/docker/using_docker_images.html#what-is-service
+# image: registry.incode.ca/se3352a/requirements-assignment-2:latest TODO: Remove
+
+# Ensure that the back passes its tests first since the front relies on the back
+stages:
+  - test
+  - build
+  - container_build
+  - deploy
+
+
+#################################
+#                               #
+#            TESTS              #
+#                               #
+#################################
+
+# Code common to the front- and back-end tests
+.test_common: &test_common
+  stage: test
+  coverage: /Lines\s*:\s*(\d*\.?\d+)%/
+  # This folder is cached between builds
+  # http://docs.gitlab.com/ce/ci/yaml/README.html#cache
+  variables:
+    NODE_ENV: 'test'  # To set Mocha to isolate data
+  cache:
+    untracked: true
+  # before_script:  # TODO: Setup npm proxy
+  # - npm config set proxy http://gitlab-ci.isolation.ad.murrayweb.ca:8080/            # Setup proxy to stop killing bandwidth
+  # - npm config set https-proxy http://gitlab-ci.isolation.ad.murrayweb.ca:8080/
+  # - npm config set strict-ssl false
+  except:
+  - temp
+  - tags
+
+.test_docker_common: &test_docker_common  # TODO: Is this necessary if image can be overridden? Figure out how to test mobile
+  <<: *test_common
+  image: node:6 # TODO: Swap out with a pre-built testing image containing testing frameworks
+  tags:
+  - docker
+  artifacts:
+    expire_in: 2 weeks
+
+# This test ensures the back end works
+test_backend:
+  <<: *test_docker_common
+  artifacts:
+    paths:
+      - src/backend/coverage/
+  script:
+   - cd src/backend
+   - npm install
+   - npm run lint || true   # Prevents JSHint errors from stopping build
+   - npm run coverage
+   # TODO: Figure out how to test backend
+
+
+# This test ensures the front end works
+test_dispatch_website:
+  <<: *test_docker_common
+  image: node:6 # TODO: Swap out with a pre-built testing image containing testing frameworks
+  tags:
+  - docker
+  artifacts:
+    paths:
+      - src/dispatch-website/coverage/
+  script:
+   - cd src/dispatch-website
+   - npm install
+   - npm run lint || true   # Prevents JSHint errors from stopping build
+   - npm run coverage
+   # TODO: Figure out how to test Angular
+
+
+# This test ensures the front end works
+# test_mobile:
+#   <<: *test_common
+#   artifacts:
+#     expire_in: 2 weeks
+#     paths:
+#       - src/mobile-app/coverage/
+#   script:
+#    - cd src/mobile-app
+#    # TODO: Figure out how to CI test mobile app
+
+
+#################################
+#                               #
+#            BUILD              #
+#                               #
+#################################
+
+# Common components to build jobs
+.build_common: &build_common
+  stage: build
+  dependencies: []
+  # before_script:  # TODO: Setup npm proxy
+  # - npm config set proxy http://gitlab-ci.isolation.ad.murrayweb.ca:8080/   # Setup proxy to stop killing bandwidth
+  # - npm config set https-proxy http://gitlab-ci.isolation.ad.murrayweb.ca:8080/
+  # - npm config set strict-ssl false
+
+.build_docker_common: &build_docker_common  # TODO: Is this necessary if image can be swapped out for mobile build?
+  <<: *build_common
+  image: node:6
+  tags:
+  - docker
+
+.build_review_common: &build_review_common
+  <<: *build_docker_common
+  when: manual
+  artifacts:
+    expire_in: 1 day
+  except:
+    - master
+    - develop
+    - tags
+
+.build_deploy_common: &build_deploy_common
+  <<: *build_docker_common
+  artifacts:
+    expire_in: 2 weeks
+  only:
+    - master
+    - develop
+  
+
+### --- REVIEW --- ###
+
+# This job builds the client-side code for review
+build_review_website:
+  <<: *build_review_common
+  artifacts:
+    paths:
+     -  src/dispatch-website  # TODO: Remember to filter this better after figuring out how to compile this app
+  script:
+   - cd src/dispatch-website
+   - npm install --production
+   # TODO: Figure out how to compile this app
+
+
+# This job builds the client-side code for review
+build_review_backend:
+  <<: *build_review_common
+  artifacts:
+    paths:
+     -  src/backend  # TODO: Remember to filter this better after figuring out how to compile this app
+  script:
+   - cd src/backend
+   - npm install --production
+   # TODO: Figure out how to compile this app
+
+
+# build_review_mobile:  # TODO: Figure this out.
+#   <<: *build_review_common
+#   artifacts:
+#     paths:
+#      -  src/mobile-app  # TODO: Remember to filter this better after figuring out how to compile this app
+#   script:
+#    - cd src/mobile-app
+#    # TODO: Figure out how to compile this app
+
+
+### --- DEPLOYMENT --- ###
+
+# This job builds the client-side web app code for deployment
+build_website:
+  <<: *build_deploy_common
+  artifacts:
+    paths:
+     -  src/dispatch-website  # TODO: Remember to filter this better after figuring out how to compile this app
+  script:
+   - cd src/dispatch-website
+   - npm install --production
+   # TODO: Figure out how to compile this app
+
+
+# This job builds the backend API for deployment
+build_backend:
+  <<: *build_deploy_common
+  artifacts:
+    paths:
+     -  src/backend  # TODO: Remember to filter this better after figuring out how to compile this app
+  script:
+   - cd src/backend
+   - npm install --production
+   # TODO: Figure out how to compile this app
+
+
+# This job builds the mobile app for deployment
+# build_mobile:
+#   <<: *build_deploy_common
+#   artifacts:
+#     paths:
+#      -  src/mobile-app  # TODO: Remember to filter this better after figuring out how to compile this app
+#   script:
+#    - cd src/mobile-app
+#    # TODO: Figure out how to compile this app
+
+
+#################################
+#                               #
+#        CONTAINER_BUILD        #
+#                               #
+#################################
+
+# Common components to build jobs
+.container_build_common: &container_build_common
+  stage: container_build
+  tags:
+  - docker_build
+  
+
+### --- REVIEW --- ###
+
+# This job builds the client-side code for review
+container_build_review_website:
+  <<: *container_build_common
+  dependencies:
+  - build_review_website
+  script:
+   - cd src/dispatch-website
+   - docker build # TODO: Finish
+   - docker push  # TODO: Finish
+
+
+# This job builds the client-side code for review
+container_build_review_backend:
+  <<: *container_build_common
+  dependencies:
+  - build_review_backend
+  script:
+   - cd src/backend
+   - docker build # TODO: Finish
+   - docker push  # TODO: Finish
+
+
+### --- DEPLOYMENT --- ###
+
+# This job builds the client-side web app code for deployment
+container_build_website:
+  <<: *build_deploy_common
+  dependencies:
+  - build_website
+  script:
+   - cd src/dispatch-website
+   - docker build # TODO: Finish
+   - docker push  # TODO: Finish
+
+
+# This job builds the backend API for deployment
+container_build_backend:
+  <<: *build_deploy_common
+  dependencies:
+  - build_backend
+  script:
+   - cd src/backend
+   - docker build # TODO: Finish
+   - docker push  # TODO: Finish
+
+
+#################################
+#                               #
+#            DEPLOY             #
+#                               #
+#################################
+
+# Common components to deploy jobs
+.deploy_common: &deploy_common
+  stage: deploy
+  variables:
+    HOSTNAME: capstone.incode.ca
+  image: registry.incode.ca/se3352a/requirements-assignment-2:compose # TODO: Change this for the Kubernetes deploy image
+
+
+### --- REVIEW --- ###
+
+# This job takes the contents from the build review jobs, then deploys everything
+deploy_review:
+  <<: *deploy_common
+  variables:
+      DOCKER_HOST: tcp://pandadocker.isolation.ad.murrayweb.ca:2375
+      VIRTUAL_HOST: $CI_COMMIT_REF_SLUG.digitalpanda.incode.ca
+  dependencies:
+   - build_review_website
+   - build_review_backend
+  before_script:
+    - mkdir ~/.docker
+    - echo $PANDADOCKER_AUTH > ~/.docker/config.json
+  script:
+    - docker-compose -p $CI_COMMIT_REF_SLUG -H $DOCKER_HOST down --volumes     # Destroy the old image
+    - docker-compose -p $CI_COMMIT_REF_SLUG -H $DOCKER_HOST up -d --build --force-recreate
+  after_script:
+    - rm -f ~/.docker/config.json
+  environment:
+    name: review/$CI_COMMIT_REF_NAME
+    url: http://$CI_COMMIT_REF_SLUG.digitalpanda.incode.ca/
+    on_stop: shutdown_review
+  except:
+    - master
+    - tags
+
+
+# This job stops the deployment containers
+shutdown_review:
+  <<: *deploy_common
+  dependencies: []
+  variables:
+      DOCKER_HOST: tcp://pandadocker.isolation.ad.murrayweb.ca:2375
+      GIT_STRATEGY: None
+  when: manual
+  script:
+    - docker-compose -p $CI_COMMIT_REF_SLUG -H $DOCKER_HOST down --volumes     # Destroy the old image
+  environment:
+    name: review/$CI_COMMIT_REF_NAME
+    url: http://$CI_COMMIT_REF_SLUG.digitalpanda.incode.ca/
+    action: stop
+  except:
+    - master
+    - tags
+
+
+### --- PRODUCTION --- ###
+
+# This job takes the contents from the previous job, builds them into a docker image, then deploys everything
+production:
+  <<: *deploy_common
+  variables:
+      DOCKER_HOST: tcp://pandadocker.isolation.ad.murrayweb.ca:2375
+      VIRTUAL_HOST: digitalpanda.incode.ca
+  dependencies:
+   - build
+  before_script:
+    - mkdir ~/.docker
+    - echo $PANDADOCKER_AUTH > ~/.docker/config.json
+  script:
+    - docker-compose -H $DOCKER_HOST down --volumes     # Destroy the old image
+    - docker-compose -H $DOCKER_HOST up -d --build --force-recreate
+  after_script:
+    - rm -f ~/.docker/config.json
+  environment:
+    name: production
+    url: http://digitalpanda.incode.ca/
+    on_stop: shutdown
+  only:
+    - master
+
+
+# This job stops the deployment containers
+shutdown:
+  <<: *deploy_common
+  dependencies: []
+  variables:
+      DOCKER_HOST: tcp://pandadocker.isolation.ad.murrayweb.ca:2375
+      GIT_STRATEGY: None
+  when: manual
+  script:
+    - docker-compose -H $DOCKER_HOST down --volumes     # Destroy the old image
+  environment:
+    name: production
+    url: http://digitalpanda.incode.ca/
+    action: stop
+  only:
+    - master
