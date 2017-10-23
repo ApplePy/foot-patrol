@@ -1,9 +1,10 @@
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  name: {{ template "footpatrol.fullname" . }}
+  name: "{{ .Values.webapp.name }}-{{ template "footpatrol.fullname" . }}"
   labels:
-    app: "{{ template "footpatrol.fullname" . }}"
+    app: {{ .Values.appLabel }}
+    name: "{{ template "footpatrol.fullname" . }}"
     chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
     release: "{{ .Release.Name }}"
     heritage: "{{ .Release.Service }}"
@@ -16,7 +17,8 @@ spec:
   template:
     metadata:
       labels:
-        app: "{{ template "footpatrol.fullname" . }}"
+        app: {{ .Values.appLabel }}
+        name: "{{ template "footpatrol.fullname" . }}"
         chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
         release: "{{ .Release.Name }}"
         heritage: "{{ .Release.Service }}"
