@@ -1,11 +1,11 @@
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  name: capstone-webapp-deploy-$CI_ENVIRONMENT_SLUG
+  name: capstone-webapp-deploy-${DEPLOY_ENVIRONMENT}
   namespace: capstone-deploy
   labels:
       name: capstone-webapp
-      app: $CI_ENVIRONMENT_SLUG
+      app: ${DEPLOY_ENVIRONMENT}
 spec:
   replicas: 2
   minReadySeconds: 10
@@ -15,10 +15,10 @@ spec:
     metadata:
       labels:
         name: capstone-webapp
-        app: $CI_ENVIRONMENT_SLUG
+        app: ${DEPLOY_ENVIRONMENT}
     spec:
       containers:
-      - image: registry.incode.ca/capstone/foot-patrol/webapp:$CI_ENVIRONMENT_SLUG
+      - image: registry.incode.ca/capstone/foot-patrol/webapp:${DEPLOY_TAG}
         imagePullPolicy: Always
         name: capstone-webapp
         ports:
@@ -28,10 +28,10 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: capstone-webapp-svc-$CI_ENVIRONMENT_SLUG
+  name: capstone-webapp-svc-${DEPLOY_ENVIRONMENT}
   labels:
     name: capstone-webapp
-    app: $CI_ENVIRONMENT_SLUG
+    app: ${DEPLOY_ENVIRONMENT}
 spec:
   ports:
   - port: 4200
@@ -39,22 +39,22 @@ spec:
     protocol: TCP
   selector:
     name: capstone-webapp
-    app: $CI_ENVIRONMENT_SLUG
+    app: ${DEPLOY_ENVIRONMENT}
 ---
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
-  name: capstone-webapp-ingress-$CI_ENVIRONMENT_SLUG
+  name: capstone-webapp-ingress-${DEPLOY_ENVIRONMENT}
   labels:
     name: capstone-webapp
-    app: $CI_ENVIRONMENT_SLUG
+    app: ${DEPLOY_ENVIRONMENT}
 spec:
   rules:
-  - host: $CI_ENVIRONMENT_SLUG.incode.ca
+  - host: ${DEPLOY_URL}
     http:
       paths:
       - backend:
-          serviceName: capstone-webapp-svc-$CI_ENVIRONMENT_SLUG
+          serviceName: capstone-webapp-svc-${DEPLOY_ENVIRONMENT}
           servicePort: 4200
         path: /
 
