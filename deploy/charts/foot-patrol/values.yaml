@@ -1,0 +1,35 @@
+imageBase: registry.incode.ca/capstone/foot-patrol
+imageTag: "master"
+imagePullPolicy: Always
+appLabel: replaceme  # Replace me!
+
+backend:
+  name: backend
+  imageName: backend
+  externalPort: 4200
+  internalPort: 4200
+  replicas: 1
+
+webapp:
+  name: webapp
+  imageName: webapp
+  externalPort: 4200
+  internalPort: 4200
+  replicas: 1
+
+ingress:
+  enabled: true
+  hosts:
+  - name: capstone.incode.ca
+    paths:
+    - path: /
+      serviceName: webapp
+      servicePort: 4200
+    - path: /api/v1
+      serviceName: backend
+      servicePort: 4200
+  # tls:
+  # - secretName: footpatrol-tls
+  #   hosts:
+  #   - capstone.incode.ca
+  #   - "*.capstone.incode.ca"

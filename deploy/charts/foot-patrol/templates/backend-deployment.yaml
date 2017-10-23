@@ -1,0 +1,31 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: {{ template "footpatrol.fullname" . }}
+  labels:
+    app: "{{ template "footpatrol.fullname" . }}"
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    release: "{{ .Release.Name }}"
+    heritage: "{{ .Release.Service }}"
+    component: {{ .Values.backend.name }}
+spec:
+  replicas: {{ .Values.backend.replicas }}
+  minReadySeconds: 10
+  strategy:
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: "{{ template "footpatrol.fullname" . }}"
+        chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+        release: "{{ .Release.Name }}"
+        heritage: "{{ .Release.Service }}"
+        component: {{ .Values.backend.name }}
+    spec:
+      containers:
+      - image: "{{ .Values.imageBase }}/{{ .Values.backend.imageName }}:{{ .Values.imageTag }}"
+        imagePullPolicy: {{ .Values.imagePullPolicy }}
+        name: {{ .Chart.Name }}
+        ports:
+        - containerPort: {{ .Values.backend.internalPort }}
+      restartPolicy: Always
