@@ -282,6 +282,7 @@ container_build_backend:
 
 ### --- REVIEW --- ###
 
+# TODO: Setup deployment for mobile
 # This job takes the contents from the build review jobs, then deploys everything
 deploy_review:
   <<: *deploy_common
@@ -289,7 +290,7 @@ deploy_review:
    - build_review_website
    - build_review_backend
   script:
-    - deploy/deploy.sh $CI_ENVIRONMENT_SLUG $CI_COMMIT_REF_SLUG $CI_ENVIRONMENT_SLUG.$DOMAIN
+    - helm install --namespace capstone-deploy --name $CI_ENVIRONMENT_SLUG --set ingress.hosts[0].name=$CI_ENVIRONMENT_SLUG.$DOMAIN,appLabel=$CI_ENVIRONMENT_SLUG
   environment:
     name: review/$CI_COMMIT_REF_NAME
     url: http://$CI_ENVIRONMENT_SLUG.$DOMAIN/
@@ -307,7 +308,7 @@ shutdown_review:
       GIT_STRATEGY: None
   when: manual
   script:
-    - deploy/destroy.sh $CI_ENVIRONMENT_SLUG $CI_COMMIT_REF_SLUG $CI_ENVIRONMENT_SLUG.$DOMAIN
+    - helm delete --purge $CI_ENVIRONMENT_SLUG
   environment:
     name: review/$CI_COMMIT_REF_NAME
     url: https://$CI_ENVIRONMENT_SLUG.$DOMAIN/
@@ -326,7 +327,7 @@ production:
    - build_website
    - build_backend
   script:
-    - deploy/deploy.sh production $CI_COMMIT_REF_SLUG $DOMAIN
+    - helm install --namespace capstone-deploy --name $CI_ENVIRONMENT_SLUG --set ingress.hosts[0].name=$DOMAIN,appLabel=$CI_ENVIRONMENT_SLUG
   environment:
     name: production
     url: http://$DOMAIN/
@@ -343,7 +344,7 @@ shutdown:
       GIT_STRATEGY: None
   when: manual
   script:
-    - deploy/destroy.sh production $CI_COMMIT_REF_SLUG $DOMAIN
+    - helm delete --purge $CI_ENVIRONMENT_SLUG
   environment:
     name: production
     url: http://$DOMAIN/
