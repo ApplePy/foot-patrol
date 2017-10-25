@@ -1,23 +1,5 @@
 import { NextFunction, Request, Response, Router } from "express";
 
-/**
- * @api {get} /locations Request all Foot Patrol destinations.
- * @apiDescription Currently not paginated.
- * @apiVersion 1.0.0
- * @apiName GetLocations
- * @apiGroup Locations
- *
- * @apiExample Example usage:
- * curl -i http://localhost/locations
- *
- * @apiSuccess {String[]} locations Array of locations.
- *
- * @apiSuccessExample Success-Response:
- *     HTTP/1.1 200 OK
- *     {
- *        locations: ["SEB", "UCC"]
- *     }
- */
 export class LocationsRoute {
 
   public router: Router;
@@ -30,7 +12,7 @@ export class LocationsRoute {
    */
   constructor() {
     // Log
-    console.log("[LocationsRoute::create] Creating locations route.");
+    console.log("[LocationsRoute::create] Creating index route.");
 
     // Create router
     this.router = Router();
@@ -49,6 +31,23 @@ export class LocationsRoute {
    * @param req {Request} The express Request object.
    * @param res {Response} The express Response object.
    * @param next {NextFunction} Execute the next method.
+   *
+   * @api {get} /locations Request all Foot Patrol destinations.
+   * @apiDescription Currently not paginated.
+   * @apiVersion 1.0.0
+   * @apiName GetLocations
+   * @apiGroup Locations
+   *
+   * @apiExample Example usage:
+   * curl -i http://localhost/locations
+   *
+   * @apiSuccess {string[]} locations Array of locations.
+   *
+   * @apiSuccessExample Success Response:
+   *     HTTP/1.1 200 OK
+   *     {
+   *        locations: ["SEB", "UCC"]
+   *     }
    */
   public locations(req: Request, res: Response, next: NextFunction) {
     // Stub data right now TODO: Fix

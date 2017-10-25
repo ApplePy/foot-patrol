@@ -8,10 +8,10 @@ export class StatusError extends Error {
   public name: string;
   public message: string;
 
-  constructor(status: number, title: string, message: string) {
+  constructor(status: number, title: string = "", message: string = "") {
     super();
     this.status = status;
-    this.name = title;
+    this.name = (title.replace(/\s/g, ""));
     this.message = message;
 
     Error.captureStackTrace(this, this.constructor);

@@ -131,8 +131,11 @@ export class Server {
     const requests = new RequestsRoute();
     router.use("/requests", requests.router);
 
-    // Default page
+    // Greeting page
     router.get("/", (req, res, next) => res.send("Welcome to the Foot Patrol API!"));
+
+    // Default response
+    router.use("*", (req, res, next) => res.sendStatus(404));
 
     // Use router middleware
     this.app.use(router);
@@ -151,12 +154,13 @@ export class Server {
       req: express.Request,
       res: express.Response,
       next: express.NextFunction) => {
+        // TODO: Better logging
         console.error(err.name);
         console.error(err.message);
 
         // Turn on stack traces in development mode
         if (process.env.NODE_ENV === "development") {
-          console.error(err.stack); // TODO: Better logging
+          console.error(err.stack);
         }
 
         next(err);
@@ -169,11 +173,11 @@ export class Server {
       res: express.Response,
       next: express.NextFunction) => {
         if (err instanceof StatusError) {
-          const error: any = {error: {message: err.message}};
+          const error: any = {error: err.name, message: err.message};
 
           // Add the stack trace in development mode
           if (process.env.NODE_ENV === "development") {
-            error.error.stack = err.stack;
+            error.stack = err.stack;
           }
 
           res.status(err.status).send(error);
@@ -190,10 +194,10 @@ export class Server {
       next: express.NextFunction) => {
         if (process.env.NODE_ENV === "development") {
           // Send the error in development mode
-          res.status(500).send({name: err.name, message: err.message, stack: err.stack});
+          res.status(500).send({error: err.name, message: err.message, stack: err.stack});
         } else {
           // Send something generic in production
-          res.status(500).send({error: {message: "Undefined error occurred."}});
+          res.status(500).send({error: err.name, message: "Undefined error occurred."});
         }
       });
   }
