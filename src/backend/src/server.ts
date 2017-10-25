@@ -3,7 +3,8 @@ import * as cookieParser from "cookie-parser";
 import * as express from "express";
 import * as logger from "morgan";
 import * as path from "path";
-import {StatusError} from "./status_error";
+import { ErrorMiddleware as ErrMid } from "./loggers";
+import { StatusError } from "./status_error";
 
 // Routes
 import { LocationsRoute } from "./routes/locations";
@@ -15,7 +16,6 @@ import { RequestsRoute } from "./routes/requests";
  * @class Server
  */
 export class Server {
-
   /**
    * Bootstrap the application.
    *
@@ -67,24 +67,11 @@ export class Server {
     // configure application
     this.config();
 
-    // add routes
-    this.routes();
+    // add api
+    this.api();
 
     // add error handling
     this.errorHandling();
-
-    // add api
-    this.api();
-  }
-
-  /**
-   * Create REST API routes
-   *
-   * @class Server
-   * @method api
-   */
-  private api() {
-    // empty for now
   }
 
   /**
@@ -116,12 +103,12 @@ export class Server {
   }
 
   /**
-   * Create router
+   * Create REST API routes
    *
    * @class Server
-   * @method routes
+   * @method api
    */
-  private routes() {
+  private api() {
     let router: express.Router;
     router = express.Router();
 
@@ -138,7 +125,11 @@ export class Server {
     router.use("*", (req, res, next) => res.sendStatus(404));
 
     // Use router middleware
-    this.app.use(router);
+    if (process.env.NODE_ENV === "development") {
+      this.app.use("/api/v1", router);  // Manually change API endpoint when in dev
+    } else {
+      this.app.use(router); // External systems will handle the path remap in prod
+    }
   }
 
   /**
@@ -149,56 +140,12 @@ export class Server {
    */
   private errorHandling() {
     // Log to console
-    this.app.use((
-      err: Error | StatusError,
-      req: express.Request,
-      res: express.Response,
-      next: express.NextFunction) => {
-        // TODO: Better logging
-        console.error(err.name);
-        console.error(err.message);
-
-        // Turn on stack traces in development mode
-        if (process.env.NODE_ENV === "development") {
-          console.error(err.stack);
-        }
-
-        next(err);
-      });
+    this.app.use(ErrMid.log);
 
     // Log StatusError
-    this.app.use((
-      err: Error | StatusError,
-      req: express.Request,
-      res: express.Response,
-      next: express.NextFunction) => {
-        if (err instanceof StatusError) {
-          const error: any = {error: err.name, message: err.message};
-
-          // Add the stack trace in development mode
-          if (process.env.NODE_ENV === "development") {
-            error.stack = err.stack;
-          }
-
-          res.status(err.status).send(error);
-        } else {  // Not a StatusError, fallback logger.
-          next(err);
-        }
-      });
+    this.app.use(ErrMid.statusReport);
 
     // Default logger
-    this.app.use((
-      err: Error,
-      req: express.Request,
-      res: express.Response,
-      next: express.NextFunction) => {
-        if (process.env.NODE_ENV === "development") {
-          // Send the error in development mode
-          res.status(500).send({error: err.name, message: err.message, stack: err.stack});
-        } else {
-          // Send something generic in production
-          res.status(500).send({error: err.name, message: "Undefined error occurred."});
-        }
-      });
+    this.app.use(ErrMid.fallback);
   }
 }
