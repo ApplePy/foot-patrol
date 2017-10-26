@@ -10,9 +10,27 @@
     "build_production": "tsc",
     "start": "ts-node src/index.js",
     "docs": "node_modules/.bin/apidoc -e node_modules/ -o docs/",
-    "test": "node_modules/.bin/mocha --require ts-node/register tests/*.ts",
-    "coverage": "node_modules/.bin/istanbul cover _mocha tests/",
+    "test": "node_modules/.bin/mocha --recursive --require ts-node/register test/* --exit",
+    "coverage": "node_modules/.bin/nyc npm test",
     "lint": "node_modules/.bin/jshint --exclude 'coverage/, docs/, dist/, node_modules/' . && node_modules/.bin/tslint --exclude 'coverage/, docs/, dist/, node_modules/' ."
+  },
+  "nyc": {
+    "include": [
+      "src/*.ts",
+      "src/**/*.ts"
+    ],
+    "exclude": [
+      "typings"
+    ],
+    "extension": [
+      ".ts"
+    ],
+    "reporter": [
+      "json",
+      "html",
+      "text"
+    ],
+    "all": true
   },
   "repository": {
     "type": "git",
@@ -42,6 +60,8 @@
     "mocha": "^4.0.1",
     "mocha-typescript": "^1.1.11",
     "nodemon": "^1.12.1",
+    "nyc": "^11.2.1",
+    "source-map-support": "^0.5.0",
     "ts-node": "^3.3.0",
     "tslint": "^5.8.0",
     "typescript": "^2.5.3"

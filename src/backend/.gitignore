@@ -60,3 +60,4 @@ typings/
 # Darryl additions
 dist/
 docs/
+coverage/
