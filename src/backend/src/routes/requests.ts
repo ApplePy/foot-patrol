@@ -1,10 +1,12 @@
 import { NextFunction, Request, Response, Router } from "express";
+import { MySQLService } from "../mysql_service";
 import { Server } from "../server";
 import { StatusError } from "../status_error";
 
 export class RequestsRoute {
 
   public router: Router;
+  private db: MySQLService;
 
   /**
    * Constructor
@@ -16,16 +18,24 @@ export class RequestsRoute {
     // Log
     console.log("[RequestsRoute::create] Creating requests route.");
 
+    // Get database (envvars were checked by index.js)
+    this.db = new MySQLService(
+      process.env.MYSQL_HOST as string,
+      process.env.MYSQL_USER as string,
+      process.env.MYSQL_PASS as string,
+      process.env.MYSQL_DB as string
+    );
+
     // Create router
     this.router = Router();
 
     // Add to router
-    this.router.get("/", this.getRequests);
-    this.router.post("/", this.postRequest);
-    this.router.get("/:id", this.getRequest);
-    this.router.put("/:id", this.putRequest);
-    this.router.patch("/:id", this.patchRequest);
-    this.router.delete("/:id", this.deleteRequest);
+    this.router.get("/", this.getRequests.bind(this));
+    this.router.post("/", this.postRequest.bind(this));
+    this.router.get("/:id", this.getRequest.bind(this));
+    this.router.put("/:id", this.putRequest.bind(this));
+    this.router.patch("/:id", this.patchRequest.bind(this));
+    this.router.delete("/:id", this.deleteRequest.bind(this));
   }
 
   /**
@@ -88,9 +98,11 @@ export class RequestsRoute {
 
     // Stub data right now TODO: Fix
     const meta = {offset, count, archived};
-    const requests = [{id: 1, name: "John Doe", from: "SEB", to: "UCC", additional_info: null, archived: false}];
 
-    res.send({requests, meta});
+    // Query for data
+    this.db.makeQuery("SELECT * FROM `requests_view` WHERE archived = false||? LIMIT ?, ?", [archived, offset, count])
+    .then((requests) => res.send({requests, meta})) // Send results
+    .catch((err) => next(new Error(err.sqlMessage))); // Send generic error
   }
 
   /**
@@ -136,7 +148,7 @@ export class RequestsRoute {
    *     HTTP/1.1 404 NOT FOUND
    *     {
    *        error: "RequestNotFound",
-   *        message: "Request ID 1 was not found."
+   *        message: "Request ID '1' was not found."
    *     }
    */
   public getRequest(req: Request, res: Response, next: NextFunction) {
@@ -147,12 +159,16 @@ export class RequestsRoute {
       return;
     }
 
-    // TODO: Actually return stuff
-    if (id !== 1) {
-      next(new StatusError(404, "RequestNotFound", "Request ID ${id} was not found."));
-    } else {
-      res.send({id: 1, name: "John Doe", from: "SEB", to: "UCC", additional_info: null, archived: false});
-    }
+    // Query for data
+    this.db.makeQuery("SELECT * FROM `requests_view` WHERE id=?", [id])
+    .then((request) => {
+      if (request.length > 0) {
+        res.send(request[0]);
+      } else {
+        next(new StatusError(404, "Request Not Found", `The requested id '${id}' was not found.`));
+      }
+    }) // Send results
+    .catch((err) => next(new Error(err.sqlMessage))); // Send generic error
   }
 
   /**

@@ -58,7 +58,7 @@ export class MySQLService {
     });
   }
 
-  public makeQuery(query: string, values?: string[]): Promise<any[]> {
+  public makeQuery(query: string, values?: any[]): Promise<any[]> {
     return this.getConnection()
     .then((conn) => {
       // Make request

@@ -20,9 +20,7 @@ export class LocationsRoute {
     this.router = Router();
 
     // Add to router
-    this.router.get("/", (req: Request, res: Response, next: NextFunction) => {
-      this.locations(req, res, next);
-    });
+    this.router.get("/", this.locations.bind(this));
   }
 
   /**

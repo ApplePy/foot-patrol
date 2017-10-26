@@ -133,6 +133,8 @@ export class Server {
     } else {
       this.app.use(router); // External systems will handle the path remap in prod
     }
+
+    this.app.use("/", (req, res, next) => res.sendStatus(404));
   }
 
   /**
