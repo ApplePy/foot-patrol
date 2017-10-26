@@ -12,7 +12,8 @@
     "docs": "node_modules/.bin/apidoc -e node_modules/ -o docs/",
     "test": "node_modules/.bin/mocha --recursive --require ts-node/register test/* --exit",
     "coverage": "node_modules/.bin/nyc npm test",
-    "lint": "node_modules/.bin/jshint --exclude 'coverage/, docs/, dist/, node_modules/' . && node_modules/.bin/tslint --exclude 'coverage/, docs/, dist/, node_modules/' ."
+    "lint": "node_modules/.bin/jshint --exclude 'coverage/, docs/, dist/, node_modules/' . && node_modules/.bin/tslint --exclude 'coverage/, docs/, dist/, node_modules/' .",
+    "clean": "rm -r .nyc_output/ coverage/ dist/ docs/ || true"
   },
   "nyc": {
     "include": [
