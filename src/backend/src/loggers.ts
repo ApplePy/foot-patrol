@@ -38,6 +38,11 @@ export class ErrorMiddleware {
     req: express.Request,
     res: express.Response,
     next: express.NextFunction) {
+    // Don't log to console if testing
+    if (process.env.NODE_ENV === "test") {
+      next(err);
+    }
+
     // TODO: Better logging
     console.error(err.name);
     console.error(err.message);

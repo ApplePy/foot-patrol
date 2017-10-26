@@ -76,4 +76,4 @@ function onListening() {
   console.log("Listening on " + bind);
 }
 
-module.exports = httpServer;   // For supporting tests
+module.exports.httpServer = httpServer;   // For supporting tests
