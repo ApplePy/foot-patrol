@@ -6,6 +6,14 @@ if (process.env.NODE_ENV === undefined) {
   process.env.NODE_ENV = "development";
 }
 
+// Ensure database connection variables exist
+if (process.env.MYSQL_HOST === undefined ||
+    process.env.MYSQL_PASS === undefined ||
+    process.env.MYSQL_USER === undefined ||
+    process.env.MYSQL_DB === undefined) {
+        throw new Error("ERROR: Database connection environment variables do not exist!");
+}
+
 // Imports
 let server = require("./server");
 let http = require("http");

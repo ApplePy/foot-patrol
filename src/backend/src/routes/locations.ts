@@ -1,8 +1,10 @@
 import { NextFunction, Request, Response, Router } from "express";
+import { PoolConnection } from "mysql";
+import { MySQLService } from "../mysql_service";
 
 export class LocationsRoute {
-
   public router: Router;
+  private database: MySQLService;
 
   /**
    * Constructor
@@ -50,7 +52,17 @@ export class LocationsRoute {
    *     }
    */
   public locations(req: Request, res: Response, next: NextFunction) {
-    // Stub data right now TODO: Fix
-    res.send( {locations: ["SEB", "UCC", "NS", "TEB"]});
+    // Get database (envvars were checked by index.js)
+    this.database = new MySQLService(
+      process.env.MYSQL_HOST as string,
+      process.env.MYSQL_USER as string,
+      process.env.MYSQL_PASS as string,
+      process.env.MYSQL_DB as string
+    );
+
+    // Query the database and get results
+    this.database.makeQuery("SELECT * FROM `locations`")
+    .then((results) => res.send({locations: results.map((val) => val.location)})) // Convert results into array and send
+    .catch((err) => next(new Error(err.sqlMessage))); // Send generic error
   }
 }

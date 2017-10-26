@@ -23,7 +23,7 @@ export class ErrorMiddleware {
       res.status(500).send({ error: err.name, message: err.message, stack: err.stack });
     } else {
       // Send something generic in production
-      res.status(500).send({ error: err.name, message: "Undefined error occurred." });
+      res.status(500).send({ error: "Server Error", message: "Undefined error occurred." });
     }
   }
 
