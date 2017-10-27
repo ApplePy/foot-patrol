@@ -62,6 +62,7 @@ export class RequestsRoute {
    * @apiSuccess {string} requests.to_location Escort destination.
    * @apiSuccess {string} [requests.additional_info] Additional request information.
    * @apiSuccess {boolean} requests.archived Specifies if this request completed and archived.
+   * @apiSuccess {string} requests.timestamp Timestamp the record was created.
    * @apiSuccess {object} meta The parameters used to generate the response.
    * @apiSuccess {number} meta.offset The offset from_location the start of the dataset.
    * @apiSuccess {number} meta.count The max number of elements requested.
@@ -80,7 +81,8 @@ export class RequestsRoute {
    *            from_location: "SEB",
    *            to_location: "UCC",
    *            additional_info: null,
-   *            archived: false
+   *            archived: false,
+   *            timestamp: "2017-10-26T06:51:05.000Z"
    *          }
    *        ],
    *        meta: {offset: 0, count: 10, archived: true}
@@ -134,6 +136,7 @@ export class RequestsRoute {
    * @apiSuccess {string} to_location Escort destination.
    * @apiSuccess {string} [additional_info] Additional request information.
    * @apiSuccess {boolean} archived Specifies if this request completed and archived.
+   * @apiSuccess {string} timestamp Timestamp the record was created.
    *
    * @apiExample Example usage:
    * curl -i http://localhost/requests/1
@@ -145,8 +148,9 @@ export class RequestsRoute {
    *        name: "John Doe",
    *        from_location: "SEB",
    *        to_location: "UCC",
-   *        additional_info: null
-   *        archived: false
+   *        additional_info: null,
+   *        archived: false,
+   *        timestamp: "2017-10-26T06:51:05.000Z"
    *     }
    *
    * @apiError (Error 400) InvalidQueryParameters The requested ID was invalid format.
@@ -195,6 +199,7 @@ export class RequestsRoute {
    * @apiSuccess {number} to_location Escort destination.
    * @apiSuccess {string} [additional_info] Additional request information.
    * @apiSuccess {boolean} archived Specifies if this request completed and archived.
+   * @apiSuccess {string} timestamp Timestamp the record was created.
    *
    * @apiSuccessExample Success Response:
    *     HTTP/1.1 200 OK
@@ -203,7 +208,8 @@ export class RequestsRoute {
    *        name: "John Doe",
    *        from_location: 1,
    *        to_location: 2,
-   *        archived: false
+   *        archived: false,
+   *        timestamp: "2017-10-26T06:51:05.000Z"
    *     }
    *
    * @apiError (Error 400) MissingParameters One of the post request parameters was missing.
@@ -224,7 +230,7 @@ export class RequestsRoute {
       next (new StatusError(
         400,
         "Missing Parameters",
-        "'from_location' and 'to' greater than 0 are required parameters."));
+        "'from_location' and 'to_location' greater than 0 are required parameters."));
       return;
     }
 
@@ -271,6 +277,7 @@ export class RequestsRoute {
    * @apiSuccess {number} to_location Escort destination.
    * @apiSuccess {string} [additional_info] Additional request information.
    * @apiSuccess {boolean} archived Specifies if this request completed and archived.
+   * @apiSuccess {string} timestamp Timestamp the record was created.
    *
    * @apiSuccessExample Success Response:
    *     HTTP/1.1 200 OK
@@ -279,7 +286,8 @@ export class RequestsRoute {
    *        name: "John Doe",
    *        from_location: 1,
    *        to_location: 2,
-   *        archived: false
+   *        archived: false,
+   *        timestamp: "2017-10-26T06:51:05.000Z"
    *     }
    *
    * @apiError (Error 400) MissingParameters One of the request parameters was missing.
@@ -296,27 +304,42 @@ export class RequestsRoute {
 
     // Catch invalid id
     if (isNaN(id) || id < 0) {
-      next(new StatusError(400, "Invalid Query Parameter", "Offset and/or count are not numbers >= 0."));
+      next(new StatusError(400, "Invalid URL Parameter", "Id is not a number >= 0."));
       return;
     }
 
     // Catch missing data
-    if (req.body.from_location === undefined || req.body.to_location === undefined) {
-      next (new StatusError(400, "Missing Parameters", "'from_location' and 'to' are required parameters."));
+    if (
+      req.body.archived === undefined ||
+      isNaN(req.body.from_location) ||
+      isNaN(req.body.to_location) ||
+      req.body.from_location <= 0 ||
+      req.body.to_location <= 0) {
+      next (new StatusError(
+        400,
+        "Missing Parameters",
+        "A required valid parameter is missing."));
       return;
     }
 
-    const newData = {
-      id: 1,  // TODO: Stop stubbing
-      additional_info: this.sanitizer.sanitize(req.body.additional_info),
-      from_location: this.sanitizer.sanitize(req.body.from_location),
-      name: this.sanitizer.sanitize(req.body.name),
-      to_location: this.sanitizer.sanitize(req.body.to),
-      archived: false // TODO: Stop stubbing
-    };
+    // Sanitize data
+    req.body.archived = Boolean(req.body.archived);
+    req.body.name = this.sanitizer.sanitize(req.body.name);
+    req.body.additional_info = this.sanitizer.sanitize(req.body.additional_info);
 
-    // TODO: Save data
-    res.status(200).send(newData);
+    // Replace records via an UPDATE
+    this.db.makeQuery(
+      "UPDATE requests SET name=?, from_location=?, to_location=?, additional_info=?, archived=? WHERE id=?",
+      [req.body.name, req.body.from_location, req.body.to_location, req.body.additional_info, req.body.archived, id])
+      .then((update: any) => {  // Make sure a record was updated
+        if (update.affectedRows === 0) {
+          return Promise.reject(new StatusError(404, "RequestNotFound", `Request ID ${id} was not found.`));
+        } else {
+          return this.getId(id);
+        }
+      })
+      .then((row) => res.send(row))
+      .catch((err) => next(err));
   }
 
   /**
@@ -348,6 +371,7 @@ export class RequestsRoute {
    * @apiSuccess {number} to_location Escort destination.
    * @apiSuccess {string} [additional_info] Additional request information.
    * @apiSuccess {boolean} archived Specifies if this request completed and archived.
+   * @apiSuccess {string} timestamp Timestamp the record was created.
    *
    * @apiSuccessExample Success Response:
    *     HTTP/1.1 200 OK
@@ -356,7 +380,8 @@ export class RequestsRoute {
    *        name: "John Doe",
    *        from_location: 1,
    *        to_location: 2,
-   *        archived: false
+   *        archived: false,
+   *        timestamp: "2017-10-26T06:51:05.000Z"
    *     }
    * @apiError (Error 400) InvalidQueryParameters The requested ID was invalid format.
    * @apiError (Error 404) RequestNotFound The request ID was not found.
@@ -376,17 +401,57 @@ export class RequestsRoute {
       return;
     }
 
-    const newData = {
-      id: 1,  // TODO: Stop stubbing
-      additional_info: this.sanitizer.sanitize(req.body.additional_info),
-      from_location: this.sanitizer.sanitize(req.body.from_location),
-      name: this.sanitizer.sanitize(req.body.name),
-      to_location: this.sanitizer.sanitize(req.body.to),
-      archived: false // TODO: Stop stubbing
+    // Valid columns
+    const columnList = ["name", "from_location", "to_location", "additional_info", "archived"];
+
+    // List of sanitized data
+    const updateList: any[] = [];
+
+    // Maps column to sanitizing function
+    const sanitizeMap: any = {
+      name: this.sanitizer.sanitize,
+      from_location: Number,
+      to_location: Number,
+      additional_info: this.sanitizer.sanitize,
+      archived: Boolean
     };
 
-    // TODO: Save data
-    res.status(200).send(newData);
+    columnList.forEach((val) => {
+      // If a property with that column is found, sanitize and add to updateList
+      if (req.body[val] !== undefined) {
+        const sanFunc = sanitizeMap[val];
+        updateList.push({
+          key: val,
+          value: sanFunc(req.body[val])
+        });
+        // Final structure of updateList: [{key: column, value: value}, ...]
+      }
+    });
+
+    let prom = Promise.resolve();
+
+    // Construct prepared columns
+    let kvPairs = "";
+    updateList.forEach((pair) => kvPairs = kvPairs.concat(`${pair.key}=? `));
+
+    if (kvPairs.length > 0) {
+      // Create prepared query string
+      const queryString = `UPDATE requests SET ${kvPairs} WHERE ID=?`;
+
+      // Make patch query
+      prom = this.db.makeQuery(queryString, [...updateList.map((pair) => pair.value), id])
+      .then((patch: any) => {  // Make sure a record was updated
+        if (patch.affectedRows === 0) {
+          return Promise.reject(new StatusError(404, "RequestNotFound", `Request ID ${id} was not found.`));
+        }
+        return Promise.resolve();
+      });
+    }
+
+    // Return updated object
+    prom.then(() => this.getId(id))
+    .then((data) => res.send(data))
+    .catch((err) => next(err)); // Send generic error
   }
 
   /**
