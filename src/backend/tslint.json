@@ -12,6 +12,7 @@
       },
       "trailing-comma": false,
       "no-trailing-whitespace": {
+        "options": ["ignore-jsdoc"],
         "severity": "warning"
       }
     },
