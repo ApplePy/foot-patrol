@@ -4,7 +4,11 @@ process.env.NODE_ENV = "test";
 import * as chai from "chai";
 import chaiHttp = require("chai-http");
 import { suite, test } from "mocha-typescript";
-import { httpServer as server} from "../src/index.js";
+import * as mock from "ts-mockito";
+import { IFACES, TAGS } from "../src/ids";
+import { default as serverEnv } from "../src/index";
+import { ISQLService } from "../src/services/isqlservice";
+import { FakeSQL } from "./fake-sql";
 
 // Route
 import { LocationsRoute } from "../src/routes/locations";
@@ -20,6 +24,15 @@ const pathPrefix = "";  // For adding '/api/v1' to api calls if needed
 @suite
 class LocationsAPITest {
 
+  public static before() {
+    serverEnv.container.rebind<ISQLService>(IFACES.ISQLSERVICE).to(FakeSQL).inSingletonScope();  // Swap out SQL service
+    serverEnv.startServer();
+  }
+
+  public static after() {
+    serverEnv.nodeServer.close();
+  }
+
   constructor() {
     // Put any needed data here
   }
@@ -33,13 +46,23 @@ class LocationsAPITest {
   }
 
   @test("should return a list of locations")
-  public locationsList() {
-    chai.request(server)
+  public locationsList(done: MochaDone) {
+    // Setup fake data
+    const LOCATIONS_DATA = [
+      { id: 1, location: "UCC" },
+      { id: 2, location: "SEB" }
+    ];
+    FakeSQL.response = LOCATIONS_DATA;
+
+    // Start request
+    chai.request(serverEnv.nodeServer)
     .get(pathPrefix + "/locations")
     .end((err, res) => {
+      // Verify results
       res.should.have.status(200);
       res.body.should.have.property("locations");
-      res.body.locations.should.have.length.above(0);
+      res.body.locations.should.deep.equal(["UCC", "SEB"]);
+      done();
     });
   }
 }
