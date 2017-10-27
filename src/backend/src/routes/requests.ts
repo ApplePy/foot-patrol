@@ -107,11 +107,14 @@ export class RequestsRoute {
       return;
     }
 
-    // Stub data right now TODO: Fix
     const meta = {offset, count, archived};
 
     // Query for data
     this.db.makeQuery("SELECT * FROM `requests_view` WHERE archived = false||? LIMIT ?, ?", [archived, offset, count])
+    .then((requests) => requests.map((val) => { // Convert int back to bool
+      val.archived = Boolean(val.archived);
+      return val;
+    }))
     .then((requests) => res.send({requests, meta})) // Send results
     .catch((err) => next(err)); // Send generic error
   }
@@ -518,6 +521,10 @@ export class RequestsRoute {
       } else {
         return Promise.reject(new StatusError(404, "Request Not Found", `The requested id '${id}' was not found.`));
       }
+    })
+    .then((val) => { // Convert int back to bool
+      val.archived = Boolean(val.archived);
+      return val;
     });
   }
 }

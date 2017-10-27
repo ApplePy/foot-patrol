@@ -65,4 +65,22 @@ class LocationsAPITest {
       done();
     });
   }
+
+  @test("should handle DB error")
+  public dbError(done: MochaDone) {
+    // Setup fake data
+    FakeSQL.response = undefined;
+
+    // Start request
+    chai.request(serverEnv.nodeServer)
+      .get(pathPrefix + "/locations")
+      .end((err, res) => {
+        // Verify results
+        res.should.have.status(500);
+        res.body.should.have.property("error");
+        res.body.should.have.property("message");
+        res.body.should.not.have.property("stack");
+        done();
+      });
+  }
 }

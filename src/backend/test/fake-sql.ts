@@ -17,10 +17,16 @@ export class FakeSQL implements ISQLService {
    */
   public makeQuery(query: string, values?: any[] | undefined): Promise<any[]> {
     return new Promise((res, rej) => {
-      if (FakeSQL.response !== undefined && FakeSQL.response !== null) {
-        res(FakeSQL.response);
-      } else {
+      // Catch error cases
+      if (FakeSQL.response === undefined || FakeSQL.response === null) {
         rej({name: "FakeSQLError", sqlMessage: "Query not supported."});
+      }
+
+      // Spit out reponse
+      if (typeof FakeSQL.response === "function") {
+        res(FakeSQL.response(query, values));
+      } else {
+        res(FakeSQL.response);
       }
     });
   }
