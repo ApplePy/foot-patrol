@@ -1,30 +1,31 @@
 import { NextFunction, Request, Response, Router } from "express";
-import { MySQLService } from "../mysql_service";
-import { Server } from "../server";
-import { StatusError } from "../status_error";
+import { Container, inject, injectable } from "inversify";
+import { IFACES, TAGS } from "../ids";
+import { ISanitizer } from "../services/isanitizer";
+import { ISQLService } from "../services/isqlservice";
+import { StatusError } from "../services/status_error";
 
+@injectable()
 export class RequestsRoute {
 
   public router: Router;
-  private db: MySQLService;
+  private db: ISQLService;
+  private sanitizer: ISanitizer;
 
   /**
    * Constructor
-   *
-   * @class RequestsRoute
-   * @constructor
    */
-  constructor() {
+  constructor(
+    @inject(IFACES.ISQLSERVICE) db: ISQLService,
+    @inject(IFACES.ISANITIZER) sanitizer: ISanitizer) {
     // Log
     console.log("[RequestsRoute::create] Creating requests route.");
 
+    // Save sanitizer
+    this.sanitizer = sanitizer;
+
     // Get database (envvars were checked by index.js)
-    this.db = new MySQLService(
-      process.env.MYSQL_HOST as string,
-      process.env.MYSQL_USER as string,
-      process.env.MYSQL_PASS as string,
-      process.env.MYSQL_DB as string
-    );
+    this.db = db;
 
     // Create router
     this.router = Router();
@@ -41,8 +42,6 @@ export class RequestsRoute {
   /**
    * Get requests
    *
-   * @class RequestsRoute
-   * @method getRequests
    * @param req {Request} The express Request object.
    * @param res {Response} The express Response object.
    * @param next {NextFunction} Execute the next method.
@@ -59,12 +58,12 @@ export class RequestsRoute {
    * @apiSuccess {string[]} requests Array of requests.
    * @apiSuccess {number} requests.id The record ID.
    * @apiSuccess {string} [requests.name] Name of the requester.
-   * @apiSuccess {string} requests.from Escort start location.
-   * @apiSuccess {string} requests.to Escort destination.
+   * @apiSuccess {string} requests.from_location Escort start location.
+   * @apiSuccess {string} requests.to_location Escort destination.
    * @apiSuccess {string} [requests.additional_info] Additional request information.
    * @apiSuccess {boolean} requests.archived Specifies if this request completed and archived.
    * @apiSuccess {object} meta The parameters used to generate the response.
-   * @apiSuccess {number} meta.offset The offset from the start of the dataset.
+   * @apiSuccess {number} meta.offset The offset from_location the start of the dataset.
    * @apiSuccess {number} meta.count The max number of elements requested.
    * @apiSuccess {boolean} meta.archived Whether archived requests were included in the response.
    *
@@ -74,7 +73,16 @@ export class RequestsRoute {
    * @apiSuccessExample Success Response:
    *     HTTP/1.1 200 OK
    *     {
-   *        requests: [{id: 1, name: "John Doe", from: "SEB", to: "UCC", additional_info: null, archived: false}],
+   *        requests: [
+   *          {
+   *            id: 1,
+   *            name: "John Doe",
+   *            from_location: "SEB",
+   *            to_location: "UCC",
+   *            additional_info: null,
+   *            archived: false
+   *          }
+   *        ],
    *        meta: {offset: 0, count: 10, archived: true}
    *     }
    *
@@ -91,6 +99,7 @@ export class RequestsRoute {
     const count = Number(req.query.count);
     const archived = Boolean(req.query.archived);
 
+    // Ensure valid parameters
     if (isNaN(offset) || isNaN(count) || offset < 0 || count < 0) {
       next(new StatusError(400, "Invalid Query Parameter", "Offset and/or count are not numbers >= 0."));
       return;
@@ -102,14 +111,12 @@ export class RequestsRoute {
     // Query for data
     this.db.makeQuery("SELECT * FROM `requests_view` WHERE archived = false||? LIMIT ?, ?", [archived, offset, count])
     .then((requests) => res.send({requests, meta})) // Send results
-    .catch((err) => next(new Error(err.sqlMessage))); // Send generic error
+    .catch((err) => next(err)); // Send generic error
   }
 
   /**
    * Get specific request
    *
-   * @class RequestsRoute
-   * @method getRequests
    * @param req {Request} The express Request object.
    * @param res {Response} The express Response object.
    * @param next {NextFunction} Execute the next method.
@@ -123,8 +130,8 @@ export class RequestsRoute {
    *
    * @apiSuccess {number} id The record ID.
    * @apiSuccess {string} [name] Name of the requester.
-   * @apiSuccess {string} from Escort start location.
-   * @apiSuccess {string} to Escort destination.
+   * @apiSuccess {string} from_location Escort start location.
+   * @apiSuccess {string} to_location Escort destination.
    * @apiSuccess {string} [additional_info] Additional request information.
    * @apiSuccess {boolean} archived Specifies if this request completed and archived.
    *
@@ -136,8 +143,8 @@ export class RequestsRoute {
    *     {
    *        id: 1,
    *        name: "John Doe",
-   *        from: "SEB",
-   *        to: "UCC",
+   *        from_location: "SEB",
+   *        to_location: "UCC",
    *        additional_info: null
    *        archived: false
    *     }
@@ -154,28 +161,20 @@ export class RequestsRoute {
   public getRequest(req: Request, res: Response, next: NextFunction) {
     const id = Number(req.params.id);
 
+    // Ensure valid id
     if (isNaN(id) || id < 0) {
       next(new StatusError(400, "Invalid Query Parameter", "Offset and/or count are not numbers >= 0."));
       return;
     }
 
-    // Query for data
-    this.db.makeQuery("SELECT * FROM `requests_view` WHERE id=?", [id])
-    .then((request) => {
-      if (request.length > 0) {
-        res.send(request[0]);
-      } else {
-        next(new StatusError(404, "Request Not Found", `The requested id '${id}' was not found.`));
-      }
-    }) // Send results
-    .catch((err) => next(new Error(err.sqlMessage))); // Send generic error
+    this.getId(id)
+    .then((data) => res.send(data))
+    .catch((err) => next(err)); // Send generic error
   }
 
   /**
    * Post new walk escort request.
    *
-   * @class RequestsRoute
-   * @method postRequest
    * @param req {Request} The express Request object.
    * @param res {Response} The express Response object.
    * @param next {NextFunction} Execute the next method.
@@ -186,14 +185,14 @@ export class RequestsRoute {
    * @apiGroup Requests
    *
    * @apiParam {string} [name] Name of the requester.
-   * @apiParam {string} from Escort start location.
-   * @apiParam {string} to Escort destination.
+   * @apiParam {number} from_location Escort start location.
+   * @apiParam {number} to_location Escort destination.
    * @apiParam {string} [additional_info] Additional request information.
    *
    * @apiSuccess {number} id The record ID.
    * @apiSuccess {string} [name] Name of the requester.
-   * @apiSuccess {string} from Escort start location.
-   * @apiSuccess {string} to Escort destination.
+   * @apiSuccess {number} from_location Escort start location.
+   * @apiSuccess {number} to_location Escort destination.
    * @apiSuccess {string} [additional_info] Additional request information.
    * @apiSuccess {boolean} archived Specifies if this request completed and archived.
    *
@@ -202,8 +201,8 @@ export class RequestsRoute {
    *     {
    *        id: 1,
    *        name: "John Doe",
-   *        from: "SEB",
-   *        to: "UCC",
+   *        from_location: 1,
+   *        to_location: 2,
    *        archived: false
    *     }
    *
@@ -212,34 +211,40 @@ export class RequestsRoute {
    *     HTTP/1.1 400 BAD REQUEST
    *     {
    *        error: "MissingParameters",
-   *        message: "'from' and 'to' are required parameters."
+   *        message: "'from_location' and 'to' are required parameters."
    *     }
    */
   public postRequest(req: Request, res: Response, next: NextFunction) {
     // Catch missing data
-    if (req.body.from === undefined || req.body.to === undefined) {
-      next (new StatusError(400, "Missing Parameters", "'from' and 'to' are required parameters."));
+    if (
+      isNaN(req.body.from_location) ||
+      isNaN(req.body.to_location) ||
+      req.body.from_location <= 0 ||
+      req.body.to_location <= 0) {
+      next (new StatusError(
+        400,
+        "Missing Parameters",
+        "'from_location' and 'to' greater than 0 are required parameters."));
       return;
     }
 
-    const newData = {
-      id: 1,  // TODO: Stop stubbing
-      additional_info: Server.sanitize(req.body.additional_info),
-      from_location: Server.sanitize(req.body.from),
-      name: Server.sanitize(req.body.name),
-      to_location: Server.sanitize(req.body.to),
-      archived: false // TODO: Stop stubbing
-    };
+    // Sanitize data
+    req.body.name = this.sanitizer.sanitize(req.body.name);
+    req.body.additional_info = this.sanitizer.sanitize(req.body.additional_info);
 
-    // TODO: Save data
-    res.status(201).send(newData);
+    // Insert into database and get resulting record
+    this.db.makeQuery(
+      "INSERT INTO `requests` (name, from_location, to_location, additional_info) VALUES(?,?,?,?)",
+      [req.body.name, req.body.from_location, req.body.to_location, req.body.additional_info])
+    .catch((err) => next(err))
+    .then((results: any) => this.getId(results.insertId))
+    .then((getRes) => res.status(201).send(getRes))
+    .catch((err) => next(err));
   }
 
   /**
    * Replace a walk escort request.
    *
-   * @class RequestsRoute
-   * @method putRequest
    * @param req {Request} The express Request object.
    * @param res {Response} The express Response object.
    * @param next {NextFunction} Execute the next method.
@@ -255,15 +260,15 @@ export class RequestsRoute {
    * @apiParam (URL Parameter) {number} id The id of the request to replace.
    *
    * @apiParam {string} [name] Name of the requester.
-   * @apiParam {string} from Escort start location.
-   * @apiParam {string} to Escort destination.
+   * @apiParam {number} from_location Escort start location.
+   * @apiParam {number} to_location Escort destination.
    * @apiParam {string} [additional_info] Additional request information.
    * @apiParam {boolean} archived Specifies if this request is completed and archived.
    *
    * @apiSuccess {number} id The record ID.
    * @apiSuccess {string} [name] Name of the requester.
-   * @apiSuccess {string} from Escort start location.
-   * @apiSuccess {string} to Escort destination.
+   * @apiSuccess {number} from_location Escort start location.
+   * @apiSuccess {number} to_location Escort destination.
    * @apiSuccess {string} [additional_info] Additional request information.
    * @apiSuccess {boolean} archived Specifies if this request completed and archived.
    *
@@ -272,8 +277,8 @@ export class RequestsRoute {
    *     {
    *        id: 1,
    *        name: "John Doe",
-   *        from: "SEB",
-   *        to: "UCC",
+   *        from_location: 1,
+   *        to_location: 2,
    *        archived: false
    *     }
    *
@@ -283,7 +288,7 @@ export class RequestsRoute {
    *     HTTP/1.1 400 BAD REQUEST
    *     {
    *        error: "MissingParameters",
-   *        message: "'from' parameter is missing."
+   *        message: "'from_location' parameter is missing."
    *     }
    */
   public putRequest(req: Request, res: Response, next: NextFunction) {
@@ -296,17 +301,17 @@ export class RequestsRoute {
     }
 
     // Catch missing data
-    if (req.body.from === undefined || req.body.to === undefined) {
-      next (new StatusError(400, "Missing Parameters", "'from' and 'to' are required parameters."));
+    if (req.body.from_location === undefined || req.body.to_location === undefined) {
+      next (new StatusError(400, "Missing Parameters", "'from_location' and 'to' are required parameters."));
       return;
     }
 
     const newData = {
       id: 1,  // TODO: Stop stubbing
-      additional_info: Server.sanitize(req.body.additional_info),
-      from_location: Server.sanitize(req.body.from),
-      name: Server.sanitize(req.body.name),
-      to_location: Server.sanitize(req.body.to),
+      additional_info: this.sanitizer.sanitize(req.body.additional_info),
+      from_location: this.sanitizer.sanitize(req.body.from_location),
+      name: this.sanitizer.sanitize(req.body.name),
+      to_location: this.sanitizer.sanitize(req.body.to),
       archived: false // TODO: Stop stubbing
     };
 
@@ -317,8 +322,6 @@ export class RequestsRoute {
   /**
    * Update a walk escort request.
    *
-   * @class RequestsRoute
-   * @method patchRequest
    * @param req {Request} The express Request object.
    * @param res {Response} The express Response object.
    * @param next {NextFunction} Execute the next method.
@@ -334,15 +337,15 @@ export class RequestsRoute {
    * @apiParam (URL Parameter) {number} id The id of the request to update.
    *
    * @apiParam {string} [name] Name of the requester.
-   * @apiParam {string} [from] Escort start location.
-   * @apiParam {string} [to] Escort destination.
+   * @apiParam {number} [from_location] Escort start location.
+   * @apiParam {number} [to_location] Escort destination.
    * @apiParam {string} [additional_info] Additional request information.
    * @apiParam {boolean} [archived] Specifies if this request is completed and archived.
    *
    * @apiSuccess {number} id The record ID.
    * @apiSuccess {string} [name] Name of the requester.
-   * @apiSuccess {string} from Escort start location.
-   * @apiSuccess {string} to Escort destination.
+   * @apiSuccess {number} from_location Escort start location.
+   * @apiSuccess {number} to_location Escort destination.
    * @apiSuccess {string} [additional_info] Additional request information.
    * @apiSuccess {boolean} archived Specifies if this request completed and archived.
    *
@@ -351,8 +354,8 @@ export class RequestsRoute {
    *     {
    *        id: 1,
    *        name: "John Doe",
-   *        from: "SEB",
-   *        to: "UCC",
+   *        from_location: 1,
+   *        to_location: 2,
    *        archived: false
    *     }
    * @apiError (Error 400) InvalidQueryParameters The requested ID was invalid format.
@@ -367,6 +370,7 @@ export class RequestsRoute {
   public patchRequest(req: Request, res: Response, next: NextFunction) {
     const id = Number(req.params.id);
 
+    // Check for invalid ID
     if (isNaN(id) || id < 0) {
       next(new StatusError(400, "Invalid Query Parameter", "Offset and/or count are not numbers >= 0."));
       return;
@@ -374,10 +378,10 @@ export class RequestsRoute {
 
     const newData = {
       id: 1,  // TODO: Stop stubbing
-      additional_info: Server.sanitize(req.body.additional_info),
-      from_location: Server.sanitize(req.body.from),
-      name: Server.sanitize(req.body.name),
-      to_location: Server.sanitize(req.body.to),
+      additional_info: this.sanitizer.sanitize(req.body.additional_info),
+      from_location: this.sanitizer.sanitize(req.body.from_location),
+      name: this.sanitizer.sanitize(req.body.name),
+      to_location: this.sanitizer.sanitize(req.body.to),
       archived: false // TODO: Stop stubbing
     };
 
@@ -388,8 +392,6 @@ export class RequestsRoute {
   /**
    * Get specific request
    *
-   * @class RequestsRoute
-   * @method getRequests
    * @param req {Request} The express Request object.
    * @param res {Response} The express Response object.
    * @param next {NextFunction} Execute the next method.
@@ -419,16 +421,38 @@ export class RequestsRoute {
   public deleteRequest(req: Request, res: Response, next: NextFunction) {
     const id = Number(req.params.id);
 
+    // Check for invalid id
     if (isNaN(id) || id < 0) {
       next(new StatusError(400, "Invalid Query Parameter", "Offset and/or count are not numbers >= 0."));
       return;
     }
 
-    // TODO: Actually return stuff
-    if (id !== 1) {
-      next(new StatusError(404, "RequestNotFound", "Request ID ${id} was not found."));
-    } else {
-      res.sendStatus(204);
-    }
+    // Make delete query
+    this.db.makeQuery("DELETE FROM `requests` WHERE id=?", [id])
+    .then((del: any) => {
+      if (del.affectedRows === 0) {
+        next(new StatusError(404, "RequestNotFound", `Request ID ${id} was not found.`));
+      } else {
+        res.sendStatus(204);
+      }
+    })
+    .catch((err) => next(err));
+  }
+
+  /**
+   * Get the request_view for an ID number.
+   * 
+   * @param id The id to retrieve
+   */
+  private getId(id: number) {
+    // Query for data
+    return this.db.makeQuery("SELECT * FROM `requests_view` WHERE id=?", [id])
+    .then((request) => {
+      if (request.length > 0) {
+        return request[0];
+      } else {
+        return Promise.reject(new StatusError(404, "Request Not Found", `The requested id '${id}' was not found.`));
+      }
+    });
   }
 }

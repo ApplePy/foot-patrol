@@ -1,20 +1,23 @@
 import { NextFunction, Request, Response, Router } from "express";
-import { PoolConnection } from "mysql";
-import { MySQLService } from "../mysql_service";
+import { Container, inject, injectable } from "inversify";
+import { IFACES, TAGS } from "../ids";
+import { ISQLService } from "../services/isqlservice";
+import { IRoute } from "./iroute";
 
-export class LocationsRoute {
+@injectable()
+export class LocationsRoute implements IRoute {
   public router: Router;
-  private database: MySQLService;
+  private database: ISQLService;
 
   /**
    * Constructor
-   *
-   * @class LocationsRoute
-   * @constructor
    */
-  constructor() {
+  constructor(@inject(IFACES.ISQLSERVICE) db: ISQLService) {
     // Log
     console.log("[LocationsRoute::create] Creating index route.");
+
+    // Get database (envvars were checked by index.js)
+    this.database = db;
 
     // Create router
     this.router = Router();
@@ -25,9 +28,7 @@ export class LocationsRoute {
 
   /**
    * The locations route
-   *
-   * @class LocationsRoute
-   * @method locations
+   * 
    * @param req {Request} The express Request object.
    * @param res {Response} The express Response object.
    * @param next {NextFunction} Execute the next method.
@@ -50,17 +51,9 @@ export class LocationsRoute {
    *     }
    */
   public locations(req: Request, res: Response, next: NextFunction) {
-    // Get database (envvars were checked by index.js)
-    this.database = new MySQLService(
-      process.env.MYSQL_HOST as string,
-      process.env.MYSQL_USER as string,
-      process.env.MYSQL_PASS as string,
-      process.env.MYSQL_DB as string
-    );
-
     // Query the database and get results
     this.database.makeQuery("SELECT * FROM `locations`")
     .then((results) => res.send({locations: results.map((val) => val.location)})) // Convert results into array and send
-    .catch((err) => next(new Error(err.sqlMessage))); // Send generic error
+    .catch((err) => next(err)); // Send generic error
   }
 }

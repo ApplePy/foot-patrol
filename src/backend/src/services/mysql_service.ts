@@ -1,40 +1,31 @@
+import { inject, injectable } from "inversify";
 import * as mysql from "mysql";
-import { Server } from "./server";
+import { ISQLService } from "./isqlservice";
 
 /**
  * Service for connecting to and managing a MySQL database.
- *
- * @class MySQLService
  */
-export class MySQLService {
-  // Pools of connections to databases
-  private static mapping: Map<string, mysql.Pool> = new Map<string, mysql.Pool>();
-  // MySQL host/database that this object queries
-  private dbHash = "";
+@injectable()
+export class MySQLService implements ISQLService {
+  private connectionPool: mysql.Pool;
 
   /**
-   * Constructor
+   * Initialize object
    *
    * @param host { String } The MySQL host to connect to.
    * @param user { String } Username to login with.
    * @param password { String } Password for user.
    * @param database { String } Database to connect to.
    */
-  constructor(host: string, user: string, password: string, database: string) {
-    // normalize host and database (since it's a key)
-    host = Server.sanitize(host.toLowerCase());
-    this.dbHash = host + Server.sanitize(database.toLowerCase());
-
-    // Create a static pool of connections, so that multiple connection requests to the same DB are cached.
-    if (!MySQLService.mapping.hasOwnProperty(this.dbHash)) {
-      MySQLService.mapping.set(this.dbHash, mysql.createPool({
-        connectionLimit : 10,
-        host,
-        user,
-        password,
-        database
-      }));
-    }
+  public initialize(host: string, user: string, password: string, database: string) {
+    // Only initialize once
+    this.connectionPool = this.connectionPool || mysql.createPool({
+      connectionLimit : 10,
+      host,
+      user,
+      password,
+      database
+    });
   }
 
   /**
@@ -44,9 +35,15 @@ export class MySQLService {
    * @return { Promise<mysql.Connection> } Promise with a MySQL connection or an error.
    */
   public getConnection(): Promise<mysql.PoolConnection> {
-    const pool = MySQLService.mapping.get(this.dbHash) as mysql.Pool;
+    const pool = this.connectionPool;
 
     return new Promise((res, rej) => {
+      // Catch uninitialized
+      if (pool === undefined) {
+        rej(new Error("Database connection not initialized!"));
+      }
+
+      // Open a new connection
       pool.getConnection((err, conn) => {
         if (err) {
           // Connection failed; call error callback
@@ -58,8 +55,16 @@ export class MySQLService {
     });
   }
 
+  /**
+   * Make a basic query to the SQL server.
+   * 
+   * @param query  The query string, optionally with ?s for values to be inserted
+   * @param values (Optional) An array of values to be inserted into appropriate places in `query`
+   */
   public makeQuery(query: string, values?: any[]): Promise<any[]> {
+    // Get a connection to the database
     return this.getConnection()
+    .catch((err) => Promise.reject(new Error(err.sqlMessage)))  // Convert MySQL error object to Error class
     .then((conn) => {
       // Make request
       return new Promise<any[]>((resolve, reject) => {

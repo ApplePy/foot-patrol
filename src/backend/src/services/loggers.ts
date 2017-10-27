@@ -3,15 +3,11 @@ import { StatusError } from "./status_error";
 
 /**
  * Collection of error middleware for logging and responding to user.
- * @class ErrorMiddleware
  */
 export class ErrorMiddleware {
 
   /**
    * Base error middleware to catch all cases.
-   *
-   * @class ErrorMiddleware
-   * @method fallback
    */
   public static fallback(
     err: Error,
@@ -29,9 +25,6 @@ export class ErrorMiddleware {
 
   /**
    * Spits out error to console.
-   *
-   * @class ErrorMiddleware
-   * @method log
    */
   public static log(
     err: Error | StatusError,
@@ -39,17 +32,15 @@ export class ErrorMiddleware {
     res: express.Response,
     next: express.NextFunction) {
     // Don't log to console if testing
-    if (process.env.NODE_ENV === "test") {
-      next(err);
-    }
+    if (process.env.NODE_ENV !== "test") {
+      // TODO: Better logging
+      console.error(err.name);
+      console.error(err.message);
 
-    // TODO: Better logging
-    console.error(err.name);
-    console.error(err.message);
-
-    // Turn on stack traces in development mode
-    if (process.env.NODE_ENV === "development") {
-      console.error(err.stack);
+      // Turn on stack traces in development mode
+      if (process.env.NODE_ENV === "development") {
+        console.error(err.stack);
+      }
     }
 
     next(err);
@@ -57,9 +48,6 @@ export class ErrorMiddleware {
 
   /**
    * Processes StatusError errors to respond to user.
-   *
-   * @class ErrorMiddleware
-   * @method log
    */
   public static statusReport(
     err: Error | StatusError,

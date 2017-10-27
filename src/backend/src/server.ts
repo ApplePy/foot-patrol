@@ -1,58 +1,26 @@
 import * as bodyParser from "body-parser";
 import * as cookieParser from "cookie-parser";
 import * as express from "express";
+import { Container, inject, injectable, named } from "inversify";
 import * as logger from "morgan";
 import * as path from "path";
-import { ErrorMiddleware as ErrMid } from "./loggers";
-import { StatusError } from "./status_error";
+import { IFACES, TAGS } from "./ids";
+import { ErrorMiddleware as ErrMid } from "./services/loggers";
 
 // Routes
-import { LocationsRoute } from "./routes/locations";
-import { RequestsRoute } from "./routes/requests";
+import { IRoute } from "./routes/iroute";
 
 /**
- * The server.
- *
- * @class Server
+ * The Express server.
  */
+@injectable()
 export class Server {
-  /**
-   * Bootstrap the application.
-   *
-   * @class Server
-   * @method bootstrap
-   * @static
-   * @return { Server } Returns the newly created injector for this app.
-   */
-  public static bootstrap(): Server {
-    return new Server();
-  }
-
-  /**
-   * Sanitize a user input string to be safe to work with.
-   *
-   * @class Server
-   * @method sanitize
-   * @static
-   * @param str { String } The string to sanitize
-   * @return { String } The sanitized version of the string.
-   */
-  public static sanitize(str: string) {
-    // htmlEscape Source: http://stackoverflow.com/questions/1219860/html-encoding-in-javascript-jquery
-    if (typeof str !== "string") {
-      return str;
-    }
-    return str
-        .replace(/&(?![A-Za-z0-9#]{2,4};)/g, "&amp;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#39;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/\//g, "&#x2F;");
-  }
-
   public app: express.Application;
   private cookieSecret: "myTotallySecretSecret";
+
+  // Routes
+  private locationRoute: IRoute;
+  private requestRoute: IRoute;
 
   /**
    * Constructor.
@@ -60,7 +28,13 @@ export class Server {
    * @class Server
    * @constructor
    */
-  constructor() {
+  constructor(
+    @inject (IFACES.IROUTE) @named(TAGS.LOCATIONS) locationRoute: IRoute,
+    @inject (IFACES.IROUTE) @named(TAGS.REQUESTS) requestRoute: IRoute) {
+    // Save DI
+    this.locationRoute = locationRoute;
+    this.requestRoute = requestRoute;
+
     // create expressjs application
     this.app = express();
 
@@ -76,9 +50,6 @@ export class Server {
 
   /**
    * Configure application
-   *
-   * @class Server
-   * @method config
    */
   private config() {
     // Loggers and parsers
@@ -107,19 +78,14 @@ export class Server {
 
   /**
    * Create REST API routes
-   *
-   * @class Server
-   * @method api
    */
   private api() {
     let router: express.Router;
     router = express.Router();
 
-    const locations = new LocationsRoute();
-    router.use("/locations", locations.router);
-
-    const requests = new RequestsRoute();
-    router.use("/requests", requests.router);
+    // Start routes
+    router.use("/locations", this.locationRoute.router);
+    router.use("/requests", this.requestRoute.router);
 
     // Greeting page
     router.get("/", (req, res, next) => res.send("Welcome to the Foot Patrol API!"));
@@ -139,9 +105,6 @@ export class Server {
 
   /**
    * Create error handling middleware
-   *
-   * @class Server
-   * @method errorHandling
    */
   private errorHandling() {
     // Log to console
