@@ -44,7 +44,7 @@ backend
 
 `services/` contains services that the API server relies on, along with relevant interface files. Files of note:
 
-* `mysql_service.ts` supports connecting
+* `mysql_service.ts` supports connecting to MySQL database.
 
 `test/` contains the testing suite. In particular, it contains `fake-sql.ts` that abstracts away the need for a running MySQL database during testing, and allows custom responses 
 
