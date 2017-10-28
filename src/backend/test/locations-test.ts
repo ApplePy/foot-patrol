@@ -45,7 +45,7 @@ class LocationsAPITest {
     // hook for after each test; make static to be after the suite
   }
 
-  @test("should return a list of locations")
+  @test("GET should return a list of locations")
   public locationsList(done: MochaDone) {
     // Setup fake data
     const LOCATIONS_DATA = [
@@ -66,7 +66,7 @@ class LocationsAPITest {
     });
   }
 
-  @test("should handle DB error")
+  @test("GET should handle DB error")
   public dbError(done: MochaDone) {
     // Setup fake data
     FakeSQL.response = undefined;
