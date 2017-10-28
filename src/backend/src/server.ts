@@ -53,9 +53,11 @@ export class Server {
    */
   private config() {
     // Loggers and parsers
-    if (process.env.NODE_ENV !== "test") {
-      // Turn off logging during testing
-      this.app.use(logger("dev")); // using 'dev' logger, TODO: Change
+    if (process.env.NODE_ENV === "development") {
+      this.app.use(logger("dev")); // using 'dev' logger
+    } else if (process.env.NODE_ENV !== "test") {
+      // Don't log during tests
+      this.app.use(logger("combined")); // using apache combined logger
     }
     this.app.use(bodyParser.json());
     this.app.use(bodyParser.urlencoded({ extended: false }));

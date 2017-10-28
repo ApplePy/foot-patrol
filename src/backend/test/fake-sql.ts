@@ -7,7 +7,12 @@ import { ISQLService } from "../src/services/isqlservice";
  */
 @injectable()
 export class FakeSQL implements ISQLService {
-  public static response: any;
+  /**
+   * This static property allows modification of what the fake MySQL service
+   * returns to the code calling `makeQuery`.
+   * Supplying `undefined` will cause FakeSQL to throw a MySQL like DB error.
+   */
+  public static response: (query: string, values?: any[] | undefined) => any | any;
 
   /**
    * Make a basic query to the SQL server.
