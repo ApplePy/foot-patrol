@@ -216,6 +216,7 @@ export class RequestsRoute {
    *     }
    *
    * @apiError (Error 400) MissingParameters One of the post request parameters was missing.
+   * @apiError (Error 400) InvalidLocation One of the location parameters refer to a non-existent location.
    * @apiErrorExample Error Response:
    *     HTTP/1.1 400 BAD REQUEST
    *     {
@@ -229,11 +230,14 @@ export class RequestsRoute {
       isNaN(req.body.from_location) ||
       isNaN(req.body.to_location) ||
       req.body.from_location <= 0 ||
-      req.body.to_location <= 0) {
+      req.body.to_location <= 0 ||
+      req.body.from_location === req.body.to_location
+    ) {
       next (new StatusError(
         400,
         "Missing Parameters",
-        "'from_location' and 'to_location' greater than 0 are required parameters."));
+        "'from_location' and 'to_location' greater than 0 and not equal to each other" +
+        " are required parameters."));
       return;
     }
 
@@ -245,7 +249,7 @@ export class RequestsRoute {
     this.db.makeQuery(
       "INSERT INTO `requests` (name, from_location, to_location, additional_info) VALUES(?,?,?,?)",
       [req.body.name, req.body.from_location, req.body.to_location, req.body.additional_info])
-    .catch((err) => next(err))
+    .catch(this.checkBadForeignKey(next))
     .then((results: any) => this.getId(results.insertId))
     .then((getRes) => res.status(201).send(getRes))
     .catch((err) => next(err));
@@ -293,7 +297,8 @@ export class RequestsRoute {
    *        timestamp: "2017-10-26T06:51:05.000Z"
    *     }
    *
-   * @apiError (Error 400) MissingParameters One of the request parameters was missing.
+   * @apiError (Error 400) MissingOrInvalidParameters One of the request parameters was missing.
+   * @apiError (Error 400) InvalidLocation One of the location parameters refer to a non-existent location.
    * @apiError (Error 404) RequestNotFound The request ID was not found.
    * @apiErrorExample Error Response:
    *     HTTP/1.1 400 BAD REQUEST
@@ -317,10 +322,11 @@ export class RequestsRoute {
       isNaN(req.body.from_location) ||
       isNaN(req.body.to_location) ||
       req.body.from_location <= 0 ||
-      req.body.to_location <= 0) {
+      req.body.to_location <= 0 ||
+      req.body.from_location === req.body.to_location) {
       next (new StatusError(
         400,
-        "Missing Parameters",
+        "Missing Or Invalid Parameters",
         "A required valid parameter is missing."));
       return;
     }
@@ -334,13 +340,9 @@ export class RequestsRoute {
     this.db.makeQuery(
       "UPDATE requests SET name=?, from_location=?, to_location=?, additional_info=?, archived=? WHERE id=?",
       [req.body.name, req.body.from_location, req.body.to_location, req.body.additional_info, req.body.archived, id])
-      .then((update: any) => {  // Make sure a record was updated
-        if (update.affectedRows === 0) {
-          return Promise.reject(new StatusError(404, "RequestNotFound", `Request ID ${id} was not found.`));
-        } else {
-          return this.getId(id);
-        }
-      })
+      .catch(this.checkBadForeignKey(next))
+      .then(this.checkRowUpdated(id, next))
+      .then(() => this.getId(id))
       .then((row) => res.send(row))
       .catch((err) => next(err));
   }
@@ -387,6 +389,7 @@ export class RequestsRoute {
    *        timestamp: "2017-10-26T06:51:05.000Z"
    *     }
    * @apiError (Error 400) InvalidQueryParameters The requested ID was invalid format.
+   * @apiError (Error 400) InvalidLocation One of the location parameters equal or refer to a non-existent location.
    * @apiError (Error 404) RequestNotFound The request ID was not found.
    * @apiErrorExample Error Response:
    *     HTTP/1.1 404 NOT FOUND
@@ -431,6 +434,13 @@ export class RequestsRoute {
       }
     });
 
+    // Locaion check
+    const from = updateList.find((val) => val.key === "from_location");
+    const to = updateList.find((val) => val.key === "to_location");
+    if (from !== undefined && to !== undefined && from.value === to.value) {
+      next(new StatusError(400, "Invalid Location", "Locations should not equal."));
+    }
+
     let prom = Promise.resolve();
 
     // Construct prepared columns
@@ -443,12 +453,8 @@ export class RequestsRoute {
 
       // Make patch query
       prom = this.db.makeQuery(queryString, [...updateList.map((pair) => pair.value), id])
-      .then((patch: any) => {  // Make sure a record was updated
-        if (patch.affectedRows === 0) {
-          return Promise.reject(new StatusError(404, "RequestNotFound", `Request ID ${id} was not found.`));
-        }
-        return Promise.resolve();
-      });
+      .catch(this.checkBadForeignKey(next))
+      .then(this.checkRowUpdated(id, next));
     }
 
     // Return updated object
@@ -497,13 +503,8 @@ export class RequestsRoute {
 
     // Make delete query
     this.db.makeQuery("DELETE FROM `requests` WHERE id=?", [id])
-    .then((del: any) => {
-      if (del.affectedRows === 0) {
-        next(new StatusError(404, "RequestNotFound", `Request ID ${id} was not found.`));
-      } else {
-        res.sendStatus(204);
-      }
-    })
+    .then(this.checkRowUpdated(id, next))
+    .then(() => res.sendStatus(204))
     .catch((err) => next(err));
   }
 
@@ -526,5 +527,36 @@ export class RequestsRoute {
       val.archived = Boolean(val.archived);
       return val;
     });
+  }
+
+  /**
+   * Check for invalid foreign key SQL error. Call in promise 'catch'
+   * 
+   * @param next The function to call on error
+   */
+  private checkBadForeignKey(next: NextFunction) {
+    return (err: any) => {
+      // Catch invalid locations
+      if (err.message.search("ER_NO_REFERENCED_ROW_2") >= 0) {
+        next(new StatusError(400, "Invalid Location", "Location does not exist."));
+      } else {
+        next(err);
+      }
+    };
+  }
+
+  /**
+   * Check to make sure a row was updated. Call in promise 'then'
+   * 
+   * @param id ID that was supposed to be updated
+   * @param next Function to call on error
+   */
+  private checkRowUpdated(id: number, next: NextFunction) {
+    return (results: any) => {  // Make sure a record was updated
+      if (results.affectedRows === 0) {
+        return Promise.reject(new StatusError(404, "RequestNotFound", `Request ID ${id} was not found.`));
+      }
+      return Promise.resolve();
+    };
   }
 }
