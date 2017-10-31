@@ -1,4 +1,5 @@
 {{- if .Values.ingress.enabled -}}
+{{- $paths:= .Values.ingress.paths }}
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
@@ -12,14 +13,14 @@ metadata:
 spec:
   rules:
   {{- range $host := .Values.ingress.hosts }}
-  - host: {{ $host.name }}
+  - host: {{ $host }}
     http:
       paths:
-      {{- range $endpoint := $host.paths }}
-      - backend:
+      {{- range $endpoint := $paths }}
+      - path: {{ $endpoint.path }}
+        backend:
           serviceName: "{{ $endpoint.serviceName }}-{{ include "footpatrol.fullname" $ }}"
           servicePort: {{ $endpoint.servicePort }}
-        path: {{ $endpoint.path }}
       {{- end -}}
   {{- end -}}
   {{- if .Values.ingress.tls}}

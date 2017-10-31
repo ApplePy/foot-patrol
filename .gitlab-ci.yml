@@ -6,8 +6,13 @@
 stages:
   - test
   - build
-  - container_build
+  - containerize
   - deploy
+
+variables:
+  NPM_CACHE: http://docker-npm-cache-sonatype-nexus.default.svc.cluster.local:8081/repository/npm-group/
+  TILLER_NAMESPACE: capstone-deploy
+  DOMAIN: capstone.incode.ca
 
 
 #################################
@@ -19,17 +24,15 @@ stages:
 # Code common to the front- and back-end tests
 .test_common: &test_common
   stage: test
-  # This folder is cached between builds
-  # http://docs.gitlab.com/ce/ci/yaml/README.html#cache
   except:
   - temp
   - tags
   artifacts:
     expire_in: 2 weeks
 
-.test_docker_common: &test_docker_common  # TODO: Is this necessary if image can be overridden? Figure out how to test mobile
+.test_docker_common: &test_docker_common
   <<: *test_common
-  image: node:8 # TODO: Swap out with a pre-built testing image containing testing frameworks
+  image: node:8
   tags:
   - docker
   - linux
@@ -37,10 +40,7 @@ stages:
   variables:
     NODE_ENV: 'test'  # To set Mocha to isolate data
   before_script:
-  - npm config set registry http://docker-npm-cache-sonatype-nexus.default.svc.cluster.local:8081/repository/npm-group/ # Setup proxy to stop killing bandwidth
-  cache:
-    paths:
-      - src/*/node_modules/
+  - npm config set registry $NPM_CACHE # Setup proxy to stop killing bandwidth
 
 # This test ensures the back end works
 test_backend:
@@ -48,13 +48,16 @@ test_backend:
   artifacts:
     paths:
       - src/backend/coverage/
+  cache:
+    key: backend_npm
+    paths:
+      - src/backend/node_modules/
   script:
    - cd src/backend
-   - rm package-lock.json
+   - rm package-lock.json || true   # So that cache server works
    - npm install
    - npm run lint || true   # Prevents JSHint errors from stopping build
    - npm run coverage
-   # TODO: Figure out how to test backend
 
 
 # This test ensures the front end works
@@ -63,12 +66,16 @@ test_dispatch_website:
   artifacts:
     paths:
       - src/dispatch-website/coverage/
+  cache:
+    key: angular_npm
+    paths:
+      - src/dispatch-website/node_modules/
   script:
    - cd src/dispatch-website
+   - rm package-lock.json || true   # So that cache server works
    - npm install
    - npm run lint || true   # Prevents JSHint errors from stopping build
-   - npm run coverage
-   # TODO: Figure out how to test Angular
+  #  - npm run coverage     # TODO: Figure out how to test Angular (https://gist.github.com/coolman565/f392f08cf90e90db18dd06e7d3f5f41c)
 
 
 # This test ensures the front end works
@@ -100,13 +107,13 @@ test_dispatch_website:
   <<: *build_common
   image: node:8
   before_script:
-  - npm config set registry http://docker-npm-cache-sonatype-nexus.default.svc.cluster.local:8081/repository/npm-group/ # Setup proxy to stop killing bandwidth
+  - npm config set registry $NPM_CACHE # Setup proxy to stop killing bandwidth
+  - npm install typescript -g
   tags:
   - docker
   - linux
 
 .build_review_common: &build_review_common
-  when: manual
   artifacts:
     expire_in: 1 day
   except:
@@ -130,7 +137,12 @@ build_review_website:
   <<: *build_docker_common
   artifacts:
     paths:
-     -  src/dispatch-website  # TODO: Remember to filter this better after figuring out how to compile this app
+     -  src/dispatch-website/dist/
+  cache:
+    key: angular_npm
+    policy: pull
+    paths:
+      - src/dispatch-website/node_modules/
   script:
    - cd src/dispatch-website
    - npm install --production
@@ -143,11 +155,16 @@ build_review_backend:
   <<: *build_docker_common
   artifacts:
     paths:
-     -  src/backend  # TODO: Remember to filter this better after figuring out how to compile this app
+     -  src/backend/dist/
+  cache:
+    key: backend_npm
+    policy: pull
+    paths:
+      - src/backend/node_modules/
   script:
    - cd src/backend
    - npm install --production
-   # TODO: Figure out how to compile this app
+   - npm run build_production
 
 
 # build_review_mobile:  # TODO: Figure this out
@@ -171,7 +188,12 @@ build_website:
   <<: *build_docker_common
   artifacts:
     paths:
-     -  src/dispatch-website  # TODO: Remember to filter this better after figuring out how to compile this app
+     -  src/dispatch-website/dist/
+  cache:
+    key: angular_npm
+    policy: pull
+    paths:
+      - src/dispatch-website/node_modules/
   script:
    - cd src/dispatch-website
    - npm install --production
@@ -184,11 +206,16 @@ build_backend:
   <<: *build_docker_common
   artifacts:
     paths:
-     -  src/backend  # TODO: Remember to filter this better after figuring out how to compile this app
+     -  src/backend/dist/
+  cache:
+    key: backend_npm
+    policy: pull
+    paths:
+      - src/backend/node_modules/
   script:
    - cd src/backend
    - npm install --production
-   # TODO: Figure out how to compile this app
+   - npm run build_production
 
 
 # This job builds the mobile app for deployment
@@ -207,64 +234,81 @@ build_backend:
 
 #################################
 #                               #
-#        CONTAINER_BUILD        #
+#         Containerize          #
 #                               #
 #################################
 
 # Common components to build jobs
-.container_build_common: &container_build_common
-  stage: container_build
+.containerize_common: &containerize_common
+  stage: containerize
   tags:
   - docker_build
   - linux
+  before_script:
+  - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
+
+.containerize_review_common: &containerize_review_common
+  except:
+    - master
+    - develop
+    - tags
+
+.containerize_deploy_common: &containerize_deploy_common
+  only:
+    - master
+    - develop
   
 
 ### --- REVIEW --- ###
 
 # This job builds the client-side code for review
-container_build_review_website:
-  <<: *container_build_common
+containerize_review_website:
+  <<: *containerize_common
+  <<: *containerize_review_common
   dependencies:
   - build_review_website
   script:
    - cd src/dispatch-website
-   - docker build -t registry.incode.ca/capstone/foot-patrol/website:$CI_COMMIT_REF_SLUG .
-   - docker push registry.incode.ca/capstone/foot-patrol/website:$CI_COMMIT_REF_SLUG
+   - docker build -t $CI_REGISTRY_IMAGE/website:$CI_COMMIT_REF_SLUG .
+   - docker push $CI_REGISTRY_IMAGE/website:$CI_COMMIT_REF_SLUG
 
 
 # This job builds the client-side code for review
-container_build_review_backend:
-  <<: *container_build_common
+containerize_review_backend:
+  <<: *containerize_common
+  <<: *containerize_review_common
   dependencies:
   - build_review_backend
   script:
    - cd src/backend
-   - docker build -t registry.incode.ca/capstone/foot-patrol/backend:$CI_COMMIT_REF_SLUG .
-   - docker push registry.incode.ca/capstone/foot-patrol/backend:$CI_COMMIT_REF_SLUG
+   - docker build -t $CI_REGISTRY_IMAGE/backend:$CI_COMMIT_REF_SLUG .
+   - docker push $CI_REGISTRY_IMAGE/backend:$CI_COMMIT_REF_SLUG
 
 
 ### --- DEPLOYMENT --- ###
 
 # This job builds the client-side web app code for deployment
-container_build_website:
-  <<: *container_build_common
+containerize_website:
+  <<: *containerize_common
+  <<: *containerize_deploy_common
   dependencies:
   - build_website
   script:
    - cd src/dispatch-website
-   - docker build -t registry.incode.ca/capstone/foot-patrol/website:$CI_COMMIT_REF_SLUG .
-   - docker push registry.incode.ca/capstone/foot-patrol/website:$CI_COMMIT_REF_SLUG
+   - docker build -t $CI_REGISTRY_IMAGE/website:$CI_COMMIT_REF_SLUG .
+   - docker push $CI_REGISTRY_IMAGE/website:$CI_COMMIT_REF_SLUG
 
 
 # This job builds the backend API for deployment
-container_build_backend:
-  <<: *container_build_common
+containerize_backend:
+  <<: *containerize_common
+  <<: *containerize_deploy_common
   dependencies:
   - build_backend
   script:
    - cd src/backend
-   - docker build -t registry.incode.ca/capstone/foot-patrol/backend:$CI_COMMIT_REF_SLUG .
-   - docker push registry.incode.ca/capstone/foot-patrol/backend:$CI_COMMIT_REF_SLUG
+   - docker build -t $CI_REGISTRY_IMAGE/backend:$CI_COMMIT_REF_SLUG .
+   - docker push $CI_REGISTRY_IMAGE/backend:$CI_COMMIT_REF_SLUG
 
 
 #################################
@@ -276,9 +320,13 @@ container_build_backend:
 # Common components to deploy jobs
 .deploy_common: &deploy_common
   stage: deploy
+  tags:
+    - docker
+    - linux
   variables:
-    DOMAIN: capstone.incode.ca
-  image: registry.incode.ca/capstone/foot-patrol/kubectl_deployer:latest
+    COMMON_INSTALL_HELM: --tiller-namespace $TILLER_NAMESPACE --namespace capstone-deploy --name $CI_ENVIRONMENT_SLUG --set appLabel=$CI_ENVIRONMENT_SLUG,dockercfg=$DOCKERCFG,imageTag=$CI_COMMIT_REF_SLUG,imageBase=$CI_REGISTRY_IMAGE
+    HELM_CHART: deploy/charts/foot-patrol
+  image: $CI_REGISTRY_IMAGE/kubectl_deployer:latest
 
 
 ### --- REVIEW --- ###
@@ -287,17 +335,15 @@ container_build_backend:
 # This job takes the contents from the build review jobs, then deploys everything
 deploy_review:
   <<: *deploy_common
-  dependencies:
-   - build_review_website
-   - build_review_backend
   script:
-    - helm install --namespace capstone-deploy --name $CI_ENVIRONMENT_SLUG --set ingress.hosts[0].name=$CI_ENVIRONMENT_SLUG.$DOMAIN,appLabel=$CI_ENVIRONMENT_SLUG
+    - helm install $COMMON_INSTALL_HELM --set ingress.hosts={"$CI_ENVIRONMENT_SLUG.$DOMAIN"} $HELM_CHART
   environment:
     name: review/$CI_COMMIT_REF_NAME
     url: http://$CI_ENVIRONMENT_SLUG.$DOMAIN/
     on_stop: shutdown_review
   except:
     - master
+    - develop
     - tags
 
 
@@ -309,26 +355,54 @@ shutdown_review:
       GIT_STRATEGY: None
   when: manual
   script:
-    - helm delete --purge $CI_ENVIRONMENT_SLUG
+    - helm delete --purge $CI_ENVIRONMENT_SLUG --tiller-namespace $TILLER_NAMESPACE
   environment:
     name: review/$CI_COMMIT_REF_NAME
     url: https://$CI_ENVIRONMENT_SLUG.$DOMAIN/
     action: stop
   except:
     - master
+    - develop
     - tags
 
+### --- Staging --- ###
+
+# This job takes the contents from the previous job, builds them into a docker image, then deploys everything
+stagin:
+  <<: *deploy_common
+  script:
+    - helm install $COMMON_INSTALL_HELM --set ingress.hosts={staging.$DOMAIN} $HELM_CHART
+  environment:
+    name: staging
+    url: http://staging.$DOMAIN/
+    on_stop: shutdown_staging
+  only:
+    - develop
+
+
+# This job stops the deployment containers
+shutdown_staging:
+  <<: *deploy_common
+  dependencies: []
+  variables:
+      GIT_STRATEGY: None
+  when: manual
+  script:
+    - helm delete --purge $CI_ENVIRONMENT_SLUG --tiller-namespace $TILLER_NAMESPACE
+  environment:
+    name: staging
+    url: http://staging.$DOMAIN/
+    action: stop
+  only:
+    - develop
 
 ### --- PRODUCTION --- ###
 
 # This job takes the contents from the previous job, builds them into a docker image, then deploys everything
 production:
   <<: *deploy_common
-  dependencies:
-   - build_website
-   - build_backend
   script:
-    - helm install --namespace capstone-deploy --name $CI_ENVIRONMENT_SLUG --set ingress.hosts[0].name=$DOMAIN,appLabel=$CI_ENVIRONMENT_SLUG
+    - helm install $COMMON_INSTALL_HELM --set ingress.hosts={$DOMAIN} $HELM_CHART
   environment:
     name: production
     url: http://$DOMAIN/
@@ -345,7 +419,7 @@ shutdown:
       GIT_STRATEGY: None
   when: manual
   script:
-    - helm delete --purge $CI_ENVIRONMENT_SLUG
+    - helm delete --purge $CI_ENVIRONMENT_SLUG --tiller-namespace $TILLER_NAMESPACE
   environment:
     name: production
     url: http://$DOMAIN/

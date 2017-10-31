@@ -24,6 +24,8 @@ spec:
         heritage: "{{ .Release.Service }}"
         component: {{ .Values.backend.name }}
     spec:
+      imagePullSecrets:
+      - name: capstone-reg-secret
       containers:
       - image: "{{ .Values.imageBase }}/{{ .Values.backend.imageName }}:{{ .Values.imageTag }}"
         imagePullPolicy: {{ .Values.imagePullPolicy }}
