@@ -4,7 +4,7 @@ using Android.OS;
 
 namespace FootPatrol.Droid
 {
-    [Activity(Label = "Foot Patrol", MainLauncher = true, Icon = "@mipmap/icon")]
+    [Activity(Label = "FootPatrol", MainLauncher = true, Icon = "@mipmap/icon")]
     public class MainActivity : Activity
     {
         int count = 1;

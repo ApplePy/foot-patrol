@@ -3,9 +3,9 @@
 <plist version="1.0">
 <dict>
 	<key>CFBundleName</key>
-	<string>Foot Patrol</string>
+	<string>FootPatrol</string>
 	<key>CFBundleIdentifier</key>
-	<string>com.companyname.Foot-Patrol</string>
+	<string>com.companyname.FootPatrol</string>
 	<key>CFBundleShortVersionString</key>
 	<string>1.0</string>
 	<key>CFBundleVersion</key>

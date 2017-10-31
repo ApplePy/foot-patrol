@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{4B1D8CD1-F1E3-4BD8-96AB-73D009B7BCCB}</ProjectGuid>
+    <ProjectGuid>{93578BFB-ED5E-4E94-B242-156162A0E1E8}</ProjectGuid>
     <ProjectTypeGuids>{EFBA0AD7-5A72-4C68-AF49-83D382785DCF};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <OutputType>Library</OutputType>
     <RootNamespace>FootPatrol.Droid</RootNamespace>
@@ -45,7 +45,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\FootPatrol\FootPatrol.csproj">
-      <Project>{67615271-AA57-4215-8C96-57A015415238}</Project>
+      <Project>{337DDA1D-47B6-4BDB-A4F5-C1A5D0762B74}</Project>
       <Name>FootPatrol</Name>
     </ProjectReference>
   </ItemGroup>
