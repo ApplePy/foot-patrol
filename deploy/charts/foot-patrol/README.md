@@ -10,10 +10,14 @@ Deploys the Foot Patrol web app, backend, and single-node MySQL.
 ## Installation
 
 ```bash
-helm install --set appLabel=$CI_ENVIRONMENT_SLUG .
+helm install --set appLabel=$CI_ENVIRONMENT_SLUG\
+  ,db.host=*mysql_host*,db.username=*mysql_username*\
+  ,db.password=*mysql_password*,db.database=*mysql_database* .
 ```
 
 You can also add a namespace with `--namespace` if needed.
+
+Remember to set `dockercfg` if image is private.
 
 ## Configuration
 
@@ -43,3 +47,9 @@ You can also add a namespace with `--namespace` if needed.
 | `ingress.tls`                     | List of DNS TLS settings for ingress       |                                           |
 | `ingress.tls.secretName`          | K8s secret containing domain SSL cert      |                                           |
 | `ingress.tls.hosts`               | List of hostnames this SSL cert covers     |                                           |
+| `dockercfg`                       | Base-64-encoded docker config.json file    |                                           |
+| `db`                              | Database connection parameters             |                                           |
+| `db.host`                         | Database URL                               |                                           |
+| `db.username`                     | Database connection username               |                                           |
+| `db.password`                     | Database connection password               |                                           |
+| `db.database`                     | Database connection database               |                                           |

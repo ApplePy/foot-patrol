@@ -13,6 +13,10 @@ variables:
   NPM_CACHE: http://docker-npm-cache-sonatype-nexus.default.svc.cluster.local:8081/repository/npm-group/
   TILLER_NAMESPACE: capstone-deploy
   DOMAIN: capstone.incode.ca
+  DB_HOST: test  # TODO: Figure out these values
+  DB_USER: test
+  DB_PASS: test
+  DB_DB: test
 
 
 #################################
@@ -342,6 +346,7 @@ containerize_backend:
     - linux
   variables:
     COMMON_INSTALL_HELM: --tiller-namespace $TILLER_NAMESPACE --namespace capstone-deploy --name $CI_ENVIRONMENT_SLUG --set appLabel=$CI_ENVIRONMENT_SLUG,dockercfg=$DOCKERCFG,imageTag=$CI_COMMIT_REF_SLUG,imageBase=$CI_REGISTRY_IMAGE
+    DB_CONFIG: db.host=$DB_HOST,db.username=$DB_USER,db.password=$DB_PASS,db.database=$DB_DB
     HELM_CHART: deploy/charts/foot-patrol
   before_script:
   - helm init --client-only --tiller-namespace $TILLER_NAMESPACE
@@ -387,6 +392,7 @@ shutdown_review:
 
 ### --- Staging --- ###
 
+# TODO: Setup deployment for mobile
 # This job takes the contents from the previous job, builds them into a docker image, then deploys everything
 staging:
   <<: *deploy_common
@@ -418,6 +424,7 @@ shutdown_staging:
 
 ### --- PRODUCTION --- ###
 
+# TODO: Setup deployment for mobile
 # This job takes the contents from the previous job, builds them into a docker image, then deploys everything
 production:
   <<: *deploy_common

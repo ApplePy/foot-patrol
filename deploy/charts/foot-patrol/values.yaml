@@ -3,6 +3,15 @@ imageTag: "master"    # Replace me!
 imagePullPolicy: Always
 appLabel: replaceme   # Replace me!
 
+# dockercfg: base-64-encoded docker config.json file here
+
+# Database connection parameters
+# db:
+#   host: host
+#   username: user
+#   password: pass
+#   database: db
+
 # For the mysql dependency chart
 mysql:
   mysqlUser: footpatrol@*
