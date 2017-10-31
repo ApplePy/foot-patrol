@@ -29,7 +29,7 @@ stages:
 
 .test_docker_common: &test_docker_common  # TODO: Is this necessary if image can be overridden? Figure out how to test mobile
   <<: *test_common
-  image: node:6 # TODO: Swap out with a pre-built testing image containing testing frameworks
+  image: node:8 # TODO: Swap out with a pre-built testing image containing testing frameworks
   tags:
   - docker
   - linux
@@ -37,7 +37,7 @@ stages:
   variables:
     NODE_ENV: 'test'  # To set Mocha to isolate data
   before_script:
-  - npm config set repository https://docker-npm-cache-sonatype-nexus.default.svc.cluster.local/repository/npm-group/ # Setup proxy to stop killing bandwidth
+  - npm config set registry http://docker-npm-cache-sonatype-nexus.default.svc.cluster.local:8081/repository/npm-group/ # Setup proxy to stop killing bandwidth
   cache:
     paths:
       - src/*/node_modules/
@@ -50,6 +50,7 @@ test_backend:
       - src/backend/coverage/
   script:
    - cd src/backend
+   - rm package-lock.json
    - npm install
    - npm run lint || true   # Prevents JSHint errors from stopping build
    - npm run coverage
@@ -97,9 +98,9 @@ test_dispatch_website:
 
 .build_docker_common: &build_docker_common
   <<: *build_common
-  image: node:6
+  image: node:8
   before_script:
-  - npm config set repository https://docker-npm-cache-sonatype-nexus.default.svc.cluster.local/repository/npm-group/ # Setup proxy to stop killing bandwidth
+  - npm config set registry http://docker-npm-cache-sonatype-nexus.default.svc.cluster.local:8081/repository/npm-group/ # Setup proxy to stop killing bandwidth
   tags:
   - docker
   - linux
