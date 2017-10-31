@@ -3,6 +3,12 @@ imageTag: "master"    # Replace me!
 imagePullPolicy: Always
 appLabel: replaceme   # Replace me!
 
+# For the mysql dependency chart
+mysql:
+  mysqlUser: footpatrol@*
+  mysqlDatabase: foot_patrol
+  # mysqlPassword: insertmeatruntime
+
 backend:
   name: backend
   imageName: backend
