@@ -12,7 +12,7 @@ export class FakeSQL implements ISQLService {
    * returns to the code calling `makeQuery`.
    * Supplying `undefined` will cause FakeSQL to throw a MySQL like DB error.
    */
-  public static response: (query: string, values?: any[] | undefined) => any | any;
+  public static response: any;
 
   /**
    * Make a basic query to the SQL server.

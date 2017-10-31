@@ -17,7 +17,11 @@ if (process.env.MYSQL_HOST === undefined ||
   process.env.MYSQL_PASS === undefined ||
   process.env.MYSQL_USER === undefined ||
   process.env.MYSQL_DB === undefined) {
+    if (process.env.NODE_ENV === "test") {
+      console.warn("WARNING: Database connection environment variables do not exist! (test env)");
+    } else {
       throw new Error("ERROR: Database connection environment variables do not exist!");
+    }
 }
 
 ////////////////////////////
