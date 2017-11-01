@@ -41,11 +41,11 @@ variables:
     NODE_ENV: 'test'  # To set Mocha to isolate data
   before_script:
   - npm config set registry $NPM_CACHE # Setup proxy to stop killing bandwidth
-  - mv .npm/ /root/.npm   # To cache miscellaneous npm binaries
+  - mv .npm/ /root/.npm || true  # To cache miscellaneous npm binaries
   - pushd .
   after_script:
   - popd
-  - cp /root/.npm .
+  - cp /root/.npm . || true
 
 # This test ensures the back end works
 test_backend:
@@ -115,12 +115,12 @@ test_dispatch_website:
   image: node:8
   before_script:
   - npm config set registry $NPM_CACHE # Setup proxy to stop killing bandwidth
-  - mv .npm/ /root/.npm   # To cache miscellaneous npm binaries
+  - mv .npm/ /root/.npm || true  # To cache miscellaneous npm binaries
   - npm install typescript -g
   - pushd .
   after_script:
   - popd
-  - cp /root/.npm .
+  - cp /root/.npm . || true
   tags:
   - docker
   - linux
