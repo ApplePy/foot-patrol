@@ -4,7 +4,7 @@ metadata:
   name: db-config
 type: Opaque
 data:
-  DB_HOST: {{ .Values.db.host }}
-  DB_USER: {{ .Values.db.username }}
-  DB_PASS: {{ .Values.db.password }}
-  DB_DB: {{ .Values.db.host }}
+  DB_HOST: {{ .Values.db.host | b64enc }}
+  DB_USER: {{ .Values.db.username | b64enc }}
+  DB_PASS: {{ .Values.db.password | b64enc }}
+  DB_DB: {{ .Values.db.database | b64enc }}

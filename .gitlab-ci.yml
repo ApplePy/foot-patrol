@@ -13,10 +13,13 @@ variables:
   NPM_CACHE: http://docker-npm-cache-sonatype-nexus.default.svc.cluster.local:8081/repository/npm-group/
   TILLER_NAMESPACE: capstone-deploy
   DOMAIN: capstone.incode.ca
-  DB_HOST: test  # TODO: Figure out these values
-  DB_USER: test
-  DB_PASS: test
-  DB_DB: test
+  DB_CONFIG: db.host=${CI_ENVIRONMENT_SLUG}-mysql.capstone-deploy.svc.cluster.local,db.username=footpatrol,db.password=$DB_PASS,db.database=foot_patrol,mysql.mysqlPassword=$DB_PASS,mysql.mysqlRootPassword=$DB_ROOT_PASS
+  DB_HOST: ${CI_ENVIRONMENT_SLUG}-mysql.capstone-deploy.svc.cluster.local
+  DB_SLEEP_TIME: 60   # Time to wait for DB to start up
+
+  # Variables in Gitlab CI:
+  # $DB_PASS: password for footpatrol account
+  # $DB_ROOT_PASS: password for root account
 
 
 #################################
@@ -293,8 +296,7 @@ containerize_backend:
     - docker
     - linux
   variables:
-    DB_CONFIG: db.host=$DB_HOST,db.username=$DB_USER,db.password=$DB_PASS,db.database=$DB_DB
-    COMMON_INSTALL_HELM: --tiller-namespace $TILLER_NAMESPACE --namespace capstone-deploy --name $CI_ENVIRONMENT_SLUG --set appLabel=$CI_ENVIRONMENT_SLUG,dockercfg=$DOCKERCFG,imageBase=$CI_REGISTRY_IMAGE
+    COMMON_INSTALL_HELM: --tiller-namespace $TILLER_NAMESPACE --namespace capstone-deploy --set appLabel=$CI_ENVIRONMENT_SLUG,dockercfg=$DOCKERCFG,imageTag=$CI_COMMIT_REF_SLUG,imageBase=$CI_REGISTRY_IMAGE
     HELM_CHART: deploy/charts/foot-patrol
   before_script:
   - helm init --client-only --tiller-namespace $TILLER_NAMESPACE
@@ -310,7 +312,10 @@ deploy_review:
   <<: *deploy_common
   script:
     - helm dependency build $HELM_CHART
-    - helm install $COMMON_INSTALL_HELM --set ingress.hosts={"$CI_ENVIRONMENT_SLUG.$DOMAIN"},$DB_CONFIG,imageTag=$CI_COMMIT_REF_SLUG-review, $HELM_CHART  # TODO: Handle upgrade
+    - helm upgrade $CI_ENVIRONMENT_SLUG $HELM_CHART --install $COMMON_INSTALL_HELM --set ingress.hosts={"$CI_ENVIRONMENT_SLUG.$DOMAIN"},$DB_CONFIG  # TODO: Handle upgrade
+    - cd src/backend
+    - sleep $DB_SLEEP_TIME
+    - mysql -h $DB_HOST -u root --password=$DB_ROOT_PASS < sql_statements.sql
   environment:
     name: review/$CI_COMMIT_REF_NAME
     url: http://$CI_ENVIRONMENT_SLUG.$DOMAIN/
@@ -346,7 +351,10 @@ staging:
   <<: *deploy_common
   script:
     - helm dependency build $HELM_CHART
-    - helm install $COMMON_INSTALL_HELM --set ingress.hosts={"staging.$DOMAIN"},$DB_CONFIG $HELM_CHART # TODO: Handle upgrade
+    - helm upgrade $CI_ENVIRONMENT_SLUG $HELM_CHART --install $COMMON_INSTALL_HELM --set ingress.hosts={"staging.$DOMAIN"},$DB_CONFIG   # TODO: Handle upgrade
+    - cd src/backend
+    - sleep $DB_SLEEP_TIME
+    - mysql -h $DB_HOST -u root --password=$DB_ROOT_PASS < sql_statements.sql
   environment:
     name: staging
     url: http://staging.$DOMAIN/
@@ -378,7 +386,10 @@ production:
   <<: *deploy_common
   script:
     - helm dependency build $HELM_CHART
-    - helm install $COMMON_INSTALL_HELM --set ingress.hosts={"$DOMAIN"},$DB_CONFIG $HELM_CHART # TODO: Handle upgrade
+    - helm upgrade $CI_ENVIRONMENT_SLUG $HELM_CHART --install $COMMON_INSTALL_HELM --set ingress.hosts={"$DOMAIN"},$DB_CONFIG # TODO: Handle upgrade
+    - cd src/backend
+    - sleep $DB_SLEEP_TIME
+    - mysql -h $DB_HOST -u root --password=$DB_ROOT_PASS < sql_statements.sql
   environment:
     name: production
     url: http://$DOMAIN/

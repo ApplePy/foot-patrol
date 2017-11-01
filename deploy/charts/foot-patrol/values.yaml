@@ -9,14 +9,15 @@ appLabel: replaceme   # Replace me!
 # db:
 #   host: host
 #   username: user
-#   password: pass
+#   password: insertmeatruntime
 #   database: db
 
 # For the mysql dependency chart
 mysql:
-  mysqlUser: footpatrol@*
+  mysqlUser: footpatrol
   mysqlDatabase: foot_patrol
   # mysqlPassword: insertmeatruntime
+  # mysqlRootPassword: insertmeatruntime
 
 backend:
   name: backend
