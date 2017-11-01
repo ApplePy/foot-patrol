@@ -16,7 +16,7 @@ import { LocationsRoute } from "../src/routes/locations";
 // Chai setup
 const should = chai.should();
 chai.use(chaiHttp);
-const pathPrefix = "";  // For adding '/api/v1' to api calls if needed
+const pathPrefix = "/api/v1";  // For adding '/api/v1' to api calls if needed
 
 /**
  * Test the Locations API
