@@ -82,7 +82,7 @@ class ServerEnvironmentSetup {
     const httpPort = this.normalizePort(process.env.PORT || 8080);
     this.expressServer = this.container.get<Server>(Server);
     this.expressServer.app.set("port", httpPort);
-    this.nodeServer = http.createServer(this.expressServer.app).listen(httpPort);
+    this.nodeServer = http.createServer(this.expressServer.app as any).listen(httpPort);
 
     // Add error handler and start listening on port
     this.nodeServer.on("error", this.onErrorGen(httpPort));
