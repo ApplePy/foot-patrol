@@ -85,6 +85,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="PickupActivity.cs" />
     <Compile Include="FootPatrolAdapter.cs" />
+    <Compile Include="FeedbackActivity.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
@@ -97,6 +98,7 @@
     <AndroidResource Include="Resources\values\Strings.xml" />
     <AndroidResource Include="Resources\layout\PickupLayout.xml" />
     <AndroidResource Include="Resources\drawable\WesternFootPatrol.png" />
+    <AndroidResource Include="Resources\layout\FeedbackLayout.xml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\drawable\" />

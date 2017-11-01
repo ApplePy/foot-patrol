@@ -28,7 +28,13 @@ namespace FootPatrol.Droid
 
         public override Android.Support.V4.App.Fragment GetItem(int position)
         {
-            return (Android.Support.V4.App.Fragment) PickUpActivity.newInstance();
+            if (position == 0)
+            {
+                return (Android.Support.V4.App.Fragment)PickUpActivity.newInstance();
+            }
+
+            else
+                return (Android.Support.V4.App.Fragment)FeedbackActivity.newInstance();
         }
 
         public override Java.Lang.ICharSequence GetPageTitleFormatted(int position)
