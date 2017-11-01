@@ -23,12 +23,23 @@ namespace FootPatrol.Droid
         }
 
         public override int Count {
-            get { return 1; }
+            get { return 2; }
         } 
 
         public override Android.Support.V4.App.Fragment GetItem(int position)
         {
             return (Android.Support.V4.App.Fragment) PickUpActivity.newInstance();
+        }
+
+        public override Java.Lang.ICharSequence GetPageTitleFormatted(int position)
+        {
+            if (position == 0)
+            {
+                return new Java.Lang.String("Pickup");
+            }
+
+            else
+                return new Java.Lang.String("Feedback");
         }
 
     }
