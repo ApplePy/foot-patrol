@@ -345,8 +345,8 @@ containerize_backend:
     - docker
     - linux
   variables:
-    COMMON_INSTALL_HELM: --tiller-namespace $TILLER_NAMESPACE --namespace capstone-deploy --name $CI_ENVIRONMENT_SLUG --set appLabel=$CI_ENVIRONMENT_SLUG,dockercfg=$DOCKERCFG,imageTag=$CI_COMMIT_REF_SLUG,imageBase=$CI_REGISTRY_IMAGE
     DB_CONFIG: db.host=$DB_HOST,db.username=$DB_USER,db.password=$DB_PASS,db.database=$DB_DB
+    COMMON_INSTALL_HELM: --tiller-namespace $TILLER_NAMESPACE --namespace capstone-deploy --name $CI_ENVIRONMENT_SLUG --set appLabel=$CI_ENVIRONMENT_SLUG,dockercfg=$DOCKERCFG,imageTag=$CI_COMMIT_REF_SLUG,imageBase=$CI_REGISTRY_IMAGE
     HELM_CHART: deploy/charts/foot-patrol
   before_script:
   - helm init --client-only --tiller-namespace $TILLER_NAMESPACE
@@ -362,7 +362,7 @@ deploy_review:
   <<: *deploy_common
   script:
     - helm dependency build $HELM_CHART
-    - helm install $COMMON_INSTALL_HELM --set ingress.hosts={"$CI_ENVIRONMENT_SLUG.$DOMAIN"} $HELM_CHART
+    - helm install $COMMON_INSTALL_HELM --set ingress.hosts={"$CI_ENVIRONMENT_SLUG.$DOMAIN"},$DB_CONFIG $HELM_CHART  # TODO: Handle upgrade
   environment:
     name: review/$CI_COMMIT_REF_NAME
     url: http://$CI_ENVIRONMENT_SLUG.$DOMAIN/
@@ -398,7 +398,7 @@ staging:
   <<: *deploy_common
   script:
     - helm dependency build $HELM_CHART
-    - helm install $COMMON_INSTALL_HELM --set ingress.hosts={staging.$DOMAIN} $HELM_CHART
+    - helm install $COMMON_INSTALL_HELM --set ingress.hosts={"staging.$DOMAIN"},$DB_CONFIG $HELM_CHART # TODO: Handle upgrade
   environment:
     name: staging
     url: http://staging.$DOMAIN/
@@ -430,7 +430,7 @@ production:
   <<: *deploy_common
   script:
     - helm dependency build $HELM_CHART
-    - helm install $COMMON_INSTALL_HELM --set ingress.hosts={$DOMAIN} $HELM_CHART
+    - helm install $COMMON_INSTALL_HELM --set ingress.hosts={"$DOMAIN"},$DB_CONFIG $HELM_CHART # TODO: Handle upgrade
   environment:
     name: production
     url: http://$DOMAIN/
