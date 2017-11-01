@@ -45,11 +45,6 @@ variables:
     NODE_ENV: 'test'  # To set Mocha to isolate data
   before_script:
   - npm config set registry $NPM_CACHE # Setup proxy to stop killing bandwidth
-  - mv .npm/ /root/.npm || true  # To cache miscellaneous npm binaries
-  - pushd .
-  after_script:
-  - popd
-  - cp /root/.npm . || true
 
 # This test ensures the back end works
 test_backend:
@@ -57,11 +52,6 @@ test_backend:
   artifacts:
     paths:
       - src/backend/coverage/
-  cache:
-    key: backend_npm
-    paths:
-      - src/backend/node_modules/
-      - .npm/
   script:
    - cd src/backend
    - rm package-lock.json || true   # So that cache server works
@@ -76,11 +66,6 @@ test_dispatch_website:
   artifacts:
     paths:
       - src/dispatch-website/coverage/
-  cache:
-    key: angular_npm
-    paths:
-      - src/dispatch-website/node_modules/
-      - .npm/
   script:
    - cd src/dispatch-website
    - rm package-lock.json || true   # So that cache server works
@@ -119,12 +104,7 @@ test_dispatch_website:
   image: node:8
   before_script:
   - npm config set registry $NPM_CACHE # Setup proxy to stop killing bandwidth
-  - mv .npm/ /root/.npm || true  # To cache miscellaneous npm binaries
   - npm install typescript -g
-  - pushd .
-  after_script:
-  - popd
-  - cp /root/.npm . || true
   tags:
   - docker
   - linux
@@ -143,7 +123,27 @@ test_dispatch_website:
   only:
     - master
     - develop
-  
+
+.website: &website
+  artifacts:
+    paths:
+     - src/dispatch-website/dist/
+     - src/dispatch-website/node_modules/
+  script:
+   - cd src/dispatch-website
+   - npm install --production
+   # TODO: Figure out how to compile this app
+
+.backend: &backend
+  artifacts:
+    paths:
+     - src/backend/dist/
+     - src/backend/node_modules/
+  script:
+   - cd src/backend
+   - npm install --production
+   - npm run build_production 
+
 
 ### --- REVIEW --- ###
 
@@ -151,41 +151,13 @@ test_dispatch_website:
 build_review_website:
   <<: *build_review_common
   <<: *build_docker_common
-  artifacts:
-    paths:
-     - src/dispatch-website/dist/
-     - src/dispatch-website/node_modules/
-  cache:
-    key: angular_npm
-    policy: pull
-    paths:
-      - src/dispatch-website/node_modules/
-      - .npm/
-  script:
-   - cd src/dispatch-website
-   - npm install --production
-   # TODO: Figure out how to compile this app
-
+  <<: *website
 
 # This job builds the client-side code for review
 build_review_backend:
   <<: *build_review_common
   <<: *build_docker_common
-  artifacts:
-    paths:
-     - src/backend/dist/
-     - src/backend/node_modules/
-  cache:
-    key: backend_npm
-    policy: pull
-    paths:
-      - src/backend/node_modules/
-      - .npm/
-  script:
-   - cd src/backend
-   - npm install --production
-   - npm run build_production
-
+  <<: *backend
 
 # build_review_mobile:  # TODO: Figure this out
 #   <<: *build_review_common
@@ -206,40 +178,13 @@ build_review_backend:
 build_website:
   <<: *build_deploy_common
   <<: *build_docker_common
-  artifacts:
-    paths:
-     - src/dispatch-website/dist/
-     - src/dispatch-website/node_modules/
-  cache:
-    key: angular_npm
-    policy: pull
-    paths:
-      - src/dispatch-website/node_modules/
-      - .npm/
-  script:
-   - cd src/dispatch-website
-   - npm install --production
-   # TODO: Figure out how to compile this app
-
+  <<: *website
 
 # This job builds the backend API for deployment
 build_backend:
   <<: *build_deploy_common
   <<: *build_docker_common
-  artifacts:
-    paths:
-     - src/backend/dist/
-     - src/backend/node_modules/
-  cache:
-    key: backend_npm
-    policy: pull
-    paths:
-      - src/backend/node_modules/
-      - .npm/
-  script:
-   - cd src/backend
-   - npm install --production
-   - npm run build_production
+  <<: *backend
 
 
 # This job builds the mobile app for deployment
@@ -282,6 +227,17 @@ build_backend:
     - master
     - develop
   
+.web_container: &web_container
+  script:
+   - cd src/dispatch-website
+   - docker build -t $CI_REGISTRY_IMAGE/website:$CI_COMMIT_REF_SLUG .
+   - docker push $CI_REGISTRY_IMAGE/website:$CI_COMMIT_REF_SLUG
+
+.back_container: &back_container
+  script:
+   - cd src/backend
+   - docker build -t $CI_REGISTRY_IMAGE/backend:$CI_COMMIT_REF_SLUG .
+   - docker push $CI_REGISTRY_IMAGE/backend:$CI_COMMIT_REF_SLUG
 
 ### --- REVIEW --- ###
 
@@ -289,24 +245,18 @@ build_backend:
 containerize_review_website:
   <<: *containerize_common
   <<: *containerize_review_common
+  <<: *web_container
   dependencies:
   - build_review_website
-  script:
-   - cd src/dispatch-website
-   - docker build -t $CI_REGISTRY_IMAGE/website:$CI_COMMIT_REF_SLUG .
-   - docker push $CI_REGISTRY_IMAGE/website:$CI_COMMIT_REF_SLUG
 
 
 # This job builds the client-side code for review
 containerize_review_backend:
   <<: *containerize_common
   <<: *containerize_review_common
+  <<: *back_container
   dependencies:
   - build_review_backend
-  script:
-   - cd src/backend
-   - docker build -t $CI_REGISTRY_IMAGE/backend:$CI_COMMIT_REF_SLUG .
-   - docker push $CI_REGISTRY_IMAGE/backend:$CI_COMMIT_REF_SLUG
 
 
 ### --- DEPLOYMENT --- ###
@@ -315,24 +265,18 @@ containerize_review_backend:
 containerize_website:
   <<: *containerize_common
   <<: *containerize_deploy_common
+  <<: *web_container
   dependencies:
   - build_website
-  script:
-   - cd src/dispatch-website
-   - docker build -t $CI_REGISTRY_IMAGE/website:$CI_COMMIT_REF_SLUG .
-   - docker push $CI_REGISTRY_IMAGE/website:$CI_COMMIT_REF_SLUG
 
 
 # This job builds the backend API for deployment
 containerize_backend:
   <<: *containerize_common
   <<: *containerize_deploy_common
+  <<: *back_container
   dependencies:
   - build_backend
-  script:
-   - cd src/backend
-   - docker build -t $CI_REGISTRY_IMAGE/backend:$CI_COMMIT_REF_SLUG .
-   - docker push $CI_REGISTRY_IMAGE/backend:$CI_COMMIT_REF_SLUG
 
 
 #################################
@@ -350,7 +294,7 @@ containerize_backend:
     - linux
   variables:
     DB_CONFIG: db.host=$DB_HOST,db.username=$DB_USER,db.password=$DB_PASS,db.database=$DB_DB
-    COMMON_INSTALL_HELM: --tiller-namespace $TILLER_NAMESPACE --namespace capstone-deploy --name $CI_ENVIRONMENT_SLUG --set appLabel=$CI_ENVIRONMENT_SLUG,dockercfg=$DOCKERCFG,imageTag=$CI_COMMIT_REF_SLUG,imageBase=$CI_REGISTRY_IMAGE
+    COMMON_INSTALL_HELM: --tiller-namespace $TILLER_NAMESPACE --namespace capstone-deploy --name $CI_ENVIRONMENT_SLUG --set appLabel=$CI_ENVIRONMENT_SLUG,dockercfg=$DOCKERCFG,imageBase=$CI_REGISTRY_IMAGE
     HELM_CHART: deploy/charts/foot-patrol
   before_script:
   - helm init --client-only --tiller-namespace $TILLER_NAMESPACE
@@ -366,7 +310,7 @@ deploy_review:
   <<: *deploy_common
   script:
     - helm dependency build $HELM_CHART
-    - helm install $COMMON_INSTALL_HELM --set ingress.hosts={"$CI_ENVIRONMENT_SLUG.$DOMAIN"},$DB_CONFIG $HELM_CHART  # TODO: Handle upgrade
+    - helm install $COMMON_INSTALL_HELM --set ingress.hosts={"$CI_ENVIRONMENT_SLUG.$DOMAIN"},$DB_CONFIG,imageTag=$CI_COMMIT_REF_SLUG-review, $HELM_CHART  # TODO: Handle upgrade
   environment:
     name: review/$CI_COMMIT_REF_NAME
     url: http://$CI_ENVIRONMENT_SLUG.$DOMAIN/

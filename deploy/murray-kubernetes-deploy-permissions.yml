@@ -57,3 +57,4 @@ roleRef:
   name: cluster-admin
 # Create a capstone deployment namespace, and grant all permissions
 # inside that namespace to the CI system
+# TODO: FIXME: I'm way too broad! I also don't have instructions for helm/tiller in the namespace!
