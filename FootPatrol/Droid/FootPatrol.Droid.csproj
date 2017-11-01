@@ -99,8 +99,8 @@
     <AndroidResource Include="Resources\mipmap-xhdpi\Icon.png" />
     <AndroidResource Include="Resources\mipmap-xxhdpi\Icon.png" />
     <AndroidResource Include="Resources\mipmap-xxxhdpi\Icon.png" />
-    <AndroidResource Include="Resources\drawable\WesternFootPatrol.png" />
     <AndroidResource Include="Resources\layout\PickupLayout.xml" />
+    <AndroidResource Include="Resources\drawable\WesternFootPatrol.png" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\drawable\" />

@@ -4,42 +4,76 @@
     p1:minHeight="25px"
     p1:layout_width="match_parent"
     p1:layout_height="match_parent"
-    p1:id="@+id/relativeLayout1">
+    p1:id="@+id/relativeLayout1"
+    p1:background="#ff4f2683"
+    p1:foregroundTint="#ff4f1f8a"
+    p1:backgroundTint="#ff4f2683">
     <TextView
         p1:text="Name"
         p1:layout_width="match_parent"
         p1:layout_height="wrap_content"
         p1:id="@+id/nameView"
-        p1:layout_marginBottom="0.0dp" />
+        p1:layout_marginBottom="0.0dp"
+        p1:layout_marginTop="20dp"
+        p1:layout_marginLeft="10dp" />
     <EditText
         p1:id="@+id/locationText"
         p1:layout_width="match_parent"
         p1:layout_height="wrap_content"
         p1:text="Location"
-        p1:layout_below="@+id/locationView" />
+        p1:layout_below="@+id/locationView"
+        p1:layout_marginLeft="5dp" />
     <TextView
         p1:text="Location"
         p1:layout_width="match_parent"
         p1:layout_height="wrap_content"
         p1:id="@+id/locationView"
         p1:layout_marginBottom="3.0dp"
-        p1:layout_below="@+id/nameText" />
+        p1:layout_below="@+id/nameText"
+        p1:layout_marginTop="20dp"
+        p1:layout_marginLeft="10dp" />
     <EditText
         p1:id="@+id/nameText"
         p1:layout_width="match_parent"
         p1:layout_height="wrap_content"
         p1:text="Name"
-        p1:layout_below="@+id/nameView" />
+        p1:layout_below="@+id/nameView"
+        p1:layout_marginLeft="5dp" />
     <TextView
         p1:layout_width="wrap_content"
         p1:layout_height="wrap_content"
         p1:id="@+id/destinationView"
         p1:text="Destination"
-        p1:layout_below="@+id/locationText" />
+        p1:layout_below="@+id/locationText"
+        p1:layout_marginTop="20dp"
+        p1:layout_marginLeft="10dp" />
     <EditText
         p1:id="@+id/destinationText"
         p1:layout_width="match_parent"
         p1:layout_height="wrap_content"
         p1:text="Destination"
-        p1:layout_below="@+id/destinationView" />
+        p1:layout_below="@+id/destinationView"
+        p1:layout_marginLeft="5dp" />
+    <Button
+        p1:layout_width="wrap_content"
+        p1:layout_height="wrap_content"
+        p1:id="@+id/button1"
+        p1:layout_below="@+id/destinationText"
+        p1:layout_marginTop="150dp"
+        p1:background="#ff807f83"
+        p1:layout_centerVertical="false"
+        p1:layout_centerHorizontal="true"
+        p1:text="Submit Request"
+        p1:foreground="#ff807f83" />
+    <ImageView
+        p1:src="@drawable/WesternFootPatrol"
+        p1:layout_width="wrap_content"
+        p1:layout_height="wrap_content"
+        p1:id="@+id/footPatrolLogo"
+        p1:layout_below="@+id/destinationText"
+        p1:adjustViewBounds="true"
+        p1:layout_centerHorizontal="true"
+        p1:layout_marginTop="30dp"
+        p1:maxWidth="90dp"
+        p1:maxHeight="90dp" />
 </RelativeLayout>

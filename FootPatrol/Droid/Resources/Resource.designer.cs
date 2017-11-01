@@ -270,6 +270,9 @@ namespace FootPatrol.Droid
 			// aapt resource value: 0x7f0b0006
 			public const int blocking = 2131427334;
 			
+			// aapt resource value: 0x7f0b0026
+			public const int button1 = 2131427366;
+			
 			// aapt resource value: 0x7f0b000f
 			public const int cancel_action = 2131427343;
 			
@@ -284,6 +287,9 @@ namespace FootPatrol.Droid
 			
 			// aapt resource value: 0x7f0b001e
 			public const int end_padder = 2131427358;
+			
+			// aapt resource value: 0x7f0b0027
+			public const int footPatrolLogo = 2131427367;
 			
 			// aapt resource value: 0x7f0b0007
 			public const int forever = 2131427335;
