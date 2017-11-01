@@ -90,14 +90,14 @@ export class Server {
     router.use("/requests", this.requestRoute.router);
 
     // Greeting page
-    router.get("/", (req, res, next) => res.send("Welcome to the Foot Patrol API!"));
+    router.get("/", (req, res, next) => res.send({greeting: "Welcome to the Foot Patrol API!"}));
 
     // Default response
     router.use("*", (req, res, next) => res.sendStatus(404));
 
     // Use router middleware
     const apiBase = "/api/v1";
-    this.app.use(apiBase, router);  // Manually change API endpoint when in dev
+    this.app.use(apiBase, router);
 
     this.app.use("/", (req, res, next) => res.redirect(apiBase));
   }
