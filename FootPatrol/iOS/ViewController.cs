@@ -39,7 +39,7 @@ namespace FootPatrol.iOS
 
             FeedbackButton.TouchUpInside += (object sender, EventArgs e) => {
 
-                UIApplication.SharedApplication.OpenUrl(new NSUrl("http://www.google.com/"));
+                UIApplication.SharedApplication.OpenUrl(new NSUrl("https://docs.google.com/forms/d/e/1FAIpQLSdeB7-BxZh4oWTGqrMGMUL4wu0ufQRKmEyNvwKGfzXt8OdZYQ/viewform?usp=sf_link"));
 
             };
 
