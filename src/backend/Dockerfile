@@ -14,6 +14,7 @@ EXPOSE 80
 
 # Set the app to production-mode
 ENV NODE_ENV=production
+ENV PORT=80
 
 # Serve the app
 CMD ["node", "index.js"]
