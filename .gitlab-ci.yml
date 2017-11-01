@@ -41,6 +41,11 @@ variables:
     NODE_ENV: 'test'  # To set Mocha to isolate data
   before_script:
   - npm config set registry $NPM_CACHE # Setup proxy to stop killing bandwidth
+  - mv .npm/ /root/.npm   # To cache miscellaneous npm binaries
+  - pushd .
+  after_script:
+  - popd
+  - cp /root/.npm .
 
 # This test ensures the back end works
 test_backend:
@@ -52,6 +57,7 @@ test_backend:
     key: backend_npm
     paths:
       - src/backend/node_modules/
+      - .npm/
   script:
    - cd src/backend
    - rm package-lock.json || true   # So that cache server works
@@ -70,6 +76,7 @@ test_dispatch_website:
     key: angular_npm
     paths:
       - src/dispatch-website/node_modules/
+      - .npm/
   script:
    - cd src/dispatch-website
    - rm package-lock.json || true   # So that cache server works
@@ -108,7 +115,12 @@ test_dispatch_website:
   image: node:8
   before_script:
   - npm config set registry $NPM_CACHE # Setup proxy to stop killing bandwidth
+  - mv .npm/ /root/.npm   # To cache miscellaneous npm binaries
   - npm install typescript -g
+  - pushd .
+  after_script:
+  - popd
+  - cp /root/.npm .
   tags:
   - docker
   - linux
@@ -143,6 +155,7 @@ build_review_website:
     policy: pull
     paths:
       - src/dispatch-website/node_modules/
+      - .npm/
   script:
    - cd src/dispatch-website
    - npm install --production
@@ -161,6 +174,7 @@ build_review_backend:
     policy: pull
     paths:
       - src/backend/node_modules/
+      - .npm/
   script:
    - cd src/backend
    - npm install --production
@@ -194,6 +208,7 @@ build_website:
     policy: pull
     paths:
       - src/dispatch-website/node_modules/
+      - .npm/
   script:
    - cd src/dispatch-website
    - npm install --production
@@ -212,6 +227,7 @@ build_backend:
     policy: pull
     paths:
       - src/backend/node_modules/
+      - .npm/
   script:
    - cd src/backend
    - npm install --production
@@ -320,12 +336,16 @@ containerize_backend:
 # Common components to deploy jobs
 .deploy_common: &deploy_common
   stage: deploy
+  dependencies: []
   tags:
     - docker
     - linux
   variables:
     COMMON_INSTALL_HELM: --tiller-namespace $TILLER_NAMESPACE --namespace capstone-deploy --name $CI_ENVIRONMENT_SLUG --set appLabel=$CI_ENVIRONMENT_SLUG,dockercfg=$DOCKERCFG,imageTag=$CI_COMMIT_REF_SLUG,imageBase=$CI_REGISTRY_IMAGE
     HELM_CHART: deploy/charts/foot-patrol
+  before_script:
+  - helm init --client-only --tiller-namespace $TILLER_NAMESPACE
+  - helm repo add stable https://kubernetes-charts.storage.googleapis.com/
   image: $CI_REGISTRY_IMAGE/kubectl_deployer:latest
 
 
@@ -336,6 +356,7 @@ containerize_backend:
 deploy_review:
   <<: *deploy_common
   script:
+    - helm dependency build $HELM_CHART
     - helm install $COMMON_INSTALL_HELM --set ingress.hosts={"$CI_ENVIRONMENT_SLUG.$DOMAIN"} $HELM_CHART
   environment:
     name: review/$CI_COMMIT_REF_NAME
@@ -350,7 +371,6 @@ deploy_review:
 # This job stops the deployment containers
 shutdown_review:
   <<: *deploy_common
-  dependencies: []
   variables:
       GIT_STRATEGY: None
   when: manual
@@ -368,9 +388,10 @@ shutdown_review:
 ### --- Staging --- ###
 
 # This job takes the contents from the previous job, builds them into a docker image, then deploys everything
-stagin:
+staging:
   <<: *deploy_common
   script:
+    - helm dependency build $HELM_CHART
     - helm install $COMMON_INSTALL_HELM --set ingress.hosts={staging.$DOMAIN} $HELM_CHART
   environment:
     name: staging
@@ -383,7 +404,6 @@ stagin:
 # This job stops the deployment containers
 shutdown_staging:
   <<: *deploy_common
-  dependencies: []
   variables:
       GIT_STRATEGY: None
   when: manual
@@ -402,6 +422,7 @@ shutdown_staging:
 production:
   <<: *deploy_common
   script:
+    - helm dependency build $HELM_CHART
     - helm install $COMMON_INSTALL_HELM --set ingress.hosts={$DOMAIN} $HELM_CHART
   environment:
     name: production
@@ -414,7 +435,6 @@ production:
 # This job stops the deployment containers
 shutdown:
   <<: *deploy_common
-  dependencies: []
   variables:
       GIT_STRATEGY: None
   when: manual
