@@ -96,13 +96,10 @@ export class Server {
     router.use("*", (req, res, next) => res.sendStatus(404));
 
     // Use router middleware
-    if (process.env.NODE_ENV === "development") {
-      this.app.use("/api/v1", router);  // Manually change API endpoint when in dev
-    } else {
-      this.app.use(router); // External systems will handle the path remap in prod
-    }
+    const apiBase = "/api/v1";
+    this.app.use(apiBase, router);  // Manually change API endpoint when in dev
 
-    this.app.use("/", (req, res, next) => res.sendStatus(404));
+    this.app.use("/", (req, res, next) => res.redirect(apiBase));
   }
 
   /**
