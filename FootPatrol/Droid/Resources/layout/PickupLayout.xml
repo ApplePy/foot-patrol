@@ -9,7 +9,7 @@
     p1:foregroundTint="#ff4f1f8a"
     p1:backgroundTint="#ff4f2683">
     <TextView
-        p1:text="Name"
+        p1:text="Name (Optional)"
         p1:layout_width="match_parent"
         p1:layout_height="wrap_content"
         p1:id="@+id/nameView"
@@ -59,7 +59,7 @@
         p1:layout_height="wrap_content"
         p1:id="@+id/button1"
         p1:layout_below="@+id/destinationText"
-        p1:layout_marginTop="150dp"
+        p1:layout_marginTop="200dp"
         p1:background="#ff807f83"
         p1:layout_centerVertical="false"
         p1:layout_centerHorizontal="true"
@@ -73,7 +73,7 @@
         p1:layout_below="@+id/destinationText"
         p1:adjustViewBounds="true"
         p1:layout_centerHorizontal="true"
-        p1:layout_marginTop="30dp"
-        p1:maxWidth="90dp"
-        p1:maxHeight="90dp" />
+        p1:layout_marginTop="55dp"
+        p1:maxWidth="110dp"
+        p1:maxHeight="110dp" />
 </RelativeLayout>
