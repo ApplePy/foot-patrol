@@ -1,27 +1,4 @@
 ﻿using Android.App;
-using Android.Widget;
-using Android.OS;
-
-namespace FootPatrol.Droid
-{
-    [Activity(Label = "FootPatrol", MainLauncher = true, Icon = "@mipmap/icon")]
-    public class MainActivity : Activity
-    {
-        int count = 1;
-
-        protected override void OnCreate(Bundle savedInstanceState)
-        {
-            base.OnCreate(savedInstanceState);
-
-            // Set our view from the "main" layout resource
-            SetContentView(Resource.Layout.Main);
-
-            // Get our button from the layout resource,
-            // and attach an event to it
-            Button button = FindViewById<Button>(Resource.Id.myButton);
-
-            button.Click += delegate { button.Text = $"{count++} clicks!"; };
-        }
+using Android.App; using Android.Widget; using Android.OS; using Android.Runtime; using Android.Content; using System; using Android.Support.V4.App; using Android.Support.V4.View; using Android.Support.V4.Content;  namespace FootPatrol.Droid {     [Activity(Label = "Foot Patrol", MainLauncher = true, Icon = "@drawable/WesternFootPatrol")]     public class MainActivity : FragmentActivity     {         private TabHost footPatrolTab;          protected override void OnCreate(Bundle savedInstanceState)         {             base.OnCreate(savedInstanceState);              // Set our view from the "main" layout resource             SetContentView(Resource.Layout.Main);             ViewPager viewpager = FindViewById<ViewPager>(Resource.Id.viewPager1);         }
     }
-}
-
+} 
