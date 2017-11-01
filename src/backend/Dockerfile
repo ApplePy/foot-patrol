@@ -8,6 +8,7 @@ WORKDIR /usr/src/app
 
 # Get all the code needed to run the app
 COPY dist/ /usr/src/app
+COPY node_modules/ /usr/src/app/node_modules/
 
 # Expose the port the app runs in
 EXPOSE 80

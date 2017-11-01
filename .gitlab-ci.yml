@@ -153,7 +153,8 @@ build_review_website:
   <<: *build_docker_common
   artifacts:
     paths:
-     -  src/dispatch-website/dist/
+     - src/dispatch-website/dist/
+     - src/dispatch-website/node_modules/
   cache:
     key: angular_npm
     policy: pull
@@ -172,7 +173,8 @@ build_review_backend:
   <<: *build_docker_common
   artifacts:
     paths:
-     -  src/backend/dist/
+     - src/backend/dist/
+     - src/backend/node_modules/
   cache:
     key: backend_npm
     policy: pull
@@ -206,7 +208,8 @@ build_website:
   <<: *build_docker_common
   artifacts:
     paths:
-     -  src/dispatch-website/dist/
+     - src/dispatch-website/dist/
+     - src/dispatch-website/node_modules/
   cache:
     key: angular_npm
     policy: pull
@@ -225,7 +228,8 @@ build_backend:
   <<: *build_docker_common
   artifacts:
     paths:
-     -  src/backend/dist/
+     - src/backend/dist/
+     - src/backend/node_modules/
   cache:
     key: backend_npm
     policy: pull
