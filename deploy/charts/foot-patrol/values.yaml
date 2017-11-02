@@ -29,8 +29,8 @@ backend:
 webapp:
   name: webapp
   imageName: webapp
-  externalPort: 4200
-  internalPort: 4200
+  externalPort: 80
+  internalPort: 80
   replicas: 1
 
 ingress:
@@ -40,7 +40,7 @@ ingress:
   paths:
   - path: /
     serviceName: webapp
-    servicePort: 4200
+    servicePort: 80
   - path: /api/v1
     serviceName: backend
     servicePort: 80
