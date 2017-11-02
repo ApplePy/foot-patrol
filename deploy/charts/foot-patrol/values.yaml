@@ -6,11 +6,11 @@ appLabel: replaceme   # Replace me!
 # dockercfg: base-64-encoded docker config.json file here
 
 # Database connection parameters
-# db:
-#   host: host
-#   username: user
-#   password: insertmeatruntime
-#   database: db
+db:
+  # host: host
+  username: footpatrol
+  # password: insertmeatruntime
+  database: foot_patrol
 
 # For the mysql dependency chart
 mysql:

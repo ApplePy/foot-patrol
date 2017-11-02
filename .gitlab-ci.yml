@@ -11,10 +11,10 @@ stages:
 
 variables:
   NPM_CACHE: http://docker-npm-cache-sonatype-nexus.default.svc.cluster.local:8081/repository/npm-group/
-  TILLER_NAMESPACE: capstone-deploy
+  NAMESPACE: capstone-deploy
   DOMAIN: capstone.incode.ca
-  DB_CONFIG: db.host=${CI_ENVIRONMENT_SLUG}-mysql.capstone-deploy.svc.cluster.local,db.username=footpatrol,db.password=$DB_PASS,db.database=foot_patrol,mysql.mysqlPassword=$DB_PASS,mysql.mysqlRootPassword=$DB_ROOT_PASS
-  DB_HOST: ${CI_ENVIRONMENT_SLUG}-mysql.capstone-deploy.svc.cluster.local
+  DB_CONFIG: db.host=${CI_ENVIRONMENT_SLUG}-mysql.${NAMESPACE}.svc.cluster.local,db.password=$DB_PASS,mysql.mysqlPassword=$DB_PASS,mysql.mysqlRootPassword=$DB_ROOT_PASS
+  DB_HOST: ${CI_ENVIRONMENT_SLUG}-mysql.${NAMESPACE}.svc.cluster.local
   DB_SLEEP_TIME: 60   # Time to wait for DB to start up
 
   # Variables in Gitlab CI:
@@ -296,10 +296,10 @@ containerize_backend:
     - docker
     - linux
   variables:
-    COMMON_INSTALL_HELM: --tiller-namespace $TILLER_NAMESPACE --namespace capstone-deploy --set appLabel=$CI_ENVIRONMENT_SLUG,dockercfg=$DOCKERCFG,imageTag=$CI_COMMIT_REF_SLUG,imageBase=$CI_REGISTRY_IMAGE
+    COMMON_INSTALL_HELM: --tiller-namespace $NAMESPACE --namespace ${NAMESPACE} --set appLabel=$CI_ENVIRONMENT_SLUG,dockercfg=$DOCKERCFG,imageTag=$CI_COMMIT_REF_SLUG,imageBase=$CI_REGISTRY_IMAGE
     HELM_CHART: deploy/charts/foot-patrol
   before_script:
-  - helm init --client-only --tiller-namespace $TILLER_NAMESPACE
+  - helm init --client-only --tiller-namespace $NAMESPACE
   - helm repo add stable https://kubernetes-charts.storage.googleapis.com/
   image: $CI_REGISTRY_IMAGE/kubectl_deployer:latest
 
@@ -333,7 +333,7 @@ shutdown_review:
       GIT_STRATEGY: None
   when: manual
   script:
-    - helm delete --purge $CI_ENVIRONMENT_SLUG --tiller-namespace $TILLER_NAMESPACE
+    - helm delete --purge $CI_ENVIRONMENT_SLUG --tiller-namespace $NAMESPACE
   environment:
     name: review/$CI_COMMIT_REF_NAME
     url: https://$CI_ENVIRONMENT_SLUG.$DOMAIN/
@@ -370,7 +370,7 @@ shutdown_staging:
       GIT_STRATEGY: None
   when: manual
   script:
-    - helm delete --purge $CI_ENVIRONMENT_SLUG --tiller-namespace $TILLER_NAMESPACE
+    - helm delete --purge $CI_ENVIRONMENT_SLUG --tiller-namespace $NAMESPACE
   environment:
     name: staging
     url: http://staging.$DOMAIN/
@@ -405,7 +405,7 @@ shutdown:
       GIT_STRATEGY: None
   when: manual
   script:
-    - helm delete --purge $CI_ENVIRONMENT_SLUG --tiller-namespace $TILLER_NAMESPACE
+    - helm delete --purge $CI_ENVIRONMENT_SLUG --tiller-namespace $NAMESPACE
   environment:
     name: production
     url: http://$DOMAIN/
