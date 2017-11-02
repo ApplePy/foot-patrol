@@ -135,7 +135,7 @@ test_dispatch_website:
   script:
    - cd src/dispatch-website
    - npm install --production
-   # TODO: Figure out how to compile this app
+   - npm run build
 
 .backend: &backend
   artifacts:
