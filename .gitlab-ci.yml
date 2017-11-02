@@ -314,7 +314,8 @@ deploy_review:
     - helm dependency build $HELM_CHART
     - helm upgrade $CI_ENVIRONMENT_SLUG $HELM_CHART --install $COMMON_INSTALL_HELM --set ingress.hosts={"$CI_ENVIRONMENT_SLUG.$DOMAIN"},$DB_CONFIG  # TODO: Handle upgrade
     - cd src/backend
-    - sleep $DB_SLEEP_TIME
+    - until [ $(kubectl get pods -n $NAMESPACE | grep "$CI_ENVIRONMENT_SLUG-mysql" | grep -o "1/1") ]; do echo "mysql not ready..."; sleep 15; done
+    - sleep 30  # Wait out any bugs
     - mysql -h $DB_HOST -u root --password=$DB_ROOT_PASS < sql_statements.sql
   environment:
     name: review/$CI_COMMIT_REF_NAME
@@ -353,7 +354,8 @@ staging:
     - helm dependency build $HELM_CHART
     - helm upgrade $CI_ENVIRONMENT_SLUG $HELM_CHART --install $COMMON_INSTALL_HELM --set ingress.hosts={"staging.$DOMAIN"},$DB_CONFIG   # TODO: Handle upgrade
     - cd src/backend
-    - sleep $DB_SLEEP_TIME
+    - until [ $(kubectl get pods -n $NAMESPACE | grep "$CI_ENVIRONMENT_SLUG-mysql" | grep -o "1/1") ]; do echo "mysql not ready..."; sleep 15; done
+    - sleep 30  # Wait out any bugs
     - mysql -h $DB_HOST -u root --password=$DB_ROOT_PASS < sql_statements.sql
   environment:
     name: staging
@@ -388,7 +390,8 @@ production:
     - helm dependency build $HELM_CHART
     - helm upgrade $CI_ENVIRONMENT_SLUG $HELM_CHART --install $COMMON_INSTALL_HELM --set ingress.hosts={"$DOMAIN"},$DB_CONFIG # TODO: Handle upgrade
     - cd src/backend
-    - sleep $DB_SLEEP_TIME
+    - until [ $(kubectl get pods -n $NAMESPACE | grep "$CI_ENVIRONMENT_SLUG-mysql" | grep -o "1/1") ]; do echo "mysql not ready..."; sleep 15; done
+    - sleep 30  # Wait out any bugs
     - mysql -h $DB_HOST -u root --password=$DB_ROOT_PASS < sql_statements.sql
   environment:
     name: production
