@@ -99,7 +99,7 @@ export class RequestsRoute {
   public getRequests(req: Request, res: Response, next: NextFunction) {
     const offset = Number(req.query.offset);
     const count = Number(req.query.count);
-    const archived = Boolean(req.query.archived);
+    const archived = (req.query.archived === "true") ? true : false;
 
     // Ensure valid parameters
     if (isNaN(offset) || isNaN(count) || offset < 0 || count < 0) {
@@ -332,7 +332,7 @@ export class RequestsRoute {
     }
 
     // Sanitize data
-    req.body.archived = Boolean(req.body.archived);
+    req.body.archived = (req.body.archived === "true") ? true : false;  // TODO: Boolean sanitizer?
     req.body.name = this.sanitizer.sanitize(req.body.name);
     req.body.additional_info = this.sanitizer.sanitize(req.body.additional_info);
 
