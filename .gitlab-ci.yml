@@ -131,10 +131,9 @@ test_dispatch_website:
   artifacts:
     paths:
      - src/dispatch-website/dist/
-     - src/dispatch-website/node_modules/
   script:
    - cd src/dispatch-website
-   - npm install --production
+   - npm install
    - npm run build
 
 .backend: &backend
@@ -233,8 +232,8 @@ build_backend:
 .web_container: &web_container
   script:
    - cd src/dispatch-website
-   - docker build -t $CI_REGISTRY_IMAGE/website:$CI_COMMIT_REF_SLUG .
-   - docker push $CI_REGISTRY_IMAGE/website:$CI_COMMIT_REF_SLUG
+   - docker build -t $CI_REGISTRY_IMAGE/webapp:$CI_COMMIT_REF_SLUG .
+   - docker push $CI_REGISTRY_IMAGE/webapp:$CI_COMMIT_REF_SLUG
 
 .back_container: &back_container
   script:
