@@ -28,8 +28,20 @@ namespace FootPatrol.iOS
                 string currentLocation = CurrentLocationTextBox.Text;
                 string destination = DestinationTextBox.Text;
 
+                //Check if all required input fields have been filled out
+                if (name == "" || name == null) {
+                    NameTextBox.BackgroundColor = UIColor.Red;
+                    return;
+                } else if (currentLocation == "" || currentLocation == null) {
+                    CurrentLocationTextBox.BackgroundColor = UIColor.Red;
+                    return;
+                } else {
+                    NameTextBox.BackgroundColor = UIColor.White;
+                    CurrentLocationTextBox.BackgroundColor = UIColor.White;
+                }
+                    
                 //Sent footpatrol request
-                RequestService.SendFootPatrolRequest(name, currentLocation, destination);
+                RequestService.SendFootPatrolRequest(name, currentLocation, destination).Wait();
 
                 //Popup saying that request has been sent
                 var requestSentAlert = UIAlertController.Create("Request Sent", "Your SafeWalk request has been sent.", UIAlertControllerStyle.Alert);

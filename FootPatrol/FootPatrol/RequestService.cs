@@ -22,9 +22,7 @@ namespace FootPatrol
             {
                 HttpResponseMessage response = await client.PostAsync("api/footpatrol", httpContent);
                 response.EnsureSuccessStatusCode();
-            }
-
-            catch (Exception e)
+            } catch (Exception e)
             {
                 //Console.WriteLine("{0} Exception caught.", e);
             }
@@ -41,9 +39,7 @@ namespace FootPatrol
             {
                 HttpResponseMessage response = await client.DeleteAsync("api/footpatrol", httpContent);
                 response.EnsureSuccessStatusCode();
-            }
-
-            catch (Exception e)
+            } catch (Exception e)
             {
                 //Console.WriteLine("{0} Exception caught.", e);
             }
