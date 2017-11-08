@@ -16,12 +16,16 @@ namespace FootPatrol
         {
 
             string json = string.Format("{'name': {0}, 'currentLocation': {1}, 'destination': {2}}", name, currentLocation, destination);
-            var httpContent = new StringContent(json, Encoding.UTF8, "application/json");
+            StringContent httpContent = new StringContent(json, Encoding.UTF8, "application/json");
 
             try
             {
                 HttpResponseMessage response = await client.PostAsync("api/footpatrol", httpContent);
                 response.EnsureSuccessStatusCode();
+
+                String stringResponse = await response.Content.ReadAsStringAsync();
+                //Check here for the request ID.  Use this id to cancel the request.
+
             } catch (Exception e)
             {
                 //Console.WriteLine("{0} Exception caught.", e);
@@ -33,11 +37,11 @@ namespace FootPatrol
         {
 
             string json = string.Format("{'name': {0}, 'currentLocation': {1}, 'destination': {2}}", name, currentLocation, destination);
-            var httpContent = new StringContent(json, Encoding.UTF8, "application/json");
+            StringContent httpContent = new StringContent(json, Encoding.UTF8, "application/json");
 
             try
             {
-                HttpResponseMessage response = await client.DeleteAsync("api/footpatrol", httpContent);
+                HttpResponseMessage response = await client.DeleteAsync("api/footpatrol");
                 response.EnsureSuccessStatusCode();
             } catch (Exception e)
             {
