@@ -48,10 +48,10 @@ com_crashlytics_export_strings.xml
 crashlytics.properties
 crashlytics-build.properties
 fabric.properties
+
 ### Vagrant template
 # General
 .vagrant/
 
 # Log files (if you are creating logs in debug mode, uncomment this)
 # *.logs
-
