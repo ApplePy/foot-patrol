@@ -16,39 +16,64 @@ export class RequestListComponent implements OnInit {
     ngOnInit(): void{
       setInterval(this.getFPrequests.bind(this),1000);
     }
-  
+    
+    //request overflow flag
     requestOverflow: boolean;
     
+    //displayRequests is displayed in the view
     displayRequests: Request[]=[ ];
-    storedRequests: Request[]=[];
-  
+    //storedRequests stores all requests that have been received.
+    storedRequests: Request[]=[ ];
+
+    requestIndex: number;
+    listIndex: number;
+    
+    /**
+     * Get Requests from the server via the ftpRequests service and display them on the website
+     * 
+     * the number of displayed requests is capped at 10. 
+     * 
+     * If more requests are stored in the storedRequests array, the 10 most recent are moved to the displayRequests array
+     * 
+     * If more than 10 requests are recieved in a batch, 
+     * the requestOverflow flag is set and only 10 of the requests are moved to the displayRequests array
+     */
     getFPrequests():void{
       this.ftpRequestService.getRequests().then(requests =>{
-        if(requests.constructor===Array){
-
-        if(requests.length>0){
+        if(requests.length>0){         
+          //add new requests to the storedRequests array
+          for(var i=0;i<requests.length;i++){
+            this.storedRequests.push(requests[i]);
+          }
+          
+          //check for overflow
           if(requests.length>10){
             this.requestOverflow=true;
-            for(var i=0;i<10;i++){
-              this.storedRequests.push(requests[i]);
-            }
           }
           else{
-            for(var i=0;i<requests.length;i++){
-              this.storedRequests.push(requests[i]);
-            }
-          }
-          //iterate backward though stored requests when adding requests to displayRequests
-          i=0;
-          var j=this.storedRequests.length;
-          if(j>10){
-            while(--j>=this.storedRequests.length-10){this.displayRequests[i++]=this.storedRequests[j];}        
+            this.requestOverflow=false;
+          }            
+
+          //setup indexes
+          this.requestIndex = 0;
+          this.listIndex=this.storedRequests.length - 1;
+          
+          //display the last 10 requests
+          if(this.listIndex>10){
+            while(this.listIndex>=this.storedRequests.length-10){
+              this.displayRequests[this.requestIndex]=this.storedRequests[this.listIndex];
+              this.requestIndex++;
+              this.listIndex--;
+            }        
           }
           else{
-            while(--j>=0){this.displayRequests[i++]=this.storedRequests[j];}
+            while(this.listIndex>=0){
+              this.displayRequests[this.requestIndex]=this.storedRequests[this.listIndex];
+              this.requestIndex++;
+              this.listIndex--;
+            }
           }
         }
-      }
       });
     }  
 }

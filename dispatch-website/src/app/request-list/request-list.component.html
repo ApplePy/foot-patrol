@@ -1,9 +1,11 @@
 <h2>Requests</h2>
 <ul class="displayRequests">
   <li *ngFor="let request of displayRequests">
-    <p>Request id: {{request.id}} <input type="checkbox" [(ngModel)]="request.complete"><br/>
+    <p>Request id: {{request.id}} <br/>
     Name: {{request.name}} <br/>
-    Location: {{request.location}} <br/>
-    Time: {{request.time}}</p>
+    From: {{request.from_location}} <br/>
+    To:   {{request.to_location}} <br/>
+    Additional Information: {{request.additional_info}} <br/>
+    Time: {{request.timestamp}}</p>
   </li>
 </ul>
