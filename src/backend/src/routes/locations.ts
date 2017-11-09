@@ -33,7 +33,7 @@ export class LocationsRoute implements IRoute {
    * @param res {Response} The express Response object.
    * @param next {NextFunction} Execute the next method.
    *
-   * @api {get} /locations Request all Foot Patrol destinations.
+   * @api {get} /api/v1/locations Request all Foot Patrol destinations.
    * @apiDescription Currently not paginated.
    * @apiVersion 1.0.0
    * @apiName GetLocations

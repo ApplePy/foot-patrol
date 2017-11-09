@@ -46,7 +46,7 @@ export class RequestsRoute {
    * @param res {Response} The express Response object.
    * @param next {NextFunction} Execute the next method.
    *
-   * @api {get} /requests Get walking escort requests
+   * @api {get} /api/v1/requests Get walking escort requests
    * @apiVersion 1.0.0
    * @apiName GetRequests
    * @apiGroup Requests
@@ -136,7 +136,7 @@ export class RequestsRoute {
    * @param res {Response} The express Response object.
    * @param next {NextFunction} Execute the next method.
    *
-   * @api {get} /requests/:id Get specific request
+   * @api {get} /api/v1/requests/:id Get specific request
    * @apiVersion 1.0.0
    * @apiName GetRequest
    * @apiGroup Requests
@@ -196,7 +196,7 @@ export class RequestsRoute {
    * @param res {Response} The express Response object.
    * @param next {NextFunction} Execute the next method.
    *
-   * @api {post} /requests Create a new walk escort request
+   * @api {post} /api/v1/requests Create a new walk escort request
    * @apiVersion 1.0.0
    * @apiName PostRequest
    * @apiGroup Requests
@@ -272,7 +272,7 @@ export class RequestsRoute {
    * @param res {Response} The express Response object.
    * @param next {NextFunction} Execute the next method.
    *
-   * @api {put} /requests/:id Replace a walk escort request
+   * @api {put} /api/v1/requests/:id Replace a walk escort request
    * @apiDescription Omitting a parameter from the new object will delete the
    *                  field if it currently exists.
    *                  Other parameters (e.g. id), if specified, will be ignored.
@@ -364,7 +364,7 @@ export class RequestsRoute {
    * @param res {Response} The express Response object.
    * @param next {NextFunction} Execute the next method.
    *
-   * @api {patch} /requests/:id Update a walk escort request
+   * @api {patch} /api/v1/requests/:id Update a walk escort request
    * @apiDescription Omitting a parameter from the new object will preserve the
    *                  existing value (if it exists).
    *                  Other parameters (e.g. id), if specified, will be ignored.
@@ -480,7 +480,7 @@ export class RequestsRoute {
    * @param res {Response} The express Response object.
    * @param next {NextFunction} Execute the next method.
    *
-   * @api {delete} /requests/:id Delete specific request
+   * @api {delete} /api/v1/requests/:id Delete specific request
    * @apiVersion 1.0.0
    * @apiName DeleteRequest
    * @apiGroup Requests
