@@ -24,6 +24,8 @@ export class RequestListComponent implements OnInit {
   
     getFPrequests():void{
       this.ftpRequestService.getRequests().then(requests =>{
+        if(requests.constructor===Array){
+
         if(requests.length>0){
           if(requests.length>10){
             this.requestOverflow=true;
@@ -46,6 +48,7 @@ export class RequestListComponent implements OnInit {
             while(--j>=0){this.displayRequests[i++]=this.storedRequests[j];}
           }
         }
+      }
       });
     }  
 }

@@ -7,7 +7,7 @@ import {Request} from './request';
 
 @Injectable()
 export class FtpRequestService {
-  private requestURL = 'api/request';  // URL to web api
+  private requestURL = 'api/getRequests';  // URL to web api
   
   constructor(private http:Http) { }
 
@@ -26,12 +26,12 @@ export class FtpRequestService {
 
   getRequests(): Promise<Request[]> { 
     //for actual use, uncomment this code
-    /*return this.http.get(this.requestURL)
+    return this.http.get(this.requestURL)
             .toPromise()
             .then(response => response.json().data as Request[])
             .catch(this.handleError);
     
-*/
+/*
     //these statements are here for testing
     if(this.swap){   
       this.swap=false;
@@ -41,6 +41,7 @@ export class FtpRequestService {
       this.swap=true;
       return Promise.resolve(this.Requests2);      
     }
+    */
    } 
 
    private handleError(error: any): Promise<any> {
