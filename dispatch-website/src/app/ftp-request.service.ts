@@ -7,7 +7,7 @@ import {Request} from './request';
 
 @Injectable()
 export class FtpRequestService {
-  private requestURL = 'api/getRequests';  // URL to web api
+  private requestURL = 'http://localhost:8080/api/getRequests';  // URL to web api
   
   constructor(private http:Http) { }
 
