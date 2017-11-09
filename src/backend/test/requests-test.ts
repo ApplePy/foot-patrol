@@ -85,6 +85,46 @@ class RequestsAPITest {
       });
   }
 
+  @test("GET should return a list of requests + default archived")
+  public requestsListDefault(done: MochaDone) {
+    const EXPECTED_RESULTS = {
+      requests: [
+        {
+          id: 1, name: "John Doe", from_location: "SEB",
+          to_location: "UCC", additional_info: null,
+          archived: false, timestamp: "2017-10-26T06:51:05.000Z"
+        }
+      ],
+      meta: { offset: 0, count: 2, archived: false }
+    };
+
+    // Setup fake data
+    const REQUESTS_DATA = (query: string, values: any[]) => {
+      values.should.deep.equal([false, 0, 2]);
+      return [
+        {
+          id: 1, name: "John Doe", from_location: "SEB",
+          to_location: "UCC", additional_info: null,
+          archived: 0, timestamp: "2017-10-26T06:51:05.000Z"
+        }
+      ];
+    };
+    FakeSQL.response = REQUESTS_DATA;
+
+    // Start request
+    chai.request(serverEnv.nodeServer)
+      .get(pathPrefix + "/requests")
+      .query({ offset: 0, count: 2, archived: false })
+      .end((err, res) => {
+        // Verify results
+        res.should.have.status(200);
+        res.body.should.have.property("requests");
+        res.body.should.have.property("meta");
+        res.body.should.deep.equal(EXPECTED_RESULTS);
+        done();
+      });
+  }
+
   @test("GET should return a list of requests + archived requests")
   public requestsListArchived(done: MochaDone) {
     const EXPECTED_RESULTS = {
@@ -131,6 +171,60 @@ class RequestsAPITest {
         res.body.should.have.property("requests");
         res.body.should.have.property("meta");
         res.body.should.deep.equal(EXPECTED_RESULTS);
+        done();
+      });
+  }
+
+  @test("GET should error on invalid offset")
+  public requestsListInvalidOffset(done: MochaDone) {
+    FakeSQL.response = undefined;
+
+    // Start request
+    chai.request(serverEnv.nodeServer)
+      .get(pathPrefix + "/requests")
+      .query({ offset: -1, count: 2, archived: false })
+      .end((err, res) => {
+        // Verify results
+        res.should.have.status(400);
+        res.body.should.have.property("error");
+        res.body.should.have.property("message");
+        res.body.should.not.have.property("stack");
+        done();
+      });
+  }
+
+  @test("GET should error on invalid archived")
+  public requestsListInvalidArchived(done: MochaDone) {
+    FakeSQL.response = [];
+
+    // Start request
+    chai.request(serverEnv.nodeServer)
+      .get(pathPrefix + "/requests")
+      .query({ offset: 1, count: 2, archived: "qwerty" })
+      .end((err, res) => {
+        // Verify results
+        res.should.have.status(400);
+        res.body.should.have.property("error");
+        res.body.should.have.property("message");
+        res.body.should.not.have.property("stack");
+        done();
+      });
+  }
+
+  @test("GET should error on invalid count")
+  public requestsListInvalidCount(done: MochaDone) {
+    FakeSQL.response = undefined;
+
+    // Start request
+    chai.request(serverEnv.nodeServer)
+      .get(pathPrefix + "/requests")
+      .query({ offset: -1, count: -1, archived: false })
+      .end((err, res) => {
+        // Verify results
+        res.should.have.status(400);
+        res.body.should.have.property("error");
+        res.body.should.have.property("message");
+        res.body.should.not.have.property("stack");
         done();
       });
   }

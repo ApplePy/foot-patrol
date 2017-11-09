@@ -97,9 +97,19 @@ export class RequestsRoute {
    *     }
    */
   public getRequests(req: Request, res: Response, next: NextFunction) {
+
+    // Test to ensure archived is valid
+    if (req.query.archived !== undefined) {
+      req.query.archived = req.query.archived.toLowerCase();  // Normalize text
+      if (req.query.archived !== "true" && req.query.archived !== "false") {
+        next(new StatusError(400, "Invalid Query Parameter", "Archived must be 'true', 'false' or undefined."));
+        return;
+      }
+    }
+
     const offset = Number(req.query.offset);
     const count = Number(req.query.count);
-    const archived = (req.query.archived === "true") ? true : false;
+    const archived = (req.query.archived.toLowerCase() === "true") ? true : false;
 
     // Ensure valid parameters
     if (isNaN(offset) || isNaN(count) || offset < 0 || count < 0) {
