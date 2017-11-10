@@ -43,6 +43,14 @@ export class RequestListComponent implements OnInit {
         if(requests.length>0){         
           //add new requests to the storedRequests array
           for(var i=0;i<requests.length;i++){
+            //archived = complete
+            //this fix will work but when the website sends info back use patch not put and specifiy only the parts you are sending back, ie: archived
+            if(requests[i].name===null){
+              requests[i].name="";
+            }
+            if(requests[i].additional_info===null){
+              requests[i].additional_info="";
+            }
             this.storedRequests.push(requests[i]);
           }
           
@@ -53,7 +61,7 @@ export class RequestListComponent implements OnInit {
           else{
             this.requestOverflow=false;
           }            
-
+// optional name and additional info
           //setup indexes
           this.requestIndex = 0;
           this.listIndex=this.storedRequests.length - 1;
