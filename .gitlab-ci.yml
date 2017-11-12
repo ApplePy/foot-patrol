@@ -1,0 +1,416 @@
+# Pick zero or more services to be used on all builds.
+# Only needed when using a docker container to run your tests in.
+# Check out: http://docs.gitlab.com/ce/ci/docker/using_docker_images.html#what-is-service
+
+# Ensure that the back passes its tests first since the front relies on the back
+stages:
+  - test
+  - build
+  - containerize
+  - deploy
+
+variables:
+  NPM_CACHE: http://docker-npm-cache-sonatype-nexus.default.svc.cluster.local:8081/repository/npm-group/
+  NAMESPACE: capstone-deploy
+  DOMAIN: capstone.incode.ca
+  DB_CONFIG: db.host=${CI_ENVIRONMENT_SLUG}-mysql.${NAMESPACE}.svc.cluster.local,db.password=$DB_PASS,mysql.mysqlPassword=$DB_PASS,mysql.mysqlRootPassword=$DB_ROOT_PASS
+  DB_HOST: ${CI_ENVIRONMENT_SLUG}-mysql.${NAMESPACE}.svc.cluster.local
+  DB_SLEEP_TIME: 60   # Time to wait for DB to start up
+
+  # Variables in Gitlab CI:
+  # $DB_PASS: password for footpatrol account
+  # $DB_ROOT_PASS: password for root account
+
+
+#################################
+#                               #
+#            TESTS              #
+#                               #
+#################################
+
+# Code common to the front- and back-end tests
+.test_common: &test_common
+  stage: test
+  except:
+  - temp
+  - tags
+  artifacts:
+    expire_in: 2 weeks
+
+.test_docker_common: &test_docker_common
+  <<: *test_common
+  image: node:8
+  tags:
+  - docker
+  - linux
+  coverage: /Lines\s*:\s*(\d*\.?\d+)%/
+  variables:
+    NODE_ENV: 'test'  # To set Mocha to isolate data
+  before_script:
+  - npm config set registry $NPM_CACHE # Setup proxy to stop killing bandwidth
+
+# This test ensures the back end works
+test_backend:
+  <<: *test_docker_common
+  artifacts:
+    paths:
+      - src/backend/coverage/
+  script:
+   - cd src/backend
+   - rm package-lock.json || true   # So that cache server works
+   - npm install
+   - npm run lint || true   # Prevents JSHint errors from stopping build
+   - npm run coverage
+
+
+# This test ensures the front end works
+test_dispatch_website:
+  <<: *test_docker_common
+  artifacts:
+    paths:
+      - src/dispatch-website/coverage/
+  script:
+   - cd src/dispatch-website
+   - rm package-lock.json || true   # So that cache server works
+   - npm install
+   - npm run lint || true   # Prevents JSHint errors from stopping build
+  #  - npm run coverage     # TODO: Figure out how to test Angular (https://gist.github.com/coolman565/f392f08cf90e90db18dd06e7d3f5f41c)
+
+
+# This test ensures the front end works
+# test_mobile:
+#   <<: *test_common
+#     tags:
+#     - ios
+#     - android
+#   artifacts:
+#     paths:
+#       - src/mobile-app/coverage/
+#   script:
+#    - cd src/mobile-app
+#    # TODO: Figure out how to CI test mobile app
+
+
+#################################
+#                               #
+#            BUILD              #
+#                               #
+#################################
+
+# Common components to build jobs
+.build_common: &build_common
+  stage: build
+  dependencies: []
+
+.build_docker_common: &build_docker_common
+  <<: *build_common
+  image: node:8
+  before_script:
+  - npm config set registry $NPM_CACHE # Setup proxy to stop killing bandwidth
+  - npm install typescript -g
+  tags:
+  - docker
+  - linux
+
+.build_review_common: &build_review_common
+  artifacts:
+    expire_in: 1 day
+  except:
+    - master
+    - develop
+    - tags
+
+.build_deploy_common: &build_deploy_common
+  artifacts:
+    expire_in: 2 weeks
+  only:
+    - master
+    - develop
+
+.website: &website
+  artifacts:
+    paths:
+     - src/dispatch-website/dist/
+  script:
+   - cd src/dispatch-website
+   - npm install
+   - npm run build
+
+.backend: &backend
+  artifacts:
+    paths:
+     - src/backend/dist/
+     - src/backend/node_modules/
+  script:
+   - cd src/backend
+   - npm install --production
+   - npm run build_production 
+
+
+### --- REVIEW --- ###
+
+# This job builds the client-side code for review
+build_review_website:
+  <<: *build_review_common
+  <<: *build_docker_common
+  <<: *website
+
+# This job builds the client-side code for review
+build_review_backend:
+  <<: *build_review_common
+  <<: *build_docker_common
+  <<: *backend
+
+# build_review_mobile:  # TODO: Figure this out
+#   <<: *build_review_common
+#   tags:
+#   - ios
+#   - android
+#   artifacts:
+#     paths:
+#      -  src/mobile-app  # TODO: Remember to filter this better after figuring out how to compile this app
+#   script:
+#    - cd src/mobile-app
+#    # TODO: Figure out how to compile this app
+
+
+### --- DEPLOYMENT --- ###
+
+# This job builds the client-side web app code for deployment
+build_website:
+  <<: *build_deploy_common
+  <<: *build_docker_common
+  <<: *website
+
+# This job builds the backend API for deployment
+build_backend:
+  <<: *build_deploy_common
+  <<: *build_docker_common
+  <<: *backend
+
+
+# This job builds the mobile app for deployment
+# build_mobile:
+#   <<: *build_deploy_common
+#   tags:
+#   - ios
+#   - android
+#   artifacts:
+#     paths:
+#      -  src/mobile-app  # TODO: Remember to filter this better after figuring out how to compile this app
+#   script:
+#    - cd src/mobile-app
+#    # TODO: Figure out how to compile this app
+
+
+#################################
+#                               #
+#         Containerize          #
+#                               #
+#################################
+
+# Common components to build jobs
+.containerize_common: &containerize_common
+  stage: containerize
+  tags:
+  - docker_build
+  - linux
+  before_script:
+  - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
+
+.containerize_review_common: &containerize_review_common
+  except:
+    - master
+    - develop
+    - tags
+
+.containerize_deploy_common: &containerize_deploy_common
+  only:
+    - master
+    - develop
+  
+.web_container: &web_container
+  script:
+   - cd src/dispatch-website
+   - docker build -t $CI_REGISTRY_IMAGE/webapp:$CI_COMMIT_REF_SLUG .
+   - docker push $CI_REGISTRY_IMAGE/webapp:$CI_COMMIT_REF_SLUG
+
+.back_container: &back_container
+  script:
+   - cd src/backend
+   - docker build -t $CI_REGISTRY_IMAGE/backend:$CI_COMMIT_REF_SLUG .
+   - docker push $CI_REGISTRY_IMAGE/backend:$CI_COMMIT_REF_SLUG
+
+### --- REVIEW --- ###
+
+# This job builds the client-side code for review
+containerize_review_website:
+  <<: *containerize_common
+  <<: *containerize_review_common
+  <<: *web_container
+  dependencies:
+  - build_review_website
+
+
+# This job builds the client-side code for review
+containerize_review_backend:
+  <<: *containerize_common
+  <<: *containerize_review_common
+  <<: *back_container
+  dependencies:
+  - build_review_backend
+
+
+### --- DEPLOYMENT --- ###
+
+# This job builds the client-side web app code for deployment
+containerize_website:
+  <<: *containerize_common
+  <<: *containerize_deploy_common
+  <<: *web_container
+  dependencies:
+  - build_website
+
+
+# This job builds the backend API for deployment
+containerize_backend:
+  <<: *containerize_common
+  <<: *containerize_deploy_common
+  <<: *back_container
+  dependencies:
+  - build_backend
+
+
+#################################
+#                               #
+#            DEPLOY             #
+#                               #
+#################################
+
+# Common components to deploy jobs
+.deploy_common: &deploy_common
+  stage: deploy
+  dependencies: []
+  tags:
+    - docker
+    - linux
+  variables:
+    COMMON_INSTALL_HELM: --tiller-namespace $NAMESPACE --namespace ${NAMESPACE} --set appLabel=$CI_ENVIRONMENT_SLUG,dockercfg=$DOCKERCFG,imageTag=$CI_COMMIT_REF_SLUG,imageBase=$CI_REGISTRY_IMAGE
+    HELM_CHART: deploy/charts/foot-patrol
+  before_script:
+  - helm init --client-only --tiller-namespace $NAMESPACE
+  - helm repo add stable https://kubernetes-charts.storage.googleapis.com/
+  image: $CI_REGISTRY_IMAGE/kubectl_deployer:latest
+
+
+### --- REVIEW --- ###
+
+# TODO: Setup deployment for mobile
+# This job takes the contents from the build review jobs, then deploys everything
+deploy_review:
+  <<: *deploy_common
+  script:
+    - helm dependency build $HELM_CHART
+    - helm upgrade $CI_ENVIRONMENT_SLUG $HELM_CHART --install $COMMON_INSTALL_HELM --set ingress.hosts={"$CI_ENVIRONMENT_SLUG.$DOMAIN"},$DB_CONFIG
+    - cd src/backend
+    - until [ $(kubectl get pods -n $NAMESPACE | grep "$CI_ENVIRONMENT_SLUG-mysql" | grep -o "1/1") ]; do echo "mysql not ready..."; sleep 15; done
+    - sleep 30  # Wait out any bugs
+    - mysql -h $DB_HOST -u root --password=$DB_ROOT_PASS < sql_statements.sql
+  environment:
+    name: review/$CI_COMMIT_REF_NAME
+    url: http://$CI_ENVIRONMENT_SLUG.$DOMAIN/
+    on_stop: shutdown_review
+  except:
+    - master
+    - develop
+    - tags
+
+
+# This job stops the deployment containers
+shutdown_review:
+  <<: *deploy_common
+  variables:
+      GIT_STRATEGY: None
+  when: manual
+  script:
+    - helm delete --purge $CI_ENVIRONMENT_SLUG --tiller-namespace $NAMESPACE
+  environment:
+    name: review/$CI_COMMIT_REF_NAME
+    url: https://$CI_ENVIRONMENT_SLUG.$DOMAIN/
+    action: stop
+  except:
+    - master
+    - develop
+    - tags
+
+### --- Staging --- ###
+
+# TODO: Setup deployment for mobile
+# This job takes the contents from the previous job, builds them into a docker image, then deploys everything
+staging:
+  <<: *deploy_common
+  script:
+    - helm dependency build $HELM_CHART
+    - helm upgrade $CI_ENVIRONMENT_SLUG $HELM_CHART --install $COMMON_INSTALL_HELM --set ingress.hosts={"staging.$DOMAIN"},$DB_CONFIG
+    - cd src/backend
+    - until [ $(kubectl get pods -n $NAMESPACE | grep "$CI_ENVIRONMENT_SLUG-mysql" | grep -o "1/1") ]; do echo "mysql not ready..."; sleep 15; done
+    - sleep 30  # Wait out any bugs
+    - mysql -h $DB_HOST -u root --password=$DB_ROOT_PASS < sql_statements.sql
+  environment:
+    name: staging
+    url: http://staging.$DOMAIN/
+    on_stop: shutdown_staging
+  only:
+    - develop
+
+
+# This job stops the deployment containers
+shutdown_staging:
+  <<: *deploy_common
+  variables:
+      GIT_STRATEGY: None
+  when: manual
+  script:
+    - helm delete --purge $CI_ENVIRONMENT_SLUG --tiller-namespace $NAMESPACE
+  environment:
+    name: staging
+    url: http://staging.$DOMAIN/
+    action: stop
+  only:
+    - develop
+
+### --- PRODUCTION --- ###
+
+# TODO: Setup deployment for mobile
+# This job takes the contents from the previous job, builds them into a docker image, then deploys everything
+production:
+  <<: *deploy_common
+  script:
+    - helm dependency build $HELM_CHART
+    - helm upgrade $CI_ENVIRONMENT_SLUG $HELM_CHART --install $COMMON_INSTALL_HELM --set ingress.hosts={"$DOMAIN"},$DB_CONFIG
+    - cd src/backend
+    - until [ $(kubectl get pods -n $NAMESPACE | grep "$CI_ENVIRONMENT_SLUG-mysql" | grep -o "1/1") ]; do echo "mysql not ready..."; sleep 15; done
+    - sleep 30  # Wait out any bugs
+    - mysql -h $DB_HOST -u root --password=$DB_ROOT_PASS < sql_statements.sql
+  environment:
+    name: production
+    url: http://$DOMAIN/
+    on_stop: shutdown
+  only:
+    - master
+
+
+# This job stops the deployment containers
+shutdown:
+  <<: *deploy_common
+  variables:
+      GIT_STRATEGY: None
+  when: manual
+  script:
+    - helm delete --purge $CI_ENVIRONMENT_SLUG --tiller-namespace $NAMESPACE
+  environment:
+    name: production
+    url: http://$DOMAIN/
+    action: stop
+  only:
+    - master

@@ -1,0 +1,30 @@
+{{- if .Values.ingress.enabled -}}
+{{- $paths:= .Values.ingress.paths }}
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: {{ include "footpatrol.fullname" . }}
+  labels:
+    app: {{ .Values.appLabel }}
+    name: {{ include "footpatrol.fullname" . }}
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  rules:
+  {{- range $host := .Values.ingress.hosts }}
+  - host: {{ $host }}
+    http:
+      paths:
+      {{- range $endpoint := $paths }}
+      - path: {{ $endpoint.path }}
+        backend:
+          serviceName: "{{ $endpoint.serviceName }}-{{ include "footpatrol.fullname" $ }}"
+          servicePort: {{ $endpoint.servicePort }}
+      {{- end -}}
+  {{- end -}}
+  {{- if .Values.ingress.tls}}
+  tls:
+{{ toYaml .Values.ingress.tls | indent 4 }}
+  {{- end -}}
+{{- end -}}

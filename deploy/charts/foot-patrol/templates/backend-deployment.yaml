@@ -1,0 +1,56 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: "{{ .Values.backend.name }}-{{ template "footpatrol.fullname" . }}"
+  labels:
+    app: {{ .Values.appLabel }}
+    name: "{{ template "footpatrol.fullname" . }}"
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    release: "{{ .Release.Name }}"
+    heritage: "{{ .Release.Service }}"
+    component: {{ .Values.backend.name }}
+spec:
+  replicas: {{ .Values.backend.replicas }}
+  minReadySeconds: 10
+  strategy:
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.appLabel }}
+        name: "{{ template "footpatrol.fullname" . }}"
+        chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+        release: "{{ .Release.Name }}"
+        heritage: "{{ .Release.Service }}"
+        component: {{ .Values.backend.name }}
+    spec:
+      imagePullSecrets:
+      - name: capstone-reg-secret
+      containers:
+      - image: "{{ .Values.imageBase }}/{{ .Values.backend.imageName }}:{{ .Values.imageTag }}"
+        imagePullPolicy: {{ .Values.imagePullPolicy }}
+        name: {{ .Chart.Name }}
+        ports:
+        - containerPort: {{ .Values.backend.internalPort }}
+        env:
+        - name: MYSQL_HOST  # TODO: Make me agnostic-named!
+          valueFrom:
+            secretKeyRef:
+              name: db-config
+              key: DB_HOST
+        - name: MYSQL_USER  # TODO: Make me agnostic-named!
+          valueFrom:
+            secretKeyRef:
+              name: db-config
+              key: DB_USER
+        - name: MYSQL_PASS  # TODO: Make me agnostic-named!
+          valueFrom:
+            secretKeyRef:
+              name: db-config
+              key: DB_PASS
+        - name: MYSQL_DB    # TODO: Make me agnostic-named!
+          valueFrom:
+            secretKeyRef:
+              name: db-config
+              key: DB_DB
+      restartPolicy: Always

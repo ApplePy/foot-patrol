@@ -1,0 +1,9 @@
+{{- if .Values.dockercfg -}}
+apiVersion: v1
+data:
+  .dockercfg: {{ .Values.dockercfg }}
+kind: Secret
+metadata:
+  name: capstone-reg-secret
+type: kubernetes.io/dockercfg
+{{- end -}}
