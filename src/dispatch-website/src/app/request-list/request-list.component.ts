@@ -28,6 +28,10 @@ export class RequestListComponent implements OnInit {
     setInterval(this.getFPrequests.bind(this), 1000);
   }
 
+  checkboxCheck(request):void{
+    this.ftpRequestService.archiveRequest(request);
+  }
+
   /**
    * Get Requests from the server via the ftpRequests service and display them on the website
    */
