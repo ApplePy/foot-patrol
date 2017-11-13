@@ -1,12 +1,22 @@
 <h2>Requests</h2>
-<ul class="displayRequests">
-  <li *ngFor="let request of displayRequests">
-    <p>Request id: {{request.id}} <br/>
-    Name: {{request.name}} <br/>
-    From: {{request.from_location}} <br/>
-    To:   {{request.to_location}} <br/>
-    Additional Information: {{request.additional_info}} <br/>
-    Time: {{request.timestamp}}</p>
-    Archived: <input type="checkbox" [(ngModel)]="request.archived">
-  </li>
-</ul>
+<table>
+  <tr>
+    <th>Request ID</th>
+    <th>Name</th>
+    <th>From</th>
+    <th>To</th>
+    <th>Additional Info</th>
+    <th>Time</th>
+    <th>Complete</th>
+  </tr>
+
+  <tr *ngFor="let request of displayRequests">
+    <td>{{request.id}}</td>
+    <td>{{request.name}}</td>
+    <td>{{request.from_location}}</td>
+    <td>{{request.to_location}}</td>
+    <td>{{request.additional_info}}</td>
+    <td>{{request.timestamp}}</td>
+    <td><input type="checkbox" [(ngModel)]="request.archived"></td>
+  </tr>
+</table>
