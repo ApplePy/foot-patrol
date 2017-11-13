@@ -30,58 +30,33 @@ export class RequestListComponent implements OnInit {
 
   /**
    * Get Requests from the server via the ftpRequests service and display them on the website
-   *
-   * the number of displayed requests is capped at 10.
-   *
-   * If more requests are stored in the storedRequests array, the 10 most recent are moved to the displayRequests array
-   *
-   * If more than 10 requests are recieved in a batch,
-   * the requestOverflow flag is set and only 10 of the requests are moved to the displayRequests array
    */
   getFPrequests(): void {
     this.ftpRequestService.getRequests()
     .then(requests => {
-      if (requests.length > 0) {
-        // add new requests to the storedRequests array
-        for (let i = 0; i < requests.length; i++) {
-          // archived = complete
-          // this fix will work but when the website sends info back use patch not put
-          // and specifiy only the parts you are sending back, ie: archived
-          if (requests[i].name === null) {
-            requests[i].name = '';
-          }
-          if (requests[i].additional_info === null) {
-            requests[i].additional_info = '';
-          }
-          this.storedRequests.push(requests[i]);
-        }
+      //sort requests in reverse chronological order. oldest last, most recent first
+      requests.sort(comparerTimestamp);
 
-        // check for overflow
-        if (requests.length > 10) {
-          this.requestOverflow = true;
-        } else {
-          this.requestOverflow = false;
-        }
-// optional name and additional info
-        // setup indexes
-        this.requestIndex = 0;
-        this.listIndex = this.storedRequests.length - 1;
-
-        // display the last 10 requests
-        if (this.listIndex > 10) {
-          while (this.listIndex >= this.storedRequests.length - 10) {
-            this.displayRequests[this.requestIndex] = this.storedRequests[this.listIndex];
-            this.requestIndex++;
-            this.listIndex--;
-          }
-        } else {
-          while (this.listIndex >= 0) {
-            this.displayRequests[this.requestIndex] = this.storedRequests[this.listIndex];
-            this.requestIndex++;
-            this.listIndex--;
-          }
-        }
-      }
+        //move requests to displayRequests to display them
+        for(let i=0;i<requests.length;i++){
+          this.displayRequests[i]=requests[i];
+        }      
     });
   }
+}
+
+/**
+ * compare function to sort requests by their timestamps
+ * 
+ * @param a request a
+ * @param b request b
+ */
+function comparerTimestamp(a, b){  
+  if (a.timestamp > b.timestamp) {
+    return -1;
+  }
+  if (a.timestamp < b.timestamp) {
+    return 1;
+  }
+  return 0;  
 }
