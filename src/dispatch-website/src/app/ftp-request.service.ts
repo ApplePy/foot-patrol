@@ -9,25 +9,24 @@ import {Request} from './request';
 @Injectable()
 export class FtpRequestService {
   private apiUrl = environment.apiUrl;
-  private requestURL = this.apiUrl + '/requests'; 
+  private requestURL = this.apiUrl + '/requests';
 
   constructor(private http: Http) { }
 
 
   getRequests(): Promise<Request[]> {
-    //get first 10 requests
-    return this.http.get(this.requestURL + "?offset=0&count=10")
+    // get first 10 requests
+    return this.http.get(this.requestURL + '?offset=0&count=10')
             .toPromise()
             .then(response => response.json().requests as Request[])
             .catch(this.handleError);
   }
-   
-  archiveRequest(request){
-    var patchURL=this.requestURL + "/"+request.id;
-    this.http.patch(patchURL,{
-      params: new HttpParams().set('archived',request.archived)
-    }
-  )
+
+  archiveRequest(request) {
+    const patchURL = this.requestURL + '/' + request.id;
+    this.http.patch(patchURL, {
+      params: new HttpParams().set('archived', request.archived)
+    });
   }
 
 
