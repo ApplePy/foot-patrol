@@ -1,0 +1,76 @@
+{
+  "name": "foot-patrol-backend",
+  "version": "1.0.0",
+  "description": "API server for foot-patrol app",
+  "main": "src/index.ts",
+  "scripts": {
+    "dev": "NODE_ENV=development nodemon -e js,ts --ignore '*.spec.ts' --exec 'ts-node' src/index.ts",
+    "dev-win": "SET NODE_ENV=development && nodemon -e js,ts --ignore '*.spec.ts' --exec 'ts-node' src/index.ts",
+    "build": "tsc -p tsconfig.production.json --sourceMap true --removeComments false",
+    "build_production": "tsc -p tsconfig.production.json",
+    "start": "node_modules/.bin/ts-node src/index.ts",
+    "docs": "node_modules/.bin/apidoc -e node_modules/ -o apidocs/; node_modules/.bin/typedoc --out docs/ src/",
+    "test": "node_modules/.bin/mocha --recursive --require ts-node/register test/*-test.ts --exit",
+    "coverage": "node_modules/.bin/nyc npm test",
+    "lint": "node_modules/.bin/jshint --exclude 'coverage/, docs/, dist/, node_modules/' . && node_modules/.bin/tslint --exclude 'coverage/, docs/, dist/, node_modules/' --project .",
+    "clean": "rm -r .nyc_output/ coverage/ dist/ apidocs/ docs/ || true"
+  },
+  "nyc": {
+    "include": [
+      "src/*.ts",
+      "src/**/*.ts"
+    ],
+    "exclude": [
+      "typings"
+    ],
+    "extension": [
+      ".ts"
+    ],
+    "reporter": [
+      "json",
+      "html",
+      "text",
+      "text-summary"
+    ],
+    "all": true
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://incode.ca/capstone/foot-patrol.git"
+  },
+  "author": "Darryl Murray <dmurra47@uwo.ca>",
+  "license": "SEE LICENSE IN ../../LICENCE",
+  "dependencies": {
+    "@types/body-parser": "^1.16.5",
+    "@types/cookie-parser": "^1.4.1",
+    "@types/express": "^4.0.37",
+    "@types/morgan": "^1.7.35",
+    "@types/mysql": "^2.15.0",
+    "body-parser": "^1.18.2",
+    "cookie-parser": "^1.4.3",
+    "express": "^4.16.2",
+    "inversify": "^4.3.0",
+    "morgan": "^1.9.0",
+    "mysql": "^2.15.0",
+    "reflect-metadata": "^0.1.10"
+  },
+  "devDependencies": {
+    "@types/chai": "^4.0.4",
+    "@types/chai-http": "^3.0.3",
+    "@types/mocha": "^2.2.43",
+    "apidoc": "^0.17.6",
+    "chai": "^4.1.2",
+    "chai-http": "^3.0.0",
+    "jshint": "^2.9.5",
+    "mocha": "^4.0.1",
+    "mocha-typescript": "^1.1.11",
+    "nodemon": "^1.12.1",
+    "nyc": "^11.2.1",
+    "source-map-support": "^0.5.0",
+    "ts-mockito": "^2.2.5",
+    "ts-node": "^3.3.0",
+    "tslint": "^5.8.0",
+    "typedoc": "^0.9.0",
+    "typescript": "^2.5.3"
+  }
+}

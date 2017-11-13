@@ -12,6 +12,8 @@ As a **role**, I want **feature** so that **reason**.
 
 - [ ] **What little pieces of work do I need to do**
 - [ ] **To complete this Work Item's User Story?**
+- [ ] Update comments/documentation
+- [ ] Write tests
 
 (Remember to add the related feature issue, update this time estimate,
 and delete this instruction line)

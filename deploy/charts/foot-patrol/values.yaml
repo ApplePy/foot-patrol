@@ -1,0 +1,51 @@
+imageBase: registry.incode.ca/capstone/foot-patrol
+imageTag: "master"    # Replace me!
+imagePullPolicy: Always
+appLabel: replaceme   # Replace me!
+
+# dockercfg: base-64-encoded docker config.json file here
+
+# Database connection parameters
+db:
+  # host: host
+  username: footpatrol
+  # password: insertmeatruntime
+  database: foot_patrol
+
+# For the mysql dependency chart
+mysql:
+  mysqlUser: footpatrol
+  mysqlDatabase: foot_patrol
+  # mysqlPassword: insertmeatruntime
+  # mysqlRootPassword: insertmeatruntime
+
+backend:
+  name: backend
+  imageName: backend
+  externalPort: 80
+  internalPort: 80
+  replicas: 1
+
+webapp:
+  name: webapp
+  imageName: webapp
+  externalPort: 80
+  internalPort: 80
+  replicas: 1
+
+ingress:
+  enabled: true
+  hosts:
+  - capstone.incode.ca
+  paths:
+  - path: /
+    serviceName: webapp
+    servicePort: 80
+  - path: /api/v1
+    serviceName: backend
+    servicePort: 80
+  # tls:
+  # - secretName: footpatrol-tls
+  #   hosts:
+  #   - capstone.incode.ca
+  #   - "*.capstone.incode.ca"
