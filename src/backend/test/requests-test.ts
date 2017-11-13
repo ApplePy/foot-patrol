@@ -229,6 +229,23 @@ class RequestsAPITest {
       });
   }
 
+  @test("GET should error on missing parameters")
+  public requestsListMissingParameters(done: MochaDone) {
+    FakeSQL.response = undefined;
+
+    // Start request
+    chai.request(serverEnv.nodeServer)
+      .get(pathPrefix + "/requests")
+      .end((err, res) => {
+        // Verify results
+        res.should.have.status(400);
+        res.body.should.have.property("error");
+        res.body.should.have.property("message");
+        res.body.should.not.have.property("stack");
+        done();
+      });
+  }
+
   @test("GET should handle DB error")
   public dbError(done: MochaDone) {
     // Setup fake data
