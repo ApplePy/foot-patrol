@@ -39,7 +39,8 @@ export class RequestListComponent implements OnInit {
    * the requestOverflow flag is set and only 10 of the requests are moved to the displayRequests array
    */
   getFPrequests(): void {
-    this.ftpRequestService.getRequests().then(requests => {
+    this.ftpRequestService.getRequests()
+    .then(requests => {
       if (requests.length > 0) {
         // add new requests to the storedRequests array
         for (let i = 0; i < requests.length; i++) {

@@ -8,14 +8,14 @@ import {Request} from './request';
 @Injectable()
 export class FtpRequestService {
   private apiUrl = environment.apiUrl;
-  private requestURL = this.apiUrl + '/requests';  
+  private requestURL = this.apiUrl + '/requests?offset=0&count=10';
 
   constructor(private http: Http) { }
 
   getRequests(): Promise<Request[]> {
     return this.http.get(this.requestURL)
             .toPromise()
-            .then(response => response.json().data as Request[])
+            .then(response => response.json().requests as Request[])
             .catch(this.handleError);
    }
 
