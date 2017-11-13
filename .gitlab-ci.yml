@@ -131,6 +131,8 @@ test_dispatch_website:
   artifacts:
     paths:
      - src/dispatch-website/dist/
+  before_script:
+   - apt-get update && apt-get -y install gettext-base
   script:
    - cd src/dispatch-website
    - npm install
