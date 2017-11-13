@@ -9,14 +9,14 @@ describe('AppComponent', () => {
   beforeEach(async(() => {
 
     TestBed.configureTestingModule({
-      imports:[
+      imports: [
         FormsModule,
         HttpModule],
       declarations: [
         AppComponent,
         RequestListComponent,
       ],
-      providers:[HttpModule]
+      providers: [HttpModule]
     }).compileComponents();
   }));
   it('should create the app', async(() => {

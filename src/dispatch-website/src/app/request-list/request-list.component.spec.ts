@@ -11,7 +11,7 @@ describe('RequestListComponent', () => {
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       imports: [
-        FormsModule, 
+        FormsModule,
         HttpModule
       ],
       declarations: [ RequestListComponent ],
