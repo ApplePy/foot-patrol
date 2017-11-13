@@ -2,7 +2,7 @@ FROM alpine:3.6
 
 LABEL maintainer="Darryl Murray <darrylmurray@me.com>"
 
-ENV KUBE_LATEST_VERSION="v1.7.6"
+ENV KUBE_LATEST_VERSION="v1.8.2"
 
 RUN apk add --update ca-certificates \
  && apk add --update -t deps curl openssl \

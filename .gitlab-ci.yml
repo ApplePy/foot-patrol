@@ -236,13 +236,13 @@ build_backend:
 .web_container: &web_container
   script:
    - cd src/dispatch-website
-   - docker build -t $CI_REGISTRY_IMAGE/webapp:$CI_COMMIT_REF_SLUG .
+   - docker build --no-cache -t $CI_REGISTRY_IMAGE/webapp:$CI_COMMIT_REF_SLUG .
    - docker push $CI_REGISTRY_IMAGE/webapp:$CI_COMMIT_REF_SLUG
 
 .back_container: &back_container
   script:
    - cd src/backend
-   - docker build -t $CI_REGISTRY_IMAGE/backend:$CI_COMMIT_REF_SLUG .
+   - docker build --no-cache -t $CI_REGISTRY_IMAGE/backend:$CI_COMMIT_REF_SLUG .
    - docker push $CI_REGISTRY_IMAGE/backend:$CI_COMMIT_REF_SLUG
 
 ### --- REVIEW --- ###
