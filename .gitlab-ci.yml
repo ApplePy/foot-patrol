@@ -146,10 +146,14 @@ test_dispatch_website:
     paths:
      - src/backend/dist/
      - src/backend/node_modules/
+     - src/backend/docs/
+     - src/backend/apidocs/
   script:
    - cd src/backend
    - npm install --production
-   - npm run build_production 
+   - npm run build_production
+   - npm install typedoc apidoc -g  # To keep them out of node_modules
+   - npm run docs
 
 
 ### --- REVIEW --- ###
@@ -246,6 +250,12 @@ build_backend:
    - docker build --no-cache -t $CI_REGISTRY_IMAGE/backend:$CI_COMMIT_REF_SLUG$CI_COMMIT_SHA .
    - docker push $CI_REGISTRY_IMAGE/backend:$CI_COMMIT_REF_SLUG$CI_COMMIT_SHA
 
+.back_docs_container: &back_docs_container
+  script:
+  - cd src/backend
+  - docker build --file Dockerfile_docs -t $CI_REGISTRY_IMAGE/backend_docs:$CI_COMMIT_REF_SLUG .
+  - docker push $CI_REGISTRY_IMAGE/backend_docs:$CI_COMMIT_REF_SLUG
+
 ### --- REVIEW --- ###
 
 # This job builds the client-side code for review
@@ -257,11 +267,19 @@ containerize_review_website:
   - build_review_website
 
 
-# This job builds the client-side code for review
+# This job builds the server-side code for review
 containerize_review_backend:
   <<: *containerize_common
   <<: *containerize_review_common
   <<: *back_container
+  dependencies:
+  - build_review_backend
+
+# This job builds the docs for the server-side code
+  containerize_review_backend:
+  <<: *containerize_common
+  <<: *containerize_review_common
+  <<: *back_docs_container
   dependencies:
   - build_review_backend
 
@@ -282,6 +300,14 @@ containerize_backend:
   <<: *containerize_common
   <<: *containerize_deploy_common
   <<: *back_container
+  dependencies:
+  - build_backend
+
+# This job builds the docs for the backend API for deployment
+containerize_backend:
+  <<: *containerize_common
+  <<: *containerize_deploy_common
+  <<: *back_docs_container
   dependencies:
   - build_backend
 

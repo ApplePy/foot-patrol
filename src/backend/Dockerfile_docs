@@ -1,0 +1,11 @@
+FROM nginx:1-alpine
+
+RUN mkdir -p /usr/share/nginx/html/apidocs/ && mkdir -p /usr/share/nginx/html/ts-docs/
+
+# Get all the code needed to run the app
+COPY apidocs/ /usr/share/nginx/html/apidocs/
+
+COPY docs/  /usr/share/nginx/html/ts-docs/
+
+# Expose the port the app runs in
+EXPOSE 80
