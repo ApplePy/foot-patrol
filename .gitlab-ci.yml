@@ -136,7 +136,7 @@ test_dispatch_website:
   script:
    - cd src/dispatch-website
    - npm install
-   - if [ $CI_COMMIT_REF_NAME == "master" ]; then export PUBLIC_URL="$DOMAIN"; elif [ $CI_COMMIT_REF_NAME == "develop" ]; then export PUBLIC_URL="staging.$DOMAIN"; else export PUBLIC_URL="$CI_ENVIRONMENT_SLUG.$DOMAIN"; fi
+   - if [ $CI_COMMIT_REF_NAME == "master" ]; then export PUBLIC_URL="$DOMAIN"; elif [ $CI_COMMIT_REF_NAME == "develop" ]; then export PUBLIC_URL="staging.$DOMAIN"; else export PUBLIC_URL="$CI_COMMIT_REF_SLUG.$DOMAIN"; fi
    - envsubst < src/environments/environment.prod.ts > src/environments/environment.prod2.ts # Do a replacement of environment.prod.ts of ${PUBLIC_URL}
    - mv src/environments/environment.prod2.ts src/environments/environment.prod.ts
    - npm run build -- --prod --env=prod  # Do a replacement of environment.prod.ts of ${PUBLIC_URL}
@@ -237,14 +237,14 @@ build_backend:
 .web_container: &web_container
   script:
    - cd src/dispatch-website
-   - docker build --no-cache -t $CI_REGISTRY_IMAGE/webapp:$CI_COMMIT_REF_SLUG .
-   - docker push $CI_REGISTRY_IMAGE/webapp:$CI_COMMIT_REF_SLUG
+   - docker build --no-cache -t $CI_REGISTRY_IMAGE/webapp:$CI_COMMIT_REF_SLUG$CI_COMMIT_SHA .
+   - docker push $CI_REGISTRY_IMAGE/webapp:$CI_COMMIT_REF_SLUG$CI_COMMIT_SHA
 
 .back_container: &back_container
   script:
    - cd src/backend
-   - docker build --no-cache -t $CI_REGISTRY_IMAGE/backend:$CI_COMMIT_REF_SLUG .
-   - docker push $CI_REGISTRY_IMAGE/backend:$CI_COMMIT_REF_SLUG
+   - docker build --no-cache -t $CI_REGISTRY_IMAGE/backend:$CI_COMMIT_REF_SLUG$CI_COMMIT_SHA .
+   - docker push $CI_REGISTRY_IMAGE/backend:$CI_COMMIT_REF_SLUG$CI_COMMIT_SHA
 
 ### --- REVIEW --- ###
 
@@ -300,7 +300,7 @@ containerize_backend:
     - docker
     - linux
   variables:
-    COMMON_INSTALL_HELM: --tiller-namespace $NAMESPACE --namespace ${NAMESPACE} --set appLabel=$CI_ENVIRONMENT_SLUG,dockercfg=$DOCKERCFG,imageTag=$CI_COMMIT_REF_SLUG,imageBase=$CI_REGISTRY_IMAGE
+    COMMON_INSTALL_HELM: --tiller-namespace $NAMESPACE --namespace ${NAMESPACE} --set appLabel=$CI_ENVIRONMENT_SLUG,dockercfg=$DOCKERCFG,imageTag=$CI_COMMIT_REF_SLUG$CI_COMMIT_SHA,imageBase=$CI_REGISTRY_IMAGE
     HELM_CHART: deploy/charts/foot-patrol
   before_script:
   - helm init --client-only --tiller-namespace $NAMESPACE
@@ -316,14 +316,14 @@ deploy_review:
   <<: *deploy_common
   script:
     - helm dependency build $HELM_CHART
-    - helm upgrade $CI_ENVIRONMENT_SLUG $HELM_CHART --install $COMMON_INSTALL_HELM --set ingress.hosts={"$CI_ENVIRONMENT_SLUG.$DOMAIN"},$DB_CONFIG
+    - helm upgrade $CI_ENVIRONMENT_SLUG $HELM_CHART --install $COMMON_INSTALL_HELM --set ingress.hosts={"$CI_COMMIT_REF_SLUG.$DOMAIN"},$DB_CONFIG
     - cd src/backend
     - until [ $(kubectl get pods -n $NAMESPACE | grep "$CI_ENVIRONMENT_SLUG-mysql" | grep -o "1/1") ]; do echo "mysql not ready..."; sleep 15; done
     - sleep 30  # Wait out any bugs
     - mysql -h $DB_HOST -u root --password=$DB_ROOT_PASS < sql_statements.sql
   environment:
     name: review/$CI_COMMIT_REF_NAME
-    url: http://$CI_ENVIRONMENT_SLUG.$DOMAIN/
+    url: http://$CI_COMMIT_REF_SLUG.$DOMAIN/
     on_stop: shutdown_review
   except:
     - master
@@ -341,7 +341,7 @@ shutdown_review:
     - helm delete --purge $CI_ENVIRONMENT_SLUG --tiller-namespace $NAMESPACE
   environment:
     name: review/$CI_COMMIT_REF_NAME
-    url: https://$CI_ENVIRONMENT_SLUG.$DOMAIN/
+    url: https://$CI_COMMIT_REF_SLUG.$DOMAIN/
     action: stop
   except:
     - master
