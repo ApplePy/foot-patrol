@@ -1,5 +1,9 @@
 FROM nginx:1-alpine
 
+# Remove the "welcome" page
+RUN echo "<html><body><a href='ts-docs/'>Typescript Docs</a><br/><a href='apidocs/'>API Docs</a></body></html>" > /usr/share/nginx/html/index.html
+
+# Create doc directories
 RUN mkdir -p /usr/share/nginx/html/apidocs/ && mkdir -p /usr/share/nginx/html/ts-docs/
 
 # Get all the code needed to run the app
