@@ -25,8 +25,8 @@ export class FtpRequestService {
   archiveRequest(request) {
     const patchURL = this.requestURL + '/' + request.id;
     this.http.patch(patchURL, {
-      params: new HttpParams().set('archived', request.archived)
-    });
+      archived: request.archived
+    }).subscribe();
   }
 
 

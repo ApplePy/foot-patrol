@@ -28,7 +28,7 @@ export class RequestListComponent implements OnInit {
     setInterval(this.getFPrequests.bind(this), 1000);
   }
 
-  checkboxCheck(request):void{
+  checkboxCheck(request): void {
     this.ftpRequestService.archiveRequest(request);
   }
 
@@ -38,29 +38,29 @@ export class RequestListComponent implements OnInit {
   getFPrequests(): void {
     this.ftpRequestService.getRequests()
     .then(requests => {
-      //sort requests in reverse chronological order. oldest last, most recent first
+      // sort requests in reverse chronological order. oldest last, most recent first
       requests.sort(comparerTimestamp);
 
-        //move requests to displayRequests to display them
-        for(let i=0;i<requests.length;i++){
-          this.displayRequests[i]=requests[i];
-        }      
+        // move requests to displayRequests to display them
+        for (let i = 0; i < requests.length; i++) {
+          this.displayRequests[i] = requests[i];
+        }
     });
   }
 }
 
 /**
  * compare function to sort requests by their timestamps
- * 
+ *
  * @param a request a
  * @param b request b
  */
-function comparerTimestamp(a, b){  
+function comparerTimestamp(a, b) {
   if (a.timestamp > b.timestamp) {
     return -1;
   }
   if (a.timestamp < b.timestamp) {
     return 1;
   }
-  return 0;  
+  return 0;
 }
