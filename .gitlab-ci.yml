@@ -152,8 +152,11 @@ test_dispatch_website:
    - cd src/backend
    - npm install --production
    - npm run build_production
-   - npm install typedoc apidoc -g  # To keep them out of node_modules
+   - cp node_modules/ node_modules_prod/  # To keep doc generation out of node_modules
+   - npm install typedoc apidoc
    - npm run docs
+   - rm -rf node_modules/
+   - mv node_modules_prod/ node_modules/
 
 
 ### --- REVIEW --- ###
