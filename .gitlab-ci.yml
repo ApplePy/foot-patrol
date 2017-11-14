@@ -276,7 +276,7 @@ containerize_review_backend:
   - build_review_backend
 
 # This job builds the docs for the server-side code
-  containerize_review_backend:
+containerize_review_backend_docs:
   <<: *containerize_common
   <<: *containerize_review_common
   <<: *back_docs_container
@@ -304,7 +304,7 @@ containerize_backend:
   - build_backend
 
 # This job builds the docs for the backend API for deployment
-containerize_backend:
+containerize_backend_docs:
   <<: *containerize_common
   <<: *containerize_deploy_common
   <<: *back_docs_container
