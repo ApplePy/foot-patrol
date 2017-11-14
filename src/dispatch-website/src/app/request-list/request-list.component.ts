@@ -10,17 +10,8 @@ import {FormsModule} from '@angular/forms';
   providers: [FtpRequestService]
 })
 export class RequestListComponent implements OnInit {
-
-  // request overflow flag
-  requestOverflow: boolean;
-
   // displayRequests is displayed in the view
   displayRequests: Request[] = [ ];
-  // storedRequests stores all requests that have been received.
-  storedRequests: Request[] = [ ];
-
-  requestIndex: number;
-  listIndex: number;
 
   constructor(private ftpRequestService: FtpRequestService) {}
 
@@ -41,10 +32,13 @@ export class RequestListComponent implements OnInit {
       // sort requests in reverse chronological order. oldest last, most recent first
       requests.sort(comparerTimestamp);
 
-        // move requests to displayRequests to display them
-        for (let i = 0; i < requests.length; i++) {
-          this.displayRequests[i] = requests[i];
-        }
+      //clear displayRequests
+      this.displayRequests.length = 0;
+
+      // move requests to displayRequests to display them
+      for (let i = 0; i < requests.length; i++) {
+        this.displayRequests[i] = requests[i];
+      }
     });
   }
 }
