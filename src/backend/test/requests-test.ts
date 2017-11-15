@@ -80,7 +80,6 @@ class RequestsAPITest {
     const results = requestsRoute.sanitizeMap(SAN_MAP, DATA_MAP);
 
     // Assert
-    console.log(results);
     results.should.deep.equal(EXPECTED_RESULTS);
   }
 
