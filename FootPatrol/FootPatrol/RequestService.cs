@@ -12,6 +12,9 @@ namespace FootPatrol
     {
 
         static HttpClient client = new HttpClient();
+        client.BaseAddress = new Uri("http://localhost:55268/");
+        client.DefaultRequestHeaders.Accept.Clear();
+        client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
         public static async Task SendFootPatrolRequest(string name, string currentLocation, string destination)
         {
@@ -21,14 +24,15 @@ namespace FootPatrol
             fpRequest.name = name;
             fpRequest.currentLocation = currentLocation;
             fpRequest.destination = destination;
-            string json = JsonConvert.SerializeObject(fpRequest);
 
+            string json = JsonConvert.SerializeObject(fpRequest);
             StringContent httpContent = new StringContent(json, Encoding.UTF8, "application/json");
 
             try
             {
-                HttpResponseMessage response = await client.PostAsJsonAsync("api/footpatrol", httpContent);
+                HttpResponseMessage response = await client.PostAsync("api/footpatrol", httpContent).Result;
                 response.EnsureSuccessStatusCode();
+                response.
 
                 String stringResponse = await response.Content.ReadAsStringAsync();
                 //Check here for the request ID.  Use this id to cancel the request.
@@ -65,46 +69,3 @@ namespace FootPatrol
         public string destination;
     }
 }
-
-
-
-//static async Task<Uri> CreateProductAsync(Product product)
-//{
-//    HttpResponseMessage response = await client.PostAsJsonAsync("api/products", product);
-//    response.EnsureSuccessStatusCode();
-
-//    // return URI of the created resource.
-//    return response.Headers.Location;
-//}
-
-//static async Task<Product> GetProductAsync(string path)
-//{
-//    Product product = null;
-//    HttpResponseMessage response = await client.GetAsync(path);
-//    if (response.IsSuccessStatusCode)
-//    {
-//        product  = await response.Content.ReadAsAsync<Product>();
-//    }
-//    return product;
-//}
-
-//static async Task<Product> UpdateProductAsync(Product product)
-//{
-//    HttpResponseMessage response = await client.PutAsJsonAsync($"api/products/{product.Id}", product);
-//    response.EnsureSuccessStatusCode();
-
-//    // Deserialize the updated product from the response body.
-//    product = await response.Content.ReadAsStringAsync<Product>();
-//    return product;
-//}
-
-//static async Task<HttpStatusCode> DeleteProductAsync(string id)
-//{
-//    HttpResponseMessage response = await client.DeleteAsync($"api/products/{id}");
-//    return response.StatusCode;
-//}
-
-//static void Main()
-//{
-//    RunAsync().Wait();
-//}
