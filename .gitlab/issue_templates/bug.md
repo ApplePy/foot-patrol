@@ -30,4 +30,4 @@ logs, and code as it's very hard to read otherwise.)
 (Remember to update this time estimate!)
 /estimate 3d 5h 10m
 
-label ~"Bug"
+/label ~"Bug"
