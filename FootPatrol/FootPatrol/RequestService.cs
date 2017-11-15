@@ -11,32 +11,30 @@ namespace FootPatrol
     public static class RequestService
     {
 
-        //static HttpClient client = new HttpClient();
-
         public static async Task SendFootPatrolRequest(string name, string currentLocation, string destination)
         {
 
-            //string json = string.Format("{'name': {0}, 'currentLocation': {1}, 'destination': {2}}", name, currentLocation, destination);
             FPRequest fpRequest = new FPRequest();
             fpRequest.name = name;
-            fpRequest.currentLocation = currentLocation;
-            fpRequest.destination = destination;
+            fpRequest.from_location = currentLocation;
+            fpRequest.to_location = destination;
 
             string json = JsonConvert.SerializeObject(fpRequest);
             StringContent httpContent = new StringContent(json, Encoding.UTF8, "application/json");
 
             try
             {
-                HttpResponseMessage response = await Httpclient.client.PostAsync("api/footpatrol", httpContent);
+                HttpResponseMessage response = await Client.client.PostAsync("api/v1/requests", httpContent);
                 response.EnsureSuccessStatusCode();
-                response.
 
-                String stringResponse = await response.Content.ReadAsStringAsync();
+                var responseJSON = await response.Content.ReadAsStringAsync();
+                FPResponse fpResponse = JsonConvert.DeserializeObject<FPResponse>(responseJSON);
+
                 //Check here for the request ID.  Use this id to cancel the request.
 
             } catch (Exception e)
             {
-                //Console.WriteLine("{0} Exception caught.", e);
+                Console.WriteLine("{0} Exception caught.", e);
             }
 
         }
@@ -62,7 +60,18 @@ namespace FootPatrol
 
     public class FPRequest {
         public string name;
-        public string currentLocation;
-        public string destination;
+        public string from_location;
+        public string to_location;
+        public string additional_info;
+    }
+
+    public class FPResponse {
+        public int id;
+        public string name;
+        public string from_location;
+        public string to_location;
+        public string additional_info;
+        public bool archived;
+        public string timestamp;
     }
 }
