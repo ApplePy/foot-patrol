@@ -12,12 +12,13 @@ namespace FootPatrol
     {
 
         static HttpClient client = new HttpClient();
-        client.BaseAddress = new Uri("http://localhost:55268/");
-        client.DefaultRequestHeaders.Accept.Clear();
-        client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
         public static async Task SendFootPatrolRequest(string name, string currentLocation, string destination)
         {
+
+            client.BaseAddress = new Uri("http://localhost:55268/");
+            client.DefaultRequestHeaders.Accept.Clear();
+            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
             //string json = string.Format("{'name': {0}, 'currentLocation': {1}, 'destination': {2}}", name, currentLocation, destination);
             FPRequest fpRequest = new FPRequest();
@@ -30,7 +31,7 @@ namespace FootPatrol
 
             try
             {
-                HttpResponseMessage response = await client.PostAsync("api/footpatrol", httpContent).Result;
+                HttpResponseMessage response = await client.PostAsync("api/footpatrol", httpContent);
                 response.EnsureSuccessStatusCode();
                 response.
 
