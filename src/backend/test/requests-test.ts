@@ -5,6 +5,7 @@ import * as chai from "chai";
 import chaiHttp = require("chai-http");
 import { only, skip, suite, test } from "mocha-typescript";
 import * as mock from "ts-mockito";
+import { isNullOrUndefined } from "util";
 import { IFACES, TAGS } from "../src/ids";
 import { default as serverEnv } from "../src/index";
 import { ISQLService } from "../src/services/isqlservice";
@@ -12,6 +13,7 @@ import { FakeSQL } from "./fake-sql";
 
 // Route
 import { LocationsRoute } from "../src/routes/locations";
+import { RequestsRoute } from "../src/routes/requests";
 
 // Chai setup
 const should = chai.should();
@@ -43,6 +45,80 @@ class RequestsAPITest {
 
   public after() {
     // hook for after each test; make static to be after the suite
+  }
+
+  @test("sanitizeMap should properly sanitize data")
+  public sanitizeTest() {
+    // Data
+    const SAN_MAP = {
+      first: Number,
+      second: Boolean,
+      third: (val: any) => val,
+      fifth: Number,
+      sixth: Boolean
+    };
+
+    const DATA_MAP = {
+      first: "123",
+      second: "stuff",
+      third: {hello: "moto"},
+      fourth: "ignore me",
+      fifth: "invalid number",
+      sixth: 0
+    };
+
+    const EXPECTED_RESULTS = [
+      {key: "first",  value: 123},
+      {key: "second", value: true},
+      {key: "third",  value: {hello: "moto"}},
+      {key: "fifth",  value: NaN},
+      {key: "sixth",  value: false}
+    ];
+
+    // Test
+    const requestsRoute = serverEnv.container.getNamed(IFACES.IROUTE, TAGS.REQUESTS) as RequestsRoute;
+    const results = requestsRoute.sanitizeMap(SAN_MAP, DATA_MAP);
+
+    // Assert
+    console.log(results);
+    results.should.deep.equal(EXPECTED_RESULTS);
+  }
+
+  @test("constructSQLUpdateQuery should properly sanitize data")
+  public constructSQLUpdateQueryTest() {
+    // Data
+    const INPUT: [{key: string, value: any}] = [
+      {key: "test", value: "ok"},
+      {key: "huh", value: 2}
+    ];
+
+    const EXPECTED_RESULTS = {
+      query: "UPDATE requests SET test=?, huh=? WHERE ID=?",
+      values: ["ok", 2, 1]
+    };
+
+    // Test
+    const requestsRoute = serverEnv.container.getNamed(IFACES.IROUTE, TAGS.REQUESTS) as RequestsRoute;
+    const results = requestsRoute.constructSQLUpdateQuery(1, "requests", INPUT);
+
+    // Assert
+    should.exist(results);
+    if (!isNullOrUndefined(results)) {
+      results.should.deep.equal(EXPECTED_RESULTS);
+    }
+  }
+
+  @test("constructSQLUpdateQuery should properly return null")
+  public constructSQLUpdateQueryTestNull() {
+    // Data
+    const INPUT: any[] = [];
+
+    // Test
+    const requestsRoute = serverEnv.container.getNamed(IFACES.IROUTE, TAGS.REQUESTS) as RequestsRoute;
+    const results = requestsRoute.constructSQLUpdateQuery(1, "requests", INPUT as [{key: string, value: any}]);
+
+    // Assert
+    should.not.exist(results);
   }
 
   @test("GET should return a list of requests")

@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response, Router } from "express";
 import { Container, inject, injectable } from "inversify";
+import { isNull } from "util";
 import { IFACES, TAGS } from "../ids";
 import { ISanitizer } from "../services/isanitizer";
 import { ISQLService } from "../services/isqlservice";
@@ -37,6 +38,62 @@ export class RequestsRoute {
     this.router.put("/:id", this.putRequest.bind(this));
     this.router.patch("/:id", this.patchRequest.bind(this));
     this.router.delete("/:id", this.deleteRequest.bind(this));
+  }
+
+  /**
+   * Sanitizes a flat map with the mapped sanitize functions
+   * 
+   * @param sanitizeMap The functions to use to sanitize different keys
+   * @param newData The flat map to sanitize
+   * @returns an array of key-value objects
+   */
+  public sanitizeMap(sanitizeMap: any, newData: any) {
+    const updateList: any[] = [];
+
+    for (const key in sanitizeMap) {
+      // Don't look down the prototype chain
+      if (!sanitizeMap.hasOwnProperty(key)) { continue; }
+
+      // If a property with that column is found, sanitize and add to updateList
+      if (newData[key] !== undefined) {
+        const sanFunc = sanitizeMap[key];
+        updateList.push({
+          key: key as string,
+          value: sanFunc(newData[key])
+        });
+        // Final structure of updateList: [{key: column, value: value}, ...]
+      }
+    }
+
+    // Return data
+    return updateList as [{key: string, value: any}];
+  }
+
+  /**
+   * Creates an SQL update query. Data must be pre-sanitized!
+   * 
+   * @param id The id to update
+   * @param updateList The list of columns and their new values to be updated in the SQL query
+   * @param table The table to update
+   * @returns an object with the query string and the values array
+   */
+  public constructSQLUpdateQuery(id: number, table: string, updateList: [{key: string, value: any}]):
+   {query: string, values: any[]} | null {
+
+    // Construct prepared columns
+    let kvPairs = "";
+    updateList.forEach((pair) => kvPairs = kvPairs.concat(`${pair.key}=?, `));
+
+    if (kvPairs.length <= 0) {
+      return null;
+    } else {
+      // Create prepared query string
+      kvPairs = kvPairs.substring(0, kvPairs.length - 2); // Chop off the trailing ', '
+      const query = `UPDATE ${table} SET ${kvPairs} WHERE ID=?`;
+      const values = [...updateList.map((pair) => pair.value), id];
+
+      return {query, values};
+    }
   }
 
   /**
@@ -421,12 +478,6 @@ export class RequestsRoute {
       return;
     }
 
-    // Valid columns
-    const columnList = ["name", "from_location", "to_location", "additional_info", "archived"];
-
-    // List of sanitized data
-    const updateList: any[] = [];
-
     // Maps column to sanitizing function
     const sanitizeMap: any = {
       name: this.sanitizer.sanitize,
@@ -436,38 +487,24 @@ export class RequestsRoute {
       archived: Boolean
     };
 
-    columnList.forEach((val) => {
-      // If a property with that column is found, sanitize and add to updateList
-      if (req.body[val] !== undefined) {
-        const sanFunc = sanitizeMap[val];
-        updateList.push({
-          key: val,
-          value: sanFunc(req.body[val])
-        });
-        // Final structure of updateList: [{key: column, value: value}, ...]
-      }
-    });
+    // List of sanitized data
+    const updateList = this.sanitizeMap(sanitizeMap, req.body);
 
     // Locaion check
-    const from = updateList.find((val) => val.key === "from_location");
-    const to = updateList.find((val) => val.key === "to_location");
+    const from = updateList.find((val: {key: string, value: any}) => val.key === "from_location");
+    const to = updateList.find((val: {key: string, value: any}) => val.key === "to_location");
     if (from !== undefined && to !== undefined && from.value === to.value) {
       next(new StatusError(400, "Invalid Location", "Locations should not equal."));
     }
 
+    // Construct SQL query
+    const sqlQueryData = this.constructSQLUpdateQuery(id, "requests", updateList);
     let prom = Promise.resolve();
 
-    // Construct prepared columns
-    let kvPairs = "";
-    updateList.forEach((pair) => kvPairs = kvPairs.concat(`${pair.key}=?, `));
-
-    if (kvPairs.length > 0) {
-      // Create prepared query string
-      kvPairs = kvPairs.substring(0, kvPairs.length - 2); // Chop off the trailing ', '
-      const queryString = `UPDATE requests SET ${kvPairs} WHERE ID=?`;
-
+    // Issue update if there's updates
+    if (!isNull(sqlQueryData)) {
       // Make patch query
-      prom = this.db.makeQuery(queryString, [...updateList.map((pair) => pair.value), id])
+      prom = this.db.makeQuery(sqlQueryData.query, sqlQueryData.values)
       .catch(this.checkBadForeignKey(next))
       .then(this.checkRowUpdated(id, next));
     }
