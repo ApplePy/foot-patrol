@@ -86,6 +86,7 @@
     <Compile Include="PickupActivity.cs" />
     <Compile Include="FootPatrolAdapter.cs" />
     <Compile Include="FeedbackActivity.cs" />
+    <Compile Include="MapsActivity.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
@@ -99,6 +100,9 @@
     <AndroidResource Include="Resources\layout\PickupLayout.xml" />
     <AndroidResource Include="Resources\drawable\WesternFootPatrol.png" />
     <AndroidResource Include="Resources\layout\FeedbackLayout.xml" />
+    <AndroidResource Include="Resources\layout\MapsLayout.xml" />
+    <AndroidResource Include="Resources\drawable\WesternFootPatrolMap.jpg" />
+    <AndroidResource Include="Resources\drawable\WesternMap.jpg" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\drawable\" />
