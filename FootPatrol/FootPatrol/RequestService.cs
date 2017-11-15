@@ -11,7 +11,7 @@ namespace FootPatrol
     public static class RequestService
     {
 
-        public static async Task SendFootPatrolRequest(string name, string currentLocation, string destination)
+        public static async Task<int> SendFootPatrolRequest(string name, string currentLocation, string destination)
         {
 
             FPRequest fpRequest = new FPRequest();
@@ -28,29 +28,30 @@ namespace FootPatrol
                 response.EnsureSuccessStatusCode();
 
                 var responseJSON = await response.Content.ReadAsStringAsync();
-                FPResponse fpResponse = JsonConvert.DeserializeObject<FPResponse>(responseJSON);
+                FPRequest fpResponse = JsonConvert.DeserializeObject<FPRequest>(responseJSON);
 
-                //Check here for the request ID.  Use this id to cancel the request.
+                int id = (int) fpRequest.id;
+
+                return id;
 
             } catch (Exception e)
             {
-                Console.WriteLine("{0} Exception caught.", e);
+                //throw new e;
             }
 
         }
 
-        public static async Task CancelFootPatrolRequest(string name, string currentLocation, string destination)
+        public static async Task CancelFootPatrolRequest(int id)
         {
-
-            string json = string.Format("{'name': {0}, 'currentLocation': {1}, 'destination': {2}}", name, currentLocation, destination);
-            StringContent httpContent = new StringContent(json, Encoding.UTF8, "application/json");
 
             try
             {
-                HttpResponseMessage response = await client.DeleteAsync("api/footpatrol");
+                HttpResponseMessage response = await Client.client.DeleteAsync($"api/v1/footpatrol/{id}");
                 response.EnsureSuccessStatusCode();
+
             } catch (Exception e)
             {
+                //throw new e;
                 //Console.WriteLine("{0} Exception caught.", e);
             }
 
@@ -59,19 +60,13 @@ namespace FootPatrol
     }
 
     public class FPRequest {
+        public int? id;
         public string name;
         public string from_location;
         public string to_location;
         public string additional_info;
-    }
-
-    public class FPResponse {
-        public int id;
-        public string name;
-        public string from_location;
-        public string to_location;
-        public string additional_info;
-        public bool archived;
+        public bool? archived;
         public string timestamp;
     }
+
 }
