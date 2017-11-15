@@ -4,6 +4,7 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 
 namespace FootPatrol
 {
@@ -15,12 +16,18 @@ namespace FootPatrol
         public static async Task SendFootPatrolRequest(string name, string currentLocation, string destination)
         {
 
-            string json = string.Format("{'name': {0}, 'currentLocation': {1}, 'destination': {2}}", name, currentLocation, destination);
+            //string json = string.Format("{'name': {0}, 'currentLocation': {1}, 'destination': {2}}", name, currentLocation, destination);
+            FPRequest fpRequest = new FPRequest();
+            fpRequest.name = name;
+            fpRequest.currentLocation = currentLocation;
+            fpRequest.destination = destination;
+            string json = JsonConvert.SerializeObject(fpRequest);
+
             StringContent httpContent = new StringContent(json, Encoding.UTF8, "application/json");
 
             try
             {
-                HttpResponseMessage response = await client.PostAsync("api/footpatrol", httpContent);
+                HttpResponseMessage response = await client.PostAsJsonAsync("api/footpatrol", httpContent);
                 response.EnsureSuccessStatusCode();
 
                 String stringResponse = await response.Content.ReadAsStringAsync();
@@ -50,6 +57,12 @@ namespace FootPatrol
 
         }
 
+    }
+
+    public class FPRequest {
+        public string name;
+        public string currentLocation;
+        public string destination;
     }
 }
 
