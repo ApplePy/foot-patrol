@@ -24,14 +24,14 @@ backend:
   imageName: backend
   externalPort: 80
   internalPort: 80
-  replicas: 1
+  replicas: 2
 
 webapp:
   name: webapp
   imageName: webapp
   externalPort: 80
   internalPort: 80
-  replicas: 1
+  replicas: 2
 
 ingress:
   enabled: true
