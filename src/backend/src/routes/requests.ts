@@ -417,7 +417,7 @@ export class RequestsRoute {
 
     // Check for invalid ID
     if (isNaN(id) || id < 0) {
-      next(new StatusError(400, "Invalid Query Parameter", "Offset and/or count are not numbers >= 0."));
+      next(new StatusError(400, "Invalid Query Parameter", "ID is required"));
       return;
     }
 

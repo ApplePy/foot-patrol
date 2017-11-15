@@ -9,10 +9,15 @@ metadata:
   name: capstone-deploy-executor
   namespace: capstone-deploy
 rules:
-- apiGroups:
-  - ""
+- apiGroups: [ "", "extensions" ]
   resources: ["*"]
   verbs: ["*"]
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: deployment-executor
+  namespace: capstone-deploy
 ---
 apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: RoleBinding
@@ -21,40 +26,9 @@ metadata:
   namespace: capstone-deploy
 subjects:
 - kind: ServiceAccount
-  name: ci-machine
-  namespace: gitlab-ci
+  name: deployment-executor
+  namespace: capstone-deploy
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
   name: capstone-deploy-executor
----
-apiVersion: rbac.authorization.k8s.io/v1beta1
-kind: ClusterRoleBinding
-metadata:
-  name: capstone-deployment
-  namespace: capstone-deploy
-subjects:
-- kind: ServiceAccount
-  name: default
-  namespace: gitlab-ci
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: ClusterRole
-  name: cluster-admin
----
-apiVersion: rbac.authorization.k8s.io/v1beta1
-kind: RoleBinding
-metadata:
-  name: capstone-deployment-2
-  namespace: capstone-deploy
-subjects:
-- kind: ServiceAccount
-  name: default
-  namespace: capstone-deploy
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: ClusterRole
-  name: cluster-admin
-# Create a capstone deployment namespace, and grant all permissions
-# inside that namespace to the CI system
-# TODO: FIXME: I'm way too broad! I also don't have instructions for helm/tiller in the namespace!
