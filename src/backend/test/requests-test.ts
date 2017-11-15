@@ -695,6 +695,7 @@ class RequestsAPITest {
     const INPUT = {
       id: 4,
       from_location: 1,
+      to_location: 2,
       timestamp: "2017-10-26T06:51:05.000Z",
       extra: "testme"
     };
@@ -709,18 +710,21 @@ class RequestsAPITest {
     };
     const REQUESTS_DATA = (query: string, values: any[]) => {
       if (query.search("^UPDATE") >= 0) {
+        // Check query to ensure proper formation
+        query.should.equal("UPDATE requests SET from_location=?, to_location=? WHERE ID=?");
+
         // Check values
         values.splice(-1);  // Remove ID
-        values.should.deep.equal([1]);
+        values.should.deep.equal([1, 2]);
 
         // Remove WHERE parameter since it has the ID
         query = query.substr(0, query.search("WHERE") - 1);
 
         // Ensure unwanted properties are not being added
-        ["id", "extra", "timestamp", "archived", "to_location"].forEach((val) => query.search(val).should.equal(-1));
+        ["id", "extra", "timestamp", "archived"].forEach((val) => query.search(val).should.equal(-1));
 
         // Ensure wanted properties are being added
-        ["from_location"].forEach((val) => query.search(val).should.not.equal(-1));
+        ["from_location", "to_location"].forEach((val) => query.search(val).should.not.equal(-1));
 
         return {affectedRows: 1};
       } else {

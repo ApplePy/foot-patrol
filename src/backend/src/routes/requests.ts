@@ -459,10 +459,11 @@ export class RequestsRoute {
 
     // Construct prepared columns
     let kvPairs = "";
-    updateList.forEach((pair) => kvPairs = kvPairs.concat(`${pair.key}=? `));
+    updateList.forEach((pair) => kvPairs = kvPairs.concat(`${pair.key}=?, `));
 
     if (kvPairs.length > 0) {
       // Create prepared query string
+      kvPairs = kvPairs.substring(0, kvPairs.length - 2); // Chop off the trailing ', '
       const queryString = `UPDATE requests SET ${kvPairs} WHERE ID=?`;
 
       // Make patch query
