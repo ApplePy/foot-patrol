@@ -52,7 +52,7 @@ ingress:
     serviceName: backend
     servicePort: 80
   - path: /backend_docs
-    serviceName: docs
+    serviceName: backend-docs
     servicePort: 80
   # tls:
   # - secretName: footpatrol-tls
