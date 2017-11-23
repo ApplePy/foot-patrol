@@ -51,7 +51,7 @@ ingress:
   - path: /api/v1
     serviceName: backend
     servicePort: 80
-  - path: /docs
+  - path: /backend_docs
     serviceName: docs
     servicePort: 80
   # tls:

@@ -4,6 +4,7 @@ import * as express from "express";
 import { Container, inject, injectable, named } from "inversify";
 import * as logger from "morgan";
 import * as path from "path";
+import { stringify } from "querystring";
 import { IFACES, TAGS } from "./ids";
 import { ErrorMiddleware as ErrMid } from "./services/loggers";
 
@@ -95,11 +96,23 @@ export class Server {
     // Default response
     router.use("*", (req, res, next) => res.sendStatus(404));
 
-    // Use router middleware
-    const apiBase = "/api/v1";
-    this.app.use(apiBase, router);
+    // Accept api base and redirect during development
+    if (process.env.NODE_ENV !== "production") {
+      // Redirect /api/v1/* calls to root
+      this.app.use("/api/v1/*", (req, res, next) => {
+        const queryParams = stringify(req.query);
+        const newSubPath = req.params["0"];
+        const newUrl = `/${newSubPath}` + ((queryParams.length > 0) ? `?${queryParams}` : "");
+        console.log(newUrl);
+        res.redirect(newUrl);
+      });
 
-    this.app.use("/", (req, res, next) => res.redirect(apiBase));
+      // Redirect /api/v1 calls to root
+      this.app.use("/api/v1", (req, res, next) => res.redirect("/"));
+    }
+
+    // Use router middleware
+    this.app.use("/", router);
   }
 
   /**
