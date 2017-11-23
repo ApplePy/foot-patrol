@@ -244,20 +244,20 @@ build_backend:
 .web_container: &web_container
   script:
    - cd src/dispatch-website
-   - docker build --no-cache -t $CI_REGISTRY_IMAGE/webapp:$CI_COMMIT_REF_SLUG$CI_COMMIT_SHA .
-   - docker push $CI_REGISTRY_IMAGE/webapp:$CI_COMMIT_REF_SLUG$CI_COMMIT_SHA
+   - docker build --no-cache -t $CI_REGISTRY_IMAGE/webapp:$CI_COMMIT_REF_SLUG-$CI_COMMIT_SHA .
+   - docker push $CI_REGISTRY_IMAGE/webapp:$CI_COMMIT_REF_SLUG-$CI_COMMIT_SHA
 
 .back_container: &back_container
   script:
    - cd src/backend
-   - docker build --no-cache -t $CI_REGISTRY_IMAGE/backend:$CI_COMMIT_REF_SLUG$CI_COMMIT_SHA .
-   - docker push $CI_REGISTRY_IMAGE/backend:$CI_COMMIT_REF_SLUG$CI_COMMIT_SHA
+   - docker build --no-cache -t $CI_REGISTRY_IMAGE/backend:$CI_COMMIT_REF_SLUG-$CI_COMMIT_SHA .
+   - docker push $CI_REGISTRY_IMAGE/backend:$CI_COMMIT_REF_SLUG-$CI_COMMIT_SHA
 
 .back_docs_container: &back_docs_container
   script:
   - cd src/backend
-  - docker build --file Dockerfile_docs -t $CI_REGISTRY_IMAGE/backend_docs:$CI_COMMIT_REF_SLUG$CI_COMMIT_SHA .
-  - docker push $CI_REGISTRY_IMAGE/backend_docs:$CI_COMMIT_REF_SLUG$CI_COMMIT_SHA
+  - docker build --file Dockerfile_docs -t $CI_REGISTRY_IMAGE/backend_docs:$CI_COMMIT_REF_SLUG-$CI_COMMIT_SHA .
+  - docker push $CI_REGISTRY_IMAGE/backend_docs:$CI_COMMIT_REF_SLUG-$CI_COMMIT_SHA
 
 ### --- REVIEW --- ###
 
@@ -329,7 +329,7 @@ containerize_backend_docs:
     - docker
     - linux
   variables:
-    COMMON_INSTALL_HELM: --tiller-namespace $NAMESPACE --namespace ${NAMESPACE} --set appLabel=$CI_ENVIRONMENT_SLUG,dockercfg=$DOCKERCFG,imageTag=$CI_COMMIT_REF_SLUG$CI_COMMIT_SHA,imageBase=$CI_REGISTRY_IMAGE
+    COMMON_INSTALL_HELM: --tiller-namespace $NAMESPACE --namespace ${NAMESPACE} --set appLabel=$CI_ENVIRONMENT_SLUG,dockercfg=$DOCKERCFG,imageTag=$CI_COMMIT_REF_SLUG-$CI_COMMIT_SHA,imageBase=$CI_REGISTRY_IMAGE
     HELM_CHART: deploy/charts/foot-patrol
   before_script:
   - helm init --client-only --tiller-namespace $NAMESPACE
