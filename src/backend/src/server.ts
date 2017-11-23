@@ -98,17 +98,8 @@ export class Server {
 
     // Accept api base and redirect during development
     if (process.env.NODE_ENV !== "production") {
-      // Redirect /api/v1/* calls to root
-      this.app.use("/api/v1/*", (req, res, next) => {
-        const queryParams = stringify(req.query);
-        const newSubPath = req.params["0"];
-        const newUrl = `/${newSubPath}` + ((queryParams.length > 0) ? `?${queryParams}` : "");
-        console.log(newUrl);
-        res.redirect(newUrl);
-      });
-
       // Redirect /api/v1 calls to root
-      this.app.use("/api/v1", (req, res, next) => res.redirect("/"));
+      this.app.use("/api/v1", router);
     }
 
     // Use router middleware
