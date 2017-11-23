@@ -256,8 +256,8 @@ build_backend:
 .back_docs_container: &back_docs_container
   script:
   - cd src/backend
-  - docker build --file Dockerfile_docs -t $CI_REGISTRY_IMAGE/backend_docs:$CI_COMMIT_REF_SLUG .
-  - docker push $CI_REGISTRY_IMAGE/backend_docs:$CI_COMMIT_REF_SLUG
+  - docker build --file Dockerfile_docs -t $CI_REGISTRY_IMAGE/backend_docs:$CI_COMMIT_REF_SLUG$CI_COMMIT_SHA .
+  - docker push $CI_REGISTRY_IMAGE/backend_docs:$CI_COMMIT_REF_SLUG$CI_COMMIT_SHA
 
 ### --- REVIEW --- ###
 
