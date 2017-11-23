@@ -34,7 +34,7 @@ webapp:
   replicas: 2
 
 docs:
-  name: backend_docs
+  name: backend-docs
   imageName: backend_docs
   externalPort: 80
   internalPort: 80
