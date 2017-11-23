@@ -25,7 +25,7 @@ spec:
         component: {{ .Values.docs.name }}
     spec:
       imagePullSecrets:
-      - name: capstone-reg-secret
+      - name: "capstone-reg-secret-{{ template "footpatrol.fullname" . }}"
       containers:
       - image: "{{ .Values.imageBase }}/{{ .Values.docs.imageName }}:{{ .Values.imageTag }}"
         imagePullPolicy: {{ .Values.imagePullPolicy }}
