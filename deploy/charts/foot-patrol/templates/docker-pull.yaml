@@ -4,6 +4,6 @@ data:
   .dockercfg: {{ .Values.dockercfg }}
 kind: Secret
 metadata:
-  name: capstone-reg-secret
+  name: "capstone-reg-secret-{{ template "footpatrol.fullname" . }}"
 type: kubernetes.io/dockercfg
 {{- end -}}
