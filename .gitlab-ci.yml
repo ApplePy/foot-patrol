@@ -132,6 +132,7 @@ test_dispatch_website:
     paths:
      - src/dispatch-website/dist/
   before_script:
+   - npm config set registry $NPM_CACHE # Setup proxy to stop killing bandwidth
    - apt-get update && apt-get -y install gettext-base
   script:
    - cd src/dispatch-website
