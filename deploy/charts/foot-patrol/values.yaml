@@ -33,6 +33,13 @@ webapp:
   internalPort: 80
   replicas: 2
 
+docs:
+  name: docs
+  imageName: docs
+  externalPort: 80
+  internalPort: 80
+  replicas: 1
+
 ingress:
   enabled: true
   hosts:
@@ -43,6 +50,9 @@ ingress:
     servicePort: 80
   - path: /api/v1
     serviceName: backend
+    servicePort: 80
+  - path: /docs
+    serviceName: docs
     servicePort: 80
   # tls:
   # - secretName: footpatrol-tls

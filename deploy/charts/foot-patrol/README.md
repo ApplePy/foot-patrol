@@ -29,21 +29,26 @@ Remember to set `dockercfg` if image is private.
 | `appLabel`                        | Set the `app` Label on containers.         | `replaceme`                               |
 | `backend.name`                    | Name of the component in K8s               | `backend`                                 |
 | `backend.imageName`               | Name of the Docker image for the backend.  | `backend`                                 |
-| `backend.externalPort`            | Cluster-facing port number on the service. | `4200`                                    |
-| `backend.internalPort`            | Service target port to container.          | `4200`                                    |
+| `backend.externalPort`            | Cluster-facing port number on the service. | `80`                                      |
+| `backend.internalPort`            | Service target port to container.          | `80`                                      |
 | `backend.replicas`                | Number of backend replicas to run.         | `1`                                       |
-| `webapp.name`                     | Name of the component in K8s               | `backend`                                 |
+| `webapp.name`                     | Name of the component in K8s               | `webapp`                                  |
 | `webapp.imageName`                | Name of the Docker image for the webapp.   | `webapp`                                  |
-| `webapp.externalPort`             | Cluster-facing port number on the service. | `4200`                                    |
-| `webapp.internalPort`             | Service target port to container.          | `4200`                                    |
-| `webapp.replicas`                 | Number of webapp replicas to run.          | `1`                                       |
+| `webapp.externalPort`             | Cluster-facing port number on the service. | `80`                                      |
+| `webapp.internalPort`             | Service target port to container.          | `80`                                      |
+| `webapp.replicas`                 | Number of docs replicas to run.            | `1`                                       |
+| `docs.name`                       | Name of the component in K8s               | `docs`                                    |
+| `docs.imageName`                  | Name of the Docker image for the docs.     | `docs`                                    |
+| `docs.externalPort`               | Cluster-facing port number on the service. | `80`                                      |
+| `docs.internalPort`               | Service target port to container.          | `80`                                      |
+| `docs.replicas`                   | Number of docs replicas to run.            | `1`                                       |
 | `ingress.enabled`                 | Provision an ingress for the app           | `true`                                    |
 | `ingress.hosts`                   | List of DNS names to expose the app under. |                                           |
 | `ingress.hosts.name`              | DNS name to use.                           | `capstone.incode.ca`                      |
 | `ingress.hosts.paths`             | List of URL Rewrite paths to use           |                                           |
 | `ingress.hosts.paths.path`        | URL path                                   | `/`                                       |
 | `ingress.hosts.paths.serviceName` | Service to attach to this ingress.         | `backend`                                 |
-| `ingress.hosts.paths.servicePort` | Service port to connect to.                | `4200`                                    |
+| `ingress.hosts.paths.servicePort` | Service port to connect to.                | `80`                                      |
 | `ingress.tls`                     | List of DNS TLS settings for ingress       |                                           |
 | `ingress.tls.secretName`          | K8s secret containing domain SSL cert      |                                           |
 | `ingress.tls.hosts`               | List of hostnames this SSL cert covers     |                                           |
