@@ -28,7 +28,7 @@ fi
 
 # Ensure CI token was passed
 if [ $# -ne 1 ] ; then
-  echo "Gitlab CI token  or '--uninstall' must be passed as an argument." >&2
+  echo "Gitlab CI token or '--uninstall' must be passed as an argument." >&2
   print_help
   exit 2
 fi
@@ -47,6 +47,7 @@ install () {
   # Download tools
   brew update
   brew install gitlab-runner
+  echo $PASSWORD | sudo -kS chown root: $(which gitlab-runner)
   brew cask fetch virtualbox virtualbox-extension-pack vagrant
 
   # Install tools, messing with sudo so it doesn't ask for password
@@ -55,12 +56,18 @@ install () {
   echo $PASSWORD | sudo -kS echo; brew cask install vagrant
 
   # Setup VM
-  vagrant up --no-provision
+  vagrant up
+
+  # Install Xcode helpers
+  echo $PASSWORD | sudo -kS gem install xcpretty
 
   # Setup gitlab-runner
   echo $PASSWORD | sudo -kS cp .vagrant/machines/default/virtualbox/private_key ~root/.gitlab-runner-private-key
-  echo $PASSWORD | sudo -kS gitlab-runner register --non-interactive -r $CI_TOKEN --tag-list mac,xamarin -u https://incode.ca/ --executor virtualbox --virtualbox-base-name high-sierra-dev --ssh-user vagrant --ssh-identity-file ~/.gitlab-runner-private-key
-  brew services start gitlab-runner
+  echo $PASSWORD | sudo -kS gitlab-runner register --non-interactive -r $CI_TOKEN --tag-list mac,xamarin -u https://incode.ca/ --executor virtualbox --virtualbox-base-name high-sierra-dev --ssh-user vagrant --ssh-identity-file ~root/.gitlab-runner-private-key
+  echo $PASSWORD | sudo -kS gitlab-runner install -u root -d ~root
+  echo $PASSWORD | sudo -S sed '/^$/N;/^\n$/i\
+<key>EnvironmentVariables</key><dict><key>HOME</key><string>/var/root</string></dict>' /Library/LaunchDaemons/gitlab-runner.plist | sudo sh -c "cat > /Library/LaunchDaemons/gitlab-runner.plist"
+  echo $PASSWORD | sudo -kS gitlab-runner start
 
   # Shutdown VM
   vagrant halt
@@ -94,7 +101,8 @@ uninstall () {
   vagrant destroy -f
 
   # Uninstall runner
-  brew uninstall gitlab-runner
+  echo $PASSWORD | sudo -kS gitlab-runner stop
+  echo $PASSWORD | sudo -kS gitlab-runner uninstall
 
   # Output warning
   tput setaf 3; echo "INFO: Preserving Vagrant and Virtualbox. To uninstall, run 'brew cask uninstall vagrant virtualbox'"
