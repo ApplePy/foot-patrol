@@ -12,6 +12,8 @@ metadata:
     heritage: {{ .Release.Service }}
   annotations:
     ingress.kubernetes.io/rewrite-target: /
+    ingress.kubernetes.io/configuration-snippet: |
+      rewrite ^(/{.Values.ingress.paths[2].path})$ $1/ temporary;
 spec:
   rules:
   {{- range $host := .Values.ingress.hosts }}
