@@ -54,6 +54,7 @@ ingress:
   - path: /backend_docs
     serviceName: backend-docs
     servicePort: 80
+    config: rewrite ^(/backend_docs)$ $1/ redirect;
   # tls:
   # - secretName: footpatrol-tls
   #   hosts:
