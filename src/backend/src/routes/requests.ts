@@ -4,13 +4,18 @@ import { IFACES, TAGS } from "../ids";
 import { ISanitizer } from "../services/isanitizer";
 import { ISQLService } from "../services/isqlservice";
 import { StatusError } from "../services/status_error";
+import { IRoute } from "./iroute";
 
 @injectable()
-export class RequestsRoute {
+export class RequestsRoute implements IRoute {
 
   public router: Router;
   private db: ISQLService;
   private sanitizer: ISanitizer;
+
+  get Router(): Router {
+    return this.router;
+  }
 
   /**
    * Constructor

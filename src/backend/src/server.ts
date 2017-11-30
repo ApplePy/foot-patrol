@@ -87,8 +87,8 @@ export class Server {
     router = express.Router();
 
     // Start routes
-    router.use("/locations", this.locationRoute.router);
-    router.use("/requests", this.requestRoute.router);
+    router.use("/locations", this.locationRoute.Router);
+    router.use("/requests", this.requestRoute.Router);
 
     // Greeting page
     router.get("/", (req, res, next) => res.send({greeting: "Welcome to the Foot Patrol API!"}));

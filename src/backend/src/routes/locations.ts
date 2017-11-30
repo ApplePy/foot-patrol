@@ -6,8 +6,12 @@ import { IRoute } from "./iroute";
 
 @injectable()
 export class LocationsRoute implements IRoute {
-  public router: Router;
+  private router: Router;
   private database: ISQLService;
+
+  get Router(): Router {
+    return this.router;
+  }
 
   /**
    * Constructor
