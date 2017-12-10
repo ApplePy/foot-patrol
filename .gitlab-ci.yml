@@ -10,7 +10,7 @@ stages:
   - deploy
 
 variables:
-  NPM_CACHE: http://docker-npm-cache-sonatype-nexus.default.svc.cluster.local:8081/repository/npm-group/
+  # NPM_CACHE: http://docker-npm-cache-sonatype-nexus.default.svc.cluster.local:8081/repository/npm-group/
   NAMESPACE: capstone-deploy
   DOMAIN: capstone.incode.ca
   DB_CONFIG: db.host=${CI_ENVIRONMENT_SLUG}-mysql.${NAMESPACE}.svc.cluster.local,db.password=$DB_PASS,mysql.mysqlPassword=$DB_PASS,mysql.mysqlRootPassword=$DB_ROOT_PASS
@@ -46,8 +46,8 @@ variables:
   coverage: /Functions\s*:\s*(\d*\.?\d+)%/
   variables:
     NODE_ENV: 'test'  # To set Mocha to isolate data
-  before_script:
-  - npm config set registry $NPM_CACHE # Setup proxy to stop killing bandwidth
+  # before_script:
+  # - npm config set registry $NPM_CACHE # Setup proxy to stop killing bandwidth
 
 # This test ensures the back end works
 test_backend:
@@ -106,7 +106,7 @@ test_dispatch_website:
   <<: *build_common
   image: node:8
   before_script:
-  - npm config set registry $NPM_CACHE # Setup proxy to stop killing bandwidth
+  # - npm config set registry $NPM_CACHE # Setup proxy to stop killing bandwidth
   - npm install typescript -g
   tags:
   - docker
@@ -132,6 +132,7 @@ test_dispatch_website:
     paths:
      - src/dispatch-website/dist/
   before_script:
+  #  - npm config set registry $NPM_CACHE # Setup proxy to stop killing bandwidth
    - apt-get update && apt-get -y install gettext-base
   script:
    - cd src/dispatch-website
@@ -316,7 +317,7 @@ deploy_review:
   <<: *deploy_common
   script:
     - helm dependency build $HELM_CHART
-    - helm upgrade $CI_ENVIRONMENT_SLUG $HELM_CHART --install $COMMON_INSTALL_HELM --set ingress.hosts={"$CI_COMMIT_REF_SLUG.$DOMAIN"},$DB_CONFIG
+    - helm upgrade $CI_ENVIRONMENT_SLUG $HELM_CHART --install $COMMON_INSTALL_HELM --set backend.replicas=1,webapp.replicas=1,ingress.hosts={"$CI_COMMIT_REF_SLUG.$DOMAIN"},$DB_CONFIG
     - cd src/backend
     - until [ $(kubectl get pods -n $NAMESPACE | grep "$CI_ENVIRONMENT_SLUG-mysql" | grep -o "1/1") ]; do echo "mysql not ready..."; sleep 15; done
     - sleep 30  # Wait out any bugs
