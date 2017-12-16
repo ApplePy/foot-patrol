@@ -15,7 +15,6 @@ export class FtpRequestService {
 
 
   getRequests(): Promise<Request[]> {
-    // get first 10 requests
     return this.http.get(this.requestURL + '?offset=0&count=10')
             .toPromise()
             .then(response => response.json().requests as Request[])
