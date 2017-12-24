@@ -56,6 +56,7 @@ test_backend:
     paths:
       - src/backend/coverage/
   cache:
+    key: backend
     paths:
       - src/backend/node_modules/
   script:
@@ -73,6 +74,7 @@ test_dispatch_website:
     paths:
       - src/dispatch-website/coverage/
   cache:
+    key: frontend
     paths:
       - src/dispatch-website/node_modules/
   script:
@@ -139,6 +141,7 @@ test_dispatch_website:
      - src/dispatch-website/dist/
   cache:
     policy: pull
+    key: frontend
     paths:
       - src/dispatch-website/node_modules/
   before_script:
@@ -159,8 +162,9 @@ test_dispatch_website:
      - src/backend/node_modules/
   cache:
     policy: pull
+    key: backend
     paths:
-      - src/dispatch-website/node_modules/
+      - src/backend/node_modules/
   script:
    - cd src/backend
    - npm prune --production # Remove non-production packages that came in with the cache
