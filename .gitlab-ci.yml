@@ -55,6 +55,10 @@ test_backend:
   artifacts:
     paths:
       - src/backend/coverage/
+  cache:
+    key: backend
+    paths:
+      - src/backend/node_modules/
   script:
    - cd src/backend
    - rm package-lock.json || true   # So that cache server works
@@ -69,6 +73,10 @@ test_dispatch_website:
   artifacts:
     paths:
       - src/dispatch-website/coverage/
+  cache:
+    key: frontend
+    paths:
+      - src/dispatch-website/node_modules/
   script:
    - cd src/dispatch-website
    - rm package-lock.json || true   # So that cache server works
