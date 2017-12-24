@@ -55,6 +55,9 @@ test_backend:
   artifacts:
     paths:
       - src/backend/coverage/
+  cache:
+    paths:
+      - src/backend/node_modules/
   script:
    - cd src/backend
    - rm package-lock.json || true   # So that cache server works
@@ -69,6 +72,9 @@ test_dispatch_website:
   artifacts:
     paths:
       - src/dispatch-website/coverage/
+  cache:
+    paths:
+      - src/dispatch-website/node_modules/
   script:
    - cd src/dispatch-website
    - rm package-lock.json || true   # So that cache server works
@@ -131,6 +137,10 @@ test_dispatch_website:
   artifacts:
     paths:
      - src/dispatch-website/dist/
+  cache:
+    policy: pull
+    paths:
+      - src/dispatch-website/node_modules/
   before_script:
   #  - npm config set registry $NPM_CACHE # Setup proxy to stop killing bandwidth
    - apt-get update && apt-get -y install gettext-base
@@ -147,8 +157,13 @@ test_dispatch_website:
     paths:
      - src/backend/dist/
      - src/backend/node_modules/
+  cache:
+    policy: pull
+    paths:
+      - src/dispatch-website/node_modules/
   script:
    - cd src/backend
+   - npm prune --production # Remove non-production packages that came in with the cache
    - npm install --production
    - npm run build_production 
 
