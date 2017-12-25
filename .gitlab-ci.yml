@@ -112,10 +112,7 @@ test_dispatch_website:
 
 .build_docker_common: &build_docker_common
   <<: *build_common
-  image: node:8
-  before_script:
-  # - npm config set registry $NPM_CACHE # Setup proxy to stop killing bandwidth
-  - npm install typescript -g
+  image: registry.incode.ca/capstone/foot-patrol/node_type:8
   tags:
   - docker
   - linux
@@ -144,9 +141,6 @@ test_dispatch_website:
     key: frontend
     paths:
       - src/dispatch-website/node_modules/
-  before_script:
-  #  - npm config set registry $NPM_CACHE # Setup proxy to stop killing bandwidth
-   - apt-get update && apt-get -y install gettext-base
   script:
    - cd src/dispatch-website
    - npm install
