@@ -104,10 +104,7 @@ test_dispatch_website:
 
 .build_docker_common: &build_docker_common
   <<: *build_common
-  image: node:8
-  before_script:
-  # - npm config set registry $NPM_CACHE # Setup proxy to stop killing bandwidth
-  - npm install typescript -g
+  image: registry.incode.ca/capstone/foot-patrol/node_type:8
   tags:
   - docker
   - linux
@@ -131,9 +128,11 @@ test_dispatch_website:
   artifacts:
     paths:
      - src/dispatch-website/dist/
-  before_script:
-  #  - npm config set registry $NPM_CACHE # Setup proxy to stop killing bandwidth
-   - apt-get update && apt-get -y install gettext-base
+  cache:
+    policy: pull
+    key: frontend
+    paths:
+      - src/dispatch-website/node_modules/
   script:
    - cd src/dispatch-website
    - npm install
@@ -149,15 +148,18 @@ test_dispatch_website:
      - src/backend/node_modules/
      - src/backend/docs/
      - src/backend/apidocs/
+  cache:
+    policy: pull
+    key: backend
+    paths:
+      - src/backend/node_modules/
   script:
    - cd src/backend
-   - npm install --production
-   - npm run build_production
-   - cp -r node_modules/ node_modules_prod/  # To keep doc generation out of node_modules
-   - npm install typedoc apidoc
+   - npm install typedoc apidoc # Can't hurt, will get caught by cache if available
    - npm run docs
-   - rm -rf node_modules/
-   - mv node_modules_prod/ node_modules/
+   - npm prune --production   # Remove non-production packages that came in with the cache
+   - npm install --production # If no cache
+   - npm run build_production
 
 
 ### --- REVIEW --- ###
