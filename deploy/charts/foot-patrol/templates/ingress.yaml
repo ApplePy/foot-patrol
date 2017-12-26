@@ -1,5 +1,5 @@
 {{- if .Values.ingress.enabled -}}
-{{- $paths:= .Values.ingress.paths }}
+{{- $paths := .Values.ingress.paths }}
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
@@ -10,6 +10,11 @@ metadata:
     chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
+  annotations:
+    ingress.kubernetes.io/rewrite-target: /
+    {{- if .Values.ingress.configSnippet }}
+    ingress.kubernetes.io/configuration-snippet: {{ .Values.ingress.configSnippet }}
+    {{- end }}
 spec:
   rules:
   {{- range $host := .Values.ingress.hosts }}

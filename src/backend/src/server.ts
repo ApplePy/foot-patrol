@@ -4,6 +4,7 @@ import * as express from "express";
 import { Container, inject, injectable, named } from "inversify";
 import * as logger from "morgan";
 import * as path from "path";
+import { stringify } from "querystring";
 import { IFACES, TAGS } from "./ids";
 import { ErrorMiddleware as ErrMid } from "./services/loggers";
 
@@ -86,8 +87,8 @@ export class Server {
     router = express.Router();
 
     // Start routes
-    router.use("/locations", this.locationRoute.router);
-    router.use("/requests", this.requestRoute.router);
+    router.use("/locations", this.locationRoute.Router);
+    router.use("/requests", this.requestRoute.Router);
 
     // Greeting page
     router.get("/", (req, res, next) => res.send({greeting: "Welcome to the Foot Patrol API!"}));
@@ -95,11 +96,14 @@ export class Server {
     // Default response
     router.use("*", (req, res, next) => res.sendStatus(404));
 
-    // Use router middleware
-    const apiBase = "/api/v1";
-    this.app.use(apiBase, router);
+    // Accept api base and redirect during development
+    if (process.env.NODE_ENV !== "production") {
+      // Redirect /api/v1 calls to root
+      this.app.use("/api/v1", router);
+    }
 
-    this.app.use("/", (req, res, next) => res.redirect(apiBase));
+    // Use router middleware
+    this.app.use("/", router);
   }
 
   /**
