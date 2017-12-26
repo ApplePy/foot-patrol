@@ -43,7 +43,7 @@ variables:
   tags:
   - docker
   - linux
-  coverage: /Lines\s*:\s*(\d*\.?\d+)%/
+  coverage: /Functions\s*:\s*(\d*\.?\d+)%/
   variables:
     NODE_ENV: 'test'  # To set Mocha to isolate data
   # before_script:
