@@ -11,9 +11,8 @@ metadata:
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
   annotations:
-    ingress.kubernetes.io/rewrite-target: /
-    {{- if .Values.ingress.configSnippet }}
-    ingress.kubernetes.io/configuration-snippet: {{ .Values.ingress.configSnippet }}
+    {{- range $key, $value := .Values.ingress.annotations }}
+    {{ $key }}: {{ $value | quote }}
     {{- end }}
 spec:
   rules:

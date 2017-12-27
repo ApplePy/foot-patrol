@@ -41,8 +41,10 @@ docs:
   replicas: 1
 
 ingress:
-  configSnippet: |+
-    rewrite ^(/backend_docs)$ $1/ redirect;
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/configuration-snippet: |+
+      rewrite ^(/backend_docs)$ $1/ redirect;
   enabled: true
   hosts:
   - capstone.incode.ca
