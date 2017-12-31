@@ -4,6 +4,7 @@
 
 # Ensure that the back passes its tests first since the front relies on the back
 stages:
+  - pretest
   - test
   - build
   - containerize
@@ -21,6 +22,44 @@ variables:
   # $DB_PASS: password for footpatrol account
   # $DB_ROOT_PASS: password for root account
 
+.quality_base: &quality_base
+  stage: pretest
+  tags:
+  - dind
+  except:
+  - temp
+  - tags
+  artifacts:
+    expire_in: 1 hour
+  image: docker:latest
+  services:
+  - docker:dind
+  artifacts:
+   paths:
+   - top.json
+   - backend.json
+   - frontend.json
+  # before_script:
+  # - export TEMPVAR="$DOCKER_HOST
+  # - unset DOCKER_HOST
+  # - docker ps
+  # - export DOCKER_HOST="$TEMPVAR"
+  # - export DIND_NAME=$HOSTNAME-docker-0
+
+quality_top:
+  <<: *quality_base
+  script:
+  - docker run --env CODECLIMATE_CODE="$PWD" --env DOCKER_HOST="$DOCKER_PORT" --volume "$PWD":/code --volume /tmp/cc:/tmp/cc codeclimate/codeclimate analyze -f json > top.json
+
+quality_backend:
+  <<: *quality_base
+  script:
+  - docker run --env CODECLIMATE_CODE="$PWD/src/backend" --env DOCKER_HOST="$DOCKER_PORT" --volume "$PWD/src/backend":/code --volume /tmp/cc:/tmp/cc codeclimate/codeclimate analyze -f json > backend.json
+
+quality_frontend:
+  <<: *quality_base
+  script:
+  - docker run --env CODECLIMATE_CODE="$PWD/src/dispatch-website" --env DOCKER_HOST="$DOCKER_PORT" --volume "$PWD/src/dispatch-website":/code --volume /tmp/cc:/tmp/cc codeclimate/codeclimate analyze -f json > frontend.json
 
 #################################
 #                               #
@@ -40,6 +79,7 @@ variables:
 .test_docker_common: &test_docker_common
   <<: *test_common
   image: node:8
+  dependencies: []
   tags:
   - docker
   - linux
@@ -84,6 +124,21 @@ test_dispatch_website:
    - npm run lint || true   # Prevents JSHint errors from stopping build
   #  - npm run coverage     # TODO: Figure out how to test Angular (https://gist.github.com/coolman565/f392f08cf90e90db18dd06e7d3f5f41c)
 
+codequality:
+  <<: *test_common
+  image: python:3
+  dependencies:
+  - quality_top
+  - quality_frontend
+  - quality_backend
+  tags:
+  - docker
+  - linux
+  artifacts:
+   paths:
+   - codeclimate.json
+  script:
+   - python join.py top.json backend.json frontend.json > codeclimate.json
 
 # This test ensures the front end works
 # test_mobile:

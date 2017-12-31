@@ -1,0 +1,13 @@
+version: "2"         # required to adjust maintainability checks
+plugins:
+  fixme:
+    enabled: true
+  nodesecurity:
+    enabled: true
+  duplication:
+    enabled: true
+  eslint:
+    enabled: true
+  tslint:
+    enabled: true
+  
