@@ -52,15 +52,19 @@ quality_backend:
   <<: *quality_base
   script:
   - cd src/backend
-  - docker run --env CODECLIMATE_CODE="$PWD" --env DOCKER_HOST="$DOCKER_PORT" --volume "$PWD:/code --volume /tmp/cc:/tmp/cc codeclimate/codeclimate analyze -f json > backend.json
+  - docker run --env CODECLIMATE_CODE="$PWD" --env DOCKER_HOST="$DOCKER_PORT" --volume "$PWD":/code --volume /tmp/cc:/tmp/cc codeclimate/codeclimate analyze -f json > ../../backend.json
 
 quality_frontend:
   <<: *quality_base
-  image: registry.incode.ca/capstone/foot-patrol/node-docker:8-17.12
+  cache:
+    key: quality_frontend
+    paths:
+    - src/dispatch-website/node_modules/
+  image: registry.incode.ca/capstone/foot-patrol/node-docker:8-17.12    # Merged node:8-alpine and docker:17.12
   script:
   - cd src/dispatch-website
-  - npm install
-  - docker run --env CODECLIMATE_DEBUG=1 --env CODECLIMATE_CODE="$PWD" --env DOCKER_HOST="$DOCKER_PORT" --volume "$PWD":/code --volume /tmp/cc:/tmp/cc codeclimate/codeclimate analyze -f json > frontend.json
+  - npm install # Workaround for https://github.com/tkqubo/codeclimate-tslint/issues/26
+  - docker run --env CODECLIMATE_CODE="$PWD" --env DOCKER_HOST="$DOCKER_PORT" --volume "$PWD":/code --volume /tmp/cc:/tmp/cc codeclimate/codeclimate analyze -f json > ../../frontend.json
 
 #################################
 #                               #
