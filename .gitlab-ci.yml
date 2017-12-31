@@ -33,7 +33,8 @@ variables:
     expire_in: 1 hour
   image: docker:latest
   services:
-  - docker:dind
+  - name: docker:dind
+    command: ["--registry-mirror=http://registry.internal.incode.ca:80"]
   artifacts:
    paths:
    - top.json
@@ -50,12 +51,16 @@ quality_top:
 quality_backend:
   <<: *quality_base
   script:
-  - docker run --env CODECLIMATE_CODE="$PWD/src/backend" --env DOCKER_HOST="$DOCKER_PORT" --volume "$PWD/src/backend":/code --volume /tmp/cc:/tmp/cc codeclimate/codeclimate analyze -f json > backend.json
+  - cd src/backend
+  - docker run --env CODECLIMATE_CODE="$PWD" --env DOCKER_HOST="$DOCKER_PORT" --volume "$PWD:/code --volume /tmp/cc:/tmp/cc codeclimate/codeclimate analyze -f json > backend.json
 
 quality_frontend:
   <<: *quality_base
+  image: registry.incode.ca/capstone/foot-patrol/node-docker:8-17.12
   script:
-  - docker run --env CODECLIMATE_CODE="$PWD/src/dispatch-website" --env DOCKER_HOST="$DOCKER_PORT" --volume "$PWD/src/dispatch-website":/code --volume /tmp/cc:/tmp/cc codeclimate/codeclimate analyze -f json > frontend.json
+  - cd src/dispatch-website
+  - npm install
+  - docker run --env CODECLIMATE_DEBUG=1 --env CODECLIMATE_CODE="$PWD" --env DOCKER_HOST="$DOCKER_PORT" --volume "$PWD":/code --volume /tmp/cc:/tmp/cc codeclimate/codeclimate analyze -f json > frontend.json
 
 #################################
 #                               #
