@@ -39,12 +39,8 @@ variables:
    - top.json
    - backend.json
    - frontend.json
-  # before_script:
-  # - export TEMPVAR="$DOCKER_HOST
-  # - unset DOCKER_HOST
-  # - docker ps
-  # - export DOCKER_HOST="$TEMPVAR"
-  # - export DIND_NAME=$HOSTNAME-docker-0
+  before_script:
+  - docker pull codeclimate/codeclimate
 
 quality_top:
   <<: *quality_base
