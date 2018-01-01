@@ -126,7 +126,7 @@ test_dispatch_website:
    - cd src/dispatch-website
    - rm package-lock.json || true   # So that cache server works
    - npm install
-   - npm run coverage     # TODO: Headless testing (https://gist.github.com/coolman565/f392f08cf90e90db18dd06e7d3f5f41c)
+   - npm run coverage
    # - npm run e2e          # TODO: Do we want e2e testing?
 
 
