@@ -9,6 +9,7 @@ plugins:
     - .nyc_output/
     - coverage/
     - dist/
+    - karma.conf.js
   fixme:
     enabled: true
     exclude_patterns:
