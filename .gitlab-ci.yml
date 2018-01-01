@@ -108,7 +108,6 @@ test_backend:
    - cd src/backend
    - rm package-lock.json || true   # So that cache server works
    - npm install
-   - npm run lint || true   # Prevents JSHint errors from stopping build
    - npm run coverage
 
 
@@ -126,9 +125,11 @@ test_dispatch_website:
    - cd src/dispatch-website
    - rm package-lock.json || true   # So that cache server works
    - npm install
-   - npm run lint || true   # Prevents JSHint errors from stopping build
-  #  - npm run coverage     # TODO: Figure out how to test Angular (https://gist.github.com/coolman565/f392f08cf90e90db18dd06e7d3f5f41c)
+   # - npm run coverage     # TODO: Headless testing (https://gist.github.com/coolman565/f392f08cf90e90db18dd06e7d3f5f41c)
+   # - npm run e2e          # TODO: Do we want e2e testing?
 
+
+# Handle linting and other code quality errors
 codequality:
   <<: *test_common
   image: python:3
