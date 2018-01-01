@@ -145,7 +145,7 @@ codequality:
    paths:
    - codeclimate.json
   script:
-   - python join.py top.json backend.json frontend.json > codeclimate.json
+   - python join.py top.json backend.json frontend.json codeclimate.json
 
 # This test ensures the front end works
 # test_mobile:
