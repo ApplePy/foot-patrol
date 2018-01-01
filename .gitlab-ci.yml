@@ -114,6 +114,7 @@ test_backend:
 # This test ensures the front end works
 test_dispatch_website:
   <<: *test_docker_common
+  image: amio/node-chrome   # Contains both Node 8 and Chrome (https://incode.ca/capstone/docker-node-chrome mirrored from https://github.com/amio/docker-node-chrome)
   artifacts:
     paths:
       - src/dispatch-website/coverage/
@@ -125,7 +126,7 @@ test_dispatch_website:
    - cd src/dispatch-website
    - rm package-lock.json || true   # So that cache server works
    - npm install
-   # - npm run coverage     # TODO: Headless testing (https://gist.github.com/coolman565/f392f08cf90e90db18dd06e7d3f5f41c)
+   - npm run coverage     # TODO: Headless testing (https://gist.github.com/coolman565/f392f08cf90e90db18dd06e7d3f5f41c)
    # - npm run e2e          # TODO: Do we want e2e testing?
 
 
