@@ -335,7 +335,7 @@ build_backend:
   - docker build --file Dockerfile_docs -t $CI_REGISTRY_IMAGE/backend_docs:$CI_COMMIT_REF_SLUG-$CI_COMMIT_SHA .
   - docker push $CI_REGISTRY_IMAGE/backend_docs:$CI_COMMIT_REF_SLUG-$CI_COMMIT_SHA
 
-  .website_docs_container: &website_docs_container
+.website_docs_container: &website_docs_container
   script:
   - cd src/dispatch-website
   - docker build --file Dockerfile_docs -t $CI_REGISTRY_IMAGE/website_docs:$CI_COMMIT_REF_SLUG-$CI_COMMIT_SHA .
