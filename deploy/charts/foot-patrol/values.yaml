@@ -33,9 +33,16 @@ webapp:
   internalPort: 80
   replicas: 2
 
-docs:
+backend_docs:
   name: backend-docs
   imageName: backend_docs
+  externalPort: 80
+  internalPort: 80
+  replicas: 1
+
+frontend_docs:
+  name: frontend-docs
+  imageName: frontend_docs
   externalPort: 80
   internalPort: 80
   replicas: 1
@@ -45,6 +52,7 @@ ingress:
     nginx.ingress.kubernetes.io/rewrite-target: /
     nginx.ingress.kubernetes.io/configuration-snippet: |+
       rewrite ^(/backend_docs)$ $1/ redirect;
+      rewrite ^(/frontend_docs)$ $1/ redirect;
   enabled: true
   hosts:
   - capstone.incode.ca
@@ -57,6 +65,9 @@ ingress:
     servicePort: 80
   - path: /backend_docs
     serviceName: backend-docs
+    servicePort: 80
+  - path: /frontend_docs
+    serviceName: frontend-docs
     servicePort: 80
   # tls:
   # - secretName: footpatrol-tls
