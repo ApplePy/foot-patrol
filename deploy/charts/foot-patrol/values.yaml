@@ -42,7 +42,7 @@ backend_docs:
 
 frontend_docs:
   name: frontend-docs
-  imageName: frontend_docs
+  imageName: website_docs
   externalPort: 80
   internalPort: 80
   replicas: 1
