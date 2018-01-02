@@ -2,13 +2,31 @@
 import sys, json, os
 
 
+def addBasePath(reports, basePath):
+    for report in reports:
+        # Only get reports from files
+        if 'location' not in report:
+            continue
+
+        report['location']['path'] = os.path.join(basePath, report['location']['path'])
+
+
 def ReadReports(filenames: list):
     '''Read in all reports'''
     reports = []
 
     for arg in filenames:
         with open(arg) as file:
-            reports.extend(json.loads(file.read()))
+            # Load json
+            fileReports = json.loads(file.read())
+
+            # Update locations to contain full path
+            if arg == "backend.json":
+                addBasePath(fileReports, 'src/backend')
+            elif arg == "frontend.json":
+                addBasePath(fileReports, 'src/dispatch-website')
+
+            reports.extend(fileReports)
     
     return reports
 
