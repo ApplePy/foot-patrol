@@ -4,8 +4,8 @@
 
 # Ensure that the back passes its tests first since the front relies on the back
 stages:
-  - pretest
   - test
+  - posttest
   - build
   - containerize
   - deploy
@@ -23,7 +23,7 @@ variables:
   # $DB_ROOT_PASS: password for root account
 
 .quality_base: &quality_base
-  stage: pretest
+  stage: test
   tags:
   - dind
   except:
@@ -133,6 +133,7 @@ test_dispatch_website:
 # Handle linting and other code quality errors
 codequality:
   <<: *test_common
+  stage: posttest
   image: python:3
   dependencies:
   - quality_top
