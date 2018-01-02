@@ -83,7 +83,7 @@ class RequestsAPITest {
     ];
 
     // Test
-    const requestsRoute = serverEnv.container.getNamed(IFACES.IROUTE, TAGS.REQUESTS) as RequestsRoute;
+    const requestsRoute = serverEnv.container.getNamed<RequestsRoute>(IFACES.IROUTE, TAGS.REQUESTS);
     const results = requestsRoute.sanitizeMap(SAN_MAP, DATA_MAP);
 
     // Assert
@@ -104,7 +104,7 @@ class RequestsAPITest {
     };
 
     // Test
-    const requestsRoute = serverEnv.container.getNamed(IFACES.IROUTE, TAGS.REQUESTS) as RequestsRoute;
+    const requestsRoute = serverEnv.container.getNamed<RequestsRoute>(IFACES.IROUTE, TAGS.REQUESTS);
     const results = requestsRoute.constructSQLUpdateQuery(1, "requests", INPUT);
 
     // Assert
@@ -120,7 +120,7 @@ class RequestsAPITest {
     const INPUT: any[] = [];
 
     // Test
-    const requestsRoute = serverEnv.container.getNamed(IFACES.IROUTE, TAGS.REQUESTS) as RequestsRoute;
+    const requestsRoute = serverEnv.container.getNamed<RequestsRoute>(IFACES.IROUTE, TAGS.REQUESTS);
     const results = requestsRoute.constructSQLUpdateQuery(1, "requests", INPUT as [{key: string, value: any}]);
 
     // Assert

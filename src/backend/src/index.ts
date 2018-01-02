@@ -59,7 +59,7 @@ class ServerEnvironmentSetup {
   constructor() {
     // Setup container
     this.container = new inversify.Container();
-    this.container.bind<IRoute>(IFACES.IROUTE).to(LocationsRoute).whenTargetNamed(TAGS.LOCATIONS);
+
     this.container.bind<IRoute>(IFACES.IROUTE).to(RequestsRoute).whenTargetNamed(TAGS.REQUESTS);
     this.container.bind<ISanitizer>(IFACES.ISANITIZER).to(Sanitizer);
     this.container.bind<ISQLService>(IFACES.ISQLSERVICE).to(MySQLService).inSingletonScope();
