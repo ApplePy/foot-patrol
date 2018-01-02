@@ -291,7 +291,7 @@ export class RequestsRoute implements IRoute {
    *        timestamp: "2017-10-26T06:51:05.000Z"
    *     }
    *
-   * @apiError (Error 400) MissingParameters One of the post request parameters was missing.
+   * @apiError (Error 400) MissingParameters One of the post request parameters was missing or invalid.
    * @apiErrorExample Error Response:
    *     HTTP/1.1 400 BAD REQUEST
    *     {
@@ -324,7 +324,6 @@ export class RequestsRoute implements IRoute {
     this.db.makeQuery(
       "INSERT INTO `requests` (name, from_location, to_location, additional_info) VALUES(?,?,?,?)",
       [req.body.name, req.body.from_location, req.body.to_location, req.body.additional_info])
-    .catch(this.checkBadForeignKey(next))
     .then((results: any) => this.getId(results.insertId))
     .then((getRes) => res.status(201).send(getRes))
     .catch((err) => next(err));
@@ -372,8 +371,7 @@ export class RequestsRoute implements IRoute {
    *        timestamp: "2017-10-26T06:51:05.000Z"
    *     }
    *
-   * @apiError (Error 400) MissingOrInvalidParameters One of the request parameters was missing.
-   * @apiError (Error 400) InvalidLocation One of the location parameters refer to a non-existent location.
+   * @apiError (Error 400) MissingOrInvalidParameters One of the request parameters was missing or invalid.
    * @apiError (Error 404) RequestNotFound The request ID was not found.
    * @apiErrorExample Error Response:
    *     HTTP/1.1 400 BAD REQUEST
@@ -415,7 +413,6 @@ export class RequestsRoute implements IRoute {
     this.db.makeQuery(
       "UPDATE requests SET name=?, from_location=?, to_location=?, additional_info=?, archived=? WHERE id=?",
       [req.body.name, req.body.from_location, req.body.to_location, req.body.additional_info, req.body.archived, id])
-      .catch(this.checkBadForeignKey(next))
       .then(this.checkRowUpdated(id, next))
       .then(() => this.getId(id))
       .then((row) => res.send(row))
@@ -464,7 +461,7 @@ export class RequestsRoute implements IRoute {
    *        timestamp: "2017-10-26T06:51:05.000Z"
    *     }
    * @apiError (Error 400) InvalidQueryParameters The requested ID was invalid format.
-   * @apiError (Error 400) InvalidLocation One of the location parameters equal or refer to a non-existent location.
+   * @apiError (Error 400) InvalidLocation One of the location parameters equal.
    * @apiError (Error 404) RequestNotFound The request ID was not found.
    * @apiErrorExample Error Response:
    *     HTTP/1.1 404 NOT FOUND
@@ -509,7 +506,6 @@ export class RequestsRoute implements IRoute {
     if (!isNull(sqlQueryData)) {
       // Make patch query
       prom = this.db.makeQuery(sqlQueryData.query, sqlQueryData.values)
-      .catch(this.checkBadForeignKey(next))
       .then(this.checkRowUpdated(id, next));
     }
 
@@ -565,7 +561,7 @@ export class RequestsRoute implements IRoute {
   }
 
   /**
-   * Get the request_view for an ID number.
+   * Get the request entry for an ID number.
    * 
    * @param id The id to retrieve
    */
@@ -583,22 +579,6 @@ export class RequestsRoute implements IRoute {
       val.archived = Boolean(val.archived);
       return val;
     });
-  }
-
-  /**
-   * Check for invalid foreign key SQL error. Call in promise 'catch'
-   * 
-   * @param next The function to call on error
-   */
-  private checkBadForeignKey(next: NextFunction) {
-    return (err: any) => {
-      // Catch invalid locations
-      if (err.message.search("ER_NO_REFERENCED_ROW_2") >= 0) {
-        next(new StatusError(400, "Invalid Location", "Location does not exist."));
-      } else {
-        next(err);
-      }
-    };
   }
 
   /**

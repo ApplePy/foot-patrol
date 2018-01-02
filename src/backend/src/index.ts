@@ -36,7 +36,6 @@ import * as inversify from "inversify";
 import "reflect-metadata";
 import { IFACES, TAGS } from "./ids";
 import { IRoute } from "./routes/iroute";
-import { LocationsRoute } from "./routes/locations";
 import { RequestsRoute } from "./routes/requests";
 import { Server } from "./server";
 import { ISanitizer } from "./services/isanitizer";
