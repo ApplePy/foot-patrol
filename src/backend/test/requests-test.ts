@@ -14,7 +14,6 @@ import { MySQLService } from "../src/services/mysql_service";
 import { TestReplaceHelper } from "./test-helper";
 
 // Route
-import { LocationsRoute } from "../src/routes/locations";
 import { RequestsRoute } from "../src/routes/requests";
 
 // Chai setup
