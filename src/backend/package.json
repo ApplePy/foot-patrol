@@ -64,6 +64,7 @@
     "jshint": "^2.9.5",
     "mocha": "^4.0.1",
     "mocha-typescript": "^1.1.11",
+    "moment": "^2.20.1",
     "nodemon": "^1.12.1",
     "nyc": "^11.2.1",
     "source-map-support": "^0.5.0",

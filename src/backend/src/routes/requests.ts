@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response, Router } from "express";
 import { Container, inject, injectable } from "inversify";
-import { isNull } from "util";
+import { isNull, isNullOrUndefined } from "util";
 import { IFACES, TAGS } from "../ids";
 import { ISanitizer } from "../services/isanitizer";
 import { ISQLService } from "../services/isqlservice";
@@ -109,7 +109,7 @@ export class RequestsRoute implements IRoute {
    * @param next {NextFunction} Execute the next method.
    *
    * @api {get} /api/v1/requests Get walking escort requests
-   * @apiVersion 1.0.0
+   * @apiVersion 1.1.0
    * @apiName GetRequests
    * @apiGroup Requests
    *
@@ -186,7 +186,7 @@ export class RequestsRoute implements IRoute {
     const meta = {offset, count, archived};
 
     // Query for data
-    this.db.makeQuery("SELECT * FROM `requests_view` WHERE archived = false||? LIMIT ?, ?", [archived, offset, count])
+    this.db.makeQuery("SELECT * FROM `requests` WHERE archived = false||? LIMIT ?, ?", [archived, offset, count]) // TODO: Why false||? ???
     .then((requests) => requests.map((val) => { // Convert int back to bool
       val.archived = Boolean(val.archived);
       return val;
@@ -263,19 +263,19 @@ export class RequestsRoute implements IRoute {
    * @param next {NextFunction} Execute the next method.
    *
    * @api {post} /api/v1/requests Create a new walk escort request
-   * @apiVersion 1.0.0
+   * @apiVersion 1.1.0
    * @apiName PostRequest
    * @apiGroup Requests
    *
    * @apiParam {string} [name] Name of the requester.
-   * @apiParam {number} from_location Escort start location.
-   * @apiParam {number} to_location Escort destination.
+   * @apiParam {string} from_location Escort start location.
+   * @apiParam {string} to_location Escort destination.
    * @apiParam {string} [additional_info] Additional request information.
    *
    * @apiSuccess {number} id The record ID.
    * @apiSuccess {string} [name] Name of the requester.
-   * @apiSuccess {number} from_location Escort start location.
-   * @apiSuccess {number} to_location Escort destination.
+   * @apiSuccess {string} from_location Escort start location.
+   * @apiSuccess {string} to_location Escort destination.
    * @apiSuccess {string} [additional_info] Additional request information.
    * @apiSuccess {boolean} archived Specifies if this request completed and archived.
    * @apiSuccess {string} timestamp Timestamp the record was created.
@@ -285,14 +285,13 @@ export class RequestsRoute implements IRoute {
    *     {
    *        id: 1,
    *        name: "John Doe",
-   *        from_location: 1,
-   *        to_location: 2,
+   *        from_location: "UCC",
+   *        to_location: "SEB",
    *        archived: false,
    *        timestamp: "2017-10-26T06:51:05.000Z"
    *     }
    *
    * @apiError (Error 400) MissingParameters One of the post request parameters was missing.
-   * @apiError (Error 400) InvalidLocation One of the location parameters refer to a non-existent location.
    * @apiErrorExample Error Response:
    *     HTTP/1.1 400 BAD REQUEST
    *     {
@@ -303,16 +302,14 @@ export class RequestsRoute implements IRoute {
   public postRequest(req: Request, res: Response, next: NextFunction) {
     // Catch missing data
     if (
-      isNaN(req.body.from_location) ||
-      isNaN(req.body.to_location) ||
-      req.body.from_location <= 0 ||
-      req.body.to_location <= 0 ||
+      isNullOrUndefined(req.body.from_location) ||
+      isNullOrUndefined(req.body.to_location) ||
       req.body.from_location === req.body.to_location
     ) {
       next (new StatusError(
         400,
         "Missing Parameters",
-        "'from_location' and 'to_location' greater than 0 and not equal to each other" +
+        "'from_location' and 'to_location' must be supplied and not equal to each other" +
         " are required parameters."));
       return;
     }
@@ -320,6 +317,8 @@ export class RequestsRoute implements IRoute {
     // Sanitize data
     req.body.name = this.sanitizer.sanitize(req.body.name);
     req.body.additional_info = this.sanitizer.sanitize(req.body.additional_info);
+    req.body.from_location = this.sanitizer.sanitize(req.body.from_location);
+    req.body.to_location = this.sanitizer.sanitize(req.body.to_location);
 
     // Insert into database and get resulting record
     this.db.makeQuery(
@@ -342,22 +341,22 @@ export class RequestsRoute implements IRoute {
    * @apiDescription Omitting a parameter from the new object will delete the
    *                  field if it currently exists.
    *                  Other parameters (e.g. id), if specified, will be ignored.
-   * @apiVersion 1.0.0
+   * @apiVersion 1.1.0
    * @apiName PutRequest
    * @apiGroup Requests
    *
    * @apiParam (URL Parameter) {number} id The id of the request to replace.
    *
    * @apiParam {string} [name] Name of the requester.
-   * @apiParam {number} from_location Escort start location.
-   * @apiParam {number} to_location Escort destination.
+   * @apiParam {string} from_location Escort start location.
+   * @apiParam {string} to_location Escort destination.
    * @apiParam {string} [additional_info] Additional request information.
    * @apiParam {boolean} archived Specifies if this request is completed and archived.
    *
    * @apiSuccess {number} id The record ID.
    * @apiSuccess {string} [name] Name of the requester.
-   * @apiSuccess {number} from_location Escort start location.
-   * @apiSuccess {number} to_location Escort destination.
+   * @apiSuccess {string} from_location Escort start location.
+   * @apiSuccess {string} to_location Escort destination.
    * @apiSuccess {string} [additional_info] Additional request information.
    * @apiSuccess {boolean} archived Specifies if this request completed and archived.
    * @apiSuccess {string} timestamp Timestamp the record was created.
@@ -367,8 +366,8 @@ export class RequestsRoute implements IRoute {
    *     {
    *        id: 1,
    *        name: "John Doe",
-   *        from_location: 1,
-   *        to_location: 2,
+   *        from_location: "UCC",
+   *        to_location: "SEB",
    *        archived: false,
    *        timestamp: "2017-10-26T06:51:05.000Z"
    *     }
@@ -395,10 +394,8 @@ export class RequestsRoute implements IRoute {
     // Catch missing data
     if (
       req.body.archived === undefined ||
-      isNaN(req.body.from_location) ||
-      isNaN(req.body.to_location) ||
-      req.body.from_location <= 0 ||
-      req.body.to_location <= 0 ||
+      isNullOrUndefined(req.body.from_location) ||
+      isNullOrUndefined(req.body.to_location) ||
       req.body.from_location === req.body.to_location) {
       next (new StatusError(
         400,
@@ -408,9 +405,11 @@ export class RequestsRoute implements IRoute {
     }
 
     // Sanitize data
-    req.body.archived = (req.body.archived === "true") ? true : false;  // TODO: Boolean sanitizer?
+    req.body.archived = (req.body.archived === true || req.body.archived === "true") ? true : false;
     req.body.name = this.sanitizer.sanitize(req.body.name);
     req.body.additional_info = this.sanitizer.sanitize(req.body.additional_info);
+    req.body.from_location = this.sanitizer.sanitize(req.body.from_location);
+    req.body.to_location = this.sanitizer.sanitize(req.body.to_location);
 
     // Replace records via an UPDATE
     this.db.makeQuery(
@@ -434,22 +433,22 @@ export class RequestsRoute implements IRoute {
    * @apiDescription Omitting a parameter from the new object will preserve the
    *                  existing value (if it exists).
    *                  Other parameters (e.g. id), if specified, will be ignored.
-   * @apiVersion 1.0.0
+   * @apiVersion 1.1.0
    * @apiName PatchRequest
    * @apiGroup Requests
    *
    * @apiParam (URL Parameter) {number} id The id of the request to update.
    *
    * @apiParam {string} [name] Name of the requester.
-   * @apiParam {number} [from_location] Escort start location.
-   * @apiParam {number} [to_location] Escort destination.
+   * @apiParam {string} [from_location] Escort start location.
+   * @apiParam {string} [to_location] Escort destination.
    * @apiParam {string} [additional_info] Additional request information.
    * @apiParam {boolean} [archived] Specifies if this request is completed and archived.
    *
    * @apiSuccess {number} id The record ID.
    * @apiSuccess {string} [name] Name of the requester.
-   * @apiSuccess {number} from_location Escort start location.
-   * @apiSuccess {number} to_location Escort destination.
+   * @apiSuccess {string} from_location Escort start location.
+   * @apiSuccess {string} to_location Escort destination.
    * @apiSuccess {string} [additional_info] Additional request information.
    * @apiSuccess {boolean} archived Specifies if this request completed and archived.
    * @apiSuccess {string} timestamp Timestamp the record was created.
@@ -459,8 +458,8 @@ export class RequestsRoute implements IRoute {
    *     {
    *        id: 1,
    *        name: "John Doe",
-   *        from_location: 1,
-   *        to_location: 2,
+   *        from_location: "UCC",
+   *        to_location: "SEB",
    *        archived: false,
    *        timestamp: "2017-10-26T06:51:05.000Z"
    *     }
@@ -486,8 +485,8 @@ export class RequestsRoute implements IRoute {
     // Maps column to sanitizing function
     const sanitizeMap: any = {
       name: this.sanitizer.sanitize,
-      from_location: Number,
-      to_location: Number,
+      from_location: this.sanitizer.sanitize,
+      to_location: this.sanitizer.sanitize,
       additional_info: this.sanitizer.sanitize,
       archived: Boolean
     };
@@ -528,7 +527,7 @@ export class RequestsRoute implements IRoute {
    * @param next {NextFunction} Execute the next method.
    *
    * @api {delete} /api/v1/requests/:id Delete specific request
-   * @apiVersion 1.0.0
+   * @apiVersion 1.1.0
    * @apiName DeleteRequest
    * @apiGroup Requests
    *
@@ -572,7 +571,7 @@ export class RequestsRoute implements IRoute {
    */
   private getId(id: number) {
     // Query for data
-    return this.db.makeQuery("SELECT * FROM `requests_view` WHERE id=?", [id])
+    return this.db.makeQuery("SELECT * FROM `requests` WHERE id=?", [id])
     .then((request) => {
       if (request.length > 0) {
         return request[0];
