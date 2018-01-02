@@ -4,6 +4,7 @@
 
 # Ensure that the back passes its tests first since the front relies on the back
 stages:
+  - pretest
   - test
   - build
   - containerize
@@ -21,6 +22,49 @@ variables:
   # $DB_PASS: password for footpatrol account
   # $DB_ROOT_PASS: password for root account
 
+.quality_base: &quality_base
+  stage: pretest
+  tags:
+  - dind
+  except:
+  - temp
+  - tags
+  artifacts:
+    expire_in: 1 hour
+  image: docker:latest
+  services:
+  - name: docker:dind
+    command: ["--registry-mirror=http://registry.internal.incode.ca:80"]
+  artifacts:
+   paths:
+   - top.json
+   - backend.json
+   - frontend.json
+  before_script:
+  - docker pull codeclimate/codeclimate
+
+quality_top:
+  <<: *quality_base
+  script:
+  - docker run --env CODECLIMATE_CODE="$PWD" --env DOCKER_HOST="$DOCKER_PORT" --volume "$PWD":/code --volume /tmp/cc:/tmp/cc codeclimate/codeclimate analyze -f json > top.json
+
+quality_backend:
+  <<: *quality_base
+  script:
+  - cd src/backend
+  - docker run --env CODECLIMATE_CODE="$PWD" --env DOCKER_HOST="$DOCKER_PORT" --volume "$PWD":/code --volume /tmp/cc:/tmp/cc codeclimate/codeclimate analyze -f json > ../../backend.json
+
+quality_frontend:
+  <<: *quality_base
+  cache:
+    key: quality_frontend
+    paths:
+    - src/dispatch-website/node_modules/
+  image: registry.incode.ca/capstone/foot-patrol/node-docker:8-17.12    # Merged node:8-alpine and docker:17.12
+  script:
+  - cd src/dispatch-website
+  - npm install # Workaround for https://github.com/tkqubo/codeclimate-tslint/issues/26
+  - docker run --env CODECLIMATE_CODE="$PWD" --env DOCKER_HOST="$DOCKER_PORT" --volume "$PWD":/code --volume /tmp/cc:/tmp/cc codeclimate/codeclimate analyze -f json > ../../frontend.json
 
 #################################
 #                               #
@@ -40,6 +84,7 @@ variables:
 .test_docker_common: &test_docker_common
   <<: *test_common
   image: node:8
+  dependencies: []
   tags:
   - docker
   - linux
@@ -63,13 +108,13 @@ test_backend:
    - cd src/backend
    - rm package-lock.json || true   # So that cache server works
    - npm install
-   - npm run lint || true   # Prevents JSHint errors from stopping build
    - npm run coverage
 
 
 # This test ensures the front end works
 test_dispatch_website:
   <<: *test_docker_common
+  image: amio/node-chrome   # Contains both Node 8 and Chrome (https://incode.ca/capstone/docker-node-chrome mirrored from https://github.com/amio/docker-node-chrome)
   artifacts:
     paths:
       - src/dispatch-website/coverage/
@@ -81,9 +126,26 @@ test_dispatch_website:
    - cd src/dispatch-website
    - rm package-lock.json || true   # So that cache server works
    - npm install
-   - npm run lint || true   # Prevents JSHint errors from stopping build
-  #  - npm run coverage     # TODO: Figure out how to test Angular (https://gist.github.com/coolman565/f392f08cf90e90db18dd06e7d3f5f41c)
+   - npm run coverage
+   # - npm run e2e          # TODO: Do we want e2e testing?
 
+
+# Handle linting and other code quality errors
+codequality:
+  <<: *test_common
+  image: python:3
+  dependencies:
+  - quality_top
+  - quality_frontend
+  - quality_backend
+  tags:
+  - docker
+  - linux
+  artifacts:
+   paths:
+   - codeclimate.json
+  script:
+   - python join.py top.json backend.json frontend.json codeclimate.json
 
 # This test ensures the front end works
 # test_mobile:
