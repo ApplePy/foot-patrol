@@ -57,7 +57,7 @@ quality_backend:
 quality_frontend:
   <<: *quality_base
   cache:
-    key: quality_frontend
+    key: frontend
     paths:
     - src/dispatch-website/node_modules/
   image: registry.incode.ca/capstone/foot-patrol/node-docker:8-17.12    # Merged node:8-alpine and docker:17.12
