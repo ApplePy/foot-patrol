@@ -445,7 +445,7 @@ deploy_review:
   <<: *deploy_common
   variables:
     TAG: $CI_COMMIT_REF_SLUG
-    COMMON_INSTALL_HELM: --tiller-namespace $NAMESPACE --namespace ${NAMESPACE} --set appLabel=$CI_ENVIRONMENT_SLUG,dockercfg=$DOCKERCFG,imageBase=$CI_REGISTRY_IMAGE # TODO: Image tag needs to be replaced
+    COMMON_INSTALL_HELM: --tiller-namespace $NAMESPACE --namespace ${NAMESPACE} --set appLabel=$CI_ENVIRONMENT_SLUG,dockercfg=$DOCKERCFG,imageBase=$CI_REGISTRY_IMAGE
     HELM_CHART: deploy/charts/foot-patrol
   script:
     - helm dependency build $HELM_CHART
@@ -489,7 +489,7 @@ staging:
   <<: *deploy_common
   variables:
     TAG: $CI_COMMIT_REF_SLUG-$CI_COMMIT_SHA
-    COMMON_INSTALL_HELM: --tiller-namespace $NAMESPACE --namespace ${NAMESPACE} --set appLabel=$CI_ENVIRONMENT_SLUG,dockercfg=$DOCKERCFG,imageBase=$CI_REGISTRY_IMAGE # TODO: Image tag needs to be replaced
+    COMMON_INSTALL_HELM: --tiller-namespace $NAMESPACE --namespace ${NAMESPACE} --set appLabel=$CI_ENVIRONMENT_SLUG,dockercfg=$DOCKERCFG,imageBase=$CI_REGISTRY_IMAGE
     HELM_CHART: deploy/charts/foot-patrol
   script:
     - helm dependency build $HELM_CHART
@@ -529,7 +529,7 @@ production:
   <<: *deploy_common
   variables:
     TAG: $CI_COMMIT_REF_SLUG-$CI_COMMIT_SHA
-    COMMON_INSTALL_HELM: --tiller-namespace $NAMESPACE --namespace ${NAMESPACE} --set appLabel=$CI_ENVIRONMENT_SLUG,dockercfg=$DOCKERCFG,imageBase=$CI_REGISTRY_IMAGE # TODO: Image tag needs to be replaced
+    COMMON_INSTALL_HELM: --tiller-namespace $NAMESPACE --namespace ${NAMESPACE} --set appLabel=$CI_ENVIRONMENT_SLUG,dockercfg=$DOCKERCFG,imageBase=$CI_REGISTRY_IMAGE
     HELM_CHART: deploy/charts/foot-patrol
   script:
     - helm dependency build $HELM_CHART
