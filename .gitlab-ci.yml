@@ -312,36 +312,39 @@ build_backend:
     - master
     - develop
     - tags
+  variables:
+    TAG: $CI_COMMIT_REF_SLUG
 
 .containerize_deploy_common: &containerize_deploy_common
   only:
     - master
     - develop
+  variables:
+    TAG: $CI_COMMIT_REF_SLUG-$CI_COMMIT_SHA
   
 .web_container: &web_container
   script:
    - cd src/dispatch-website
-   - docker build --no-cache -t $CI_REGISTRY_IMAGE/webapp:$CI_COMMIT_REF_SLUG-$CI_COMMIT_SHA .
-   - docker push $CI_REGISTRY_IMAGE/webapp:$CI_COMMIT_REF_SLUG-$CI_COMMIT_SHA
+   - docker build --no-cache -t $CI_REGISTRY_IMAGE/webapp:$TAG .
+   - docker push $CI_REGISTRY_IMAGE/webapp:$TAG
 
 .back_container: &back_container
   script:
    - cd src/backend
-   - docker build --no-cache -t $CI_REGISTRY_IMAGE/backend:$CI_COMMIT_REF_SLUG-$CI_COMMIT_SHA .
-   - docker push $CI_REGISTRY_IMAGE/backend:$CI_COMMIT_REF_SLUG-$CI_COMMIT_SHA
+   - docker build --no-cache -t $CI_REGISTRY_IMAGE/backend:$TAG .
+   - docker push $CI_REGISTRY_IMAGE/backend:$TAG
 
 .back_docs_container: &back_docs_container
   script:
   - cd src/backend
-  - docker build --file Dockerfile_docs -t $CI_REGISTRY_IMAGE/backend_docs:$CI_COMMIT_REF_SLUG-$CI_COMMIT_SHA .
-  - docker push $CI_REGISTRY_IMAGE/backend_docs:$CI_COMMIT_REF_SLUG-$CI_COMMIT_SHA
+  - docker build --file Dockerfile_docs -t $CI_REGISTRY_IMAGE/backend_docs:$TAG .
+  - docker push $CI_REGISTRY_IMAGE/backend_docs:$TAG
 
 .website_docs_container: &website_docs_container
   script:
   - cd src/dispatch-website
-  - docker build --file Dockerfile_docs -t $CI_REGISTRY_IMAGE/website_docs:$CI_COMMIT_REF_SLUG-$CI_COMMIT_SHA .
-  - docker push $CI_REGISTRY_IMAGE/website_docs:$CI_COMMIT_REF_SLUG-$CI_COMMIT_SHA
-
+  - docker build --file Dockerfile_docs -t $CI_REGISTRY_IMAGE/website_docs:$TAG .
+  - docker push $CI_REGISTRY_IMAGE/website_docs:$TAG
 ### --- REVIEW --- ###
 
 # This job builds the client-side code for review
@@ -429,7 +432,7 @@ containerize_website_docs:
     - linux
     - kubernetes
   variables:
-    COMMON_INSTALL_HELM: --tiller-namespace $NAMESPACE --namespace ${NAMESPACE} --set appLabel=$CI_ENVIRONMENT_SLUG,dockercfg=$DOCKERCFG,imageTag=$CI_COMMIT_REF_SLUG-$CI_COMMIT_SHA,imageBase=$CI_REGISTRY_IMAGE
+    COMMON_INSTALL_HELM: --tiller-namespace $NAMESPACE --namespace ${NAMESPACE} --set appLabel=$CI_ENVIRONMENT_SLUG,dockercfg=$DOCKERCFG,imageBase=$CI_REGISTRY_IMAGE # TODO: Image tag needs to be replaced
     HELM_CHART: deploy/charts/foot-patrol
   before_script:
   - helm init --client-only --tiller-namespace $NAMESPACE
@@ -443,9 +446,11 @@ containerize_website_docs:
 # This job takes the contents from the build review jobs, then deploys everything
 deploy_review:
   <<: *deploy_common
+  variables:
+    TAG: $CI_COMMIT_REF_SLUG
   script:
     - helm dependency build $HELM_CHART
-    - helm upgrade $CI_ENVIRONMENT_SLUG $HELM_CHART --install $COMMON_INSTALL_HELM --set backend.replicas=1,webapp.replicas=1,ingress.hosts={"$CI_COMMIT_REF_SLUG.$DOMAIN"},$DB_CONFIG
+    - helm upgrade $CI_ENVIRONMENT_SLUG $HELM_CHART --install $COMMON_INSTALL_HELM --set backend.replicas=1,webapp.replicas=1,imageTag=$TAG,ingress.hosts={"$CI_COMMIT_REF_SLUG.$DOMAIN"},$DB_CONFIG
     - cd src/backend
     - until [ $(kubectl get pods -n $NAMESPACE | grep "$CI_ENVIRONMENT_SLUG-mysql" | grep -o "1/1") ]; do echo "mysql not ready..."; sleep 15; done
     - sleep 30  # Wait out any bugs
@@ -483,9 +488,11 @@ shutdown_review:
 # This job takes the contents from the previous job, builds them into a docker image, then deploys everything
 staging:
   <<: *deploy_common
+  variables:
+    TAG: $CI_COMMIT_REF_SLUG-$CI_COMMIT_SHA
   script:
     - helm dependency build $HELM_CHART
-    - helm upgrade $CI_ENVIRONMENT_SLUG $HELM_CHART --install $COMMON_INSTALL_HELM --set ingress.hosts={"staging.$DOMAIN"},$DB_CONFIG
+    - helm upgrade $CI_ENVIRONMENT_SLUG $HELM_CHART --install $COMMON_INSTALL_HELM --set ingress.hosts={"staging.$DOMAIN"},imageTag=$TAG,$DB_CONFIG
     - cd src/backend
     - until [ $(kubectl get pods -n $NAMESPACE | grep "$CI_ENVIRONMENT_SLUG-mysql" | grep -o "1/1") ]; do echo "mysql not ready..."; sleep 15; done
     - sleep 30  # Wait out any bugs
@@ -519,9 +526,11 @@ shutdown_staging:
 # This job takes the contents from the previous job, builds them into a docker image, then deploys everything
 production:
   <<: *deploy_common
+  variables:
+    TAG: $CI_COMMIT_REF_SLUG-$CI_COMMIT_SHA
   script:
     - helm dependency build $HELM_CHART
-    - helm upgrade $CI_ENVIRONMENT_SLUG $HELM_CHART --install $COMMON_INSTALL_HELM --set ingress.hosts={"$DOMAIN"},$DB_CONFIG
+    - helm upgrade $CI_ENVIRONMENT_SLUG $HELM_CHART --install $COMMON_INSTALL_HELM --set ingress.hosts={"$DOMAIN"},imageTag=$TAG,$DB_CONFIG
     - cd src/backend
     - until [ $(kubectl get pods -n $NAMESPACE | grep "$CI_ENVIRONMENT_SLUG-mysql" | grep -o "1/1") ]; do echo "mysql not ready..."; sleep 15; done
     - sleep 30  # Wait out any bugs
