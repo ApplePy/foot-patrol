@@ -427,6 +427,7 @@ containerize_website_docs:
   tags:
     - docker
     - linux
+    - kubernetes
   variables:
     COMMON_INSTALL_HELM: --tiller-namespace $NAMESPACE --namespace ${NAMESPACE} --set appLabel=$CI_ENVIRONMENT_SLUG,dockercfg=$DOCKERCFG,imageTag=$CI_COMMIT_REF_SLUG-$CI_COMMIT_SHA,imageBase=$CI_REGISTRY_IMAGE
     HELM_CHART: deploy/charts/foot-patrol
