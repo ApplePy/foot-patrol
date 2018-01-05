@@ -40,12 +40,12 @@ class RequestsAPITest {
     // Put any needed data here
   }
 
-  public before() {
-    // hook for before each test; make static to be after the suite
+  public after() {
+    // hook for after each test; make static to be after the suite
   }
 
-    // hook for after each test; make static to be after the suite
-  public after(done: MochaDone) {
+    // hook for before each test; make static to be before the suite
+  public before(done: MochaDone) {
     // Clear DB and FakeSQL state
     FakeSQL.response = undefined;
     serverEnv.container.get<ISQLService>(IFACES.ISQLSERVICE).makeQuery("DELETE FROM requests")

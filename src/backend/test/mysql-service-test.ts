@@ -3,7 +3,7 @@ process.env.NODE_ENV = "test";
 
 import * as chai from "chai";
 import chaiAsPromised = require("chai-as-promised");
-import { only, skip, suite, test } from "mocha-typescript";
+import { only, skip, suite, test, timeout } from "mocha-typescript";
 import "reflect-metadata";
 import * as mock from "ts-mockito";
 import { isNullOrUndefined } from "util";
@@ -22,6 +22,35 @@ const eventually = chai.use(chaiAsPromised);
  */
 @suite
 class MySQLServiceTest {
+
+  @timeout(10 * 1000 * 5)
+  public static before(done: MochaDone) {
+    // Ensure MySQL is up before starting
+    const sql = new MySQLService();
+    sql.initialize(
+      process.env.MYSQL_HOST as string,
+      process.env.MYSQL_USER as string,
+      process.env.MYSQL_PASS as string,
+      process.env.MYSQL_DB as string);
+
+    // Process of looping around until db is ready
+    const isConnected = (retriesLeft: number) => {
+      sql.getConnection()
+      .then(() => done())
+      .catch((err) => {
+        if (retriesLeft <= 0) {
+          console.error("Ran out of retries, quitting...");
+          done(err);  // Error out
+        } else {
+          console.error("MySQL not ready, waiting 10s before retrying...");
+          setTimeout(isConnected, 10 * 1000, retriesLeft - 1);  // Try again
+        }
+      });
+    };
+
+    // Start checking if connected
+    isConnected(4);
+  }
 
   constructor() {
     // Put any needed data here

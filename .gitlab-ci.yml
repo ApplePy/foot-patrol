@@ -89,14 +89,22 @@ quality_frontend:
   - docker
   - linux
   coverage: /Functions\s*:\s*(\d*\.?\d+)%/
-  variables:
-    NODE_ENV: 'test'  # To set Mocha to isolate data
   # before_script:
   # - npm config set registry $NPM_CACHE # Setup proxy to stop killing bandwidth
 
 # This test ensures the back end works
 test_backend:
   <<: *test_docker_common
+  variables:
+    NODE_ENV: 'test'  # To set Mocha to isolate data
+    MYSQL_ROOT_PASSWORD: testing
+    MYSQL_DATABASE: foot_patrol
+    MYSQL_HOST: localhost
+    MYSQL_PASS: testing
+    MYSQL_USER: root
+    MYSQL_DB: foot_patrol
+  services:
+    - mysql:latest
   artifacts:
     paths:
       - src/backend/coverage/
