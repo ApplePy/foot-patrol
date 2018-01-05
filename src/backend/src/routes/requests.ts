@@ -186,7 +186,8 @@ export class RequestsRoute implements IRoute {
     const meta = {offset, count, archived};
 
     // Query for data
-    this.db.makeQuery("SELECT * FROM `requests` WHERE archived = false||? LIMIT ?, ?", [archived, offset, count]) // TODO: Why false||? ???
+    // TODO: Why 'false||?' ?
+    this.db.makeQuery("SELECT * FROM `requests` WHERE archived = false||? LIMIT ?, ?", [archived, offset, count])
     .then((requests) => requests.map((val) => { // Convert int back to bool
       val.archived = Boolean(val.archived);
       return val;
@@ -481,11 +482,11 @@ export class RequestsRoute implements IRoute {
 
     // Maps column to sanitizing function
     const sanitizeMap: any = {
-      name: this.sanitizer.sanitize,
-      from_location: this.sanitizer.sanitize,
-      to_location: this.sanitizer.sanitize,
       additional_info: this.sanitizer.sanitize,
-      archived: Boolean
+      archived: Boolean,
+      from_location: this.sanitizer.sanitize,
+      name: this.sanitizer.sanitize,
+      to_location: this.sanitizer.sanitize
     };
 
     // List of sanitized data

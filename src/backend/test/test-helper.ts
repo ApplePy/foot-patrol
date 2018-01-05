@@ -14,16 +14,19 @@ export class TestReplaceHelper {
      * @param table         The table to do the replacement in
      * @param data          The data to use
      */
-    public static replace(queryFunction: (string: string, prepare: any[])=>any, table: string, data: any) {
-        
+    public static replace(
+      queryFunction: (queryString: string, prepare: any[]) => any,
+      table: string,
+      data: any) {
         // Create questions array
-        let questions = [];
-        for (let item in Object.keys(data)) {
-            questions.push('?');
+        const questions = [];
+        for (const item of Object.keys(data)) {
+            questions.push("?");
         }
 
         // Construct query function
-        return queryFunction(`REPLACE INTO ${table} (${Object.keys(data).join()}) values (${questions.join()})`, Object.keys(data).map(key => data[key]));
+        return queryFunction(`REPLACE INTO ${table} (${Object.keys(data).join()})
+         VALUES (${questions.join()})`, Object.keys(data).map((key) => data[key]));
     }
 
     /**
@@ -34,20 +37,24 @@ export class TestReplaceHelper {
      * @param dataInfo      The data to use
      * @param field         The field with a date in it that needs conversion
      */
-    public static dateReplace(queryFunction: (string: string, prepare: any[])=>any, table: string, dataInfo: object | object[], field: string) {
+    public static dateReplace(
+      queryFunction: (queryString: string, prepare: any[]) => any,
+      table: string,
+      dataInfo: object | object[],
+      field: string) {
         let dataArr: any[];
-        if (Array.isArray(dataInfo) == false) {
+        if (Array.isArray(dataInfo) === false) {
             dataArr = [dataInfo];  // Convert to array
         } else {
             dataArr = dataInfo as object[];
         }
-        
+
         // Stub to make FakeSQL quiet
         const temp = FakeSQL.response;
         FakeSQL.response = {};
 
-        let promises = [];
-        for (let data of dataArr) {
+        const promises = [];
+        for (const data of dataArr) {
             // Swap out date types
             const tempData = data[field];
             data[field] = Moment(data[field]).format("YYYY-MM-DD HH:mm:ss");

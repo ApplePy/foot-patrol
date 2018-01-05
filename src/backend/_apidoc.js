@@ -1,6 +1,6 @@
 /**
  * The locations route
- * 
+ *
  * @param req {Request} The express Request object.
  * @param res {Response} The express Response object.
  * @param next {NextFunction} Execute the next method.
@@ -11,7 +11,7 @@
  * @apiName GetLocations
  * @apiGroup Locations
  * @apiDeprecated
- * 
+ *
  *
  * @apiExample Example usage:
  * curl -i http://localhost/locations
@@ -167,7 +167,7 @@
  *     }
  *
  * @apiError (Error 400) MissingParameters One of the post request parameters was missing.
- * @apiError (Error 400) InvalidLocation One of the location parameters refer to a non-existent location.
+ * @apiError (Error 400) InvalidLocationOne of the location parameters equal or does not exist.
  * @apiErrorExample Error Response:
  *     HTTP/1.1 400 BAD REQUEST
  *     {
@@ -219,7 +219,7 @@
  *     }
  *
  * @apiError (Error 400) MissingOrInvalidParameters One of the request parameters was missing.
- * @apiError (Error 400) InvalidLocation One of the location parameters refer to a non-existent location.
+ * @apiError (Error 400) InvalidLocationOne of the location parameters equal or does not exist.
  * @apiError (Error 404) RequestNotFound The request ID was not found.
  * @apiErrorExample Error Response:
  *     HTTP/1.1 400 BAD REQUEST
@@ -271,7 +271,7 @@
  *        timestamp: "2017-10-26T06:51:05.000Z"
  *     }
  * @apiError (Error 400) InvalidQueryParameters The requested ID was invalid format.
- * @apiError (Error 400) InvalidLocation One of the location parameters equal or refer to a non-existent location.
+ * @apiError (Error 400) InvalidLocation  One of the location parameters equals or does not exist.
  * @apiError (Error 404) RequestNotFound The request ID was not found.
  * @apiErrorExample Error Response:
  *     HTTP/1.1 404 NOT FOUND

@@ -9,8 +9,8 @@ import { isNullOrUndefined } from "util";
 import { IFACES, TAGS } from "../src/ids";
 import { default as serverEnv } from "../src/index";
 import { ISQLService } from "../src/services/isqlservice";
-import { FakeSQL } from "./fake-sql";
 import { MySQLService } from "../src/services/mysql_service";
+import { FakeSQL } from "./fake-sql";
 import { TestReplaceHelper } from "./test-helper";
 
 // Route
@@ -50,7 +50,13 @@ class RequestsAPITest {
     FakeSQL.response = undefined;
     serverEnv.container.get<ISQLService>(IFACES.ISQLSERVICE).makeQuery("DELETE FROM requests")
     .then(() => done())
-    .catch((err) => { if (err.name != "FakeSQLError") done(err); else done(); });
+    .catch((err) => {
+      if (err.name !== "FakeSQLError") {
+        done(err);
+      } else {
+        done();
+      }
+    });
   }
 
   @test("sanitizeMap should properly sanitize data")
@@ -129,15 +135,15 @@ class RequestsAPITest {
   @test("GET should return a list of requests")
   public requestsList(done: MochaDone) {
     // Get SQL connector instance
-    let sqlInstance = serverEnv.container.get<ISQLService>(IFACES.ISQLSERVICE);
-    let sqlQuery = sqlInstance.makeQuery.bind(sqlInstance);
+    const sqlInstance = serverEnv.container.get<ISQLService>(IFACES.ISQLSERVICE);
+    const sqlQuery = sqlInstance.makeQuery.bind(sqlInstance);
 
     // Fake data
     const DB_DATA = {
       id: 1, name: "John Doe", from_location: "SEB",
       to_location: "UCC", additional_info: null,
       archived: 0, timestamp: "2017-10-26T06:51:05.000Z"
-    }
+    };
 
     // Expected return
     const EXPECTED_RESULTS = {
@@ -150,7 +156,6 @@ class RequestsAPITest {
       ],
       meta: { offset: 0, count: 2, archived: false }
     };
-
 
     // Setup fake data
     FakeSQL.response = (query: string, values: any[]) => {
@@ -179,8 +184,8 @@ class RequestsAPITest {
   @test("GET should return a list of requests + default archived")
   public requestsListDefault(done: MochaDone) {
     // Get SQL connector instance
-    let sqlInstance = serverEnv.container.get<ISQLService>(IFACES.ISQLSERVICE);
-    let sqlQuery = sqlInstance.makeQuery.bind(sqlInstance);
+    const sqlInstance = serverEnv.container.get<ISQLService>(IFACES.ISQLSERVICE);
+    const sqlQuery = sqlInstance.makeQuery.bind(sqlInstance);
 
     // DATA
     const DB_DATA = [{
@@ -231,9 +236,9 @@ class RequestsAPITest {
   @test("GET should return a list of requests + archived requests")
   public requestsListArchived(done: MochaDone) {
      // Get SQL connector instance
-     let sqlInstance = serverEnv.container.get<ISQLService>(IFACES.ISQLSERVICE);
-     let sqlQuery = sqlInstance.makeQuery.bind(sqlInstance);
- 
+     const sqlInstance = serverEnv.container.get<ISQLService>(IFACES.ISQLSERVICE);
+     const sqlQuery = sqlInstance.makeQuery.bind(sqlInstance);
+
      // DATA
      const DB_DATA = [{
        id: 1, name: "John Doe", from_location: "SEB",
@@ -245,8 +250,8 @@ class RequestsAPITest {
        to_location: "UCC", additional_info: null,
        archived: 0, timestamp: "2017-10-26T06:51:05.000Z"
      }];
- 
-    const EXPECTED_RESULTS = {
+
+     const EXPECTED_RESULTS = {
       requests: [
         {
           id: 1, name: "John Doe", from_location: "SEB",
@@ -265,7 +270,7 @@ class RequestsAPITest {
     // Setup fake data
      FakeSQL.response = (query: string, values: any[]) => {
       values.should.deep.equal([true, 0, 2]);
-       return DB_DATA;
+      return DB_DATA;
     };
      TestReplaceHelper.dateReplace(sqlQuery, "requests", DB_DATA, "timestamp")
      .then(() => {
@@ -383,15 +388,15 @@ class RequestsAPITest {
   @test("GET should return one request")
   public getRequest(done: MochaDone) {
     // Get SQL connector instance
-    let sqlInstance = serverEnv.container.get<ISQLService>(IFACES.ISQLSERVICE);
-    let sqlQuery = sqlInstance.makeQuery.bind(sqlInstance);
+    const sqlInstance = serverEnv.container.get<ISQLService>(IFACES.ISQLSERVICE);
+    const sqlQuery = sqlInstance.makeQuery.bind(sqlInstance);
 
     // Fake data
     const DB_DATA = {
       id: 1, name: "John Doe", from_location: "SEB",
       to_location: "UCC", additional_info: null,
       archived: 0, timestamp: "2017-10-26T06:51:05.000Z"
-    }
+    };
 
     // Expected return
     const EXPECTED_RESULTS = {
@@ -564,15 +569,15 @@ class RequestsAPITest {
   @test("DELETE should delete successfully")
   public deleteSuccess(done: MochaDone) {
     // Get SQL connector instance
-    let sqlInstance = serverEnv.container.get<ISQLService>(IFACES.ISQLSERVICE);
-    let sqlQuery = sqlInstance.makeQuery.bind(sqlInstance);
+    const sqlInstance = serverEnv.container.get<ISQLService>(IFACES.ISQLSERVICE);
+    const sqlQuery = sqlInstance.makeQuery.bind(sqlInstance);
 
     // Fake data
     const DB_DATA = {
       id: 5, name: "John Doe", from_location: "SEB",
       to_location: "UCC", additional_info: null,
       archived: 0, timestamp: "2017-10-26T06:51:05.000Z"
-    }
+    };
 
     // Setup fake data
     const REQUESTS_DATA = {affectedRows: 1};
@@ -637,15 +642,15 @@ class RequestsAPITest {
   @test("PUT should update object, ignoring other parameters")
   public putSuccess(done: MochaDone) {
     // Get SQL connector instance
-    let sqlInstance = serverEnv.container.get<ISQLService>(IFACES.ISQLSERVICE);
-    let sqlQuery = sqlInstance.makeQuery.bind(sqlInstance);
+    const sqlInstance = serverEnv.container.get<ISQLService>(IFACES.ISQLSERVICE);
+    const sqlQuery = sqlInstance.makeQuery.bind(sqlInstance);
 
     // Fake data
     const DB_DATA = {
       id: 1, name: "John Doe", from_location: "SEB",
       to_location: "UCC", additional_info: "additional info",
       archived: 0, timestamp: "2017-10-26T06:51:05.000Z"
-    }
+    };
 
     // Setup fake data
     const INPUT = {
@@ -811,15 +816,15 @@ class RequestsAPITest {
   @test("PATCH should update object, ignoring other parameters")
   public patchSuccess(done: MochaDone) {
     // Get SQL connector instance
-    let sqlInstance = serverEnv.container.get<ISQLService>(IFACES.ISQLSERVICE);
-    let sqlQuery = sqlInstance.makeQuery.bind(sqlInstance);
+    const sqlInstance = serverEnv.container.get<ISQLService>(IFACES.ISQLSERVICE);
+    const sqlQuery = sqlInstance.makeQuery.bind(sqlInstance);
 
     // Fake data
     const DB_DATA = {
       id: 1, name: "John Doe", from_location: "SEB",
       to_location: "UCC", additional_info: "additional info",
       archived: 0, timestamp: "2017-10-26T06:51:05.000Z"
-    }
+    };
 
     // Setup fake data
     const INPUT = {
@@ -862,7 +867,7 @@ class RequestsAPITest {
         return [EXPECTED_RESULTS];
       }
     };
-    
+
     TestReplaceHelper.dateReplace(sqlQuery, "requests", DB_DATA, "timestamp")
     .then(() => {
 
@@ -929,7 +934,6 @@ class RequestsAPITest {
         done();
       });
   }
-
 
   @test("PATCH should fail on non-existent ID")
   public patchBadId(done: MochaDone) {

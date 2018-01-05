@@ -7,7 +7,7 @@
     "start": "ng serve",
     "build": "ng build",
     "test": "ng test",
-    "lint": "ng lint",
+    "lint": "ng lint --type-check true",
     "e2e": "ng e2e",
     "coverage": "npm run test -- --single-run --code-coverage",
     "docs": "node_modules/.bin/typedoc --module es6 --out docs/ src/"
