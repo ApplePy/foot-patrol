@@ -20,7 +20,6 @@ export class Server {
   private cookieSecret: "myTotallySecretSecret";
 
   // Routes
-  private locationRoute: IRoute;
   private requestRoute: IRoute;
 
   /**
@@ -29,11 +28,8 @@ export class Server {
    * @class Server
    * @constructor
    */
-  constructor(
-    @inject (IFACES.IROUTE) @named(TAGS.LOCATIONS) locationRoute: IRoute,
-    @inject (IFACES.IROUTE) @named(TAGS.REQUESTS) requestRoute: IRoute) {
+  constructor(@inject (IFACES.IROUTE) @named(TAGS.REQUESTS) requestRoute: IRoute) {
     // Save DI
-    this.locationRoute = locationRoute;
     this.requestRoute = requestRoute;
 
     // create expressjs application
@@ -87,7 +83,6 @@ export class Server {
     router = express.Router();
 
     // Start routes
-    router.use("/locations", this.locationRoute.Router);
     router.use("/requests", this.requestRoute.Router);
 
     // Greeting page
