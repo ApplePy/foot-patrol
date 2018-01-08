@@ -1,10 +1,9 @@
 import { NextFunction, Request, Response, Router } from "express";
 import { Container, inject, injectable } from "inversify";
-import { isNull, isNullOrUndefined } from "util";
 import { IFACES, TAGS } from "../ids";
 import { ISanitizer } from "../services/isanitizer";
 import { ISQLService } from "../services/isqlservice";
-import { StatusError } from "../services/status_error";
+import { StatusError } from "../models/status_error";
 import { IRoute } from "./iroute";
 
 @injectable()
@@ -303,8 +302,8 @@ export class RequestsRoute implements IRoute {
   public postRequest(req: Request, res: Response, next: NextFunction) {
     // Catch missing data
     if (
-      isNullOrUndefined(req.body.from_location) ||
-      isNullOrUndefined(req.body.to_location) ||
+      req.body.from_location === null || req.body.from_location === undefined ||
+      req.body.to_location === null || req.body.to_location === undefined ||
       req.body.from_location === req.body.to_location
     ) {
       next (new StatusError(
@@ -393,8 +392,8 @@ export class RequestsRoute implements IRoute {
     // Catch missing data
     if (
       req.body.archived === undefined ||
-      isNullOrUndefined(req.body.from_location) ||
-      isNullOrUndefined(req.body.to_location) ||
+      req.body.from_location === null || req.body.from_location === undefined ||
+      req.body.to_location === null || req.body.to_location === undefined ||
       req.body.from_location === req.body.to_location) {
       next (new StatusError(
         400,
@@ -504,7 +503,7 @@ export class RequestsRoute implements IRoute {
     let prom = Promise.resolve();
 
     // Issue update if there's updates
-    if (!isNull(sqlQueryData)) {
+    if (sqlQueryData !== null && sqlQueryData !== undefined) {
       // Make patch query
       prom = this.db.makeQuery(sqlQueryData.query, sqlQueryData.values)
       .then(this.checkRowUpdated(id, next));

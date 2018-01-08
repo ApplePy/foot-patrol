@@ -5,7 +5,6 @@ import * as chai from "chai";
 import chaiHttp = require("chai-http");
 import { only, skip, suite, test } from "mocha-typescript";
 import * as mock from "ts-mockito";
-import { isNullOrUndefined } from "util";
 import { IFACES, TAGS } from "../src/ids";
 import { default as serverEnv } from "../src/index";
 import { ISQLService } from "../src/services/isqlservice";
@@ -114,7 +113,7 @@ class RequestsAPITest {
 
     // Assert
     should.exist(results);
-    if (!isNullOrUndefined(results)) {
+    if (results !== null && results !== undefined) {
       results.should.deep.equal(EXPECTED_RESULTS);
     }
   }
