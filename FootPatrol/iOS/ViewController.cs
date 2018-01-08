@@ -6,6 +6,10 @@ namespace FootPatrol.iOS
 {
     public partial class ViewController : UIViewController
     {
+
+        public int requestID;
+        public bool requestSent = false;
+
         protected ViewController(IntPtr handle) : base(handle)
         {
             // Note: this .ctor should not contain any initialization logic.
@@ -14,41 +18,70 @@ namespace FootPatrol.iOS
         public override void ViewDidLoad()
         {
             base.ViewDidLoad();
-            // Perform any additional setup after loading the view, typically from a nib.
 
+            //Request button clicked
             RequestButton.TouchUpInside += (object sender, EventArgs e) => {
 
-                //Resign first responders
-                NameTextBox.ResignFirstResponder();
-                CurrentLocationTextBox.ResignFirstResponder();
-                DestinationTextBox.ResignFirstResponder();
+                if (requestSent == false) {
 
-                //Get user information
-                string name = NameTextBox.Text;
-                string currentLocation = CurrentLocationTextBox.Text;
-                string destination = DestinationTextBox.Text;
+                    //Resign first responders
+                    NameTextBox.ResignFirstResponder();
+                    CurrentLocationTextBox.ResignFirstResponder();
+                    DestinationTextBox.ResignFirstResponder();
 
-                //Check if all required input fields have been filled out
-                if (name == "" || name == null) {
-                    NameTextBox.BackgroundColor = UIColor.Red;
-                    return;
-                } else if (currentLocation == "" || currentLocation == null) {
-                    CurrentLocationTextBox.BackgroundColor = UIColor.Red;
-                    return;
+                    //Get user information
+                    string name = NameTextBox.Text;
+                    string fromLocation = CurrentLocationTextBox.Text;
+                    string toLocation = DestinationTextBox.Text;
+
+                    //Check if all required input fields have been filled out
+                    if (name == "" || name == null)
+                    {
+                        NameTextBox.BackgroundColor = UIColor.Red;
+                        return;
+                    }
+                    else if (fromLocation == "" || fromLocation == null)
+                    {
+                        CurrentLocationTextBox.BackgroundColor = UIColor.Red;
+                        return;
+                    }
+                    else if (toLocation == "" || toLocation == null)
+                    {
+                        DestinationTextBox.BackgroundColor = UIColor.Red;
+                        return;
+                    }
+                    else
+                    {
+                        NameTextBox.BackgroundColor = UIColor.White;
+                        CurrentLocationTextBox.BackgroundColor = UIColor.White;
+                    }
+
+                    //Send footpatrol request
+                    requestID = SendFootPatrolRequest(name, fromLocation, toLocation).Wait();
+
+                    RequestButton.SetTitle("Cancel SafeWalk Request", UIControlState.Normal);
+
+                    //Popup saying that request has been sent
+                    var requestSentAlert = UIAlertController.Create("Request Sent", "Your SafeWalk request has been sent.", UIAlertControllerStyle.Alert);
+                    requestSentAlert.AddAction(UIAlertAction.Create("Ok", UIAlertActionStyle.Default, null));
+                    PresentViewController(requestSentAlert, true, null);
+
                 } else {
-                    NameTextBox.BackgroundColor = UIColor.White;
-                    CurrentLocationTextBox.BackgroundColor = UIColor.White;
-                }
-                    
-                //Sent footpatrol request
-                RequestService.SendFootPatrolRequest(name, currentLocation, destination).Wait();
 
-                //Popup saying that request has been sent
-                var requestSentAlert = UIAlertController.Create("Request Sent", "Your SafeWalk request has been sent.", UIAlertControllerStyle.Alert);
-                requestSentAlert.AddAction(UIAlertAction.Create("Ok", UIAlertActionStyle.Default, null));
-                PresentViewController(requestSentAlert, true, null);
+                    //Cancel footpatrol request
+                    RequestService.DeleteFootPatrolRequest(requestID).Wait();
+
+                    RequestButton.SetTitle("Request SafeWalk", UIControlState.Normal);
+
+                    //Popup saying that request has been sent
+                    var requestSentAlert = UIAlertController.Create("Request Cancelled", "Your SafeWalk request has been cancelled.", UIAlertControllerStyle.Alert);
+                    requestSentAlert.AddAction(UIAlertAction.Create("Ok", UIAlertActionStyle.Default, null));
+                    PresentViewController(requestSentAlert, true, null);
+
+                }
             };
 
+            //Feedback button clicked
             FeedbackButton.TouchUpInside += (object sender, EventArgs e) => {
 
                 UIApplication.SharedApplication.OpenUrl(new NSUrl("https://docs.google.com/forms/d/e/1FAIpQLSdeB7-BxZh4oWTGqrMGMUL4wu0ufQRKmEyNvwKGfzXt8OdZYQ/viewform?usp=sf_link"));
