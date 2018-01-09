@@ -25,21 +25,21 @@ namespace FootPatrol
 
             try
             {
-                HttpResponseMessage response = await Client.client.PostAsync("api/v1/requests", httpContent);
+                HttpResponseMessage response = await Client.Instance.PostAsync("api/v1/requests", httpContent);
                 response.EnsureSuccessStatusCode();
 
-                var responseJSON = await response.Content.ReadAsStringAsync();
+                string responseJSON = await response.Content.ReadAsStringAsync();
                 FPRequest fpResponse = JsonConvert.DeserializeObject<FPRequest>(responseJSON);
 
-                int id = (int) fpRequest.id;
+                int id = fpResponse.id;
 
                 return id;
 
-            } catch (Exception e)
+            } 
+            catch (Exception e)
             {
                 Debug.WriteLine("{0} Exception caught.", e);
-
-                return -1;
+                throw e;
             }
 
         }
@@ -49,12 +49,14 @@ namespace FootPatrol
 
             try
             {
-                HttpResponseMessage response = await Client.client.DeleteAsync($"api/v1/footpatrol/{id}");
+                HttpResponseMessage response = await Client.Instance.DeleteAsync($"api/v1/footpatrol/{id}");
                 response.EnsureSuccessStatusCode();
 
-            } catch (Exception e)
+            } 
+            catch (Exception e)
             {
                 Debug.WriteLine("{0} Exception caught.", e);
+                throw e;
             }
 
         }
@@ -62,7 +64,7 @@ namespace FootPatrol
     }
 
     public class FPRequest {
-        public int? id;
+        public int id;
         public string name;
         public string from_location;
         public string to_location;

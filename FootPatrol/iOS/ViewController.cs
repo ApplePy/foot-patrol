@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Foundation;
 using UIKit;
 
@@ -20,9 +21,12 @@ namespace FootPatrol.iOS
             base.ViewDidLoad();
 
             //Request button clicked
-            RequestButton.TouchUpInside += (object sender, EventArgs e) => {
+            RequestButton.TouchUpInside += async (object sender, EventArgs e) => {
 
                 if (requestSent == false) {
+
+                    requestSent = true;
+                    RequestButton.Enabled = false;
 
                     //Resign first responders
                     NameTextBox.ResignFirstResponder();
@@ -57,7 +61,23 @@ namespace FootPatrol.iOS
                     }
 
                     //Send footpatrol request
-                    requestID = SendFootPatrolRequest(name, fromLocation, toLocation).Wait();
+                    try
+                    {
+                        requestID = await RequestService.SendFootPatrolRequest(name, fromLocation, toLocation);
+                    }
+                    catch (Exception error)
+                    {
+                        requestSent = false;
+
+                        //Popup with error
+                        var errorAlert = UIAlertController.Create("Error", error.ToString(), UIAlertControllerStyle.Alert);
+                        errorAlert.AddAction(UIAlertAction.Create("Ok", UIAlertActionStyle.Default, null));
+                        PresentViewController(errorAlert, true, null);
+
+                        RequestButton.Enabled = true;
+
+                        return;
+                    }
 
                     RequestButton.SetTitle("Cancel SafeWalk Request", UIControlState.Normal);
 
@@ -66,10 +86,31 @@ namespace FootPatrol.iOS
                     requestSentAlert.AddAction(UIAlertAction.Create("Ok", UIAlertActionStyle.Default, null));
                     PresentViewController(requestSentAlert, true, null);
 
+                    RequestButton.Enabled = true;
+
                 } else {
 
+                    requestSent = false;
+                    RequestButton.Enabled = false;
+
                     //Cancel footpatrol request
-                    RequestService.DeleteFootPatrolRequest(requestID).Wait();
+                    try 
+                    {
+                        await RequestService.DeleteFootPatrolRequest(requestID);
+                    }
+                    catch (Exception error)
+                    {
+                        requestSent = true;
+
+                        //Popup with error
+                        var errorAlert = UIAlertController.Create("Error", error.ToString(), UIAlertControllerStyle.Alert);
+                        errorAlert.AddAction(UIAlertAction.Create("Ok", UIAlertActionStyle.Default, null));
+                        PresentViewController(errorAlert, true, null);
+
+                        RequestButton.Enabled = true;
+
+                        return;
+                    }
 
                     RequestButton.SetTitle("Request SafeWalk", UIControlState.Normal);
 
@@ -77,6 +118,8 @@ namespace FootPatrol.iOS
                     var requestSentAlert = UIAlertController.Create("Request Cancelled", "Your SafeWalk request has been cancelled.", UIAlertControllerStyle.Alert);
                     requestSentAlert.AddAction(UIAlertAction.Create("Ok", UIAlertActionStyle.Default, null));
                     PresentViewController(requestSentAlert, true, null);
+
+                    RequestButton.Enabled = true;
 
                 }
             };

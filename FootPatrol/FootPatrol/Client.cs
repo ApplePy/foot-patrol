@@ -4,16 +4,25 @@ using System.Net.Http.Headers;
 
 namespace FootPatrol
 {
+    // Requires Static HttpClient
+    // https://aspnetmonsters.com/2016/08/2016-08-27-httpclientwrong/
     public static class Client
     {
 
-        public static HttpClient client = new HttpClient();
+        private static HttpClient instance = new HttpClient();
+        public static HttpClient Instance
+        {
+            get
+            {
+                return instance;
+            }
+        }
 
         static Client()
         {
-            client.BaseAddress = new Uri("http://staging.capstone.incode.ca");
-            client.DefaultRequestHeaders.Accept.Clear();
-            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            instance.BaseAddress = new Uri("http://staging.capstone.incode.ca");
+            instance.DefaultRequestHeaders.Accept.Clear();
+            instance.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
         }
     }
 }
