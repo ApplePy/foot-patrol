@@ -44,7 +44,6 @@ import { Server } from "./server";
 import { MySQLService } from "./services/mysql-service";
 import { Sanitizer } from "./services/sanitizer";
 import { SQLRequestsManager } from "./services/sql-requests-manager";
-// TODO: IoC Loggers and Status Error and import
 
 /**
  * Setup server with environment

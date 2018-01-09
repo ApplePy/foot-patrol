@@ -129,23 +129,8 @@ export class RequestsRoute implements IRoute {
    *     }
    */
   public getRequests(req: Request, res: Response, next: NextFunction) {
-
-    // Test to ensure archived is valid
-    if (req.query.archived !== undefined) {
-
-      req.query.archived = req.query.archived.toLowerCase();  // Normalize text
-
-      // Check valid value
-      if (req.query.archived !== "true" && req.query.archived !== "false") {
-        next(new StatusError(400, "Invalid Query Parameter", "Archived must be 'true', 'false' or undefined."));
-        return;
-      }
-
-    }
-
     const offset = Number(req.query.offset);
     const count = Number(req.query.count);
-    const archived = (req.query.archived === "true") ? true : false;  // Capitalization fix done in previous `if`
 
     // Ensure valid parameters
     if (isNaN(offset) || isNaN(count) || offset < 0 || count < 0) {
@@ -153,10 +138,18 @@ export class RequestsRoute implements IRoute {
       return;
     }
 
+    // Test to ensure archived is valid
+    if (this.validValues(req.query.archived, undefined, "true", "false") === false) {
+      next(new StatusError(400, "Invalid Query Parameter", "Archived must be 'true', 'false' or undefined."));
+      return;
+    }
+
+    const archived = (req.query.archived === "true") ? true : false;
     const meta = {offset, count, archived};
+    const filterMap = (archived === false) ? new Map([["archived", archived]]) : undefined;
 
     // If archived records are not requested, filter by 'false'. Otherwise, don't filter to get both true and false
-    this.data.getRequests(offset, count, (archived === false) ? new Map([["archived", archived]]) : undefined)
+    this.data.getRequests(offset, count, filterMap)
     .then((requests) => res.send({requests, meta})) // Send results
     .catch((err) => next(this.translateErrors(err))); // Send generic error
   }
@@ -267,11 +260,7 @@ export class RequestsRoute implements IRoute {
    */
   public postRequest(req: Request, res: Response, next: NextFunction) {
     // Catch missing data
-    if (
-      req.body.from_location === null || req.body.from_location === undefined ||
-      req.body.to_location === null || req.body.to_location === undefined ||
-      req.body.from_location === req.body.to_location
-    ) {
+    if (this.checkToFromUniqueness(req.body.to_location, req.body.from_location)) {
       next (new StatusError(
         400,
         "Missing Parameters",
@@ -356,11 +345,7 @@ export class RequestsRoute implements IRoute {
     }
 
     // Catch missing data
-    if (
-      req.body.archived === undefined ||
-      req.body.from_location === null || req.body.from_location === undefined ||
-      req.body.to_location === null || req.body.to_location === undefined ||
-      req.body.from_location === req.body.to_location) {
+    if (req.body.archived == null || this.checkToFromUniqueness(req.body.to_location, req.body.from_location)) {
       next (new StatusError(
         400,
         "Missing Or Invalid Parameters",
@@ -437,10 +422,8 @@ export class RequestsRoute implements IRoute {
    *     }
    */
   public patchRequest(req: Request, res: Response, next: NextFunction) {
-    const id = Number(req.params.id);
-
     // Check for invalid ID
-    if (isNaN(id) || id < 0) {
+    if (isNaN(Number(req.params.id)) || Number(req.params.id) < 0) {
       next(new StatusError(400, "Invalid Query Parameter", "ID is required"));
       return;
     }
@@ -467,11 +450,11 @@ export class RequestsRoute implements IRoute {
     }
 
     const patchData = new TravelRequest(updateDict);
-    patchData.id = id;
+    patchData.id = Number(req.params.id);
 
     // Update object
     this.data.updateRequest(patchData, Object.keys(updateDict))
-    .then(() => this.data.getRequest(id))
+    .then(() => this.data.getRequest(patchData.id))
     .then((data) => res.send(data))
     .catch((err) => next(this.translateErrors(err))); // Send generic error
   }
@@ -531,5 +514,28 @@ export class RequestsRoute implements IRoute {
     } else {
       return new StatusError(500, "Internal Server Error", "An error has occurred.");
     }
+  }
+
+  /**
+   * Check if to and from are the same.
+   *
+   * @param to
+   * @param from
+   */
+  private checkToFromUniqueness(to: string, from: string) {
+    return (to == null || from == null || to === from);
+  }
+
+  private validValues(subject: any, ...valids: any[]) {
+    let valid = false;
+
+    for (const validOption of valids) {
+      if (subject === validOption) {
+        valid = true;
+        break;
+      }
+    }
+
+    return valid;
   }
 }
