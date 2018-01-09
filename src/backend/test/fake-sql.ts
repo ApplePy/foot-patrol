@@ -1,4 +1,4 @@
-import { inject, injectable } from "inversify";
+import { injectable } from "inversify";
 import * as mysql from "mysql";
 import { ISQLService } from "../src/services/isqlservice";
 
@@ -16,11 +16,11 @@ export class FakeSQL implements ISQLService {
 
   /**
    * Make a basic query to the SQL server.
-   * 
+   *
    * @param query  The query string, optionally with ?s for values to be inserted
    * @param values (Optional) An array of values to be inserted into appropriate places in `query`
    */
-  public makeQuery(query: string, values?: any[] | undefined): Promise<any[]> {
+  public makeQuery(query: string, values?: any[] | undefined): Promise<any> {
     return new Promise((res, rej) => {
       // Catch error cases
       if (FakeSQL.response === undefined || FakeSQL.response === null) {

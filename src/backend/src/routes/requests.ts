@@ -46,7 +46,7 @@ export class RequestsRoute implements IRoute {
 
   /**
    * Sanitizes a flat map with the mapped sanitize functions
-   * 
+   *
    * @param sanitizeMap The functions to use to sanitize different keys
    * @param newData The flat map to sanitize
    * @returns an array of key-value objects
@@ -75,7 +75,7 @@ export class RequestsRoute implements IRoute {
 
   /**
    * Creates an SQL update query. Data must be pre-sanitized!
-   * 
+   *
    * @param id The id to update
    * @param updateList The list of columns and their new values to be updated in the SQL query
    * @param table The table to update
@@ -187,7 +187,7 @@ export class RequestsRoute implements IRoute {
     // Query for data
     // TODO: Why 'false||?' ?
     this.db.makeQuery("SELECT * FROM `requests` WHERE archived = false||? LIMIT ?, ?", [archived, offset, count])
-    .then((requests) => requests.map((val) => { // Convert int back to bool
+    .then((requests) => requests.map((val: any) => { // Convert int back to bool
       val.archived = Boolean(val.archived);
       return val;
     }))
@@ -562,7 +562,7 @@ export class RequestsRoute implements IRoute {
 
   /**
    * Get the request entry for an ID number.
-   * 
+   *
    * @param id The id to retrieve
    */
   private getId(id: number) {
@@ -583,7 +583,7 @@ export class RequestsRoute implements IRoute {
 
   /**
    * Check to make sure a row was updated. Call in promise 'then'
-   * 
+   *
    * @param id ID that was supposed to be updated
    * @param next Function to call on error
    */
