@@ -232,7 +232,7 @@ class RequestsAPITest {
 
     // Setup fake data
      FakeSQL.response = (query: string, values: any[]) => {
-      values.should.deep.equal([true, 0, 2]);
+      values.should.deep.equal([0, 2]);
       return DB_DATA;
     };
      TestReplaceHelper.dateReplace(sqlQuery, "requests", DB_DATA, "timestamp")
