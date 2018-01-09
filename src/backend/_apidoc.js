@@ -84,53 +84,6 @@
  */
 
 /**
- * Get specific request
- *
- * @param req {Request} The express Request object.
- * @param res {Response} The express Response object.
- * @param next {NextFunction} Execute the next method.
- *
- * @api {get} /api/v1/requests/:id Get specific request
- * @apiVersion 1.0.0
- * @apiName GetRequest
- * @apiGroup Requests
- *
- * @apiParam (URL Parameter) {number} id The id of the request to retrieve.
- *
- * @apiSuccess {number} id The record ID.
- * @apiSuccess {string} [name] Name of the requester.
- * @apiSuccess {string} from_location Escort start location.
- * @apiSuccess {string} to_location Escort destination.
- * @apiSuccess {string} [additional_info] Additional request information.
- * @apiSuccess {boolean} archived Specifies if this request completed and archived.
- * @apiSuccess {string} timestamp Timestamp the record was created.
- *
- * @apiExample Example usage:
- * curl -i http://localhost/requests/1
- *
- * @apiSuccessExample Success Response:
- *     HTTP/1.1 200 OK
- *     {
- *        id: 1,
- *        name: "John Doe",
- *        from_location: "SEB",
- *        to_location: "UCC",
- *        additional_info: null,
- *        archived: false,
- *        timestamp: "2017-10-26T06:51:05.000Z"
- *     }
- *
- * @apiError (Error 400) InvalidQueryParameters The requested ID was invalid format.
- * @apiError (Error 404) RequestNotFound The request ID was not found.
- * @apiErrorExample Error Response:
- *     HTTP/1.1 404 NOT FOUND
- *     {
- *        error: "RequestNotFound",
- *        message: "Request ID '1' was not found."
- *     }
- */
-
-/**
  * Post new walk escort request.
  *
  * @param req {Request} The express Request object.

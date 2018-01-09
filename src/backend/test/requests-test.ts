@@ -144,6 +144,55 @@ class RequestsAPITest {
     .catch(done);
   }
 
+  @test("GET should return a list of requests with count capped")
+  public requestsListCapped(done: MochaDone) {
+    // Get SQL connector instance
+    const sqlInstance = serverEnv.container.get<ISQLService>(IFACES.ISQLSERVICE);
+    const sqlQuery = sqlInstance.makeQuery.bind(sqlInstance);
+
+    // Fake data
+    const DB_DATA = {
+      id: 1, name: "John Doe", from_location: "SEB",
+      to_location: "UCC", additional_info: null,
+      archived: 0, timestamp: "2017-10-26T06:51:05.000Z"
+    };
+
+    // Expected return
+    const EXPECTED_RESULTS = {
+      requests: [
+        {
+          id: 1, name: "John Doe", from_location: "SEB",
+          to_location: "UCC", additional_info: null,
+          archived: false, timestamp: "2017-10-26T06:51:05.000Z"
+        }
+      ],
+      meta: { offset: 0, count: 100, archived: false }
+    };
+
+    // Setup fake data
+    FakeSQL.response = (query: string, values: any[]) => {
+      values.should.deep.equal([false, 0, 100]);
+      return [DB_DATA];
+    };
+    TestReplaceHelper.dateReplace(sqlQuery, "requests", DB_DATA, "timestamp")
+    .then(() => {
+
+    // Start request
+    chai.request(serverEnv.nodeServer)
+      .get(pathPrefix + "/requests")
+      .query({ offset: 0, count: 500, archived: false })
+      .end((err, res) => {
+        // Verify results
+        res.should.have.status(200);
+        res.body.should.have.property("requests");
+        res.body.should.have.property("meta");
+        res.body.should.deep.equal(EXPECTED_RESULTS);
+        done();
+      });
+    })
+    .catch(done);
+  }
+
   @test("GET should return a list of requests + default archived")
   public requestsListDefault(done: MochaDone) {
     // Get SQL connector instance

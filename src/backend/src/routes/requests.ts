@@ -79,12 +79,12 @@ export class RequestsRoute implements IRoute {
    * @param next {NextFunction} Execute the next method.
    *
    * @api {get} /api/v1/requests Get walking escort requests
-   * @apiVersion 1.1.0
+   * @apiVersion 1.1.1
    * @apiName GetRequests
    * @apiGroup Requests
    *
    * @apiParam (Query Parameter) {number} offset The number of elements to skip when filling request.
-   * @apiParam (Query Parameter) {number} count The maximum number of elements return.
+   * @apiParam (Query Parameter) {number} count The maximum number of elements return; capped at 100.
    * @apiParam (Query Parameter) {boolean} [archived=false] Include archived requests in the response.
    *
    * @apiSuccess {string[]} requests Array of requests.
@@ -130,7 +130,7 @@ export class RequestsRoute implements IRoute {
    */
   public getRequests(req: Request, res: Response, next: NextFunction) {
     const offset = Number(req.query.offset);
-    const count = Number(req.query.count);
+    const count = Math.min(Number(req.query.count), 100);
 
     // Ensure valid parameters
     if (isNaN(offset) || isNaN(count) || offset < 0 || count < 0) {
