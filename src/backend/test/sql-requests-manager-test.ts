@@ -109,8 +109,6 @@ class SQLRequestsManagerTest {
 
     // Setup FakeSQL response
     FakeSQL.response = (query: string, values: any[]) => {
-      query.should.equal("SELECT * FROM `requests` WHERE id=?");
-      values.should.deep.equal([1]);
       return [DATA];
     };
     return TestReplaceHelper.dateReplace(this.sqlQuery, "requests", DATA, "timestamp")
@@ -136,7 +134,6 @@ class SQLRequestsManagerTest {
 
     // Setup FakeSQL response
     FakeSQL.response = (query: string, values: any[]) => {
-      query.should.equal("SELECT * FROM `requests` LIMIT ?, ?");
       return (values[0] === 0 && values[1] >= 1) ? [DATA] : [];
     };
 
@@ -165,7 +162,6 @@ class SQLRequestsManagerTest {
 
     // Setup FakeSQL response
     FakeSQL.response = (query: string, values: any[]) => {
-      query.should.equal("SELECT * FROM `requests` WHERE name=? AND archived=? LIMIT ?, ?");
       return (values[0] === "John" && values[1] === 0) ? [DATA] : [];
     };
 
@@ -185,7 +181,7 @@ class SQLRequestsManagerTest {
     });
   }
 
-  @test.only("createRequest works")
+  @test("createRequest works")
   public createRequestsNormal() {
     // Test data
     const DATA = {
@@ -200,7 +196,6 @@ class SQLRequestsManagerTest {
 
     // Setup FakeSQL response
     FakeSQL.response = (query: string, values: any[]) => {
-      query.should.equal("INSERT INTO `requests` (name, from_location, to_location, additional_info) VALUES(?,?,?,?)");
       return {insertId: 1};
     };
 
@@ -208,7 +203,7 @@ class SQLRequestsManagerTest {
     return this.reqMgr.createRequest(new TravelRequest(DATA)).should.eventually.be.fulfilled.and.not.equal(DATA.id);
   }
 
-  @test.only("deleteRequest works")
+  @test("deleteRequest works")
   public deleteRequestsNormal() {
     // Test data
     const DATA = {
@@ -223,8 +218,6 @@ class SQLRequestsManagerTest {
 
     // Setup FakeSQL response
     FakeSQL.response = (query: string, values: any[]) => {
-      query.should.equal("DELETE FROM `requests` WHERE id=?");
-      values.should.deep.equal([1]);
       return {affectedRows: 1};
     };
 
@@ -233,7 +226,7 @@ class SQLRequestsManagerTest {
     .then(() => this.reqMgr.deleteRequest(DATA.id).should.eventually.be.fulfilled);
   }
 
-  @test.only("deleteRequest rejects when the ID is not found")
+  @test("deleteRequest rejects when the ID is not found")
   public deleteRequestsInvalid() {
     // Test data
     const DATA = {
@@ -248,8 +241,6 @@ class SQLRequestsManagerTest {
 
     // Setup FakeSQL response
     FakeSQL.response = (query: string, values: any[]) => {
-      query.should.equal("DELETE FROM `requests` WHERE id=?");
-      values.should.deep.equal([100]);
       return {affectedRows: 0};
     };
 
