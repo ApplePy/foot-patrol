@@ -37,6 +37,7 @@ namespace FootPatrol.iOS
                     string name = NameTextBox.Text;
                     string fromLocation = CurrentLocationTextBox.Text;
                     string toLocation = DestinationTextBox.Text;
+                    string additionalInfo = AdditionalInfoTextBox.Text;
 
                     //Check if all required input fields have been filled out
                     if (name == "" || name == null)
@@ -63,7 +64,7 @@ namespace FootPatrol.iOS
                     //Send footpatrol request
                     try
                     {
-                        requestID = await RequestService.SendFootPatrolRequest(name, fromLocation, toLocation);
+                        requestID = await RequestService.SendFootPatrolRequest(name, fromLocation, toLocation, additionalInfo);
                     }
                     catch (Exception error)
                     {

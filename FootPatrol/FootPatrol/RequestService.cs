@@ -12,13 +12,14 @@ namespace FootPatrol
     public static class RequestService
     {
 
-        public static async Task<int> SendFootPatrolRequest(string name, string fromLocation, string toLocation)
+        public static async Task<int> SendFootPatrolRequest(string name, string fromLocation, string toLocation, string additionalInfo)
         {
 
             FPRequest fpRequest = new FPRequest();
             fpRequest.name = name;
             fpRequest.from_location = fromLocation;
             fpRequest.to_location = toLocation;
+            fpRequest.additional_info = additionalInfo;
 
             string json = JsonConvert.SerializeObject(fpRequest);
             StringContent httpContent = new StringContent(json, Encoding.UTF8, "application/json");
