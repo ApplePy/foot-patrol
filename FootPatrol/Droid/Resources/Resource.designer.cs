@@ -276,6 +276,9 @@ namespace FootPatrol.Droid
 			// aapt resource value: 0x7f0a0021
 			public const int actions = 2131361825;
 			
+			// aapt resource value: 0x7f0a002b
+			public const int additionalInformationText = 2131361835;
+			
 			// aapt resource value: 0x7f0a0005
 			public const int async = 2131361797;
 			
@@ -302,9 +305,6 @@ namespace FootPatrol.Droid
 			
 			// aapt resource value: 0x7f0a000b
 			public const int feedbackText = 2131361803;
-			
-			// aapt resource value: 0x7f0a002a
-			public const int footPatrolLogo = 2131361834;
 			
 			// aapt resource value: 0x7f0a0007
 			public const int forever = 2131361799;
@@ -371,6 +371,9 @@ namespace FootPatrol.Droid
 			
 			// aapt resource value: 0x7f0a0003
 			public const int text2 = 2131361795;
+			
+			// aapt resource value: 0x7f0a002a
+			public const int textView1 = 2131361834;
 			
 			// aapt resource value: 0x7f0a001b
 			public const int time = 2131361819;

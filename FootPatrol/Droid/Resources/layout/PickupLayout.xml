@@ -24,7 +24,7 @@
         p1:layout_below="@+id/locationView"
         p1:layout_marginLeft="5dp" />
     <TextView
-        p1:text="Location"
+        p1:text="From Location"
         p1:layout_width="match_parent"
         p1:layout_height="wrap_content"
         p1:id="@+id/locationView"
@@ -43,16 +43,31 @@
         p1:layout_width="wrap_content"
         p1:layout_height="wrap_content"
         p1:id="@+id/destinationView"
-        p1:text="Destination"
         p1:layout_below="@+id/locationText"
         p1:layout_marginTop="20dp"
-        p1:layout_marginLeft="10dp" />
+        p1:layout_marginLeft="10dp"
+        p1:text="To Location" />
     <EditText
         p1:id="@+id/destinationText"
         p1:layout_width="match_parent"
         p1:layout_height="wrap_content"
         p1:text="Destination"
         p1:layout_below="@+id/destinationView"
+        p1:layout_marginLeft="5dp" />
+    <TextView
+        p1:layout_width="match_parent"
+        p1:layout_height="wrap_content"
+        p1:id="@+id/textView1"
+        p1:layout_marginLeft="10dp"
+        p1:layout_below="@id/destinationText"
+        p1:layout_marginTop="20dp"
+        p1:text="Additional Information" />
+    <EditText
+        p1:id="@+id/additionalInformationText"
+        p1:layout_width="match_parent"
+        p1:layout_height="wrap_content"
+        p1:text="Additional Info"
+        p1:layout_below="@+id/textView1"
         p1:layout_marginLeft="5dp" />
     <Button
         p1:layout_width="wrap_content"
@@ -65,15 +80,4 @@
         p1:layout_centerHorizontal="true"
         p1:text="Submit Request"
         p1:foreground="#ff807f83" />
-    <ImageView
-        p1:src="@drawable/WesternFootPatrol"
-        p1:layout_width="wrap_content"
-        p1:layout_height="wrap_content"
-        p1:id="@+id/footPatrolLogo"
-        p1:layout_below="@+id/destinationText"
-        p1:adjustViewBounds="true"
-        p1:layout_centerHorizontal="true"
-        p1:layout_marginTop="55dp"
-        p1:maxWidth="110dp"
-        p1:maxHeight="110dp" />
 </RelativeLayout>
