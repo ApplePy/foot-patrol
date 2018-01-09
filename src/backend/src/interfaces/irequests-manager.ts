@@ -1,4 +1,4 @@
-import { TravelRequest } from "../models/travel_request";
+import { TravelRequest } from "../models/travel-request";
 
 /**
  * Interface for objects that interact with persistent storage to handle storing requests.

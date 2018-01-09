@@ -7,8 +7,8 @@ import { only, skip, suite, test } from "mocha-typescript";
 import * as mock from "ts-mockito";
 import { IFACES, TAGS } from "../src/ids";
 import { default as serverEnv } from "../src/index";
-import { ISQLService } from "../src/services/isqlservice";
-import { MySQLService } from "../src/services/mysql_service";
+import { ISQLService } from "../src/interfaces/isql-service";
+import { MySQLService } from "../src/services/mysql-service";
 import { FakeSQL } from "./fake-sql";
 import { TestReplaceHelper } from "./test-helper";
 

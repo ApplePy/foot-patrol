@@ -1,6 +1,6 @@
 import { injectable } from "inversify";
 import * as mysql from "mysql";
-import { ISQLService } from "./isqlservice";
+import { ISQLService } from "../interfaces/isql-service";
 
 /**
  * Service for connecting to and managing a MySQL database.

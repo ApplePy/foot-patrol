@@ -9,7 +9,7 @@ import { IFACES, TAGS } from "./ids";
 import { ErrorMiddleware as ErrMid } from "./services/loggers";
 
 // Routes
-import { IRoute } from "./routes/iroute";
+import { IRoute } from "./interfaces/iroute";
 
 /**
  * The Express server.

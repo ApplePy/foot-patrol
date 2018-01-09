@@ -1,6 +1,6 @@
 import { injectable } from "inversify";
 import * as mysql from "mysql";
-import { ISQLService } from "../src/services/isqlservice";
+import { ISQLService } from "../src/interfaces/isql-service";
 
 /**
  * Mock class to eliminate SQL server during testing

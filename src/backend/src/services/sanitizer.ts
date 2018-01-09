@@ -1,5 +1,5 @@
 import { injectable } from "inversify";
-import { ISanitizer } from "./isanitizer";
+import { ISanitizer } from "../interfaces/isanitizer";
 
 /**
  * Class for generic sanitation of strings.

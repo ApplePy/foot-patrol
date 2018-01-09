@@ -1,8 +1,8 @@
 import { inject, injectable } from "inversify";
 import { IFACES } from "../ids";
-import { TravelRequest } from "../models/travel_request";
-import { IRequestsManager } from "./irequests_manager";
-import { ISQLService } from "./isqlservice";
+import { IRequestsManager } from "../interfaces/irequests-manager";
+import { ISQLService } from "../interfaces/isql-service";
+import { TravelRequest } from "../models/travel-request";
 
 /**
  * Data manager for handling retrieving requested data from multiple possible persistence layers.

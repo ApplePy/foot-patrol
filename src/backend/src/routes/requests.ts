@@ -1,10 +1,10 @@
 import { NextFunction, Request, Response, Router } from "express";
 import { Container, inject, injectable } from "inversify";
 import { IFACES, TAGS } from "../ids";
-import { ISanitizer } from "../services/isanitizer";
-import { ISQLService } from "../services/isqlservice";
-import { StatusError } from "../models/status_error";
-import { IRoute } from "./iroute";
+import { IRoute } from "../interfaces/iroute";
+import { ISanitizer } from "../interfaces/isanitizer";
+import { ISQLService } from "../interfaces/isql-service";
+import { StatusError } from "../models/status-error";
 
 @injectable()
 export class RequestsRoute implements IRoute {

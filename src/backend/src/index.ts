@@ -35,12 +35,12 @@ import * as http from "http";
 import * as inversify from "inversify";
 import "reflect-metadata";
 import { IFACES, TAGS } from "./ids";
-import { IRoute } from "./routes/iroute";
+import { IRoute } from "./interfaces/iroute";
+import { ISanitizer } from "./interfaces/isanitizer";
+import { ISQLService } from "./interfaces/isql-service";
 import { RequestsRoute } from "./routes/requests";
 import { Server } from "./server";
-import { ISanitizer } from "./services/isanitizer";
-import { ISQLService } from "./services/isqlservice";
-import { MySQLService } from "./services/mysql_service";
+import { MySQLService } from "./services/mysql-service";
 import { Sanitizer } from "./services/sanitizer";
 // TODO: IoC Loggers and Status Error and import
 
