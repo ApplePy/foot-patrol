@@ -23,7 +23,7 @@ const eventually = chai.use(chaiAsPromised);
 /**
  * Test the Locations API
  */
-@suite.only
+@suite
 class SQLRequestsManagerTest {
 
   @timeout(10 * 1000 * 5)

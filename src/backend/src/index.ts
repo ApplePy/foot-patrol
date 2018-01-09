@@ -35,6 +35,7 @@ import * as http from "http";
 import * as inversify from "inversify";
 import "reflect-metadata";
 import { IFACES, TAGS } from "./ids";
+import { IRequestsManager } from "./interfaces/irequests-manager";
 import { IRoute } from "./interfaces/iroute";
 import { ISanitizer } from "./interfaces/isanitizer";
 import { ISQLService } from "./interfaces/isql-service";
@@ -42,6 +43,7 @@ import { RequestsRoute } from "./routes/requests";
 import { Server } from "./server";
 import { MySQLService } from "./services/mysql-service";
 import { Sanitizer } from "./services/sanitizer";
+import { SQLRequestsManager } from "./services/sql-requests-manager";
 // TODO: IoC Loggers and Status Error and import
 
 /**
@@ -62,6 +64,7 @@ class ServerEnvironmentSetup {
     this.container.bind<IRoute>(IFACES.IROUTE).to(RequestsRoute).whenTargetNamed(TAGS.REQUESTS);
     this.container.bind<ISanitizer>(IFACES.ISANITIZER).to(Sanitizer);
     this.container.bind<ISQLService>(IFACES.ISQLSERVICE).to(MySQLService).inSingletonScope();
+    this.container.bind<IRequestsManager>(IFACES.IREQUESTSMANAGER).to(SQLRequestsManager).inSingletonScope();
     this.container.bind<Server>(Server).toSelf();
   }
 

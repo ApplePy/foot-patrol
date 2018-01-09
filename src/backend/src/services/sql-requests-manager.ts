@@ -110,7 +110,7 @@ export class SQLRequestsManager implements IRequestsManager {
       infoDict.set(column, (request as any)[column]);
     }
     // Create the components of the dynamic SQL query
-    const filterArray = Array(infoDict.values());
+    const filterArray = Array.from(infoDict.values());
     const questionMarks = this.generateQuestionMarks(infoDict.keys());
 
     // DB execute
@@ -118,7 +118,8 @@ export class SQLRequestsManager implements IRequestsManager {
       return Promise.resolve();
     }
 
-    return this.db.makeQuery(`UPDATE \`requests\` SET ${questionMarks}`, filterArray)
+    return this.db.makeQuery(`UPDATE \`requests\` SET ${questionMarks} WHERE id=?`,
+    [...filterArray, request.id])
     .then((result) => (result.affectedRows > 0) ?
                       Promise.resolve() :
                       Promise.reject(new Error("Not Found")));

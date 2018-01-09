@@ -6,30 +6,26 @@ export class TravelRequest {
   /* tslint:disable:variable-name */
 
   public id: number;
-  public name: string;
+  public name: string | null = null;
   public from_location: string;
   public to_location: string;
-  public additional_info: string;
+  public additional_info: string | null = null;
   public archived: boolean;
   public timestamp: Date;
 
   /* tslint:enable:variable-name */
 
   constructor(obj?: {[key: string]: any}) {
-    // Return default object if the obj is null, undefined, empty, etc.
-    if (obj == null) {
+    // Return default object if the obj is undefined
+    if (obj === undefined) {
       return;
     }
 
     // Sanity check on data
-    if (isNaN(Number(obj.id)) === true ||
-        Number(obj.id) < 1 ||
-        obj.from_location === null ||
-        obj.from_location === undefined ||
-        obj.to_location === null ||
-        obj.to_location === undefined
-        ) {
-      throw new Error("Invalid MySQL Data");
+    if (obj.from_location !== undefined &&
+        obj.to_location !== undefined &&
+        obj.from_location === obj.to_location) {
+      throw new Error("Invalid Request Data");
     }
 
     // Fill object

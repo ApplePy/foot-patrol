@@ -27,6 +27,7 @@ const pathPrefix = "";  // For adding '/api/v1' to api calls if needed
 class RequestsAPITest {
 
   public static before() {
+    // Update this line to switch to MySQL if desired
     serverEnv.container.rebind<ISQLService>(IFACES.ISQLSERVICE).to(FakeSQL).inSingletonScope();
     serverEnv.startServer();
   }
@@ -78,13 +79,13 @@ class RequestsAPITest {
       sixth: 0
     };
 
-    const EXPECTED_RESULTS = [
-      {key: "first",  value: 123},
-      {key: "second", value: true},
-      {key: "third",  value: {hello: "moto"}},
-      {key: "fifth",  value: NaN},
-      {key: "sixth",  value: false}
-    ];
+    const EXPECTED_RESULTS = {
+      first: 123,
+      second: true,
+      third: {hello: "moto"},
+      fifth: NaN,
+      sixth: false
+    };
 
     // Test
     const requestsRoute = serverEnv.container.getNamed<RequestsRoute>(IFACES.IROUTE, TAGS.REQUESTS);
@@ -92,43 +93,6 @@ class RequestsAPITest {
 
     // Assert
     results.should.deep.equal(EXPECTED_RESULTS);
-  }
-
-  @test("constructSQLUpdateQuery should properly sanitize data")
-  public constructSQLUpdateQueryTest() {
-    // Data
-    const INPUT: [{key: string, value: any}] = [
-      {key: "test", value: "ok"},
-      {key: "huh", value: 2}
-    ];
-
-    const EXPECTED_RESULTS = {
-      query: "UPDATE requests SET test=?, huh=? WHERE ID=?",
-      values: ["ok", 2, 1]
-    };
-
-    // Test
-    const requestsRoute = serverEnv.container.getNamed<RequestsRoute>(IFACES.IROUTE, TAGS.REQUESTS);
-    const results = requestsRoute.constructSQLUpdateQuery(1, "requests", INPUT);
-
-    // Assert
-    should.exist(results);
-    if (results !== null && results !== undefined) {
-      results.should.deep.equal(EXPECTED_RESULTS);
-    }
-  }
-
-  @test("constructSQLUpdateQuery should properly return null")
-  public constructSQLUpdateQueryTestNull() {
-    // Data
-    const INPUT: any[] = [];
-
-    // Test
-    const requestsRoute = serverEnv.container.getNamed<RequestsRoute>(IFACES.IROUTE, TAGS.REQUESTS);
-    const results = requestsRoute.constructSQLUpdateQuery(1, "requests", INPUT as [{key: string, value: any}]);
-
-    // Assert
-    should.not.exist(results);
   }
 
   @test("GET should return a list of requests")
@@ -845,7 +809,7 @@ class RequestsAPITest {
     FakeSQL.response = (query: string, values: any[]) => {
       if (query.search("^UPDATE") >= 0) {
         // Check query to ensure proper formation
-        query.should.equal("UPDATE requests SET from_location=?, to_location=? WHERE ID=?");
+        query.should.equal("UPDATE `requests` SET from_location=?, to_location=? WHERE id=?");
 
         // Check values
         values.splice(-1);  // Remove ID

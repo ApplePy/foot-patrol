@@ -1,16 +1,17 @@
 import { NextFunction, Request, Response, Router } from "express";
 import { Container, inject, injectable } from "inversify";
 import { IFACES, TAGS } from "../ids";
+import { IRequestsManager } from "../interfaces/irequests-manager";
 import { IRoute } from "../interfaces/iroute";
 import { ISanitizer } from "../interfaces/isanitizer";
-import { ISQLService } from "../interfaces/isql-service";
 import { StatusError } from "../models/status-error";
+import { TravelRequest } from "../models/travel-request";
 
 @injectable()
 export class RequestsRoute implements IRoute {
 
   public router: Router;
-  private db: ISQLService;
+  private data: IRequestsManager;
   private sanitizer: ISanitizer;
 
   get Router(): Router {
@@ -21,7 +22,7 @@ export class RequestsRoute implements IRoute {
    * Constructor
    */
   constructor(
-    @inject(IFACES.ISQLSERVICE) db: ISQLService,
+    @inject(IFACES.IREQUESTSMANAGER) data: IRequestsManager,
     @inject(IFACES.ISANITIZER) sanitizer: ISanitizer) {
     // Log
     console.log("[RequestsRoute::create] Creating requests route.");
@@ -30,7 +31,7 @@ export class RequestsRoute implements IRoute {
     this.sanitizer = sanitizer;
 
     // Get database (envvars were checked by index.js)
-    this.db = db;
+    this.data = data;
 
     // Create router
     this.router = Router();
@@ -52,7 +53,7 @@ export class RequestsRoute implements IRoute {
    * @returns an array of key-value objects
    */
   public sanitizeMap(sanitizeMap: any, newData: any) {
-    const updateList: any[] = [];
+    const updateList: {[key: string]: any} = {};
 
     for (const key in sanitizeMap) {
       // Don't look down the prototype chain
@@ -61,43 +62,13 @@ export class RequestsRoute implements IRoute {
       // If a property with that column is found, sanitize and add to updateList
       if (newData[key] !== undefined) {
         const sanFunc = sanitizeMap[key];
-        updateList.push({
-          key: key as string,
-          value: sanFunc(newData[key])
-        });
-        // Final structure of updateList: [{key: column, value: value}, ...]
+        updateList[key as string] = sanFunc(newData[key]);
+        // Final structure of updateList: {column: value, ...}
       }
     }
 
     // Return data
-    return updateList as [{key: string, value: any}];
-  }
-
-  /**
-   * Creates an SQL update query. Data must be pre-sanitized!
-   *
-   * @param id The id to update
-   * @param updateList The list of columns and their new values to be updated in the SQL query
-   * @param table The table to update
-   * @returns an object with the query string and the values array
-   */
-  public constructSQLUpdateQuery(id: number, table: string, updateList: [{key: string, value: any}]):
-   {query: string, values: any[]} | null {
-
-    // Construct prepared columns
-    let kvPairs = "";
-    updateList.forEach((pair) => kvPairs = kvPairs.concat(`${pair.key}=?, `));
-
-    if (kvPairs.length <= 0) {
-      return null;
-    } else {
-      // Create prepared query string
-      kvPairs = kvPairs.substring(0, kvPairs.length - 2); // Chop off the trailing ', '
-      const query = `UPDATE ${table} SET ${kvPairs} WHERE ID=?`;
-      const values = [...updateList.map((pair) => pair.value), id];
-
-      return {query, values};
-    }
+    return updateList;
   }
 
   /**
@@ -184,15 +155,10 @@ export class RequestsRoute implements IRoute {
 
     const meta = {offset, count, archived};
 
-    // Query for data
-    // TODO: Why 'false||?' ?
-    this.db.makeQuery("SELECT * FROM `requests` WHERE archived = false||? LIMIT ?, ?", [archived, offset, count])
-    .then((requests) => requests.map((val: any) => { // Convert int back to bool
-      val.archived = Boolean(val.archived);
-      return val;
-    }))
+    // If archived records are not requested, filter by 'false'. Otherwise, don't filter to get both true and false
+    this.data.getRequests(offset, count, (archived === false) ? new Map([["archived", archived]]) : undefined)
     .then((requests) => res.send({requests, meta})) // Send results
-    .catch((err) => next(err)); // Send generic error
+    .catch((err) => next(this.translateErrors(err))); // Send generic error
   }
 
   /**
@@ -250,9 +216,9 @@ export class RequestsRoute implements IRoute {
       return;
     }
 
-    this.getId(id)
+    this.data.getRequest(id)
     .then((data) => res.send(data))
-    .catch((err) => next(err)); // Send generic error
+    .catch((err) => next(this.translateErrors(err))); // Send generic error
   }
 
   /**
@@ -320,13 +286,13 @@ export class RequestsRoute implements IRoute {
     req.body.from_location = this.sanitizer.sanitize(req.body.from_location);
     req.body.to_location = this.sanitizer.sanitize(req.body.to_location);
 
+    const postData = new TravelRequest(req.body);
+
     // Insert into database and get resulting record
-    this.db.makeQuery(
-      "INSERT INTO `requests` (name, from_location, to_location, additional_info) VALUES(?,?,?,?)",
-      [req.body.name, req.body.from_location, req.body.to_location, req.body.additional_info])
-    .then((results: any) => this.getId(results.insertId))
+    this.data.createRequest(postData)
+    .then((id) => this.data.getRequest(id))
     .then((getRes) => res.status(201).send(getRes))
-    .catch((err) => next(err));
+    .catch((err) => next(this.translateErrors(err))); // Send generic error
   }
 
   /**
@@ -409,14 +375,14 @@ export class RequestsRoute implements IRoute {
     req.body.from_location = this.sanitizer.sanitize(req.body.from_location);
     req.body.to_location = this.sanitizer.sanitize(req.body.to_location);
 
-    // Replace records via an UPDATE
-    this.db.makeQuery(
-      "UPDATE requests SET name=?, from_location=?, to_location=?, additional_info=?, archived=? WHERE id=?",
-      [req.body.name, req.body.from_location, req.body.to_location, req.body.additional_info, req.body.archived, id])
-      .then(this.checkRowUpdated(id, next))
-      .then(() => this.getId(id))
-      .then((row) => res.send(row))
-      .catch((err) => next(err));
+    // Replace records
+    const putData = new TravelRequest(req.body);
+    putData.id = id;
+
+    this.data.updateRequest(putData)
+    .then(() => this.data.getRequest(id))
+    .then((row) => res.send(row))
+    .catch((err) => next(this.translateErrors(err))); // Send generic error
   }
 
   /**
@@ -489,30 +455,25 @@ export class RequestsRoute implements IRoute {
     };
 
     // List of sanitized data
-    const updateList = this.sanitizeMap(sanitizeMap, req.body);
+    const updateDict = this.sanitizeMap(sanitizeMap, req.body);
 
     // Locaion check
-    const from = updateList.find((val: {key: string, value: any}) => val.key === "from_location");
-    const to = updateList.find((val: {key: string, value: any}) => val.key === "to_location");
-    if (from !== undefined && to !== undefined && from.value === to.value) {
+    if (updateDict.from_location !== undefined
+        && updateDict.to_location !== undefined
+        && updateDict.from_location === updateDict.to_location
+    ) {
       next(new StatusError(400, "Invalid Location", "Locations should not equal."));
+      return;
     }
 
-    // Construct SQL query
-    const sqlQueryData = this.constructSQLUpdateQuery(id, "requests", updateList);
-    let prom = Promise.resolve();
+    const patchData = new TravelRequest(updateDict);
+    patchData.id = id;
 
-    // Issue update if there's updates
-    if (sqlQueryData !== null && sqlQueryData !== undefined) {
-      // Make patch query
-      prom = this.db.makeQuery(sqlQueryData.query, sqlQueryData.values)
-      .then(this.checkRowUpdated(id, next));
-    }
-
-    // Return updated object
-    prom.then(() => this.getId(id))
+    // Update object
+    this.data.updateRequest(patchData, Object.keys(updateDict))
+    .then(() => this.data.getRequest(id))
     .then((data) => res.send(data))
-    .catch((err) => next(err)); // Send generic error
+    .catch((err) => next(this.translateErrors(err))); // Send generic error
   }
 
   /**
@@ -554,45 +515,21 @@ export class RequestsRoute implements IRoute {
     }
 
     // Make delete query
-    this.db.makeQuery("DELETE FROM `requests` WHERE id=?", [id])
-    .then(this.checkRowUpdated(id, next))
+    this.data.deleteRequest(id)
     .then(() => res.sendStatus(204))
-    .catch((err) => next(err));
+    .catch((err) => next(this.translateErrors(err))); // Send generic error
   }
 
   /**
-   * Get the request entry for an ID number.
+   * Translate generic errors from data layer into HTTP errors.
    *
-   * @param id The id to retrieve
+   * @param err
    */
-  private getId(id: number) {
-    // Query for data
-    return this.db.makeQuery("SELECT * FROM `requests` WHERE id=?", [id])
-    .then((request) => {
-      if (request.length > 0) {
-        return request[0];
-      } else {
-        return Promise.reject(new StatusError(404, "Request Not Found", `The requested id '${id}' was not found.`));
-      }
-    })
-    .then((val) => { // Convert int back to bool
-      val.archived = Boolean(val.archived);
-      return val;
-    });
-  }
-
-  /**
-   * Check to make sure a row was updated. Call in promise 'then'
-   *
-   * @param id ID that was supposed to be updated
-   * @param next Function to call on error
-   */
-  private checkRowUpdated(id: number, next: NextFunction) {
-    return (results: any) => {  // Make sure a record was updated
-      if (results.affectedRows === 0) {
-        return Promise.reject(new StatusError(404, "RequestNotFound", `Request ID ${id} was not found.`));
-      }
-      return Promise.resolve();
-    };
+  private translateErrors(err: Error) {
+    if (err.message === "Not Found") {
+      return new StatusError(404, "Not Found", `ID was not found.`);
+    } else {
+      return new StatusError(500, "Internal Server Error", "An error has occurred.");
+    }
   }
 }

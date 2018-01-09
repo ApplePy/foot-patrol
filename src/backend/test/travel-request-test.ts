@@ -63,19 +63,4 @@ class TravelRequestTest {
 
     new TravelRequest(testData).should.deep.equal(expected);
   }
-
-  @test("Converting an object with a bad id should fail")
-  public invalidConvert() {
-    // Setup
-    const testData: {[key: string]: any} = {
-      id: -1,
-      from_location: "UCC",
-      to_location: "SEB",
-      archived: 0,
-      timestamp: "2018-01-09T01:44:12.926Z"
-    };
-    should.throw(() => new TravelRequest(testData), "Invalid MySQL Data");
-    testData.id = "lol";
-    should.throw(() => new TravelRequest(testData), "Invalid MySQL Data");
-  }
 }
