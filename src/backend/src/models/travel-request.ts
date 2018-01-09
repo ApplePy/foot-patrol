@@ -47,7 +47,7 @@ export class TravelRequest {
 
     this.to_location = String(obj.to_location);
 
-    this.archived = Boolean(obj.archived);
+    this.archived = (obj.archived === "false") ? false : Boolean(obj.archived);
 
     this.timestamp = new Date(obj.timestamp);
   }
