@@ -12,7 +12,7 @@ export class TravelRequest {
     const travelRequest = new TravelRequest();
 
     // Sanity check on data
-    if (isNaN(Number(obj.id)) === true) {
+    if (isNaN(Number(obj.id)) === true || Number(obj.id) < 1) {
       throw new Error("Invalid MySQL Data");
     }
 
@@ -27,9 +27,9 @@ export class TravelRequest {
     travelRequest.additional_info = String(obj.additional_info);
     }
 
-    travelRequest.from_location = String(obj.name);
+    travelRequest.from_location = String(obj.from_location);
 
-    travelRequest.to_location = String(obj.name);
+    travelRequest.to_location = String(obj.to_location);
 
     travelRequest.archived = Boolean(obj.archived);
 
