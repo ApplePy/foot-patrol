@@ -35,7 +35,7 @@ export class SQLRequestsManager implements IRequestsManager {
     // Ensure data was returned
     .then((request) => (request.length > 0) ? request[0] : Promise.reject(new Error("Not Found")))
     // Convert to appropriate format and return
-    .then((val) => TravelRequest.convertToTravelRequest(val));
+    .then((val) => new TravelRequest(val));
   }
 
   /**
@@ -54,13 +54,14 @@ export class SQLRequestsManager implements IRequestsManager {
     }
 
     // Get filter array
-    const filterArray = (filter !== undefined) ? this.convertFilterDictToArray(filter) : [];
-    const questionMarks = this.generateQuestionMarks(filterArray.length / 2);
+    const filterArray = (filter !== undefined) ? filter.values() : [];
+    const questionMarks = this.generateQuestionMarks((filter !== undefined) ? filter.keys() : [], " AND ");
 
     // Query for data
-    return this.db.makeQuery(`SELECT * FROM \`requests\` WHERE ${questionMarks} LIMIT ?, ?`,
-                             [...filterArray, offset, count])
-    .then((requests) => requests.map((x) => TravelRequest.convertToTravelRequest(requests)) as TravelRequest[]);
+    return this.db.makeQuery(
+      `SELECT * FROM \`requests\`${(questionMarks.length > 0) ? " WHERE " : ""}${questionMarks} LIMIT ?, ?`,
+      [...filterArray, offset, count])
+    .then((requests) => requests.map((x: any) => new TravelRequest(x)) as TravelRequest[]);
   }
 
   /**
@@ -109,10 +110,14 @@ export class SQLRequestsManager implements IRequestsManager {
       infoDict.set(column, (request as any)[column]);
     }
     // Create the components of the dynamic SQL query
-    const filterArray = this.convertFilterDictToArray(infoDict);
-    const questionMarks = this.generateQuestionMarks(filterArray.length / 2);
+    const filterArray = Array(infoDict.values());
+    const questionMarks = this.generateQuestionMarks(infoDict.keys());
 
     // DB execute
+    if (questionMarks.length === 0) {
+      return Promise.resolve();
+    }
+
     return this.db.makeQuery(`UPDATE \`requests\` SET ${questionMarks}`, filterArray)
     .then((result) => (result.affectedRows > 0) ?
                       Promise.resolve() :
@@ -120,45 +125,19 @@ export class SQLRequestsManager implements IRequestsManager {
   }
 
   /**
-   * Converts a flat K-V filter dictionary to an array suitable for SQL prepare.
+   * Generate strings of "'column name'=?, ..." for SQL prepared statements
    *
-   * @param filterDict The dictionary to convert.
+   * @param columnNames The names of the columns to use for the prepared sections (must be pre-sanitized)
+   * @param separator   [optional] the string to separate the prepared sections
    */
-  private convertFilterDictToArray(filterDict: Map<string, any>) {
-    // Sanity check
-    if (typeof filterDict !== "object") {
-      throw new Error("Invalid Filter Dictionary");
-    }
-
-    const filterArray = [];
-
-    // Get the filter array to be [key, value, key, value] etc.
-    for (const [key, value] of filterDict) {
-        filterArray.push(key);
-        filterArray.push(value);
-    }
-
-    return filterArray;
-  }
-
-  /**
-   * Generate strings of "?=?, ?=?, ..." for SQL prepared statements
-   *
-   * @param pairs The number of "?=?" pairs to create
-   */
-  private generateQuestionMarks(pairs: number) {
-    // Sanity check
-    if (pairs < 0) {
-      throw new Error("Invalid Pair Count");
-    }
-
+  private generateQuestionMarks(columnNames: Iterable<string>, separator: string = ", ") {
     let questionMarks = "";
 
     // Create the question marks for the prepared statement
-    for (let i = 0; i < pairs; i++) {
-      questionMarks = questionMarks.concat("?=?, ");
+    for (const name of columnNames) {
+      questionMarks = questionMarks.concat(name + "=?" + separator);
     }
-    questionMarks = questionMarks.substring(0, questionMarks.length - 2); // Chop off the trailing ', '
+    questionMarks = questionMarks.substring(0, questionMarks.length - separator.length); // Chop off the trailing sep
 
     return questionMarks;
   }

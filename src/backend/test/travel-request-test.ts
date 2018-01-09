@@ -41,7 +41,7 @@ class TravelRequestTest {
     expected.archived = false;
     expected.timestamp = new Date("2018-01-09T01:44:12.926Z");
 
-    TravelRequest.convertToTravelRequest(testData).should.deep.equal(expected);
+    new TravelRequest(testData).should.deep.equal(expected);
   }
 
   @test("Converting an object with missing fields should succeed")
@@ -61,21 +61,21 @@ class TravelRequestTest {
     expected.archived = false;
     expected.timestamp = new Date("2018-01-09T01:44:12.926Z");
 
-    TravelRequest.convertToTravelRequest(testData).should.deep.equal(expected);
+    new TravelRequest(testData).should.deep.equal(expected);
   }
 
   @test("Converting an object with a bad id should fail")
   public invalidConvert() {
     // Setup
-    const testData: any = {
+    const testData: {[key: string]: any} = {
       id: -1,
       from_location: "UCC",
       to_location: "SEB",
       archived: 0,
       timestamp: "2018-01-09T01:44:12.926Z"
     };
-    should.throw(TravelRequest.convertToTravelRequest.bind(TravelRequest, testData), "Invalid MySQL Data");
+    should.throw(() => new TravelRequest(testData), "Invalid MySQL Data");
     testData.id = "lol";
-    should.throw(TravelRequest.convertToTravelRequest.bind(TravelRequest, testData), "Invalid MySQL Data");
+    should.throw(() => new TravelRequest(testData), "Invalid MySQL Data");
   }
 }
