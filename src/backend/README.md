@@ -29,8 +29,10 @@ backend
 ├── coverage
 ├── node_modules
 ├── src
-│   ├── routes
-│   └── services
+│   ├── interfaces
+│   ├── models
+│   ├── routes
+│   └── services
 └── test
 ```
 
@@ -47,6 +49,11 @@ backend
 `services/` contains services that the API server relies on, along with relevant interface files. Files of note:
 
 * `mysql-service.ts` supports connecting to MySQL database.
+* `sql-requests-manager.ts` supports using the MySQL database to get/store/update Foot Patrol travel requests.
+
+`models/` contains the data objects that the API server uses when communicating with other components.
+
+`interfaces/` contains all the interfaces used in the backend project.
 
 `test/` contains the testing suite. In particular, it contains `fake-sql.ts` that abstracts away the need for a running MySQL database during testing, and allows custom responses
 
