@@ -1,8 +1,12 @@
-import { TestBed, inject } from '@angular/core/testing';
+import { TestBed, inject, getTestBed, async } from '@angular/core/testing';
 import {HttpModule, Http, Response, ResponseOptions, XHRBackend} from '@angular/http';
 import { FtpRequestService } from './ftp-request.service';
-import {MockBackend} from '@angular/http/testing';
+import {MockBackend, MockConnection} from '@angular/http/testing';
 import { request } from 'http';
+import { HttpClient } from '@angular/common/http/src/client';
+import { Component } from '@angular/core/src/metadata/directives';
+import { environment } from '../environments/environment';
+import{HttpClientTestingModule} from '@angular/common/http/testing';
 
 describe('FtpRequestService', () => {
   beforeEach(() => {
@@ -10,12 +14,13 @@ describe('FtpRequestService', () => {
       providers: [
         {provide: XHRBackend, useClass: MockBackend},
         FtpRequestService,
-        HttpModule
+        HttpModule,      
       ],
       imports: [
-        HttpModule
+        HttpModule,
+        HttpClientTestingModule
       ]
-    });
+    });  
   });
 
   it('should be created', inject([FtpRequestService], (service: FtpRequestService) => {
@@ -23,10 +28,8 @@ describe('FtpRequestService', () => {
   }));
 
   describe('getRequests()',()=>{
-
     it('should return a json with an array of requests', 
     inject([FtpRequestService, XHRBackend], (service, mockBackend) => {
-
       const mockResponse1 = {
         request:[{
           id: 1,
@@ -45,7 +48,7 @@ describe('FtpRequestService', () => {
           timestamp: "11/1/2017"
         }]
       };
-  
+
       mockBackend.connections.subscribe((connection)=>{
         connection.mockRespond(new Response(new ResponseOptions({
           body: JSON.stringify(mockResponse1)
@@ -54,6 +57,7 @@ describe('FtpRequestService', () => {
 
       service.getRequests().then((requests)=>{
         expect(requests.length).toBe(2);
+
         expect(requests[0].id).toEqual(1);
         expect(requests[0].name).toEqual("name1");
         expect(requests[0].from_location).toEqual("SEB");
@@ -68,8 +72,13 @@ describe('FtpRequestService', () => {
         expect(requests[1].additional_info).toBeNull();
         expect(requests[1].timestamp).toEqual("11/1/2017");
       });
-
     }));
-
+  });
+  
+  describe('archiveRequest(request)',()=>{
+    it('should be defined', 
+    inject([FtpRequestService], (service:FtpRequestService) => {
+      expect(service.archiveRequest).toBeDefined();
+    }));  
   });
 });

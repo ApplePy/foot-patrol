@@ -10,7 +10,7 @@ import {FormsModule} from '@angular/forms';
   providers: [FtpRequestService]
 })
 export class RequestListComponent implements OnInit {
-  // displayRequests is displayed in the view
+  // requests in displayRequests are displayed in the view
   displayRequests: Request[] = [ ];
 
   constructor(private ftpRequestService: FtpRequestService) {}
@@ -19,7 +19,8 @@ export class RequestListComponent implements OnInit {
     setInterval(this.getFPrequests.bind(this), 1000);
   }
 
-  checkboxCheck(request): void {
+  archive(request): void {
+    request.archived=true;
     this.ftpRequestService.archiveRequest(request);
   }
 

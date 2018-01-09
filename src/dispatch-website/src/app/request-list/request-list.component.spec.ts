@@ -1,8 +1,10 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { async, ComponentFixture, TestBed, inject } from '@angular/core/testing';
 import { NgModule } from '@angular/core';
 import { RequestListComponent } from './request-list.component';
 import {FormsModule} from '@angular/forms';
-import {HttpModule} from '@angular/http';
+import {HttpModule, Http, Response, ResponseOptions, XHRBackend} from '@angular/http';
+import { FtpRequestService } from '../ftp-request.service';
+import {MockBackend} from '@angular/http/testing';
 
 describe('RequestListComponent', () => {
   let component: RequestListComponent;
@@ -29,4 +31,6 @@ describe('RequestListComponent', () => {
   it('should create', () => {
     expect(component).toBeTruthy();
   });
+
+  
 });
