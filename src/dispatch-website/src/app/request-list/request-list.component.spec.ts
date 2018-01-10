@@ -91,23 +91,24 @@ describe('RequestListComponent', () => {
       component.getFPrequests();
       expect(component.ftpRequestService.getRequests).toHaveBeenCalled();
     });
-  });
 
-  describe('displayFPrequests(requests)',()=>{
-    beforeEach(()=>{
-      fixture = TestBed.createComponent(RequestListComponent);
-      component = fixture.componentInstance;
-      fixture.detectChanges();
-    });
+    // it('should call displayFPrequests',async()=>{
+    //   component.getFPrequests();
+    //   fixture.whenStable().then(()=>{
+    //   expect(component.displayFPrequests).toHaveBeenCalled();
+    // });
+    // });
 
-    it('should call the sort function',()=>{
+    it('should call the sort function',async()=>{
       spyOn(Array.prototype,"sort");
-      component.displayFPrequests([testRequestList[0]]);
-      expect(Array.prototype.sort).toHaveBeenCalled();
+      component.getFPrequests();
+      fixture.whenStable().then(()=>{
+        expect(Array.prototype.sort).toHaveBeenCalled();
+      });      
     });
 
-    it('should sort the result by timestamp and store the result in displayRequests',()=>{
-      component.displayFPrequests(testRequestList);
+    it('should sort the result by timestamp and store the result in displayRequests',async()=>{
+      component.getFPrequests();
       var request1={request:{
         id: 1,
         name: "name1",
@@ -127,11 +128,13 @@ describe('RequestListComponent', () => {
         timestamp: "2017-10-26T06:51:06.000Z",
         archived: true
       }};
-      expect(component.displayRequests[0].timestamp).toBe(request2.request.timestamp);
-      expect(component.displayRequests[1].timestamp).toBe(request1.request.timestamp);
+      fixture.whenStable().then(()=>{
+        expect(component.displayRequests[0].timestamp).toBe(request2.request.timestamp);
+        expect(component.displayRequests[1].timestamp).toBe(request1.request.timestamp);
+      }); 
     });
 
-    it('should clear the existing list of displayed requests when getting the new list',()=>{
+    it('should clear the existing list of displayed requests when getting the new list',async()=>{
       var request1={request:{
         id: 1,
         name: "name1",
@@ -151,10 +154,14 @@ describe('RequestListComponent', () => {
         timestamp: "2017-10-26T06:51:06.000Z",
         archived: true
       }};
-      component.displayFPrequests(testRequestList);
-      expect(component.displayRequests.length).toEqual(2);
-      component.displayFPrequests(testRequestList);
-      expect(component.displayRequests.length).toEqual(2);
+      component.getFPrequests();
+      fixture.whenStable().then(()=>{
+        expect(component.displayRequests.length).toEqual(2);
+        component.getFPrequests();
+        fixture.whenStable().then(()=>{
+          expect(component.displayRequests.length).toEqual(2);
+        }); 
+       }); 
     });
   });
   
