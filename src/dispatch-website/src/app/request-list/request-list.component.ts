@@ -33,7 +33,7 @@ export class RequestListComponent implements OnInit {
         // sort requests in reverse chronological order. oldest last, most recent first
       requests.sort(this.comparerTimestamp);
 
-      //clear displayRequests
+      // clear displayRequests
       this.displayRequests.length = 0;
 
       // move requests to displayRequests to display them

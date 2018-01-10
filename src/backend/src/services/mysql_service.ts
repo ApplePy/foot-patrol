@@ -64,7 +64,6 @@ export class MySQLService implements ISQLService {
   public makeQuery(query: string, values?: any[]): Promise<any[]> {
     // Get a connection to the database
     return this.getConnection()
-    .catch((err) => Promise.reject(new Error(err.code)))  // Convert MySQL error object to Error class
     .then((conn) => {
       // Make request
       return new Promise<any[]>((resolve, reject) => {

@@ -1,0 +1,6 @@
+FROM node:8
+
+LABEL maintainer="Darryl Murray <darrylmurray@me.com>"
+
+RUN apt-get update && apt-get -y install gettext-base && rm -rf /var/lib/apt/lists/*
+RUN npm install typescript -g

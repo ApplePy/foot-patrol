@@ -5,6 +5,7 @@
 # Ensure that the back passes its tests first since the front relies on the back
 stages:
   - test
+  - posttest
   - build
   - containerize
   - deploy
@@ -21,6 +22,49 @@ variables:
   # $DB_PASS: password for footpatrol account
   # $DB_ROOT_PASS: password for root account
 
+.quality_base: &quality_base
+  stage: test
+  tags:
+  - dind
+  except:
+  - temp
+  - tags
+  artifacts:
+    expire_in: 1 hour
+  image: docker:latest
+  services:
+  - name: docker:dind
+    command: ["--registry-mirror=http://registry.internal.incode.ca:80"]
+  artifacts:
+   paths:
+   - top.json
+   - backend.json
+   - frontend.json
+  before_script:
+  - docker pull codeclimate/codeclimate
+
+quality_top:
+  <<: *quality_base
+  script:
+  - docker run --env CODECLIMATE_CODE="$PWD" --env DOCKER_HOST="$DOCKER_PORT" --volume "$PWD":/code --volume /tmp/cc:/tmp/cc codeclimate/codeclimate analyze -f json > top.json
+
+quality_backend:
+  <<: *quality_base
+  script:
+  - cd src/backend
+  - docker run --env CODECLIMATE_CODE="$PWD" --env DOCKER_HOST="$DOCKER_PORT" --volume "$PWD":/code --volume /tmp/cc:/tmp/cc codeclimate/codeclimate analyze -f json > ../../backend.json
+
+quality_frontend:
+  <<: *quality_base
+  cache:
+    key: frontend
+    paths:
+    - src/dispatch-website/node_modules/
+  image: registry.incode.ca/capstone/foot-patrol/node-docker:8-17.12    # Merged node:8-alpine and docker:17.12
+  script:
+  - cd src/dispatch-website
+  - npm install # Workaround for https://github.com/tkqubo/codeclimate-tslint/issues/26
+  - docker run --env CODECLIMATE_CODE="$PWD" --env DOCKER_HOST="$DOCKER_PORT" --volume "$PWD":/code --volume /tmp/cc:/tmp/cc codeclimate/codeclimate analyze -f json > ../../frontend.json
 
 #################################
 #                               #
@@ -40,42 +84,77 @@ variables:
 .test_docker_common: &test_docker_common
   <<: *test_common
   image: node:8
+  dependencies: []
   tags:
   - docker
   - linux
   coverage: /Functions\s*:\s*(\d*\.?\d+)%/
-  variables:
-    NODE_ENV: 'test'  # To set Mocha to isolate data
   # before_script:
   # - npm config set registry $NPM_CACHE # Setup proxy to stop killing bandwidth
 
 # This test ensures the back end works
 test_backend:
   <<: *test_docker_common
+  variables:
+    NODE_ENV: 'test'  # To set Mocha to isolate data
+    MYSQL_ROOT_PASSWORD: testing
+    MYSQL_DATABASE: foot_patrol
+    MYSQL_HOST: localhost
+    MYSQL_PASS: testing
+    MYSQL_USER: root
+    MYSQL_DB: foot_patrol
+  services:
+    - mysql:latest
   artifacts:
     paths:
       - src/backend/coverage/
+  cache:
+    key: backend
+    paths:
+      - src/backend/node_modules/
   script:
    - cd src/backend
    - rm package-lock.json || true   # So that cache server works
    - npm install
-   - npm run lint || true   # Prevents JSHint errors from stopping build
    - npm run coverage
 
 
 # This test ensures the front end works
 test_dispatch_website:
   <<: *test_docker_common
+  image: amio/node-chrome   # Contains both Node 8 and Chrome (https://incode.ca/capstone/docker-node-chrome mirrored from https://github.com/amio/docker-node-chrome)
   artifacts:
     paths:
       - src/dispatch-website/coverage/
+  cache:
+    key: frontend
+    paths:
+      - src/dispatch-website/node_modules/
   script:
    - cd src/dispatch-website
    - rm package-lock.json || true   # So that cache server works
    - npm install
-   - npm run lint || true   # Prevents JSHint errors from stopping build
-  #  - npm run coverage     # TODO: Figure out how to test Angular (https://gist.github.com/coolman565/f392f08cf90e90db18dd06e7d3f5f41c)
+   - npm run coverage
+   # - npm run e2e          # TODO: Do we want e2e testing?
 
+
+# Handle linting and other code quality errors
+codequality:
+  <<: *test_common
+  stage: posttest
+  image: python:3
+  dependencies:
+  - quality_top
+  - quality_frontend
+  - quality_backend
+  tags:
+  - docker
+  - linux
+  artifacts:
+   paths:
+   - codeclimate.json
+  script:
+   - python join.py top.json backend.json frontend.json codeclimate.json
 
 # This test ensures the front end works
 # test_mobile:
@@ -104,10 +183,7 @@ test_dispatch_website:
 
 .build_docker_common: &build_docker_common
   <<: *build_common
-  image: node:8
-  before_script:
-  # - npm config set registry $NPM_CACHE # Setup proxy to stop killing bandwidth
-  - npm install typescript -g
+  image: registry.incode.ca/capstone/foot-patrol/node_type:8
   tags:
   - docker
   - linux
@@ -131,12 +207,17 @@ test_dispatch_website:
   artifacts:
     paths:
      - src/dispatch-website/dist/
-  before_script:
-  #  - npm config set registry $NPM_CACHE # Setup proxy to stop killing bandwidth
-   - apt-get update && apt-get -y install gettext-base
+     - src/dispatch-website/docs/
+  cache:
+    policy: pull
+    key: frontend
+    paths:
+      - src/dispatch-website/node_modules/
   script:
    - cd src/dispatch-website
+   - npm install typedoc
    - npm install
+   - npm run docs
    - if [ $CI_COMMIT_REF_NAME == "master" ]; then export PUBLIC_URL="$DOMAIN"; elif [ $CI_COMMIT_REF_NAME == "develop" ]; then export PUBLIC_URL="staging.$DOMAIN"; else export PUBLIC_URL="$CI_COMMIT_REF_SLUG.$DOMAIN"; fi
    - envsubst < src/environments/environment.prod.ts > src/environments/environment.prod2.ts # Do a replacement of environment.prod.ts of ${PUBLIC_URL}
    - mv src/environments/environment.prod2.ts src/environments/environment.prod.ts
@@ -147,10 +228,20 @@ test_dispatch_website:
     paths:
      - src/backend/dist/
      - src/backend/node_modules/
+     - src/backend/docs/
+     - src/backend/apidocs/
+  cache:
+    policy: pull
+    key: backend
+    paths:
+      - src/backend/node_modules/
   script:
    - cd src/backend
-   - npm install --production
-   - npm run build_production 
+   - npm install typedoc apidoc # Can't hurt, will get caught by cache if available
+   - npm run docs
+   - npm prune --production   # Remove non-production packages that came in with the cache
+   - npm install --production # If no cache
+   - npm run build_production
 
 
 ### --- REVIEW --- ###
@@ -229,24 +320,39 @@ build_backend:
     - master
     - develop
     - tags
+  variables:
+    TAG: $CI_COMMIT_REF_SLUG
 
 .containerize_deploy_common: &containerize_deploy_common
   only:
     - master
     - develop
+  variables:
+    TAG: $CI_COMMIT_REF_SLUG-$CI_COMMIT_SHA
   
 .web_container: &web_container
   script:
    - cd src/dispatch-website
-   - docker build --no-cache -t $CI_REGISTRY_IMAGE/webapp:$CI_COMMIT_REF_SLUG$CI_COMMIT_SHA .
-   - docker push $CI_REGISTRY_IMAGE/webapp:$CI_COMMIT_REF_SLUG$CI_COMMIT_SHA
+   - docker build --no-cache -t $CI_REGISTRY_IMAGE/webapp:$TAG .
+   - docker push $CI_REGISTRY_IMAGE/webapp:$TAG
 
 .back_container: &back_container
   script:
    - cd src/backend
-   - docker build --no-cache -t $CI_REGISTRY_IMAGE/backend:$CI_COMMIT_REF_SLUG$CI_COMMIT_SHA .
-   - docker push $CI_REGISTRY_IMAGE/backend:$CI_COMMIT_REF_SLUG$CI_COMMIT_SHA
+   - docker build --no-cache -t $CI_REGISTRY_IMAGE/backend:$TAG .
+   - docker push $CI_REGISTRY_IMAGE/backend:$TAG
 
+.back_docs_container: &back_docs_container
+  script:
+  - cd src/backend
+  - docker build --file Dockerfile_docs -t $CI_REGISTRY_IMAGE/backend_docs:$TAG .
+  - docker push $CI_REGISTRY_IMAGE/backend_docs:$TAG
+
+.website_docs_container: &website_docs_container
+  script:
+  - cd src/dispatch-website
+  - docker build --file Dockerfile_docs -t $CI_REGISTRY_IMAGE/website_docs:$TAG .
+  - docker push $CI_REGISTRY_IMAGE/website_docs:$TAG
 ### --- REVIEW --- ###
 
 # This job builds the client-side code for review
@@ -258,13 +364,29 @@ containerize_review_website:
   - build_review_website
 
 
-# This job builds the client-side code for review
+# This job builds the server-side code for review
 containerize_review_backend:
   <<: *containerize_common
   <<: *containerize_review_common
   <<: *back_container
   dependencies:
   - build_review_backend
+
+# This job builds the docs for the server-side code
+containerize_review_backend_docs:
+  <<: *containerize_common
+  <<: *containerize_review_common
+  <<: *back_docs_container
+  dependencies:
+  - build_review_backend
+
+# This job builds the docs for the client-side code
+containerize_review_website_docs:
+  <<: *containerize_common
+  <<: *containerize_review_common
+  <<: *website_docs_container
+  dependencies:
+  - build_review_website
 
 
 ### --- DEPLOYMENT --- ###
@@ -286,6 +408,22 @@ containerize_backend:
   dependencies:
   - build_backend
 
+# This job builds the docs for the backend API for deployment
+containerize_backend_docs:
+  <<: *containerize_common
+  <<: *containerize_deploy_common
+  <<: *back_docs_container
+  dependencies:
+  - build_backend
+
+# This job builds the docs for the website for deployment
+containerize_website_docs:
+  <<: *containerize_common
+  <<: *containerize_deploy_common
+  <<: *website_docs_container
+  dependencies:
+  - build_website
+
 
 #################################
 #                               #
@@ -300,9 +438,7 @@ containerize_backend:
   tags:
     - docker
     - linux
-  variables:
-    COMMON_INSTALL_HELM: --tiller-namespace $NAMESPACE --namespace ${NAMESPACE} --set appLabel=$CI_ENVIRONMENT_SLUG,dockercfg=$DOCKERCFG,imageTag=$CI_COMMIT_REF_SLUG$CI_COMMIT_SHA,imageBase=$CI_REGISTRY_IMAGE
-    HELM_CHART: deploy/charts/foot-patrol
+    - kubernetes
   before_script:
   - helm init --client-only --tiller-namespace $NAMESPACE
   - helm repo add stable https://kubernetes-charts.storage.googleapis.com/
@@ -315,9 +451,13 @@ containerize_backend:
 # This job takes the contents from the build review jobs, then deploys everything
 deploy_review:
   <<: *deploy_common
+  variables:
+    TAG: $CI_COMMIT_REF_SLUG
+    COMMON_INSTALL_HELM: --tiller-namespace $NAMESPACE --namespace ${NAMESPACE} --set appLabel=$CI_ENVIRONMENT_SLUG,dockercfg=$DOCKERCFG,imageBase=$CI_REGISTRY_IMAGE
+    HELM_CHART: deploy/charts/foot-patrol
   script:
     - helm dependency build $HELM_CHART
-    - helm upgrade $CI_ENVIRONMENT_SLUG $HELM_CHART --install $COMMON_INSTALL_HELM --set backend.replicas=1,webapp.replicas=1,ingress.hosts={"$CI_COMMIT_REF_SLUG.$DOMAIN"},$DB_CONFIG
+    - helm upgrade $CI_ENVIRONMENT_SLUG $HELM_CHART --install $COMMON_INSTALL_HELM --set backend.replicas=1,webapp.replicas=1,imageTag=$TAG,ingress.hosts={"$CI_COMMIT_REF_SLUG.$DOMAIN"},$DB_CONFIG
     - cd src/backend
     - until [ $(kubectl get pods -n $NAMESPACE | grep "$CI_ENVIRONMENT_SLUG-mysql" | grep -o "1/1") ]; do echo "mysql not ready..."; sleep 15; done
     - sleep 30  # Wait out any bugs
@@ -355,9 +495,13 @@ shutdown_review:
 # This job takes the contents from the previous job, builds them into a docker image, then deploys everything
 staging:
   <<: *deploy_common
+  variables:
+    TAG: $CI_COMMIT_REF_SLUG-$CI_COMMIT_SHA
+    COMMON_INSTALL_HELM: --tiller-namespace $NAMESPACE --namespace ${NAMESPACE} --set appLabel=$CI_ENVIRONMENT_SLUG,dockercfg=$DOCKERCFG,imageBase=$CI_REGISTRY_IMAGE
+    HELM_CHART: deploy/charts/foot-patrol
   script:
     - helm dependency build $HELM_CHART
-    - helm upgrade $CI_ENVIRONMENT_SLUG $HELM_CHART --install $COMMON_INSTALL_HELM --set ingress.hosts={"staging.$DOMAIN"},$DB_CONFIG
+    - helm upgrade $CI_ENVIRONMENT_SLUG $HELM_CHART --install $COMMON_INSTALL_HELM --set ingress.hosts={"staging.$DOMAIN"},imageTag=$TAG,$DB_CONFIG
     - cd src/backend
     - until [ $(kubectl get pods -n $NAMESPACE | grep "$CI_ENVIRONMENT_SLUG-mysql" | grep -o "1/1") ]; do echo "mysql not ready..."; sleep 15; done
     - sleep 30  # Wait out any bugs
@@ -391,9 +535,13 @@ shutdown_staging:
 # This job takes the contents from the previous job, builds them into a docker image, then deploys everything
 production:
   <<: *deploy_common
+  variables:
+    TAG: $CI_COMMIT_REF_SLUG-$CI_COMMIT_SHA
+    COMMON_INSTALL_HELM: --tiller-namespace $NAMESPACE --namespace ${NAMESPACE} --set appLabel=$CI_ENVIRONMENT_SLUG,dockercfg=$DOCKERCFG,imageBase=$CI_REGISTRY_IMAGE
+    HELM_CHART: deploy/charts/foot-patrol
   script:
     - helm dependency build $HELM_CHART
-    - helm upgrade $CI_ENVIRONMENT_SLUG $HELM_CHART --install $COMMON_INSTALL_HELM --set ingress.hosts={"$DOMAIN"},$DB_CONFIG
+    - helm upgrade $CI_ENVIRONMENT_SLUG $HELM_CHART --install $COMMON_INSTALL_HELM --set ingress.hosts={"$DOMAIN"},imageTag=$TAG,$DB_CONFIG
     - cd src/backend
     - until [ $(kubectl get pods -n $NAMESPACE | grep "$CI_ENVIRONMENT_SLUG-mysql" | grep -o "1/1") ]; do echo "mysql not ready..."; sleep 15; done
     - sleep 30  # Wait out any bugs

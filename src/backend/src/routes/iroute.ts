@@ -7,5 +7,5 @@ export interface IRoute {
   /**
    * Completed router object
    */
-  router: Router;
+  readonly Router: Router;
 }
