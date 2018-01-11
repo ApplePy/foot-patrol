@@ -282,7 +282,7 @@ export class RequestsRoute implements IRoute {
    * @apiSuccess {string} timestamp Timestamp the record was created.
    *
    * @apiSuccessExample Success Response:
-   *     HTTP/1.1 200 OK
+   *     HTTP/1.1 201 CREATED
    *     {
    *        id: 1,
    *        name: "John Doe",
