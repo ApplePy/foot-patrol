@@ -20,7 +20,6 @@
         p1:id="@+id/locationText"
         p1:layout_width="match_parent"
         p1:layout_height="wrap_content"
-        p1:text="Location"
         p1:layout_below="@+id/locationView"
         p1:layout_marginLeft="5dp" />
     <TextView
@@ -36,7 +35,6 @@
         p1:id="@+id/nameText"
         p1:layout_width="match_parent"
         p1:layout_height="wrap_content"
-        p1:text="Name"
         p1:layout_below="@+id/nameView"
         p1:layout_marginLeft="5dp" />
     <TextView
@@ -51,7 +49,6 @@
         p1:id="@+id/destinationText"
         p1:layout_width="match_parent"
         p1:layout_height="wrap_content"
-        p1:text="Destination"
         p1:layout_below="@+id/destinationView"
         p1:layout_marginLeft="5dp" />
     <TextView
@@ -66,7 +63,6 @@
         p1:id="@+id/additionalInformationText"
         p1:layout_width="match_parent"
         p1:layout_height="wrap_content"
-        p1:text="Additional Info"
         p1:layout_below="@+id/textView1"
         p1:layout_marginLeft="5dp" />
     <Button
@@ -76,8 +72,21 @@
         p1:layout_below="@+id/destinationText"
         p1:layout_marginTop="200dp"
         p1:background="#ff807f83"
-        p1:layout_centerVertical="false"
-        p1:layout_centerHorizontal="true"
+        p1:layout_centerVertical="true"
         p1:text="Submit Request"
-        p1:foreground="#ff807f83" />
+        p1:foreground="#ff807f83"
+        p1:layout_centerHorizontal="false"
+        p1:layout_marginLeft="40dp" />
+    <Button
+        p1:layout_width="wrap_content"
+        p1:layout_height="wrap_content"
+        p1:id="@+id/button2"
+        p1:layout_below="@+id/destinationText"
+        p1:layout_marginTop="200dp"
+        p1:background="#ff807f83"
+        p1:layout_centerVertical="true"
+        p1:text="Cancel Request"
+        p1:foreground="#ff807f83"
+        p1:layout_centerHorizontal="false"
+        p1:layout_marginLeft="220dp" />
 </RelativeLayout>

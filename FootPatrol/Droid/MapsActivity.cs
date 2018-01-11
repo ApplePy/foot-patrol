@@ -22,7 +22,7 @@ namespace FootPatrol.Droid
             return maps;
         }
 
-        public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+        public override View OnCreateViewAsync(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
             View views = inflater.Inflate(Resource.Layout.MapsLayout, container, false);
             return views;
