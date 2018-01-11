@@ -273,13 +273,13 @@ export class RequestsRoute implements IRoute {
    * @apiParam {string} to_location Escort destination.
    * @apiParam {string} [additional_info] Additional request information.
    *
-   * @apiSuccess {number} id The record ID.
-   * @apiSuccess {string} [name] Name of the requester.
-   * @apiSuccess {string} from_location Escort start location.
-   * @apiSuccess {string} to_location Escort destination.
-   * @apiSuccess {string} [additional_info] Additional request information.
-   * @apiSuccess {boolean} archived Specifies if this request completed and archived.
-   * @apiSuccess {string} timestamp Timestamp the record was created.
+   * @apiSuccess (Created 201) {number} id The record ID.
+   * @apiSuccess (Created 201) {string} [name] Name of the requester.
+   * @apiSuccess (Created 201) {string} from_location Escort start location.
+   * @apiSuccess (Created 201) {string} to_location Escort destination.
+   * @apiSuccess (Created 201) {string} [additional_info] Additional request information.
+   * @apiSuccess (Created 201) {boolean} archived Specifies if this request completed and archived.
+   * @apiSuccess (Created 201) {string} timestamp Timestamp the record was created.
    *
    * @apiSuccessExample Success Response:
    *     HTTP/1.1 201 CREATED
