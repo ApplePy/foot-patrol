@@ -6,10 +6,7 @@
     "jsRules": {},
     "rules": {
       "no-console": false,
-      "object-literal-sort-keys": {
-        "options": ["ignore-case", "match-declaration-order"],
-        "severity": "warning"
-      },
+      "object-literal-sort-keys": false,
       "trailing-comma": false,
       "no-trailing-whitespace": {
         "options": ["ignore-jsdoc"],
