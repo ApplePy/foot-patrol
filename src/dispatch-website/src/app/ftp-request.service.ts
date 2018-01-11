@@ -21,9 +21,9 @@ export class FtpRequestService {
     return this.http.get(this.requestURL + '?offset=0&count=10')
             .toPromise()
             .then(response => {
-              response.json().requests as Request[]
-              if(response.status!==200){
-                console.log("Code: "+response.status+", "+response.statusText)
+              // response.json().requests as Request[]
+              if (response.status !== 200) {
+                console.log('Code: ' + response.status + ', ' + response.statusText);
               }
             })
             .catch(this.handleError);
@@ -31,14 +31,14 @@ export class FtpRequestService {
 
   /**
    * archives the request by sending a patch request with the updated status
-   * 
+   *
    * @param request the request to be archived
    */
   archiveRequest(request) {
     const patchURL = this.requestURL + '/' + request.id;
     this.http.patch(patchURL, {
       archived: request.archived
-    }).subscribe(resp=>{},error=>this.handleError(error));
+    }).subscribe(resp => {}, error => this.handleError(error));
   }
 
 

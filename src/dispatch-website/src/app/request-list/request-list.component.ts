@@ -20,7 +20,7 @@ export class RequestListComponent implements OnInit {
   }
 
   archive(request): void {
-    request.archived=true;
+    request.archived = true;
     this.ftpRequestService.archiveRequest(request);
   }
 
@@ -29,11 +29,11 @@ export class RequestListComponent implements OnInit {
    */
   getFPrequests(): void {
     this.ftpRequestService.getRequests()
-    .then(requests=>{
+    .then(requests => {
         // sort requests in reverse chronological order. oldest last, most recent first
       requests.sort(this.comparerTimestamp);
 
-      //clear displayRequests
+      // clear displayRequests
       this.displayRequests.length = 0;
 
       // move requests to displayRequests to display them
@@ -50,16 +50,12 @@ export class RequestListComponent implements OnInit {
    * @param b request b
    */
   comparerTimestamp(a, b) {
-    if (a.timestamp > b.timestamp) {
-      return -1;
-    }
-    if (a.timestamp < b.timestamp) {
-      return 1;
-    }
-    return 0;
+    return clamp(b.timestamp - a.timestamp, 1, -1);
   }
 }
 
-
+function clamp(val: number, max: number, min: number) {
+  return Math.max(Math.min(val, max), min);
+}
 
 
