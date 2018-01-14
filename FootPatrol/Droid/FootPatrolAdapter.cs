@@ -23,7 +23,7 @@ namespace FootPatrol.Droid
         }
 
         public override int Count {
-            get { return 2; }
+            get { return 3; }
         } 
 
         public override Android.Support.V4.App.Fragment GetItem(int position)
@@ -31,6 +31,10 @@ namespace FootPatrol.Droid
             if (position == 0)
             {
                 return (Android.Support.V4.App.Fragment)PickUpActivity.newInstance();
+            }
+
+            else if(position == 1){
+                return (Android.Support.V4.App.Fragment)MapsActivity.newInstance();
             }
 
             else
@@ -43,6 +47,9 @@ namespace FootPatrol.Droid
             {
                 return new Java.Lang.String("Pickup");
             }
+
+            else if (position == 1)
+                return new Java.Lang.String("Campus Maps");
 
             else
                 return new Java.Lang.String("Feedback");

@@ -13,18 +13,18 @@ using Android.Widget;
 
 namespace FootPatrol.Droid
 {
-    [Activity(Label = "FeedbackActivity")]
-    public class FeedbackActivity : Android.Support.V4.App.Fragment 
+    [Activity(Label = "MapsActivity")]
+    public class MapsActivity : Android.Support.V4.App.Fragment 
     {
-        public static FeedbackActivity newInstance()
+        public static MapsActivity newInstance()
         {
-            FeedbackActivity feedback = new FeedbackActivity();
-            return feedback;
+            MapsActivity maps = new MapsActivity();
+            return maps;
         }
 
         public override View OnCreateViewAsync(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
-            View views = inflater.Inflate(Resource.Layout.FeedbackLayout, container, false);
+            View views = inflater.Inflate(Resource.Layout.MapsLayout, container, false);
             return views;
         }
     }
