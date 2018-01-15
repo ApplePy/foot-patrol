@@ -5,11 +5,10 @@ import * as chai from "chai";
 import chaiHttp = require("chai-http");
 import { only, skip, suite, test } from "mocha-typescript";
 import * as mock from "ts-mockito";
-import { isNullOrUndefined } from "util";
 import { IFACES, TAGS } from "../src/ids";
 import { default as serverEnv } from "../src/index";
-import { ISQLService } from "../src/services/isqlservice";
-import { MySQLService } from "../src/services/mysql_service";
+import { ISQLService } from "../src/interfaces/isql-service";
+import { MySQLService } from "../src/services/mysql-service";
 import { FakeSQL } from "./fake-sql";
 import { TestReplaceHelper } from "./test-helper";
 
@@ -28,6 +27,7 @@ const pathPrefix = "";  // For adding '/api/v1' to api calls if needed
 class RequestsAPITest {
 
   public static before() {
+    // Update this line to switch to MySQL if desired
     serverEnv.container.rebind<ISQLService>(IFACES.ISQLSERVICE).to(FakeSQL).inSingletonScope();
     serverEnv.startServer();
   }
@@ -79,13 +79,13 @@ class RequestsAPITest {
       sixth: 0
     };
 
-    const EXPECTED_RESULTS = [
-      {key: "first",  value: 123},
-      {key: "second", value: true},
-      {key: "third",  value: {hello: "moto"}},
-      {key: "fifth",  value: NaN},
-      {key: "sixth",  value: false}
-    ];
+    const EXPECTED_RESULTS = {
+      first: 123,
+      second: true,
+      third: {hello: "moto"},
+      fifth: NaN,
+      sixth: false
+    };
 
     // Test
     const requestsRoute = serverEnv.container.getNamed<RequestsRoute>(IFACES.IROUTE, TAGS.REQUESTS);
@@ -93,43 +93,6 @@ class RequestsAPITest {
 
     // Assert
     results.should.deep.equal(EXPECTED_RESULTS);
-  }
-
-  @test("constructSQLUpdateQuery should properly sanitize data")
-  public constructSQLUpdateQueryTest() {
-    // Data
-    const INPUT: [{key: string, value: any}] = [
-      {key: "test", value: "ok"},
-      {key: "huh", value: 2}
-    ];
-
-    const EXPECTED_RESULTS = {
-      query: "UPDATE requests SET test=?, huh=? WHERE ID=?",
-      values: ["ok", 2, 1]
-    };
-
-    // Test
-    const requestsRoute = serverEnv.container.getNamed<RequestsRoute>(IFACES.IROUTE, TAGS.REQUESTS);
-    const results = requestsRoute.constructSQLUpdateQuery(1, "requests", INPUT);
-
-    // Assert
-    should.exist(results);
-    if (!isNullOrUndefined(results)) {
-      results.should.deep.equal(EXPECTED_RESULTS);
-    }
-  }
-
-  @test("constructSQLUpdateQuery should properly return null")
-  public constructSQLUpdateQueryTestNull() {
-    // Data
-    const INPUT: any[] = [];
-
-    // Test
-    const requestsRoute = serverEnv.container.getNamed<RequestsRoute>(IFACES.IROUTE, TAGS.REQUESTS);
-    const results = requestsRoute.constructSQLUpdateQuery(1, "requests", INPUT as [{key: string, value: any}]);
-
-    // Assert
-    should.not.exist(results);
   }
 
   @test("GET should return a list of requests")
@@ -169,6 +132,55 @@ class RequestsAPITest {
     chai.request(serverEnv.nodeServer)
       .get(pathPrefix + "/requests")
       .query({ offset: 0, count: 2, archived: false })
+      .end((err, res) => {
+        // Verify results
+        res.should.have.status(200);
+        res.body.should.have.property("requests");
+        res.body.should.have.property("meta");
+        res.body.should.deep.equal(EXPECTED_RESULTS);
+        done();
+      });
+    })
+    .catch(done);
+  }
+
+  @test("GET should return a list of requests with count capped")
+  public requestsListCapped(done: MochaDone) {
+    // Get SQL connector instance
+    const sqlInstance = serverEnv.container.get<ISQLService>(IFACES.ISQLSERVICE);
+    const sqlQuery = sqlInstance.makeQuery.bind(sqlInstance);
+
+    // Fake data
+    const DB_DATA = {
+      id: 1, name: "John Doe", from_location: "SEB",
+      to_location: "UCC", additional_info: null,
+      archived: 0, timestamp: "2017-10-26T06:51:05.000Z"
+    };
+
+    // Expected return
+    const EXPECTED_RESULTS = {
+      requests: [
+        {
+          id: 1, name: "John Doe", from_location: "SEB",
+          to_location: "UCC", additional_info: null,
+          archived: false, timestamp: "2017-10-26T06:51:05.000Z"
+        }
+      ],
+      meta: { offset: 0, count: 100, archived: false }
+    };
+
+    // Setup fake data
+    FakeSQL.response = (query: string, values: any[]) => {
+      values.should.deep.equal([false, 0, 100]);
+      return [DB_DATA];
+    };
+    TestReplaceHelper.dateReplace(sqlQuery, "requests", DB_DATA, "timestamp")
+    .then(() => {
+
+    // Start request
+    chai.request(serverEnv.nodeServer)
+      .get(pathPrefix + "/requests")
+      .query({ offset: 0, count: 500, archived: false })
       .end((err, res) => {
         // Verify results
         res.should.have.status(200);
@@ -269,7 +281,7 @@ class RequestsAPITest {
 
     // Setup fake data
      FakeSQL.response = (query: string, values: any[]) => {
-      values.should.deep.equal([true, 0, 2]);
+      values.should.deep.equal([0, 2]);
       return DB_DATA;
     };
      TestReplaceHelper.dateReplace(sqlQuery, "requests", DB_DATA, "timestamp")
@@ -846,7 +858,7 @@ class RequestsAPITest {
     FakeSQL.response = (query: string, values: any[]) => {
       if (query.search("^UPDATE") >= 0) {
         // Check query to ensure proper formation
-        query.should.equal("UPDATE requests SET from_location=?, to_location=? WHERE ID=?");
+        query.should.equal("UPDATE `requests` SET from_location=?, to_location=? WHERE id=?");
 
         // Check values
         values.splice(-1);  // Remove ID

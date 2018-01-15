@@ -4,11 +4,11 @@
 export interface ISQLService {
   /**
    * Make a basic query to the SQL server.
-   * 
+   *
    * @param query  The query string, optionally with ?s for values to be inserted
    * @param values (Optional) An array of values to be inserted into appropriate places in `query`
    */
-  makeQuery(query: string, values?: any[]): Promise<any[]>;
+  makeQuery(query: string, values?: any[]): Promise<any>;
 
   /**
    * Initialize object

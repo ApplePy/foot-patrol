@@ -1,5 +1,5 @@
 import * as express from "express";
-import { StatusError } from "./status_error";
+import { StatusError } from "../models/status-error";
 
 /**
  * Collection of error middleware for logging and responding to user.

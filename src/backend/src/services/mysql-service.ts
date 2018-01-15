@@ -1,6 +1,6 @@
-import { inject, injectable } from "inversify";
+import { injectable } from "inversify";
 import * as mysql from "mysql";
-import { ISQLService } from "./isqlservice";
+import { ISQLService } from "../interfaces/isql-service";
 
 /**
  * Service for connecting to and managing a MySQL database.
@@ -57,16 +57,16 @@ export class MySQLService implements ISQLService {
 
   /**
    * Make a basic query to the SQL server.
-   * 
+   *
    * @param query  The query string, optionally with ?s for values to be inserted
    * @param values (Optional) An array of values to be inserted into appropriate places in `query`
    */
-  public makeQuery(query: string, values?: any[]): Promise<any[]> {
+  public makeQuery(query: string, values?: any[]): Promise<any> {
     // Get a connection to the database
     return this.getConnection()
     .then((conn) => {
       // Make request
-      return new Promise<any[]>((resolve, reject) => {
+      return new Promise<any>((resolve, reject) => {
         conn.query(query, values, (err, results) => {
           conn.release(); // Release connection
 

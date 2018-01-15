@@ -6,8 +6,7 @@ import chaiAsPromised = require("chai-as-promised");
 import { only, skip, suite, test, timeout } from "mocha-typescript";
 import "reflect-metadata";
 import * as mock from "ts-mockito";
-import { isNullOrUndefined } from "util";
-import { MySQLService } from "../src/services/mysql_service";
+import { MySQLService } from "../src/services/mysql-service";
 import { TestReplaceHelper } from "./test-helper";
 
 // Route
