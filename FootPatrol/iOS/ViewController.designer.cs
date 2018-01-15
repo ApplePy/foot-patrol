@@ -18,6 +18,10 @@ namespace FootPatrol.iOS
 
         [Outlet]
         [GeneratedCode ("iOS Designer", "1.0")]
+        UIKit.UITextField AdditionalInfoTextBox { get; set; }
+
+        [Outlet]
+        [GeneratedCode ("iOS Designer", "1.0")]
         UIKit.UITextField CurrentLocationTextBox { get; set; }
 
         [Outlet]
@@ -38,6 +42,11 @@ namespace FootPatrol.iOS
 
         void ReleaseDesignerOutlets ()
         {
+            if (AdditionalInfoTextBox != null) {
+                AdditionalInfoTextBox.Dispose ();
+                AdditionalInfoTextBox = null;
+            }
+
             if (CurrentLocationTextBox != null) {
                 CurrentLocationTextBox.Dispose ();
                 CurrentLocationTextBox = null;
