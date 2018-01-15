@@ -50,7 +50,8 @@ namespace FootPatrol
 
             try
             {
-                HttpResponseMessage response = await Client.Instance.DeleteAsync($"api/v1/footpatrol/{id}");
+                Debug.WriteLine("api/v1/requests/" + id.ToString());
+                HttpResponseMessage response = await Client.Instance.DeleteAsync("api/v1/requests/" + id.ToString());
                 response.EnsureSuccessStatusCode();
 
             } 

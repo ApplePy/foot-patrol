@@ -71,7 +71,7 @@ namespace FootPatrol.iOS
                         requestSent = false;
 
                         //Popup with error
-                        var errorAlert = UIAlertController.Create("Error", error.ToString(), UIAlertControllerStyle.Alert);
+                        var errorAlert = UIAlertController.Create("Error", "Please check your input.", UIAlertControllerStyle.Alert);
                         errorAlert.AddAction(UIAlertAction.Create("Ok", UIAlertActionStyle.Default, null));
                         PresentViewController(errorAlert, true, null);
 
@@ -104,7 +104,7 @@ namespace FootPatrol.iOS
                         requestSent = true;
 
                         //Popup with error
-                        var errorAlert = UIAlertController.Create("Error", error.ToString(), UIAlertControllerStyle.Alert);
+                        var errorAlert = UIAlertController.Create("Error", "There was an error cancelling request.", UIAlertControllerStyle.Alert);
                         errorAlert.AddAction(UIAlertAction.Create("Ok", UIAlertActionStyle.Default, null));
                         PresentViewController(errorAlert, true, null);
 
