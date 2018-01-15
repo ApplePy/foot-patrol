@@ -2,6 +2,8 @@
 using Android.OS;
 using Android.Views;
 using Android.Gms.Maps;
+using Android.Locations;
+using System.Collections.Generic;
 using System;
 
 namespace FootPatrol.Droid
@@ -13,6 +15,7 @@ namespace FootPatrol.Droid
         private GoogleMap googleMap;
         bool _gettingMap = false;
         public event EventHandler handle;
+        public static Android.Content.Context context;
 
         public static VolunteerActivity newInstance()
         {
@@ -44,7 +47,7 @@ namespace FootPatrol.Droid
             if(googleMap != null)
             {
                 System.Diagnostics.Debug.WriteLine("In here");
-                googleMap.SetMapStyle((Android.Gms.Maps.Model.MapStyleOptions)GoogleMap.MapTypeTerrain);
+                //googleMap.SetMapStyle((Android.Gms.Maps.Model.MapStyleOptions)GoogleMap.MapTypeTerrain);
             }
                               
             return view;
@@ -76,7 +79,7 @@ namespace FootPatrol.Droid
         public event EventHandler handle;
         public GoogleMap map;
 
-        public void OnMapReady(GoogleMap googleMap)
+        public void OnMapReady(GoogleMap googleMap) //being called
         {
             map = googleMap;
             var handler = handle;
@@ -84,6 +87,50 @@ namespace FootPatrol.Droid
             {
                 handler(this, EventArgs.Empty);
             }
+
+            LocationManager lm = (LocationManager)Application.Context.GetSystemService(Android.Content.Context.LocationService);
+            Criteria criteria = new Criteria();
+            Location myLocation = getLastLocation(lm, criteria);
+
+            if (myLocation == null)
+                System.Diagnostics.Debug.WriteLine("This is why it doesn't execute");
+
+            if(myLocation != null)
+            {
+                map.AnimateCamera(CameraUpdateFactory.NewLatLng(new Android.Gms.Maps.Model.LatLng(myLocation.Latitude, myLocation.Longitude)));
+
+                Android.Gms.Maps.Model.CameraPosition cp = new Android.Gms.Maps.Model.CameraPosition.Builder().
+                    Target(new Android.Gms.Maps.Model.LatLng(myLocation.Latitude, myLocation.Longitude)).Zoom(13).Bearing(90).Tilt(40).Build();
+
+                googleMap.AnimateCamera(CameraUpdateFactory.NewCameraPosition(cp));
+                
+            }
+
+        }
+
+        public Location getLastLocation(LocationManager lm, Criteria cr)
+        {
+            IList<string> providers = lm.GetProviders(cr, true);
+            Location bestLocation = null;
+
+            foreach(string provider in providers)
+            {
+                Location location = lm.GetLastKnownLocation(provider);
+                if (location == null)
+                    continue;
+
+                if(bestLocation == null || location.Accuracy < bestLocation.Accuracy)
+                {
+                    bestLocation = location;
+                }
+            }
+
+            if(bestLocation == null)
+            {
+                return null;
+            }
+
+            return bestLocation;
 
         }
     }
