@@ -6,4 +6,4 @@
 
 *Just list off any issues still kicking around so we don't forget to put them in the issue tracker*
 
-(Add applicable labels here e.g. label ~"Mobile")
+(Add applicable labels here e.g. `/label ~"Mobile"`)

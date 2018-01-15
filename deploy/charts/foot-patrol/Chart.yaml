@@ -1,0 +1,14 @@
+name: foot-patrol
+version: 0.1.0
+description: An integrated mobile app and dispatcher solution for effectively coordinating evening walking escorts.
+keywords:
+- uwo
+- foot patrol
+- mobile
+home: https://capstone.incode.ca/
+sources:
+- https://incode.ca/capstone/foot-patrol
+maintainers:
+- name: Darryl Murray
+  email: dmurra47@uwo.ca
+engine: gotpl

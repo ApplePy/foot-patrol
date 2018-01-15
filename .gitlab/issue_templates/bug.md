@@ -27,7 +27,7 @@ logs, and code as it's very hard to read otherwise.)
 
 (If you can, link to the line of code that might be responsible for the problem)
 
-(Remember to update this time estimate!)
-/estimate 3d 5h 10m
+(Remember to add estimated difficulty from 1-9)
+/weight 4
 
-label ~"Bug"
+/label ~"Bug"

@@ -1,0 +1,10 @@
+{
+  "extends": "./tsconfig.json",
+  "exclude": [
+    "test/",
+    "_apidoc.js",
+    "*docs/",
+    "dist/",
+    "coverage/"
+  ]
+}

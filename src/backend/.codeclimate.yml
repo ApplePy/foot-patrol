@@ -1,0 +1,56 @@
+version: "2"         # required to adjust maintainability checks
+plugins:
+  structure:
+    enabled: true
+    exclude_patterns:
+    - node_modules/
+    - docs/
+    - apidocs/
+    - .nyc_output/
+    - coverage/
+    - dist/
+  fixme:
+    enabled: true
+    exclude_patterns:
+    - node_modules/
+    - docs/
+    - apidocs/
+    - .nyc_output/
+    - coverage/
+    - dist/
+  nodesecurity:
+    enabled: true
+    exclude_patterns:
+    - node_modules/
+    - docs/
+    - apidocs/
+    - .nyc_output/
+    - coverage/
+    - dist/
+  duplication:
+    enabled: true
+    exclude_patterns:
+    - node_modules/
+    - docs/
+    - apidocs/
+    - .nyc_output/
+    - coverage/
+    - dist/
+  eslint:
+    enabled: true
+    exclude_patterns:
+    - node_modules/
+    - docs/
+    - apidocs/
+    - .nyc_output/
+    - coverage/
+    - dist/
+  tslint:
+    enabled: true
+    exclude_patterns:
+    - node_modules/
+    - docs/
+    - apidocs/
+    - .nyc_output/
+    - coverage/
+    - dist/

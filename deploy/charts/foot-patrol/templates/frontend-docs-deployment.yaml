@@ -1,0 +1,35 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: "{{ .Values.frontend_docs.name }}-{{ template "footpatrol.fullname" . }}"
+  labels:
+    app: {{ .Values.appLabel }}
+    name: "{{ template "footpatrol.fullname" . }}"
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    release: "{{ .Release.Name }}"
+    heritage: "{{ .Release.Service }}"
+    component: {{ .Values.frontend_docs.name }}
+spec:
+  replicas: {{ .Values.frontend_docs.replicas }}
+  minReadySeconds: 10
+  strategy:
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.appLabel }}
+        name: "{{ template "footpatrol.fullname" . }}"
+        chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+        release: "{{ .Release.Name }}"
+        heritage: "{{ .Release.Service }}"
+        component: {{ .Values.frontend_docs.name }}
+    spec:
+      imagePullSecrets:
+      - name: "capstone-reg-secret-{{ template "footpatrol.fullname" . }}"
+      containers:
+      - image: "{{ .Values.imageBase }}/{{ .Values.frontend_docs.imageName }}:{{ .Values.imageTag }}"
+        imagePullPolicy: {{ .Values.imagePullPolicy }}
+        name: {{ .Chart.Name }}
+        ports:
+        - containerPort: {{ .Values.frontend_docs.internalPort }}
+      restartPolicy: Always
