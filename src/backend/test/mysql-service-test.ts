@@ -22,7 +22,7 @@ const eventually = chai.use(chaiAsPromised);
 @suite
 class MySQLServiceTest {
 
-  @timeout(10 * 1000 * 5)
+  @timeout(10 * 1000 * 11)
   public static before(done: MochaDone) {
     // Ensure MySQL is up before starting
     const sql = new MySQLService();
@@ -48,7 +48,7 @@ class MySQLServiceTest {
     };
 
     // Start checking if connected
-    isConnected(4);
+    isConnected(10);
   }
 
   constructor() {

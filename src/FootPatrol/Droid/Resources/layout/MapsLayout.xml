@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:p1="http://schemas.android.com/apk/res/android"
+    p1:minWidth="25px"
+    p1:minHeight="25px"
+    p1:layout_width="match_parent"
+    p1:layout_height="match_parent"
+    p1:background="#ff4f2683"
+    p1:foregroundTint="#ff4f1f8a"
+    p1:backgroundTint="#ff4f2683">
+    <ImageView
+        p1:src="@drawable/westernfootpatrolmap"
+        p1:layout_width="match_parent"
+        p1:layout_height="230dp"
+        p1:id="@+id/WesternFootPatrolMap"
+        p1:layout_marginLeft="4dp"
+        p1:layout_marginRight="4dp"
+        p1:layout_marginTop="20dp"
+        p1:maxHeight="200dp" />
+    <ImageView
+        p1:src="@drawable/westernmap"
+        p1:layout_width="match_parent"
+        p1:layout_height="250dp"
+        p1:id="@+id/WesternMap"
+        p1:layout_below="@id/WesternFootPatrolMap"
+        p1:layout_marginTop="10dp"
+        p1:layout_marginLeft="4dp"
+        p1:layout_marginRight="4dp" />
+</RelativeLayout>

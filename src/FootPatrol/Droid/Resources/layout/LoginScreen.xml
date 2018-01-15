@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:p1="http://schemas.android.com/apk/res/android"
+    p1:layout_width="match_parent"
+    p1:layout_height="match_parent"
+    p1:background="#ff4f2683"
+    p1:foregroundTint="#ff4f1f8a"
+    p1:backgroundTint="#ff4f2683"
+    p1:minWidth="25px"
+    p1:minHeight="25px">
+    <ImageView
+        p1:src="@drawable/westernfootpatrol"
+        p1:layout_width="200dp"
+        p1:layout_height="200.0dp"
+        p1:id="@+id/WesternLogo"
+        p1:cropToPadding="false"
+        p1:adjustViewBounds="false"
+        p1:scaleX="1"
+        p1:scaleY="1"
+        p1:layout_centerHorizontal="true"
+        p1:layout_marginTop="30.0dp"
+        p1:layout_marginBottom="60dp" />
+    <EditText
+        p1:layout_width="300dp"
+        p1:layout_height="wrap_content"
+        p1:id="@+id/usernameField"
+        p1:layout_below="@id/WesternLogo"
+        p1:layout_centerHorizontal="true"
+        p1:hint="Username"
+        p1:typeface="normal" />
+    <EditText
+        p1:layout_width="300dp"
+        p1:layout_height="wrap_content"
+        p1:id="@+id/passwordField"
+        p1:layout_below="@id/usernameField"
+        p1:layout_centerHorizontal="true"
+        p1:hint="Password"
+        p1:typeface="normal" />
+    <Button
+        p1:layout_width="wrap_content"
+        p1:layout_height="wrap_content"
+        p1:id="@+id/loginBtn"
+        p1:layout_below="@id/passwordField"
+        p1:layout_marginTop="10dp"
+        p1:layout_centerHorizontal="true"
+        p1:text="SIGN IN"
+        p1:foreground="#ff807f83"
+        p1:foregroundTint="#ff807f83"
+        p1:backgroundTint="#ff807f83" />
+    <TextView
+        p1:layout_width="wrap_content"
+        p1:layout_height="wrap_content"
+        p1:id="@+id/textView1"
+        p1:text="CONTINUE AS USER"
+        p1:layout_below="@id/loginBtn"
+        p1:layout_centerHorizontal="true"
+        p1:layout_marginTop="10dp" />
+</RelativeLayout>

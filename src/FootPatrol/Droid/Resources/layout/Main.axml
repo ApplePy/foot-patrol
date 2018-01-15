@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v4.view.ViewPager xmlns:p1="http://schemas.android.com/apk/res/android"
+    p1:layout_width="match_parent"
+    p1:layout_height="match_parent"
+    p1:id="@+id/viewPager1"
+    p1:foregroundTint="#ff4f2683"
+    p1:foreground="#ff4f2683">
+    <android.support.v4.view.PagerTabStrip
+        p1:layout_width="match_parent"
+        p1:layout_height="wrap_content"
+        p1:layout_gravity="top"
+        p1:paddingBottom="10dp"
+        p1:paddingTop="10dp"
+        p1:textColor="#fff" />
+</android.support.v4.view.ViewPager>

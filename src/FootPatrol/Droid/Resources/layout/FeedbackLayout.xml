@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:p1="http://schemas.android.com/apk/res/android"
+    p1:minWidth="25px"
+    p1:minHeight="25px"
+    p1:layout_width="match_parent"
+    p1:layout_height="match_parent"
+    p1:id="@+id/relativeLayout1"
+    p1:background="#ff4f2683"
+    p1:foregroundTint="#ff4f1f8a"
+    p1:backgroundTint="#ff4f2683">
+    <TextView
+        p1:textAppearance="?android:attr/textAppearanceLarge"
+        p1:layout_width="wrap_content"
+        p1:layout_height="wrap_content"
+        p1:id="@+id/feedbackText"
+        p1:text="Please feel free to send us feedback by clicking below:"
+        p1:layout_marginTop="100dp"
+        p1:adjustViewBounds="true"
+        p1:layout_centerHorizontal="true"
+        p1:maxWidth="300dp" />
+    <Button
+        p1:layout_width="wrap_content"
+        p1:layout_height="wrap_content"
+        p1:id="@+id/button1"
+        p1:layout_centerHorizontal="true"
+        p1:layout_below="@id/feedbackText"
+        p1:layout_marginTop="50dp"
+        p1:text="Feedback" />
+</RelativeLayout>
