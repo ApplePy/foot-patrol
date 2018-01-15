@@ -95,6 +95,10 @@ quality_frontend:
 # This test ensures the back end works
 test_backend:
   <<: *test_docker_common
+  tags:
+  - docker
+  - linux
+  - kubernetes
   variables:
     NODE_ENV: 'test'  # To set Mocha to isolate data
     MYSQL_ROOT_PASSWORD: testing
