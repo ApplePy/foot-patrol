@@ -150,6 +150,7 @@
     <Compile Include="FootPatrolAdapter.cs" />
     <Compile Include="FeedbackActivity.cs" />
     <Compile Include="MapsActivity.cs" />
+    <Compile Include="VolunteerActivity.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
@@ -167,7 +168,7 @@
     <AndroidResource Include="Resources\drawable\WesternMap.jpg" />
     <AndroidResource Include="Resources\layout\LoginScreen.xml" />
     <AndroidResource Include="Resources\drawable\WesternFootPatrolNoBack.png" />
-    <AndroidResource Include="Resources\drawable\WesternFootPatrol2.png" />
+    <AndroidResource Include="Resources\drawable\westernfootpatrol.png" />
     <AndroidResource Include="Resources\layout\VolunteerScreen.xml" />
   </ItemGroup>
   <ItemGroup>

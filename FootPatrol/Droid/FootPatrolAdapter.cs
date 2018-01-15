@@ -23,7 +23,7 @@ namespace FootPatrol.Droid
         }
 
         public override int Count {
-            get { return 3; }
+            get { return 4; }
         } 
 
         public override Android.Support.V4.App.Fragment GetItem(int position)
@@ -33,12 +33,18 @@ namespace FootPatrol.Droid
                 return (Android.Support.V4.App.Fragment)PickUpActivity.newInstance();
             }
 
-            else if(position == 1){
+            else if (position == 1)
+            {
                 return (Android.Support.V4.App.Fragment)MapsActivity.newInstance();
             }
 
-            else
+            else if (position == 2)
+            {
                 return (Android.Support.V4.App.Fragment)FeedbackActivity.newInstance();
+            }
+
+            else
+                return (Android.Support.V4.App.Fragment)VolunteerActivity.newInstance();
         }
 
         public override Java.Lang.ICharSequence GetPageTitleFormatted(int position)
@@ -51,8 +57,11 @@ namespace FootPatrol.Droid
             else if (position == 1)
                 return new Java.Lang.String("Campus Maps");
 
-            else
+            else if (position == 2)
                 return new Java.Lang.String("Feedback");
+
+            else
+                return new Java.Lang.String("Volunteer");
         }
 
     }

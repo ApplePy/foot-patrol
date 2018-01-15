@@ -8,13 +8,12 @@
     p1:minWidth="25px"
     p1:minHeight="25px">
     <ImageView
-        p1:src="@drawable/WesternFootPatrol2"
+        p1:src="@drawable/westernfootpatrol"
         p1:layout_width="200dp"
         p1:layout_height="200.0dp"
         p1:id="@+id/WesternLogo"
         p1:cropToPadding="false"
         p1:adjustViewBounds="false"
-        p1:foregroundInsidePadding="false"
         p1:scaleX="1"
         p1:scaleY="1"
         p1:layout_centerHorizontal="true"

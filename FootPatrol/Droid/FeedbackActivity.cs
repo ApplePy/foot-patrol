@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-
+using System.Threading.Tasks;
 using Android.App;
 using Android.Content;
 using Android.OS;
@@ -22,7 +22,7 @@ namespace FootPatrol.Droid
             return feedback;
         }
 
-        public override View OnCreateViewAsync(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+        public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
             View views = inflater.Inflate(Resource.Layout.FeedbackLayout, container, false);
             return views;
