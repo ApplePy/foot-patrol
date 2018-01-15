@@ -17,6 +17,6 @@
     <td>{{request.to_location}}</td>
     <td>{{request.additional_info}}</td>
     <td>{{request.timestamp}}</td>
-    <td><input type="checkbox" (change)="checkboxCheck(request)" [(ngModel)]="request.archived"></td>
+    <td><input type="checkbox" (change)="archive(request)" [(ngModel)]="request.archived"></td>
   </tr>
 </table>
