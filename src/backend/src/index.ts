@@ -39,6 +39,7 @@ import { IRequestsManager } from "./interfaces/irequests-manager";
 import { IRoute } from "./interfaces/iroute";
 import { ISanitizer } from "./interfaces/isanitizer";
 import { ISQLService } from "./interfaces/isql-service";
+import { OAuth2Route } from "./routes/auth";
 import { RequestsRoute } from "./routes/requests";
 import { Server } from "./server";
 import { MySQLService } from "./services/mysql-service";
@@ -61,6 +62,7 @@ class ServerEnvironmentSetup {
     this.container = new inversify.Container();
 
     this.container.bind<IRoute>(IFACES.IROUTE).to(RequestsRoute).whenTargetNamed(TAGS.REQUESTS);
+    this.container.bind<IRoute>(IFACES.IROUTE).to(OAuth2Route).whenTargetNamed(TAGS.OAUTH2);
     this.container.bind<ISanitizer>(IFACES.ISANITIZER).to(Sanitizer);
     this.container.bind<ISQLService>(IFACES.ISQLSERVICE).to(MySQLService).inSingletonScope();
     this.container.bind<IRequestsManager>(IFACES.IREQUESTSMANAGER).to(SQLRequestsManager).inSingletonScope();

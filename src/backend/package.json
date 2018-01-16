@@ -52,6 +52,7 @@
     "inversify": "^4.3.0",
     "morgan": "^1.9.0",
     "mysql": "^2.15.0",
+    "openid-client": "^1.19.1",
     "reflect-metadata": "^0.1.10"
   },
   "devDependencies": {
