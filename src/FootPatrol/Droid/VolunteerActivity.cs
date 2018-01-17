@@ -1,137 +1,146 @@
 ﻿using Android.App;
+using Android.Media;
 using Android.OS;
 using Android.Views;
+using Android.Gms.Common.Apis;
 using Android.Gms.Maps;
+using Android.Gms.Location;
 using Android.Locations;
 using System.Collections.Generic;
 using System;
+using System.Threading.Tasks;
+using Java.Lang;
+using Android.Gms.Common;
+using Android.Runtime;
 
 namespace FootPatrol.Droid
 {
     [Activity(Label = "VolunteerActivity")]
-    public class VolunteerActivity : Android.Support.V4.App.Fragment
+    public class VolunteerActivity : Android.Support.V4.App.Fragment, GoogleApiClient.IOnConnectionFailedListener, GoogleApiClient.IConnectionCallbacks, Android.Gms.Location.ILocationListener, IOnMapReadyCallback
     {
         MapView mView;
-        private GoogleMap googleMap;
+        private GoogleMap map;
         bool _gettingMap = false;
-        public event EventHandler handle;
-        public static Android.Content.Context context;
+        public static View view;
+        public static VolunteerActivity va;
+        public static GoogleApiClient client;
+        public static Location myLocation;
+        public LocationManager manager;
+        public IFusedLocationProviderApi location;
+        public LocationRequest locationRequest;
 
         public static VolunteerActivity newInstance()
         {
-            VolunteerActivity va = new VolunteerActivity();
+            va = new VolunteerActivity();
             return va;
         }
 
         public override Android.Views.View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
-            Android.Views.View view = inflater.Inflate(Resource.Layout.VolunteerScreen, container, false);
+            view = inflater.Inflate(Resource.Layout.VolunteerScreen, container, false);
 
             mView = (MapView)view.FindViewById(Resource.Id.map);
             mView.OnCreate(savedInstanceState);
 
-            mView.OnResume();
-            mapSetup();
+            locationRequest = LocationRequest.Create();
+            locationRequest.SetPriority(LocationRequest.PriorityHighAccuracy);
+            locationRequest.SetInterval(10000);
+            locationRequest.SetFastestInterval(1000);
+
+            client = new GoogleApiClient.Builder(Application.Context.ApplicationContext).AddConnectionCallbacks(this).AddOnConnectionFailedListener(this).AddApi(LocationServices.API).Build(); //create new client
+            location = LocationServices.FusedLocationApi;
+
+            mView.OnStart();
 
             try
             {
                 MapsInitializer.Initialize(this.Activity.ApplicationContext);
             }
 
-            catch (Exception e)
+            catch (Java.Lang.Exception e)
             {
                 System.Diagnostics.Debug.WriteLine(e.StackTrace);
             }
 
-            if(googleMap != null)
-            {
-                System.Diagnostics.Debug.WriteLine("In here");
-                //googleMap.SetMapStyle((Android.Gms.Maps.Model.MapStyleOptions)GoogleMap.MapTypeTerrain);
-            }
-                              
             return view;
+        }
+
+        public override void OnStart()
+        {
+            base.OnStart();
+            client.Connect(); //connect the client
         }
 
         public void mapSetup()
         {
-            if(googleMap != null)
-            {
-                return;
-            }
-
-            var callback = new googleMapReady();
-            if (callback != null)
-            {
-                callback.handle += (sender, args) =>
-                {
-                    _gettingMap = false;
-                };
-            }
-
-            _gettingMap = true;
-            mView.GetMapAsync(callback);
+            mView.GetMapAsync(this);
         }
-    }
 
-    public class googleMapReady : Java.Lang.Object, IOnMapReadyCallback
-    {
-        public event EventHandler handle;
-        public GoogleMap map;
+        public void OnConnectionFailed(ConnectionResult result)
+        {
+            System.Diagnostics.Debug.WriteLine("Connection Failed!");
+        }
 
-        public void OnMapReady(GoogleMap googleMap) //being called
+        public void OnConnected(Bundle connectionHint)
+        {
+            myLocation = location.GetLastLocation(client);
+            location.RequestLocationUpdates(client, locationRequest, this);
+            System.Diagnostics.Debug.WriteLine("Connection Accepted!");
+            System.Diagnostics.Debug.WriteLine(myLocation);
+            mapSetup();
+        }
+
+        public void OnConnectionSuspended(int cause)
+        {
+            System.Diagnostics.Debug.WriteLine("Connection Suspended!");
+        }
+
+        public void OnLocationChanged(Location location)
+        {
+            map.AnimateCamera(CameraUpdateFactory.NewLatLng(new Android.Gms.Maps.Model.LatLng(location.Latitude, location.Longitude)));
+
+            Android.Gms.Maps.Model.CameraPosition cp = new Android.Gms.Maps.Model.CameraPosition.Builder().
+                Target(new Android.Gms.Maps.Model.LatLng(location.Latitude, location.Longitude)).Zoom(10).Bearing(90).Tilt(40).Build();
+
+            map.AnimateCamera(CameraUpdateFactory.NewCameraPosition(cp));
+        }
+
+        public void OnProviderDisabled(string provider)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void OnProviderEnabled(string provider)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void OnStatusChanged(string provider, [GeneratedEnum] Availability status, Bundle extras)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void OnMapReady(GoogleMap googleMap)
         {
             map = googleMap;
-            var handler = handle;
-            if(handler != null)
+
+            if (client.IsConnected)
             {
-                handler(this, EventArgs.Empty);
-            }
+                if (myLocation == null)
+                    System.Diagnostics.Debug.WriteLine("This is why it doesn't execute");
 
-            LocationManager lm = (LocationManager)Application.Context.GetSystemService(Android.Content.Context.LocationService);
-            Criteria criteria = new Criteria();
-            Location myLocation = getLastLocation(lm, criteria);
-
-            if (myLocation == null)
-                System.Diagnostics.Debug.WriteLine("This is why it doesn't execute");
-
-            if(myLocation != null)
-            {
-                map.AnimateCamera(CameraUpdateFactory.NewLatLng(new Android.Gms.Maps.Model.LatLng(myLocation.Latitude, myLocation.Longitude)));
-
-                Android.Gms.Maps.Model.CameraPosition cp = new Android.Gms.Maps.Model.CameraPosition.Builder().
-                    Target(new Android.Gms.Maps.Model.LatLng(myLocation.Latitude, myLocation.Longitude)).Zoom(13).Bearing(90).Tilt(40).Build();
-
-                googleMap.AnimateCamera(CameraUpdateFactory.NewCameraPosition(cp));
-                
-            }
-
-        }
-
-        public Location getLastLocation(LocationManager lm, Criteria cr)
-        {
-            IList<string> providers = lm.GetProviders(cr, true);
-            Location bestLocation = null;
-
-            foreach(string provider in providers)
-            {
-                Location location = lm.GetLastKnownLocation(provider);
-                if (location == null)
-                    continue;
-
-                if(bestLocation == null || location.Accuracy < bestLocation.Accuracy)
+                else
                 {
-                    bestLocation = location;
+                    map.AnimateCamera(CameraUpdateFactory.NewLatLng(new Android.Gms.Maps.Model.LatLng(myLocation.Latitude, myLocation.Longitude)));
+
+                    Android.Gms.Maps.Model.CameraPosition cp = new Android.Gms.Maps.Model.CameraPosition.Builder().
+                        Target(new Android.Gms.Maps.Model.LatLng(myLocation.Latitude, myLocation.Longitude)).Zoom(10).Bearing(90).Tilt(40).Build();
+
+                    map.AnimateCamera(CameraUpdateFactory.NewCameraPosition(cp));
+
                 }
             }
-
-            if(bestLocation == null)
-            {
-                return null;
-            }
-
-            return bestLocation;
-
         }
     }
 }

@@ -78,24 +78,24 @@ namespace FootPatrol.Droid
                     statusLine = await response.Content.ReadAsStringAsync();
                     PickUpActivity p = JsonConvert.DeserializeObject<PickUpActivity>(statusLine);
                     pickupID = p.Id;
-                    System.Diagnostics.Debug.WriteLine(pickupID);
-                    System.Diagnostics.Debug.WriteLine(statusLine);
+                    //System.Diagnostics.Debug.WriteLine(pickupID);
+                    //System.Diagnostics.Debug.WriteLine(statusLine);
                 }
 
                 else
                 {
-                    System.Diagnostics.Debug.WriteLine("The status returned is: " + status);
+                    //System.Diagnostics.Debug.WriteLine("The status returned is: " + status);
                     statusLine = await response.Content.ReadAsStringAsync();
-                    System.Diagnostics.Debug.WriteLine(statusLine);
+                    //System.Diagnostics.Debug.WriteLine(statusLine);
                 }
 
             };
 
-            cancelButton.Click += async (sender, e) =>
+            /*cancelButton.Click += async (sender, e) =>
             {
                 cancelButton.Enabled = false;
                 requestButton.Enabled = true;
-            };
+            }; */
 
             return view;
         }

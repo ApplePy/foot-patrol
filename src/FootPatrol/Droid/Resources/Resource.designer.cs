@@ -26,7 +26,6 @@ namespace FootPatrol.Droid
 		
 		public static void UpdateIdValues()
 		{
-			global::Xamarin.Forms.Platform.Android.Resource.Attribute.actionBarSize = global::FootPatrol.Droid.Resource.Attribute.actionBarSize;
 		}
 		
 		public partial class Animation
