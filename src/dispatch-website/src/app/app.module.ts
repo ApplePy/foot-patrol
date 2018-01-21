@@ -5,16 +5,20 @@ import { AppComponent } from './app.component';
 import {HttpModule} from '@angular/http';
 import {FormsModule} from '@angular/forms';
 import { RequestListComponent } from './request-list/request-list.component';
+import { AppRoutingModule } from './/app-routing.module';
+import { AddRequestComponent } from './add-request/add-request.component';
 
 @NgModule({
   declarations: [
     AppComponent,
-    RequestListComponent
+    RequestListComponent,
+    AddRequestComponent
   ],
   imports: [
     BrowserModule,
     HttpModule,
-    FormsModule
+    FormsModule,
+    AppRoutingModule
   ],
   providers: [],
   bootstrap: [AppComponent]
