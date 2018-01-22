@@ -3,6 +3,7 @@ using Android.OS;
 using Android.Views;
 using Android.Gms.Common.Apis;
 using Android.Gms.Maps;
+using Android.Gms.Maps.Model;
 using Android.Gms.Location;
 using Android.Locations;
 using System;
@@ -24,6 +25,7 @@ namespace FootPatrol.Droid
         public LocationManager manager;
         public IFusedLocationProviderApi location;
         public LocationRequest locationRequest;
+        MarkerOptions myMarker;
 
         public static VolunteerActivity newInstance()
         {
@@ -38,6 +40,8 @@ namespace FootPatrol.Droid
 
             mView = (MapView)view.FindViewById(Resource.Id.map);
             mView.OnCreate(savedInstanceState);
+
+            myMarker = new MarkerOptions();
 
             locationRequest = LocationRequest.Create();
             locationRequest.SetPriority(LocationRequest.PriorityHighAccuracy);
@@ -94,7 +98,9 @@ namespace FootPatrol.Droid
 
         public void OnLocationChanged(Location location)
         {
+            myMarker.SetPosition(new LatLng(location.Latitude, location.Longitude)).SetTitle("Volunteer").SetIcon(BitmapDescriptorFactory.DefaultMarker(BitmapDescriptorFactory.HueRed));
             map.AnimateCamera(CameraUpdateFactory.NewLatLng(new Android.Gms.Maps.Model.LatLng(location.Latitude, location.Longitude)));
+            map.AddMarker(myMarker);
 
             Android.Gms.Maps.Model.CameraPosition cp = new Android.Gms.Maps.Model.CameraPosition.Builder().
                 Target(new Android.Gms.Maps.Model.LatLng(location.Latitude, location.Longitude)).Zoom(10).Bearing(90).Tilt(40).Build();
@@ -129,8 +135,9 @@ namespace FootPatrol.Droid
 
                 else
                 {
+                    myMarker.SetPosition(new LatLng(myLocation.Latitude, myLocation.Longitude)).SetTitle("Volunteer").SetIcon(BitmapDescriptorFactory.DefaultMarker(BitmapDescriptorFactory.HueRed));
                     map.AnimateCamera(CameraUpdateFactory.NewLatLng(new Android.Gms.Maps.Model.LatLng(myLocation.Latitude, myLocation.Longitude)));
-
+                    map.AddMarker(myMarker);
                     Android.Gms.Maps.Model.CameraPosition cp = new Android.Gms.Maps.Model.CameraPosition.Builder().
                         Target(new Android.Gms.Maps.Model.LatLng(myLocation.Latitude, myLocation.Longitude)).Zoom(10).Bearing(90).Tilt(40).Build();
 
