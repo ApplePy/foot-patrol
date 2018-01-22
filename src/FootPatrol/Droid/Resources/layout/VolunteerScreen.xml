@@ -10,4 +10,46 @@
         p1:layout_width="match_parent"
         p1:layout_height="match_parent"
         p1:id="@+id/map" />
+    <ImageView
+        p1:src="@drawable/WalkNotification"
+        p1:layout_width="80dp"
+        p1:layout_height="80dp"
+        p1:id="@+id/notificationBase"
+        p1:layout_alignParentTop="true"
+        p1:layout_alignParentRight="true"
+        p1:layout_marginTop="20dp"
+        p1:layout_marginRight="20dp" />
+    <ImageView
+        p1:src="@drawable/purplecircle"
+        p1:id="@+id/notificationBadge"
+        p1:layout_alignParentTop="true"
+        p1:layout_alignParentRight="true"
+        p1:layout_width="30dp"
+        p1:layout_height="30dp"
+        p1:layout_marginTop="10dp"
+        p1:layout_marginRight="20dp" />
+    <TextView
+        p1:layout_width="25dp"
+        p1:layout_height="25dp"
+        p1:id="@+id/badgeCounter"
+        p1:layout_alignParentTop="true"
+        p1:layout_alignParentRight="true"
+        p1:layout_marginTop="12dp"
+        p1:layout_marginRight="16dp"
+        p1:textStyle="bold"
+        p1:text="0"
+        p1:textSize="20dp" />
+    <Button
+        p1:layout_width="30dp"
+        p1:layout_height="150dp"
+        p1:id="@+id/sidetab"
+        p1:layout_marginLeft="-5dp"
+        p1:layout_marginTop="100dp"
+        p1:foregroundTint="#ff4f1f8a"
+        p1:foreground="#ff4f1f8a"
+        p1:drawableTint="#ff4f1f8a"
+        p1:backgroundTint="#ff4f1f8a"
+        p1:text="|"
+        p1:textSize="50dp"
+        p1:textStyle="normal" />
 </RelativeLayout>

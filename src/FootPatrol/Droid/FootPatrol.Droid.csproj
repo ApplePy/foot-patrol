@@ -151,6 +151,8 @@
     <AndroidResource Include="Resources\drawable\WesternFootPatrolNoBack.png" />
     <AndroidResource Include="Resources\drawable\westernfootpatrol.png" />
     <AndroidResource Include="Resources\layout\VolunteerScreen.xml" />
+    <AndroidResource Include="Resources\drawable\WalkNotification.png" />
+    <AndroidResource Include="Resources\drawable\purplecircle.png" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\drawable\" />

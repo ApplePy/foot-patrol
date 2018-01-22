@@ -1,15 +1,11 @@
 ﻿using Android.App;
-using Android.Media;
 using Android.OS;
 using Android.Views;
 using Android.Gms.Common.Apis;
 using Android.Gms.Maps;
 using Android.Gms.Location;
 using Android.Locations;
-using System.Collections.Generic;
 using System;
-using System.Threading.Tasks;
-using Java.Lang;
 using Android.Gms.Common;
 using Android.Runtime;
 
@@ -104,6 +100,7 @@ namespace FootPatrol.Droid
                 Target(new Android.Gms.Maps.Model.LatLng(location.Latitude, location.Longitude)).Zoom(10).Bearing(90).Tilt(40).Build();
 
             map.AnimateCamera(CameraUpdateFactory.NewCameraPosition(cp));
+
         }
 
         public void OnProviderDisabled(string provider)
