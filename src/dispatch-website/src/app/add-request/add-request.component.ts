@@ -14,19 +14,33 @@ export class AddRequestComponent implements OnInit {
 
   ngOnInit() {
   }
+
   submitReq() {
-    const name = (<HTMLInputElement>document.getElementById('name')).value;
-    const fromLocation = (<HTMLInputElement>document.getElementById('fromLocation')).value;
-    const toLocation = (<HTMLInputElement>document.getElementById('toLocation')).value;
-    const additionalInfo = (<HTMLInputElement>document.getElementById('additionalInfo')).value;
+    const Iname = (<HTMLInputElement>document.getElementById('name')).value;
+    const IfromLocation = (<HTMLInputElement>document.getElementById('fromLocation')).value;
+    const ItoLocation = (<HTMLInputElement>document.getElementById('toLocation')).value;
+    const IadditionalInfo = (<HTMLInputElement>document.getElementById('additionalInfo')).value;
+
+    const req = {
+      name: Iname,
+      from_location: IfromLocation,
+      to_location: ItoLocation,
+      additional_info: IadditionalInfo
+    };
 
 
-    console.log('N:'+name+' FL:'+fromLocation+' TL:'+toLocation+' AI:'+additionalInfo);
-    this.router.navigateByUrl('/request-list');
+
+    this.ftpService.addRequest(req).then(response => {
+      this.router.navigateByUrl('/request-list');
+    });
+
+    // console.log('N:'+name+'FL:'+fromLocation+' TL:'+toLocation+' AI:'+additionalInfo);
+
+    // this.router.navigateByUrl('/request-list');
    }
 
-  //  cancelReq() {
-  //    console.log('cancel');
-  //  }
+private checkValid(str) {
+  
+}
 
 }

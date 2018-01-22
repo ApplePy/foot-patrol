@@ -11,6 +11,7 @@ import { Response } from '@angular/http/src/static_response';
 export class FtpRequestService {
   private apiUrl = environment.apiUrl;
   private requestURL = this.apiUrl + '/requests';
+  private addRequestURL = this.requestURL;
 
   constructor(private http: Http) { }
 
@@ -41,6 +42,20 @@ export class FtpRequestService {
     }).subscribe(resp => {}, error => this.handleError(error));
   }
 
+  /**
+   * Send request infomation to the server where it is made into a full request and added to the list of active requests
+   * @param requestMini the request information to be sent to the server
+   */
+  addRequest(requestMini): Promise<Request> {
+    return this.http.post(this.addRequestURL, requestMini)
+            .toPromise()
+            .then(response => {
+              if (response.status !== 201 || response.statusText !== 'CREATED') {
+                console.log('Code: ' + response.status + ', ' + response.statusText);
+              }
+            })
+            .catch(this.handleError);
+  }
 
    private handleError(error: any): Promise<any> {
     console.error('An error occurred', error);
