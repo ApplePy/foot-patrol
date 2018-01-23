@@ -6,18 +6,30 @@ using Android.Gms.Maps;
 using Android.Gms.Maps.Model;
 using Android.Gms.Location;
 using Android.Locations;
+using System.Net;
+using System.Net.Http;
+using System.IO;
 using System;
+using System.Linq;
 using Android.Gms.Common;
 using Android.Runtime;
+using Android.Widget;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using System.Threading.Tasks;
+using System.Collections.Generic;
 
 namespace FootPatrol.Droid
 {
     [Activity(Label = "VolunteerActivity")]
     public class VolunteerActivity : Android.Support.V4.App.Fragment, GoogleApiClient.IOnConnectionFailedListener, GoogleApiClient.IConnectionCallbacks, Android.Gms.Location.ILocationListener, IOnMapReadyCallback
     {
+        public string name, to_location, from_location, additional_info;
+
         MapView mView;
+        ImageView notificationBase, notificationBadge;
+        TextView badgeCounter;
         private GoogleMap map;
-        bool _gettingMap = false;
         public static View view;
         public static VolunteerActivity va;
         public static GoogleApiClient client;
@@ -39,9 +51,15 @@ namespace FootPatrol.Droid
             view = inflater.Inflate(Resource.Layout.VolunteerScreen, container, false);
 
             mView = (MapView)view.FindViewById(Resource.Id.map);
+            notificationBase = (ImageView)view.FindViewById(Resource.Id.notificationBase);
+            notificationBadge = (ImageView)view.FindViewById(Resource.Id.notificationBadge);
+            badgeCounter = (TextView)view.FindViewById(Resource.Id.badgeCounter);
+
             mView.OnCreate(savedInstanceState);
 
             myMarker = new MarkerOptions();
+
+            var request = Task.Run(() => getRequests()).Result;
 
             locationRequest = LocationRequest.Create();
             locationRequest.SetPriority(LocationRequest.PriorityHighAccuracy);
@@ -145,6 +163,49 @@ namespace FootPatrol.Droid
 
                 }
             }
+        }
+
+        public async Task<List<string>> getRequests()
+        {
+            HttpClient httpClient = new HttpClient();
+            Uri customURI = new Uri("http://staging.capstone.incode.ca/api/v1/requests?offset=0&count=9&archived=true");
+            var response = await httpClient.GetAsync(customURI);
+
+            try
+            {
+                response.EnsureSuccessStatusCode();
+            }
+
+            catch (Exception error)
+            {
+                System.Diagnostics.Debug.WriteLine("The exception is: " + error);
+            }
+
+            int status = (int)response.StatusCode;
+            List<string> requestArray = new List<string>();
+
+            if (status == 200 || status == 201)
+            {
+                var responseContent = await response.Content.ReadAsStringAsync();
+                var o = JObject.Parse(responseContent);
+                var requests = o.SelectToken("requests").ToList();
+                foreach(JToken a in requests)
+                {
+                    requestArray.Add(a.ToString());
+                }
+
+                badgeCounter.Text = requests.Count.ToString();
+                return requestArray;
+            }
+
+            else
+            {
+                System.Diagnostics.Debug.WriteLine("The status is: " + status);
+                return null;
+            }
+                
+
+
         }
     }
 }

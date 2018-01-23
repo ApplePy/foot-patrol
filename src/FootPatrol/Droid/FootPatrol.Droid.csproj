@@ -132,6 +132,7 @@
     <Compile Include="FeedbackActivity.cs" />
     <Compile Include="MapsActivity.cs" />
     <Compile Include="VolunteerActivity.cs" />
+    <Compile Include="LoginActivity.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />

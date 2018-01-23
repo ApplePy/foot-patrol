@@ -23,42 +23,28 @@ namespace FootPatrol.Droid
         }
 
         public override int Count {
-            get { return 4; }
+            get { return 2; }
         } 
 
         public override Android.Support.V4.App.Fragment GetItem(int position)
         {
             if (position == 0)
             {
-                return (Android.Support.V4.App.Fragment)PickUpActivity.newInstance();
-            }
-
-            else if (position == 1)
-            {
-                return (Android.Support.V4.App.Fragment)MapsActivity.newInstance();
-            }
-
-            else if (position == 2)
-            {
-                return (Android.Support.V4.App.Fragment)FeedbackActivity.newInstance();
+                return (Android.Support.V4.App.Fragment)LoginActivity.newInstance();
             }
 
             else
+            {
                 return (Android.Support.V4.App.Fragment)VolunteerActivity.newInstance();
+            }
         }
 
         public override Java.Lang.ICharSequence GetPageTitleFormatted(int position)
         {
             if (position == 0)
             {
-                return new Java.Lang.String("Pickup");
+                return new Java.Lang.String("Login");
             }
-
-            else if (position == 1)
-                return new Java.Lang.String("Campus Maps");
-
-            else if (position == 2)
-                return new Java.Lang.String("Feedback");
 
             else
                 return new Java.Lang.String("Volunteer");

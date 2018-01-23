@@ -84,7 +84,7 @@ namespace FootPatrol.Droid
 
                 else
                 {
-                    //System.Diagnostics.Debug.WriteLine("The status returned is: " + status);
+                    System.Diagnostics.Debug.WriteLine("The status returned is: " + status);
                     statusLine = await response.Content.ReadAsStringAsync();
                     //System.Diagnostics.Debug.WriteLine(statusLine);
                 }
