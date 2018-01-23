@@ -6,15 +6,12 @@ using Android.Gms.Maps;
 using Android.Gms.Maps.Model;
 using Android.Gms.Location;
 using Android.Locations;
-using System.Net;
 using System.Net.Http;
-using System.IO;
 using System;
 using System.Linq;
 using Android.Gms.Common;
 using Android.Runtime;
 using Android.Widget;
-using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Threading.Tasks;
 using System.Collections.Generic;
@@ -29,14 +26,15 @@ namespace FootPatrol.Droid
         MapView mView;
         ImageView notificationBase, notificationBadge;
         TextView badgeCounter;
+        HorizontalScrollView requestScroll;
+        Button scrollViewTab;
         private GoogleMap map;
-        public static View view;
-        public static VolunteerActivity va;
-        public static GoogleApiClient client;
-        public static Location myLocation;
-        public LocationManager manager;
-        public IFusedLocationProviderApi location;
-        public LocationRequest locationRequest;
+        private static View view;
+        private static VolunteerActivity va;
+        private static GoogleApiClient client;
+        private static Location myLocation;
+        private IFusedLocationProviderApi location;
+        private LocationRequest locationRequest;
         MarkerOptions myMarker;
 
         public static VolunteerActivity newInstance()
@@ -48,27 +46,27 @@ namespace FootPatrol.Droid
         public override Android.Views.View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
-            view = inflater.Inflate(Resource.Layout.VolunteerScreen, container, false);
 
+            view = inflater.Inflate(Resource.Layout.VolunteerScreen, container, false);
             mView = (MapView)view.FindViewById(Resource.Id.map);
             notificationBase = (ImageView)view.FindViewById(Resource.Id.notificationBase);
             notificationBadge = (ImageView)view.FindViewById(Resource.Id.notificationBadge);
             badgeCounter = (TextView)view.FindViewById(Resource.Id.badgeCounter);
+            requestScroll = (HorizontalScrollView)view.FindViewById(Resource.Id.scrollView);
+            scrollViewTab = (Button)view.FindViewById(Resource.Id.scrollViewTab);
+
+            requestScroll.Visibility = ViewStates.Invisible; //disable the scrollView until the volunteer has clicked on the notification base or badge
+            scrollViewTab.Visibility = ViewStates.Invisible;
+
 
             mView.OnCreate(savedInstanceState);
 
             myMarker = new MarkerOptions();
 
-            var request = Task.Run(() => getRequests()).Result;
+            var request = Task.Run(() => getRequests()).Result; //get all user requests
 
-            locationRequest = LocationRequest.Create();
-            locationRequest.SetPriority(LocationRequest.PriorityHighAccuracy);
-            locationRequest.SetInterval(10000);
-            locationRequest.SetFastestInterval(1000);
-
-            client = new GoogleApiClient.Builder(Application.Context.ApplicationContext).AddConnectionCallbacks(this).AddOnConnectionFailedListener(this).AddApi(LocationServices.API).Build(); //create new client
-            location = LocationServices.FusedLocationApi;
-
+            createLocationRequest();
+            clientSetup();
             mView.OnStart();
 
             try
@@ -81,6 +79,21 @@ namespace FootPatrol.Droid
                 System.Diagnostics.Debug.WriteLine(e.StackTrace);
             }
 
+            notificationBase.Click += (sender, e) =>
+            {
+                onRequestClick();
+            };
+
+            notificationBadge.Click += (sender, e) =>
+            {
+                onRequestClick();
+            };
+
+            scrollViewTab.Click += (sender, e) =>
+            {
+                onScrollClose();
+            };
+
             return view;
         }
 
@@ -88,6 +101,20 @@ namespace FootPatrol.Droid
         {
             base.OnStart();
             client.Connect(); //connect the client
+        }
+
+        public void clientSetup()
+        {
+            client = new GoogleApiClient.Builder(Application.Context.ApplicationContext).AddConnectionCallbacks(this).AddOnConnectionFailedListener(this).AddApi(LocationServices.API).Build(); //create new client
+            location = LocationServices.FusedLocationApi;
+        }
+
+        public void createLocationRequest()
+        {
+            locationRequest = LocationRequest.Create();
+            locationRequest.SetPriority(LocationRequest.PriorityHighAccuracy);
+            locationRequest.SetInterval(10000);
+            locationRequest.SetFastestInterval(1000);
         }
 
         public void mapSetup()
@@ -206,6 +233,24 @@ namespace FootPatrol.Droid
                 
 
 
+        }
+
+        public void onRequestClick()
+        {
+            requestScroll.Visibility = ViewStates.Visible;
+            notificationBase.Visibility = ViewStates.Invisible;
+            notificationBadge.Visibility = ViewStates.Invisible;
+            badgeCounter.Visibility = ViewStates.Invisible;
+            scrollViewTab.Visibility = ViewStates.Visible;
+        }
+
+        public void onScrollClose()
+        {
+            requestScroll.Visibility = ViewStates.Invisible;
+            notificationBase.Visibility = ViewStates.Visible;
+            notificationBadge.Visibility = ViewStates.Visible;
+            badgeCounter.Visibility = ViewStates.Visible;
+            scrollViewTab.Visibility = ViewStates.Invisible;
         }
     }
 }

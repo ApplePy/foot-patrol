@@ -3539,8 +3539,8 @@ namespace FootPatrol.Droid
 			// aapt resource value: 0x7f0b00e3
 			public const int map = 2131427555;
 			
-			// aapt resource value: 0x7f0b00e9
-			public const int masked = 2131427561;
+			// aapt resource value: 0x7f0b00ea
+			public const int masked = 2131427562;
 			
 			// aapt resource value: 0x7f0b00cd
 			public const int media_actions = 2131427533;
@@ -3728,6 +3728,9 @@ namespace FootPatrol.Droid
 			// aapt resource value: 0x7f0b0071
 			public const int scrollView = 2131427441;
 			
+			// aapt resource value: 0x7f0b00e8
+			public const int scrollViewTab = 2131427560;
+			
 			// aapt resource value: 0x7f0b005e
 			public const int scrollable = 2131427422;
 			
@@ -3905,8 +3908,8 @@ namespace FootPatrol.Droid
 			// aapt resource value: 0x7f0b0016
 			public const int view_offset_helper = 2131427350;
 			
-			// aapt resource value: 0x7f0b00e8
-			public const int visible = 2131427560;
+			// aapt resource value: 0x7f0b00e9
+			public const int visible = 2131427561;
 			
 			// aapt resource value: 0x7f0b00bf
 			public const int volume_item_container = 2131427519;

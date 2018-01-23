@@ -44,12 +44,33 @@
         p1:layout_height="150dp"
         p1:id="@+id/sidetab"
         p1:layout_marginLeft="-5dp"
-        p1:layout_marginTop="100dp"
+        p1:layout_marginTop="150dp"
         p1:foregroundTint="#ff4f1f8a"
         p1:foreground="#ff4f1f8a"
         p1:drawableTint="#ff4f1f8a"
         p1:backgroundTint="#ff4f1f8a"
-        p1:text="|"
         p1:textSize="50dp"
-        p1:textStyle="normal" />
+        p1:textStyle="normal"
+        p1:text="|" />
+    <HorizontalScrollView
+        p1:minWidth="25px"
+        p1:minHeight="25px"
+        p1:layout_width="match_parent"
+        p1:layout_height="150dp"
+        p1:id="@+id/scrollView"
+        p1:foreground="#ff4f1f8a"
+        p1:layout_marginTop="-5dp" />
+    <Button
+        p1:id="@+id/scrollViewTab"
+        p1:layout_width="100dp"
+        p1:layout_marginTop="-9dp"
+        p1:layout_centerHorizontal="true"
+        p1:layout_below="@id/scrollView"
+        p1:foreground="#ff4f1f8a"
+        p1:foregroundTint="#ff4f1f8a"
+        p1:backgroundTint="#ff000000"
+        p1:drawableTint="#ff000000"
+        p1:textStyle="normal"
+        p1:textSize="100dp"
+        p1:layout_height="30dp" />
 </RelativeLayout>
