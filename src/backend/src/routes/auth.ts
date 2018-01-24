@@ -2,6 +2,7 @@ import { NextFunction, Request, Response, Router } from "express";
 import { Container, inject, injectable } from "inversify";
 import { Issuer } from "openid-client";
 import { isNull, isNullOrUndefined } from "util";
+import { initCheck } from "../decorators/initCheck";
 import { IFACES, TAGS } from "../ids";
 import { IRoute } from "../interfaces/iroute";
 import { ISanitizer } from "../interfaces/isanitizer";
@@ -73,33 +74,4 @@ export class OAuth2Route implements IRoute {
     })
     .catch(() => next(new StatusError(403, "Callback Verify Failed")));
   }
-}
-
-/**
- * Decorator to ensure that oidClient object has been initialized before running the function.
- * 
- * @param target
- * @param propertyKey
- * @param descriptor 
- */
-function initCheck(
-  target: any,
-  propertyKey: string,
-  descriptor: TypedPropertyDescriptor<(req: Request, res: Response, next: NextFunction) => any>) {
-  const originalMethod = descriptor.value; // save a reference to the original method
-
-  // NOTE: Do not use arrow syntax here. Use a function expression in
-  // order to use the correct value of `this` in this method
-  descriptor.value = function(req: Request, res: Response, next: NextFunction) {
-    const obj: any = this;  // To get around type system
-
-    if (obj.oidClient !== null && originalMethod != null) {
-      // run and store result
-      originalMethod.call(this, req, res, next);
-    } else {
-      next(new StatusError(503, "Initializating", "OpenID initializing..."));
-    }
-  };
-
-  return descriptor;
 }
