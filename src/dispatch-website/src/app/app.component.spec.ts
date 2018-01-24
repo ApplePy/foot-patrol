@@ -4,6 +4,7 @@ import { NgModule } from '@angular/core';
 import {RequestListComponent} from './request-list/request-list.component';
 import {FormsModule} from '@angular/forms';
 import {HttpModule} from '@angular/http';
+import {RouterTestingModule} from '@angular/router/testing';
 
 describe('AppComponent', () => {
   beforeEach(async(() => {
@@ -11,7 +12,8 @@ describe('AppComponent', () => {
     TestBed.configureTestingModule({
       imports: [
         FormsModule,
-        HttpModule],
+        HttpModule,
+      RouterTestingModule],
       declarations: [
         AppComponent,
         RequestListComponent,

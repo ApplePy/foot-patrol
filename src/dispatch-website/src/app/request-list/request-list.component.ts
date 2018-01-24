@@ -40,7 +40,7 @@ export class RequestListComponent implements OnInit {
       for (let i = 0; i < requests.length; i++) {
         this.displayRequests[i] = requests[i];
       }
-    });
+    }).catch(this.handleError);
   }
 
   /**
@@ -51,6 +51,10 @@ export class RequestListComponent implements OnInit {
    */
   comparerTimestamp(a, b) {
     return clamp(b.timestamp - a.timestamp, 1, -1);
+  }
+  private handleError(error: any): Promise<any> {
+    console.error('An error occurred', error);
+    return Promise.reject(error.message || error);
   }
 }
 

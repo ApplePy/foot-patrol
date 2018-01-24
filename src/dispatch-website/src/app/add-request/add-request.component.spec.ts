@@ -1,6 +1,9 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-
+import {HttpModule} from '@angular/http';
 import { AddRequestComponent } from './add-request.component';
+import { Router, RouterModule } from '@angular/router';
+import {RouterTestingModule} from '@angular/router/testing';
+import { NgModule } from '@angular/core';
 
 describe('AddRequestComponent', () => {
   let component: AddRequestComponent;
@@ -8,7 +11,16 @@ describe('AddRequestComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ AddRequestComponent ]
+      imports: [
+        HttpModule,
+        RouterTestingModule
+      ],
+      declarations: [
+        AddRequestComponent
+      ],
+      providers: [
+        HttpModule
+      ]
     })
     .compileComponents();
   }));
@@ -17,9 +29,60 @@ describe('AddRequestComponent', () => {
     fixture = TestBed.createComponent(AddRequestComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
+    spyOn(component.ftpService, 'addRequest').and.callFake(() => {
+      return Promise.resolve();
+    });
+    spyOn(component.router, 'navigateByUrl');
   });
 
   it('should create', () => {
     expect(component).toBeTruthy();
+  });
+
+  describe('SubmitRequest()', () => {
+    beforeEach(() => {
+      spyOn(component, 'checkValid').and.returnValue(true);
+      component.submitReq();
+    });
+    it('should call ftpService.addRequest', () => {
+      expect(component.checkValid).toHaveBeenCalledTimes(4);
+      expect(component.ftpService.addRequest).toHaveBeenCalled();
+    });
+    it('should navigate to the request list screen after sending the request', async() => {
+      expect(component.ftpService.addRequest).toHaveBeenCalled();
+      fixture.whenStable().then(() => {
+        expect(component.router.navigateByUrl).toHaveBeenCalled();
+      });
+    });
+  });
+
+  describe('checkValid(string)', () => {
+    it('should accept strings with no special characters', () => {
+      expect(component.checkValid('a valid string')).toBe(true);
+    });
+    it('should reject invalid strings', () => {
+      expect(component.checkValid('*')).toBe(false);
+      expect(component.checkValid('|')).toBe(false);
+      expect(component.checkValid(',')).toBe(false);
+      expect(component.checkValid('\"')).toBe(false);
+      expect(component.checkValid(':')).toBe(false);
+      expect(component.checkValid('<')).toBe(false);
+      expect(component.checkValid('>')).toBe(false);
+      expect(component.checkValid('[')).toBe(false);
+      expect(component.checkValid(']')).toBe(false);
+      expect(component.checkValid('{')).toBe(false);
+      expect(component.checkValid('}')).toBe(false);
+      expect(component.checkValid('`')).toBe(false);
+      expect(component.checkValid('\'')).toBe(false);
+      expect(component.checkValid(';')).toBe(false);
+      expect(component.checkValid('(')).toBe(false);
+      expect(component.checkValid(')')).toBe(false);
+      expect(component.checkValid('@')).toBe(false);
+      expect(component.checkValid('&')).toBe(false);
+      expect(component.checkValid('$')).toBe(false);
+      expect(component.checkValid('#')).toBe(false);
+      expect(component.checkValid('%')).toBe(false);
+
+    });
   });
 });

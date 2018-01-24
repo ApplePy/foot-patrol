@@ -10,11 +10,14 @@ import { FtpRequestService } from '../ftp-request.service';
 })
 export class AddRequestComponent implements OnInit {
 
-  constructor(private router: Router, private ftpService: FtpRequestService) { }
+  constructor(public router: Router, public ftpService: FtpRequestService) { }
 
   ngOnInit() {
   }
 
+  /**
+   * Send the server a new request using the values in the input fields
+   */
   submitReq() {
     const Iname = (<HTMLInputElement>document.getElementById('name')).value;
     const IfromLocation = (<HTMLInputElement>document.getElementById('fromLocation')).value;
@@ -25,7 +28,7 @@ export class AddRequestComponent implements OnInit {
       this.checkValid(IfromLocation) === true &&
       this.checkValid(ItoLocation) === true &&
       this.checkValid(IadditionalInfo) === true
-  ) {
+    ) {
 
     const req = {
       'name': Iname,
@@ -36,24 +39,30 @@ export class AddRequestComponent implements OnInit {
 
     this.ftpService.addRequest(req).then(response => {
       this.router.navigateByUrl('/request-list');
-    });
-  } else {
-    alert('Invalid characters detected. Please remove any special characters such as *|,":<>[]{}`\';()@&$#% from the input fields');
+    })
+    .catch(this.handleError);
+    } else {
+      alert('Invalid characters detected. Please remove any special characters such as *|,":<>[]{}`\';()@&$#% from the input fields');
+    }
   }
 
-    // console.log('N:'+name+'FL:'+fromLocation+' TL:'+toLocation+' AI:'+additionalInfo);
-
-    // this.router.navigateByUrl('/request-list');
-   }
-
-private checkValid(str): Boolean {
+   /**
+    * Checks that the input string contains no special characters
+    * @param str The string that is being checked
+    */
+  checkValid(str): Boolean {
   const splChars = '*|,\":<>[]{}`\';()@&$#%';
-  for (let i = 0; i < str.value.length; i++) {
-    if (splChars.indexOf(str.value.charAt(i)) !== -1) {
+  for (let i = 0; i < str.length; i++) {
+    if (splChars.indexOf(str.charAt(i)) !== -1) {
       return false;
     }
     return true;
   }
 }
+
+  private handleError(error: any): Promise<any> {
+    console.error('An error occurred', error);
+    return Promise.reject(error.message || error);
+  }
 
 }

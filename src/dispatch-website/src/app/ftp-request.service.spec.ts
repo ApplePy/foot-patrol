@@ -64,4 +64,35 @@ describe('FtpRequestService', () => {
       expect(service.archiveRequest).toBeDefined();
     }));
   });
+
+  describe('addRequest(request)', () => {
+    it('should return a json of the sent request',
+    inject([FtpRequestService, XHRBackend], (service, mockBackend) => {
+      const mockResponse2 = {
+        request: {
+          id: 3,
+          name: 'name3',
+          from_location: 'TEB',
+          to_location: 'SEB',
+          additional_info: 'quickly',
+          timestamp: '10/12/2017ZE100:234'
+        }
+      };
+      const mockRequest1 = {
+        'name': 'name3',
+        'from_location': 'TEB',
+        'to_location': 'SEB',
+        'additional_info': 'quickly',
+      };
+      mockBackend.connections.subscribe((connection) => {
+        connection.mockRespond(new Response(new ResponseOptions({
+          body: JSON.stringify(mockResponse2)
+        })));
+      });
+      service.addRequest(mockRequest1).then((req) => {
+        expect(req.length).toBe(1);
+        expect(req).toBe(mockResponse2.request);
+      });
+    }));
+  });
 });
