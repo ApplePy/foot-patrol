@@ -21,26 +21,39 @@ export class AddRequestComponent implements OnInit {
     const ItoLocation = (<HTMLInputElement>document.getElementById('toLocation')).value;
     const IadditionalInfo = (<HTMLInputElement>document.getElementById('additionalInfo')).value;
 
+    if (this.checkValid(Iname) === true &&
+      this.checkValid(IfromLocation) === true &&
+      this.checkValid(ItoLocation) === true &&
+      this.checkValid(IadditionalInfo) === true
+  ) {
+
     const req = {
-      name: Iname,
-      from_location: IfromLocation,
-      to_location: ItoLocation,
-      additional_info: IadditionalInfo
+      'name': Iname,
+      'from_location': IfromLocation,
+      'to_location': ItoLocation,
+      'additional_info': IadditionalInfo
     };
-
-
 
     this.ftpService.addRequest(req).then(response => {
       this.router.navigateByUrl('/request-list');
     });
+  } else {
+    alert('Invalid characters detected. Please remove any special characters such as *|,":<>[]{}`\';()@&$#% from the input fields');
+  }
 
     // console.log('N:'+name+'FL:'+fromLocation+' TL:'+toLocation+' AI:'+additionalInfo);
 
     // this.router.navigateByUrl('/request-list');
    }
 
-private checkValid(str) {
-  
+private checkValid(str): Boolean {
+  const splChars = '*|,\":<>[]{}`\';()@&$#%';
+  for (let i = 0; i < str.value.length; i++) {
+    if (splChars.indexOf(str.value.charAt(i)) !== -1) {
+      return false;
+    }
+    return true;
+  }
 }
 
 }
