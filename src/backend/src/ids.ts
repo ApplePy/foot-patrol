@@ -2,6 +2,7 @@
  * Interfaces marked as Injectable.
  */
 export const IFACES = {
+  IAUTHMODULE: Symbol("IAUTHMODULE"),
   IROUTE: Symbol("IROUTE"),
   ISANITIZER: Symbol("ISANITIZER"),
   ISQLSERVICE: Symbol("ISQLSERVICE"),
