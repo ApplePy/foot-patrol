@@ -51,20 +51,31 @@ import { SQLRequestsManager } from "./services/sql-requests-manager";
 class ServerEnvironmentSetup {
   public expressServer: Server;
   public nodeServer: any;
-  public container: inversify.Container;  // IoC Container
+  public readonly container: inversify.Container = new inversify.Container();  // IoC Container
 
   /**
    * Constructor
    */
   constructor() {
     // Setup container
-    this.container = new inversify.Container();
-
-    this.container.bind<IRoute>(IFACES.IROUTE).to(RequestsRoute).whenTargetNamed(TAGS.REQUESTS);
-    this.container.bind<ISanitizer>(IFACES.ISANITIZER).to(Sanitizer);
-    this.container.bind<ISQLService>(IFACES.ISQLSERVICE).to(MySQLService).inSingletonScope();
-    this.container.bind<IRequestsManager>(IFACES.IREQUESTSMANAGER).to(SQLRequestsManager).inSingletonScope();
-    this.container.bind<Server>(Server).toSelf();
+    this.container
+      .bind<IRoute>(IFACES.IROUTE)
+      .to(RequestsRoute)
+      .whenTargetNamed(TAGS.REQUESTS);
+    this.container
+      .bind<ISanitizer>(IFACES.ISANITIZER)
+      .to(Sanitizer);
+    this.container
+      .bind<ISQLService>(IFACES.ISQLSERVICE)
+      .to(MySQLService)
+      .inSingletonScope();
+    this.container
+      .bind<IRequestsManager>(IFACES.IREQUESTSMANAGER)
+      .to(SQLRequestsManager)
+      .inSingletonScope();
+    this.container
+      .bind<Server>(Server)
+      .toSelf();
   }
 
   /**
@@ -72,7 +83,9 @@ class ServerEnvironmentSetup {
    */
   public startServer() {
     // Initialize MySQL singleton
-    this.container.get<ISQLService>(IFACES.ISQLSERVICE).initialize(
+    this.container
+      .get<ISQLService>(IFACES.ISQLSERVICE)
+      .initialize(
       process.env.MYSQL_HOST as string,
       process.env.MYSQL_USER as string,
       process.env.MYSQL_PASS as string,
