@@ -1,11 +1,13 @@
 import { NextFunction, Request, Response, Router } from "express";
 import { Container, inject, injectable } from "inversify";
+import { auth } from "../decorators/auth";
 import { IFACES, TAGS } from "../ids";
 import { IRequestsManager } from "../interfaces/irequests-manager";
 import { IRoute } from "../interfaces/iroute";
 import { ISanitizer } from "../interfaces/isanitizer";
 import { StatusError } from "../models/status-error";
 import { TravelRequest } from "../models/travel-request";
+import { Role } from "../roles";
 
 @injectable()
 export class RequestsRoute implements IRoute {
@@ -200,6 +202,7 @@ export class RequestsRoute implements IRoute {
    *        message: "Request ID '1' was not found."
    *     }
    */
+  @auth(Role.STUDENT)
   public getRequest(req: Request, res: Response, next: NextFunction) {
     const id = Number(req.params.id);
 
