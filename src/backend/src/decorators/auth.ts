@@ -5,6 +5,8 @@ import { IAuthModule } from "../interfaces/iauth-module";
 import { StatusError } from "../models/status-error";
 import { Role } from "../roles";
 
+// tslint:disable:no-bitwise
+
 /**
  * Decorator to ensure that oidClient object has been initialized before running the function.
  *
@@ -31,8 +33,9 @@ export function auth(validRoles: Role, appendUserInfo: boolean = false) {
       const user = authModule.processRequest(req);
 
       // If role is not ok, throw a status error.
-      // tslint:disable-next-line:no-bitwise
-      if (user === null || (user.role & validRoles) === Role.ANONYMOUS) {
+      if (user === null) {
+        return next(new StatusError(401, "Unauthorized", "Access to the requested resource is disallowed."));
+      } else if ((user.role & validRoles) === Role.ANONYMOUS) {
         return next(new StatusError(403, "Forbidden", "Access to the requested resource is disallowed."));
       }
 
