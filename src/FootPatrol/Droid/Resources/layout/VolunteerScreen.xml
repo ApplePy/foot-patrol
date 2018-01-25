@@ -3,7 +3,9 @@
     p1:minWidth="25px"
     p1:minHeight="25px"
     p1:layout_width="match_parent"
-    p1:layout_height="match_parent">
+    p1:fillViewport="true"
+    p1:layout_height="match_parent"
+    p1:gravity="center_vertical">
     <com.google.android.gms.maps.MapView
         p1:minWidth="25px"
         p1:minHeight="25px"
@@ -58,8 +60,78 @@
         p1:layout_width="match_parent"
         p1:layout_height="150dp"
         p1:id="@+id/scrollView"
-        p1:foreground="#ff4f1f8a"
-        p1:layout_marginTop="-5dp" />
+        p1:layout_marginTop="-5dp"
+        p1:scrollbarSize="30dp"
+        p1:fillViewport="true"
+        xmlns:tools="http://schemas.android.com/tools"
+        tools:visibility="visible">
+        <LinearLayout xmlns:app="http://schemas.android.com/apk/res-auto"
+            p1:orientation="horizontal"
+            p1:minWidth="25px"
+            p1:minHeight="25px"
+            p1:layout_width="match_parent"
+            p1:layout_height="match_parent"
+            p1:id="@+id/linearLayout1"
+            p1:foreground="#ff4f1f8a"
+            p1:foregroundTint="#ff4f1f8a"
+            p1:backgroundTint="#ff4f1f8a"
+            app:backgroundTint="#ff4f1f8a"
+            p1:gravity="center_vertical">
+            <RelativeLayout
+                p1:minWidth="25px"
+                p1:minHeight="25px"
+                p1:layout_width="match_parent"
+                p1:layout_height="match_parent"
+                p1:id="@+id/relativeLayout1"
+                p1:gravity="center_vertical"
+                p1:touchscreenBlocksFocus="false"
+                p1:foreground="#ff4f1f8a"
+                p1:scrollbars="horizontal">
+                <TextView
+                    p1:id="@+id/userName"
+                    p1:textAlignment="center"
+                    p1:layout_width="wrap_content"
+                    p1:layout_height="wrap_content"
+                    p1:layout_marginTop="5dp"
+                    p1:layout_centerHorizontal="true"
+                    p1:text="NAME:" />
+                <TextView
+                    p1:id="@+id/fromLocation"
+                    p1:textAlignment="center"
+                    p1:layout_width="wrap_content"
+                    p1:layout_height="wrap_content"
+                    p1:layout_below="@id/userName"
+                    p1:layout_centerHorizontal="true"
+                    p1:layout_marginTop="10dp"
+                    p1:text="START LOCATION:" />
+                <TextView
+                    p1:id="@+id/toLocation"
+                    p1:textAlignment="center"
+                    p1:layout_width="wrap_content"
+                    p1:layout_height="wrap_content"
+                    p1:layout_below="@id/fromLocation"
+                    p1:layout_centerHorizontal="true"
+                    p1:layout_marginTop="10dp"
+                    p1:text="END LOCATION:" />
+                <TextView
+                    p1:id="@+id/additionalInfo"
+                    p1:textAlignment="center"
+                    p1:layout_width="wrap_content"
+                    p1:layout_height="wrap_content"
+                    p1:layout_below="@id/toLocation"
+                    p1:layout_centerHorizontal="true"
+                    p1:layout_marginTop="10dp"
+                    p1:text="ADDITIONAL INFO:" />
+                <Button
+                    p1:layout_width="wrap_content"
+                    p1:layout_height="45dp"
+                    p1:id="@+id/button1"
+                    p1:text="Accept request"
+                    p1:layout_below="@id/additionalInfo"
+                    p1:layout_centerHorizontal="true" />
+            </RelativeLayout>
+        </LinearLayout>
+    </HorizontalScrollView>
     <Button
         p1:id="@+id/scrollViewTab"
         p1:layout_width="100dp"

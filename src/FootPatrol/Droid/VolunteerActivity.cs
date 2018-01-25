@@ -5,6 +5,7 @@ using Android.Gms.Common.Apis;
 using Android.Gms.Maps;
 using Android.Gms.Maps.Model;
 using Android.Gms.Location;
+using Android.Graphics;
 using Android.Locations;
 using System.Net.Http;
 using System;
@@ -22,10 +23,11 @@ namespace FootPatrol.Droid
     public class VolunteerActivity : Android.Support.V4.App.Fragment, GoogleApiClient.IOnConnectionFailedListener, GoogleApiClient.IConnectionCallbacks, Android.Gms.Location.ILocationListener, IOnMapReadyCallback
     {
         public string name, to_location, from_location, additional_info;
+        private Typeface bentonSans;
 
         MapView mView;
         ImageView notificationBase, notificationBadge;
-        TextView badgeCounter;
+        TextView badgeCounter, nameText, userName, toLocation, fromLocation, additionalInfo;
         HorizontalScrollView requestScroll;
         Button scrollViewTab;
         private GoogleMap map;
@@ -52,11 +54,24 @@ namespace FootPatrol.Droid
             notificationBase = (ImageView)view.FindViewById(Resource.Id.notificationBase);
             notificationBadge = (ImageView)view.FindViewById(Resource.Id.notificationBadge);
             badgeCounter = (TextView)view.FindViewById(Resource.Id.badgeCounter);
+            nameText = (TextView)view.FindViewById(Resource.Id.textView1);
             requestScroll = (HorizontalScrollView)view.FindViewById(Resource.Id.scrollView);
             scrollViewTab = (Button)view.FindViewById(Resource.Id.scrollViewTab);
+            userName = (TextView)view.FindViewById(Resource.Id.userName);
+            toLocation = (TextView)view.FindViewById(Resource.Id.toLocation);
+            fromLocation = (TextView)view.FindViewById(Resource.Id.fromLocation);
+            additionalInfo = (TextView)view.FindViewById(Resource.Id.additionalInfo);
 
             requestScroll.Visibility = ViewStates.Invisible; //disable the scrollView until the volunteer has clicked on the notification base or badge
             scrollViewTab.Visibility = ViewStates.Invisible;
+
+            //Take care of correct fonts
+            bentonSans = Typeface.CreateFromAsset(this.Activity.Application.Assets, "BentonSansRegular.otf");
+            setFont(bentonSans, badgeCounter);
+            setFont(bentonSans, userName);
+            setFont(bentonSans, toLocation);
+            setFont(bentonSans, fromLocation);
+            setFont(bentonSans, additionalInfo);
 
 
             mView.OnCreate(savedInstanceState);
@@ -64,6 +79,7 @@ namespace FootPatrol.Droid
             myMarker = new MarkerOptions();
 
             var request = Task.Run(() => getRequests()).Result; //get all user requests
+            System.Diagnostics.Debug.WriteLine("There are: "+ request.Count + " requests!");
 
             createLocationRequest();
             clientSetup();
@@ -242,6 +258,9 @@ namespace FootPatrol.Droid
             notificationBadge.Visibility = ViewStates.Invisible;
             badgeCounter.Visibility = ViewStates.Invisible;
             scrollViewTab.Visibility = ViewStates.Visible;
+
+            Color myColor = new Color(79, 31, 138);
+            requestScroll.SetBackgroundColor(myColor);
         }
 
         public void onScrollClose()
@@ -252,5 +271,11 @@ namespace FootPatrol.Droid
             badgeCounter.Visibility = ViewStates.Visible;
             scrollViewTab.Visibility = ViewStates.Invisible;
         }
+
+        public void setFont(Typeface font, TextView text)
+        {
+            text.SetTypeface(font, TypefaceStyle.Normal);
+        }
+
     }
 }
