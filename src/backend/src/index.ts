@@ -53,7 +53,7 @@ import { SQLRequestsManager } from "./services/sql-requests-manager";
 class ServerEnvironmentSetup {
   public expressServer: Server;
   public nodeServer: any;
-  public container: inversify.Container = new inversify.Container();  // IoC Container
+  public readonly container: inversify.Container = new inversify.Container();  // IoC Container
 
   /**
    * Constructor
