@@ -5,15 +5,19 @@ using UIKit;
 
 namespace FootPatrol.iOS
 {
-    public partial class ViewController : UIViewController
+    public partial class ViewController : UIViewController, IViewController
     {
 
         public int requestID;
         public bool requestSent = false;
 
+        private SViewController sharedViewController;
+
         protected ViewController(IntPtr handle) : base(handle)
         {
             // Note: this .ctor should not contain any initialization logic.
+
+            sharedViewController = new SViewController(this);
         }
 
         public override void ViewDidLoad()
@@ -132,6 +136,14 @@ namespace FootPatrol.iOS
 
             };
 
+        }
+
+        //Create and Display Popup
+        public void DisplayPopup(string messsageTitle, string messageBody) 
+        {
+            var popup = UIAlertController.Create(messsageTitle, messageBody, UIAlertControllerStyle.Alert);
+            popup.AddAction(UIAlertAction.Create("Ok", UIAlertActionStyle.Default, null));
+            PresentViewController(popup, true, null);
         }
 
         public override void DidReceiveMemoryWarning()
