@@ -8,17 +8,24 @@ import { RequestListComponent } from './request-list/request-list.component';
 import { AppRoutingModule } from './/app-routing.module';
 import { AddRequestComponent } from './add-request/add-request.component';
 
+import {AgmCoreModule} from '@agm/core';
+import { MapGeneralComponent } from './map-general/map-general.component';
+
 @NgModule({
   declarations: [
     AppComponent,
     RequestListComponent,
-    AddRequestComponent
+    AddRequestComponent,
+    MapGeneralComponent
   ],
   imports: [
     BrowserModule,
     HttpModule,
     FormsModule,
-    AppRoutingModule
+    AppRoutingModule,
+    AgmCoreModule.forRoot({
+      apiKey: 'AIzaSyBCuq_f6oftSWJxY9D8SnQ3wcqtdCZj_u8'
+    })
   ],
   providers: [],
   bootstrap: [AppComponent]
