@@ -8,10 +8,6 @@ import { AgmCoreModule } from '@agm/core/core.module';
   styleUrls: ['./map-general.component.css'],
 })
 
-@NgModule({
-  imports: [AgmCoreModule],
-  schemas: [ CUSTOM_ELEMENTS_SCHEMA]
-})
 export class MapGeneralComponent implements OnInit {
 
   // ignore lint, the number declaration is needed to make the map work
