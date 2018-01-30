@@ -38,7 +38,6 @@ namespace FootPatrol.Droid
             userName.SetTypeface(bentonSans, TypefaceStyle.Normal);
             password.SetTypeface(bentonSans, TypefaceStyle.Normal);
 
-
             return views;
         }
 

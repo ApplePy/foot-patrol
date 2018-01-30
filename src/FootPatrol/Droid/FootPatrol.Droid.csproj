@@ -129,10 +129,10 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="PickupActivity.cs" />
     <Compile Include="FootPatrolAdapter.cs" />
-    <Compile Include="FeedbackActivity.cs" />
     <Compile Include="MapsActivity.cs" />
     <Compile Include="VolunteerActivity.cs" />
     <Compile Include="LoginActivity.cs" />
+    <Compile Include="RequestsActivity2.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
@@ -144,7 +144,6 @@
     <AndroidResource Include="Resources\layout\Main.axml" />
     <AndroidResource Include="Resources\values\Strings.xml" />
     <AndroidResource Include="Resources\layout\PickupLayout.xml" />
-    <AndroidResource Include="Resources\layout\FeedbackLayout.xml" />
     <AndroidResource Include="Resources\layout\MapsLayout.xml" />
     <AndroidResource Include="Resources\drawable\WesternFootPatrolMap.jpg" />
     <AndroidResource Include="Resources\drawable\WesternMap.jpg" />
@@ -154,6 +153,9 @@
     <AndroidResource Include="Resources\layout\VolunteerScreen.xml" />
     <AndroidResource Include="Resources\drawable\WalkNotification.png" />
     <AndroidResource Include="Resources\drawable\purplecircle.png" />
+    <AndroidResource Include="Resources\layout\Requests.xml" />
+    <AndroidResource Include="Resources\drawable\ic_keyboard_arrow_left_black_24dp.png" />
+    <AndroidResource Include="Resources\drawable\ic_keyboard_arrow_right_black_24dp.png" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\drawable\" />

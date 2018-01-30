@@ -30,12 +30,12 @@ namespace FootPatrol.Droid
         {
             if (position == 0)
             {
-                return (Android.Support.V4.App.Fragment)LoginActivity.newInstance();
+                return LoginActivity.newInstance();
             }
 
             else
             {
-                return (Android.Support.V4.App.Fragment)VolunteerActivity.newInstance();
+                return VolunteerActivity.newInstance();
             }
         }
 

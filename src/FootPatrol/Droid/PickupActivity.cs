@@ -29,7 +29,6 @@ namespace FootPatrol.Droid
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
-            Contract.Ensures(Contract.Result<View>() != null);
             View view = inflater.Inflate(Resource.Layout.PickupLayout, container, false);
 
             Button requestButton = (Button)view.FindViewById(Resource.Id.button1);

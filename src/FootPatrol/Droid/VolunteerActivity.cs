@@ -1,4 +1,5 @@
 ﻿using Android.App;
+using Android.Content;
 using Android.OS;
 using Android.Views;
 using Android.Gms.Common.Apis;
@@ -27,9 +28,11 @@ namespace FootPatrol.Droid
 
         MapView mView;
         ImageView notificationBase, notificationBadge;
-        TextView badgeCounter, nameText, userName, toLocation, fromLocation, additionalInfo;
-        HorizontalScrollView requestScroll;
-        Button scrollViewTab;
+        TextView badgeCounter;
+
+        public List<string> request;
+        public int requestCount;
+
         private GoogleMap map;
         private static View view;
         private static VolunteerActivity va;
@@ -45,7 +48,7 @@ namespace FootPatrol.Droid
             return va;
         }
 
-        public override Android.Views.View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+        public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
 
@@ -54,32 +57,18 @@ namespace FootPatrol.Droid
             notificationBase = (ImageView)view.FindViewById(Resource.Id.notificationBase);
             notificationBadge = (ImageView)view.FindViewById(Resource.Id.notificationBadge);
             badgeCounter = (TextView)view.FindViewById(Resource.Id.badgeCounter);
-            nameText = (TextView)view.FindViewById(Resource.Id.textView1);
-            requestScroll = (HorizontalScrollView)view.FindViewById(Resource.Id.scrollView);
-            scrollViewTab = (Button)view.FindViewById(Resource.Id.scrollViewTab);
-            userName = (TextView)view.FindViewById(Resource.Id.userName);
-            toLocation = (TextView)view.FindViewById(Resource.Id.toLocation);
-            fromLocation = (TextView)view.FindViewById(Resource.Id.fromLocation);
-            additionalInfo = (TextView)view.FindViewById(Resource.Id.additionalInfo);
-
-            requestScroll.Visibility = ViewStates.Invisible; //disable the scrollView until the volunteer has clicked on the notification base or badge
-            scrollViewTab.Visibility = ViewStates.Invisible;
 
             //Take care of correct fonts
             bentonSans = Typeface.CreateFromAsset(this.Activity.Application.Assets, "BentonSansRegular.otf");
             setFont(bentonSans, badgeCounter);
-            setFont(bentonSans, userName);
-            setFont(bentonSans, toLocation);
-            setFont(bentonSans, fromLocation);
-            setFont(bentonSans, additionalInfo);
 
 
             mView.OnCreate(savedInstanceState);
 
             myMarker = new MarkerOptions();
 
-            var request = Task.Run(() => getRequests()).Result; //get all user requests
-            System.Diagnostics.Debug.WriteLine("There are: "+ request.Count + " requests!");
+            request = Task.Run(() => getRequests()).Result; //get all user requests
+            requestCount = request.Count;
 
             createLocationRequest();
             clientSetup();
@@ -103,11 +92,6 @@ namespace FootPatrol.Droid
             notificationBadge.Click += (sender, e) =>
             {
                 onRequestClick();
-            };
-
-            scrollViewTab.Click += (sender, e) =>
-            {
-                onScrollClose();
             };
 
             return view;
@@ -160,11 +144,11 @@ namespace FootPatrol.Droid
         public void OnLocationChanged(Location location)
         {
             myMarker.SetPosition(new LatLng(location.Latitude, location.Longitude)).SetTitle("Volunteer").SetIcon(BitmapDescriptorFactory.DefaultMarker(BitmapDescriptorFactory.HueRed));
-            map.AnimateCamera(CameraUpdateFactory.NewLatLng(new Android.Gms.Maps.Model.LatLng(location.Latitude, location.Longitude)));
+            map.AnimateCamera(CameraUpdateFactory.NewLatLng(new LatLng(location.Latitude, location.Longitude)));
             map.AddMarker(myMarker);
 
-            Android.Gms.Maps.Model.CameraPosition cp = new Android.Gms.Maps.Model.CameraPosition.Builder().
-                Target(new Android.Gms.Maps.Model.LatLng(location.Latitude, location.Longitude)).Zoom(10).Bearing(90).Tilt(40).Build();
+            CameraPosition cp = new Android.Gms.Maps.Model.CameraPosition.Builder().
+                Target(new LatLng(location.Latitude, location.Longitude)).Zoom(10).Bearing(90).Tilt(40).Build();
 
             map.AnimateCamera(CameraUpdateFactory.NewCameraPosition(cp));
 
@@ -199,7 +183,7 @@ namespace FootPatrol.Droid
                     myMarker.SetPosition(new LatLng(myLocation.Latitude, myLocation.Longitude)).SetTitle("Volunteer").SetIcon(BitmapDescriptorFactory.DefaultMarker(BitmapDescriptorFactory.HueRed));
                     map.AnimateCamera(CameraUpdateFactory.NewLatLng(new Android.Gms.Maps.Model.LatLng(myLocation.Latitude, myLocation.Longitude)));
                     map.AddMarker(myMarker);
-                    Android.Gms.Maps.Model.CameraPosition cp = new Android.Gms.Maps.Model.CameraPosition.Builder().
+                    CameraPosition cp = new Android.Gms.Maps.Model.CameraPosition.Builder().
                         Target(new Android.Gms.Maps.Model.LatLng(myLocation.Latitude, myLocation.Longitude)).Zoom(10).Bearing(90).Tilt(40).Build();
 
                     map.AnimateCamera(CameraUpdateFactory.NewCameraPosition(cp));
@@ -232,7 +216,7 @@ namespace FootPatrol.Droid
                 var responseContent = await response.Content.ReadAsStringAsync();
                 var o = JObject.Parse(responseContent);
                 var requests = o.SelectToken("requests").ToList();
-                foreach(JToken a in requests)
+                foreach (JToken a in requests)
                 {
                     requestArray.Add(a.ToString());
                 }
@@ -246,30 +230,13 @@ namespace FootPatrol.Droid
                 System.Diagnostics.Debug.WriteLine("The status is: " + status);
                 return null;
             }
-                
-
-
         }
 
         public void onRequestClick()
         {
-            requestScroll.Visibility = ViewStates.Visible;
-            notificationBase.Visibility = ViewStates.Invisible;
-            notificationBadge.Visibility = ViewStates.Invisible;
-            badgeCounter.Visibility = ViewStates.Invisible;
-            scrollViewTab.Visibility = ViewStates.Visible;
-
-            Color myColor = new Color(79, 31, 138);
-            requestScroll.SetBackgroundColor(myColor);
-        }
-
-        public void onScrollClose()
-        {
-            requestScroll.Visibility = ViewStates.Invisible;
-            notificationBase.Visibility = ViewStates.Visible;
-            notificationBadge.Visibility = ViewStates.Visible;
-            badgeCounter.Visibility = ViewStates.Visible;
-            scrollViewTab.Visibility = ViewStates.Invisible;
+            
+            RequestsActivity2 ra = RequestsActivity2.newInstance(request, requestCount);
+            ra.Show(this.FragmentManager,"Requests");
         }
 
         public void setFont(Typeface font, TextView text)
@@ -278,4 +245,5 @@ namespace FootPatrol.Droid
         }
 
     }
+
 }
