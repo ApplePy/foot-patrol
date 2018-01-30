@@ -181,10 +181,10 @@ namespace FootPatrol.Droid
                 else
                 {
                     myMarker.SetPosition(new LatLng(myLocation.Latitude, myLocation.Longitude)).SetTitle("Volunteer").SetIcon(BitmapDescriptorFactory.DefaultMarker(BitmapDescriptorFactory.HueRed));
-                    map.AnimateCamera(CameraUpdateFactory.NewLatLng(new Android.Gms.Maps.Model.LatLng(myLocation.Latitude, myLocation.Longitude)));
+                    map.AnimateCamera(CameraUpdateFactory.NewLatLng(new LatLng(myLocation.Latitude, myLocation.Longitude)));
                     map.AddMarker(myMarker);
-                    CameraPosition cp = new Android.Gms.Maps.Model.CameraPosition.Builder().
-                        Target(new Android.Gms.Maps.Model.LatLng(myLocation.Latitude, myLocation.Longitude)).Zoom(10).Bearing(90).Tilt(40).Build();
+                    CameraPosition cp = new CameraPosition.Builder().
+                        Target(new LatLng(myLocation.Latitude, myLocation.Longitude)).Zoom(10).Bearing(90).Tilt(40).Build();
 
                     map.AnimateCamera(CameraUpdateFactory.NewCameraPosition(cp));
 
