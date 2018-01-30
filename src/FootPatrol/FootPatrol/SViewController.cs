@@ -25,17 +25,7 @@ namespace FootPatrol
                 inst.SetRequestButtonEnabled(false);
 
                 //Check if all required input fields have been filled out
-                if (name == "" || name == null)
-                {
-                    inst.DisplayPopup("Error", "Please check your input.");
-                    return;
-                }
-                else if (fromLocation == "" || fromLocation == null)
-                {
-                    inst.DisplayPopup("Error", "Please check your input.");
-                    return;
-                }
-                else if (toLocation == "" || toLocation == null)
+                if (String.IsNullOrEmpty(name) || String.IsNullOrEmpty(fromLocation) || String.IsNullOrEmpty(toLocation))
                 {
                     inst.DisplayPopup("Error", "Please check your input.");
                     return;
