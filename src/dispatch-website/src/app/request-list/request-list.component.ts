@@ -18,12 +18,12 @@ export class RequestListComponent implements OnInit {
 
   constructor(public ftpRequestService: FtpRequestService, private router: Router) {
     router.events.subscribe((val) => {
-      clearInterval(this.getRepeat);
+      // clearInterval(this.getRepeat);
     });
   }
 
   ngOnInit(): void {
-    this.getRepeat = setInterval(this.getFPrequests.bind(this), 1000);
+    // this.getRepeat = setInterval(this.getFPrequests.bind(this), 1000);
   }
 
   archive(request): void {
@@ -37,19 +37,23 @@ export class RequestListComponent implements OnInit {
   getFPrequests(): void {
     this.ftpRequestService.getRequests()
     .then(requests => {
-      try {
-        console.log(requests);
+       try {
+         console.log(requests);
         // sort requests in reverse chronological order. oldest last, most recent first
         requests.sort(this.comparerTimestamp);
+        console.log(requests);
 
         // clear displayRequests
         this.displayRequests.length = 0;
+        console.log(requests);
 
         // move requests to displayRequests to display them
         for (let i = 0; i < requests.length; i++) {
           this.displayRequests[i] = requests[i];
         }
-      } catch (error) {this.handleError(error); }
+        console.log(requests);
+
+       } catch (error) {this.handleError(error); }
     }).catch(this.handleError);
   }
 
@@ -60,7 +64,14 @@ export class RequestListComponent implements OnInit {
    * @param b request b
    */
   comparerTimestamp(a, b) {
-    return clamp(b.timestamp - a.timestamp, 1, -1);
+
+    if (a.timestamp < b.timestamp) {
+      return 1;
+    } else if (a.timestamp > b.timestamp) {
+      return -1;
+    }
+
+    // return clamp(b.timestamp - a.timestamp, 1, -1);
   }
   private handleError(error: any): Promise<any> {
     console.error('An error occurred', error);

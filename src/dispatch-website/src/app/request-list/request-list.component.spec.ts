@@ -99,10 +99,32 @@ describe('RequestListComponent', () => {
       });
     });
     it('should sort the result by timestamp and store the result in displayRequests', async() => {
+      spyOn(Array.prototype, 'sort').and.callThrough();
+      const testRequestListSort: Request[] =
+      [{
+        id: 1,
+        name: 'name1',
+        from_Location: 'SEB',
+        to_Location: 'TEB',
+        additional_info: 'quick',
+        timestamp: '2017-10-26T06:51:05.000Z',
+        archived: false
+      },
+      {
+        id: 2,
+        name: 'name2',
+        from_Location: 'TEB',
+        to_Location: 'SEB',
+        additional_info: null,
+        timestamp: '2017-10-26T06:51:06.000Z',
+        archived: true
+      }];
       component.getFPrequests();
       fixture.whenStable().then(() => {
-        expect(component.displayRequests[0].timestamp).toBe(testRequestList[1].timestamp);
-        expect(component.displayRequests[1].timestamp).toBe(testRequestList[0].timestamp);
+        expect(component.displayRequests).toBeDefined();
+        expect(Array.prototype.sort).toHaveBeenCalled();
+        expect(component.displayRequests[0].timestamp).toBe(testRequestListSort[1].timestamp);
+        expect(component.displayRequests[1].timestamp).toBe(testRequestListSort[0].timestamp);
       });
     });
     it('should clear the existing list of displayed requests when getting the new list', async() => {
@@ -125,8 +147,27 @@ describe('RequestListComponent', () => {
     });
 
     it('should sort in decending order', () => {
-      const a = {timestamp: '4'};
-      const b = {timestamp: '5'};
+      const testRequestListSort: Request[] =
+    [{
+      id: 1,
+      name: 'name1',
+      from_Location: 'SEB',
+      to_Location: 'TEB',
+      additional_info: 'quick',
+      timestamp: '2017-10-26T06:51:05.000Z',
+      archived: false
+    },
+    {
+      id: 2,
+      name: 'name2',
+      from_Location: 'TEB',
+      to_Location: 'SEB',
+      additional_info: null,
+      timestamp: '2017-10-26T06:51:06.000Z',
+      archived: true
+    }];
+      const a = testRequestListSort[0];
+      const b = testRequestListSort[1];
       const l = [a, b];
       l.sort(component.comparerTimestamp);
       expect(l[0]).toBe(b);
