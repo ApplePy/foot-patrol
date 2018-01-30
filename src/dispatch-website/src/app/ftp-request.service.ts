@@ -19,7 +19,8 @@ export class FtpRequestService {
    * Returns a Promise with up to 10 requests from the server
    */
   getRequests(): Promise<Request[]> {
-    return this.http.get(this.requestURL + '?offset=0&count=10', {observe: 'response'})
+    console.log(this.requestURL + '?offset=0&count=10');
+    return this.http.get(this.requestURL + '?offset=0&count=10')
             .toPromise()
             .catch(this.handleError);
   }
@@ -41,7 +42,7 @@ export class FtpRequestService {
    * @param requestMini the request information to be sent to the server
    */
   addRequest(requestMini): Promise<Request> {
-    return this.http.post(this.addRequestURL, requestMini, {observe: 'response'})
+    return this.http.post(this.addRequestURL, requestMini)
             .toPromise()
             .catch(this.handleError);
   }
