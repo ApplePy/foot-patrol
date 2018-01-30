@@ -1,6 +1,7 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-
+import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { MapGeneralComponent } from './map-general.component';
+
 
 describe('MapGeneralComponent', () => {
   let component: MapGeneralComponent;
@@ -8,7 +9,8 @@ describe('MapGeneralComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ MapGeneralComponent ]
+      declarations: [ MapGeneralComponent ],
+      schemas: [CUSTOM_ELEMENTS_SCHEMA]
     })
     .compileComponents();
   }));

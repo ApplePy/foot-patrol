@@ -9,6 +9,8 @@ import 'rxjs/add/observable/of';
 import { Observable } from 'rxjs/Observable';
 import { resolve } from 'path';
 import {Request} from '../request';
+import { HttpClient, HttpHandler } from '@angular/common/http';
+import { RouterTestingModule } from '@angular/router/testing';
 
 describe('RequestListComponent', () => {
   let component: RequestListComponent;
@@ -36,13 +38,16 @@ describe('RequestListComponent', () => {
     TestBed.configureTestingModule({
       imports: [
         FormsModule,
-        HttpModule
+        HttpModule,
+        RouterTestingModule
       ],
       declarations: [
         RequestListComponent
       ],
       providers: [
-        HttpModule
+        HttpModule,
+        HttpClient,
+        HttpHandler
       ]
     })
     .compileComponents();
@@ -82,7 +87,9 @@ describe('RequestListComponent', () => {
     });
     it('should call ftpRequestService.getRequests', () => {
       component.getFPrequests();
-      expect(component.ftpRequestService.getRequests).toHaveBeenCalled();
+      fixture.whenStable().then(() => {
+        expect(component.ftpRequestService.getRequests).toHaveBeenCalled();
+      });
     });
     it('should call the sort function', async() => {
       spyOn(Array.prototype, 'sort');

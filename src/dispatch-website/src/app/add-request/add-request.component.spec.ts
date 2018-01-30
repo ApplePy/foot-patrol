@@ -4,6 +4,7 @@ import { AddRequestComponent } from './add-request.component';
 import { Router, RouterModule } from '@angular/router';
 import {RouterTestingModule} from '@angular/router/testing';
 import { NgModule } from '@angular/core';
+import { HttpClient, HttpHandler } from '@angular/common/http';
 
 describe('AddRequestComponent', () => {
   let component: AddRequestComponent;
@@ -19,7 +20,9 @@ describe('AddRequestComponent', () => {
         AddRequestComponent
       ],
       providers: [
-        HttpModule
+        HttpModule,
+        HttpClient,
+        HttpHandler
       ]
     })
     .compileComponents();
@@ -82,7 +85,6 @@ describe('AddRequestComponent', () => {
       expect(component.checkValid('$')).toBe(false);
       expect(component.checkValid('#')).toBe(false);
       expect(component.checkValid('%')).toBe(false);
-
     });
   });
 });

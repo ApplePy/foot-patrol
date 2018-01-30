@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import {Request} from '../request';
 import {FtpRequestService} from '../ftp-request.service';
 import {FormsModule} from '@angular/forms';
+import { Router, RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-request-list',
@@ -13,10 +14,16 @@ export class RequestListComponent implements OnInit {
   // requests in displayRequests are displayed in the view
   displayRequests: Request[] = [ ];
 
-  constructor(public ftpRequestService: FtpRequestService) {}
+  getRepeat: number;
+
+  constructor(public ftpRequestService: FtpRequestService, private router: Router) {
+    router.events.subscribe((val) => {
+      clearInterval(this.getRepeat);
+    });
+  }
 
   ngOnInit(): void {
-    setInterval(this.getFPrequests.bind(this), 1000);
+    this.getRepeat = setInterval(this.getFPrequests.bind(this), 1000);
   }
 
   archive(request): void {
