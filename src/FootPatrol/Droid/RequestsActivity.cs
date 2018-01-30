@@ -1,11 +1,7 @@
-﻿using System.Linq;
-using System.Text;
-using Android.App;
-using Android.Content;
+﻿using Android.App;
 using System.Collections.Generic;
 using Android.Graphics;
 using Android.OS;
-using Android.Runtime;
 using Android.Views;
 using Android.Widget;
 using Newtonsoft.Json.Linq;
@@ -13,9 +9,9 @@ using Newtonsoft.Json.Linq;
 namespace FootPatrol.Droid 
 {               
     [Activity(Label = "Requests")]
-    public class RequestsActivity2 : Android.Support.V4.App.DialogFragment
+    public class RequestsActivity : Android.Support.V4.App.DialogFragment
     {
-        public static RequestsActivity2 req;
+        public static RequestsActivity req;
         private static View view;
 
         private static List<string> request, userName, toLoc, fromLoc, addInfo;
@@ -23,9 +19,9 @@ namespace FootPatrol.Droid
 
         private int currentCount;
 
-        public static RequestsActivity2 newInstance(List<string> requests, int requestCount)
+        public static RequestsActivity newInstance(List<string> requests, int requestCount)
         {
-            req = new RequestsActivity2();
+            req = new RequestsActivity();
             reqCount = requestCount;
             request = requests;
             return req;
@@ -33,15 +29,11 @@ namespace FootPatrol.Droid
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
+            Dialog.Window.RequestFeature(WindowFeatures.NoTitle);
             base.OnCreate(savedInstanceState);
+
+            Dialog.Window.SetLayout(ViewGroup.LayoutParams.MatchParent,ViewGroup.LayoutParams.WrapContent);
             view = inflater.Inflate(Resource.Layout.Requests, container, false);
-
-            RelativeLayout layout = (RelativeLayout)view.FindViewById(Resource.Id.relativeLayout);
-            Color backgroundColour = new Color(79, 38, 131);
-            layout.SetBackgroundColor(backgroundColour);
-
-            foreach(string a in request)
-            System.Diagnostics.Debug.WriteLine(a);
 
             TextView name = (TextView)view.FindViewById(Resource.Id.userName);
             TextView toLocation = (TextView)view.FindViewById(Resource.Id.toLocation);
@@ -49,6 +41,7 @@ namespace FootPatrol.Droid
             TextView additionalInfo = (TextView)view.FindViewById(Resource.Id.additionalInfo);
             ImageButton rightArrow = (ImageButton)view.FindViewById(Resource.Id.rightArrow);
             ImageButton leftArrow = (ImageButton)view.FindViewById(Resource.Id.leftArrow);
+            ImageButton closeBtn = (ImageButton)view.FindViewById(Resource.Id.closeButton);
 
             currentCount = 0;
 
@@ -72,25 +65,28 @@ namespace FootPatrol.Droid
                 addInfo.Add(aInfo);
             }
 
-            foreach(string a in userName)
-            {
-                System.Diagnostics.Debug.WriteLine(a);
-            }
+            name.Text = "NAME: " + userName[currentCount];
+            fromLocation.Text = "START LOCATION: " + fromLoc[currentCount];
+            toLocation.Text = "END LOCATION: " + toLoc[currentCount];
+            additionalInfo.Text = "ADDITIONAL INFO: " + addInfo[currentCount];
+
+            disableArrow(leftArrow);
 
             leftArrow.Click += (sender, e) =>
             {
                 if(currentCount == 0)
                 {
-                    leftArrow.Enabled = false; 
+                    disableArrow(leftArrow);
                 }
 
                 else
                 {
-                    leftArrow.Enabled = true;
-                    name.Text = "NAME " + userName[currentCount];
-                    fromLocation.Text = "START LOCATION " + fromLoc[currentCount];
-                    toLocation.Text = "END LOCATION " + toLoc[currentCount];
-                    additionalInfo.Text = "ADDITIONAL INFO " + addInfo[currentCount];
+                    enableArrow(leftArrow);
+                    enableArrow(rightArrow);
+                    name.Text = "NAME: " + userName[currentCount];
+                    fromLocation.Text = "START LOCATION: " + fromLoc[currentCount];
+                    toLocation.Text = "END LOCATION: " + toLoc[currentCount];
+                    additionalInfo.Text = "ADDITIONAL INFO: " + addInfo[currentCount];
                     currentCount--;
                 }
             };
@@ -99,12 +95,13 @@ namespace FootPatrol.Droid
             {
                 if(currentCount == reqCount - 1)
                 {
-                    rightArrow.Enabled = false;
+                    disableArrow(rightArrow);
                 }
 
                 else
                 {
-                    rightArrow.Enabled = true;
+                    enableArrow(leftArrow);
+                    enableArrow(rightArrow);
                     name.Text = "NAME: " + userName[currentCount];
                     fromLocation.Text = "START LOCATION: " + fromLoc[currentCount];
                     toLocation.Text = "END LOCATION: " + toLoc[currentCount];
@@ -113,7 +110,25 @@ namespace FootPatrol.Droid
                 }
             };
 
+            closeBtn.Click += (sender, e) =>
+            {
+                this.Dismiss();
+            };
+
             return view;
         }
+
+        public void disableArrow(ImageButton button)
+        {
+            button.Enabled = false;
+            button.SetBackgroundColor(Color.Gray);
+        }
+
+        public void enableArrow(ImageButton button)
+        {
+            button.Enabled = true;
+            button.SetBackgroundColor(Color.White);
+        }
+
     }
 }

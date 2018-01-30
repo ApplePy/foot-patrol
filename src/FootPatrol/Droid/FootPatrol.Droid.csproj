@@ -132,7 +132,7 @@
     <Compile Include="MapsActivity.cs" />
     <Compile Include="VolunteerActivity.cs" />
     <Compile Include="LoginActivity.cs" />
-    <Compile Include="RequestsActivity2.cs" />
+    <Compile Include="RequestsActivity.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
@@ -153,9 +153,10 @@
     <AndroidResource Include="Resources\layout\VolunteerScreen.xml" />
     <AndroidResource Include="Resources\drawable\WalkNotification.png" />
     <AndroidResource Include="Resources\drawable\purplecircle.png" />
-    <AndroidResource Include="Resources\layout\Requests.xml" />
     <AndroidResource Include="Resources\drawable\ic_keyboard_arrow_left_black_24dp.png" />
     <AndroidResource Include="Resources\drawable\ic_keyboard_arrow_right_black_24dp.png" />
+    <AndroidResource Include="Resources\drawable\ic_close_black_24dp.png" />
+    <AndroidResource Include="Resources\layout\Requests.xml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\drawable\" />

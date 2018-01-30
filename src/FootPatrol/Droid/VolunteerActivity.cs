@@ -235,7 +235,7 @@ namespace FootPatrol.Droid
         public void onRequestClick()
         {
             
-            RequestsActivity2 ra = RequestsActivity2.newInstance(request, requestCount);
+            RequestsActivity ra = RequestsActivity.newInstance(request, requestCount);
             ra.Show(this.FragmentManager,"Requests");
         }
 
