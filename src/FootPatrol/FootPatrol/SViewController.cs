@@ -95,7 +95,7 @@ namespace FootPatrol
                 inst.SetRequestButtonEnabled(true);
 
             }
-        };
+        }
 
     }
 }
