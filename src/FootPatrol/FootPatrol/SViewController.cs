@@ -22,34 +22,23 @@ namespace FootPatrol
             {
 
                 requestSent = true;
-                RequestButton.Enabled = false;
-
-                //Get user information
-                string name = NameTextBox.Text;
-                string fromLocation = CurrentLocationTextBox.Text;
-                string toLocation = DestinationTextBox.Text;
-                string additionalInfo = AdditionalInfoTextBox.Text;
+                inst.SetRequestButtonEnabled(false);
 
                 //Check if all required input fields have been filled out
                 if (name == "" || name == null)
                 {
-                    NameTextBox.BackgroundColor = UIColor.Red;
+                    inst.DisplayPopup("Error", "Please check your input.");
                     return;
                 }
                 else if (fromLocation == "" || fromLocation == null)
                 {
-                    CurrentLocationTextBox.BackgroundColor = UIColor.Red;
+                    inst.DisplayPopup("Error", "Please check your input.");
                     return;
                 }
                 else if (toLocation == "" || toLocation == null)
                 {
-                    DestinationTextBox.BackgroundColor = UIColor.Red;
+                    inst.DisplayPopup("Error", "Please check your input.");
                     return;
-                }
-                else
-                {
-                    NameTextBox.BackgroundColor = UIColor.White;
-                    CurrentLocationTextBox.BackgroundColor = UIColor.White;
                 }
 
                 //Send footpatrol request
@@ -61,31 +50,25 @@ namespace FootPatrol
                 {
                     requestSent = false;
 
-                    //Popup with error
-                    var errorAlert = UIAlertController.Create("Error", "Please check your input.", UIAlertControllerStyle.Alert);
-                    errorAlert.AddAction(UIAlertAction.Create("Ok", UIAlertActionStyle.Default, null));
-                    PresentViewController(errorAlert, true, null);
+                    inst.DisplayPopup("Error", "Please check your input.");
 
-                    RequestButton.Enabled = true;
+                    inst.SetRequestButtonEnabled(true);
 
                     return;
                 }
 
-                RequestButton.SetTitle("Cancel SafeWalk Request", UIControlState.Normal);
+                inst.SetRequestButtonTitle("Cancel SafeWalk Request");
 
-                //Popup saying that request has been sent
-                var requestSentAlert = UIAlertController.Create("Request Sent", "Your SafeWalk request has been sent.", UIAlertControllerStyle.Alert);
-                requestSentAlert.AddAction(UIAlertAction.Create("Ok", UIAlertActionStyle.Default, null));
-                PresentViewController(requestSentAlert, true, null);
+                inst.DisplayPopup("Request Sent", "Your SafeWalk request has been sent.");
 
-                RequestButton.Enabled = true;
+                inst.SetRequestButtonEnabled(true);
 
             }
             else
             {
 
                 requestSent = false;
-                RequestButton.Enabled = false;
+                inst.SetRequestButtonEnabled(false);
 
                 //Cancel footpatrol request
                 try
@@ -97,23 +80,19 @@ namespace FootPatrol
                     requestSent = true;
 
                     //Popup with error
-                    var errorAlert = UIAlertController.Create("Error", "There was an error cancelling request.", UIAlertControllerStyle.Alert);
-                    errorAlert.AddAction(UIAlertAction.Create("Ok", UIAlertActionStyle.Default, null));
-                    PresentViewController(errorAlert, true, null);
+                    inst.DisplayPopup("Error", "There was an error cancelling request.");
 
-                    RequestButton.Enabled = true;
+                    inst.SetRequestButtonEnabled(true);
 
                     return;
                 }
 
-                RequestButton.SetTitle("Request SafeWalk", UIControlState.Normal);
+                inst.SetRequestButtonTitle("Request SafeWalk");
 
                 //Popup saying that request has been sent
-                var requestSentAlert = UIAlertController.Create("Request Cancelled", "Your SafeWalk request has been cancelled.", UIAlertControllerStyle.Alert);
-                requestSentAlert.AddAction(UIAlertAction.Create("Ok", UIAlertActionStyle.Default, null));
-                PresentViewController(requestSentAlert, true, null);
+                inst.DisplayPopup("Request Cancelled", "Your SafeWalk request has been cancelled.");
 
-                RequestButton.Enabled = true;
+                inst.SetRequestButtonEnabled(true);
 
             }
         };

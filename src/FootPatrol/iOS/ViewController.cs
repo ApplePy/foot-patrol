@@ -146,6 +146,16 @@ namespace FootPatrol.iOS
             PresentViewController(popup, true, null);
         }
 
+        public void SetRequestButtonEnabled(bool enabled) 
+        {
+            RequestButton.Enabled = enabled;
+        }
+
+        public void SetRequestButtonTitle(string title) 
+        {
+            RequestButton.SetTitle(title, UIControlState.Normal);
+        }
+
         public override void DidReceiveMemoryWarning()
         {
             base.DidReceiveMemoryWarning();
