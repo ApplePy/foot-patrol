@@ -5,19 +5,19 @@ using UIKit;
 
 namespace FootPatrol.iOS
 {
-    public partial class ViewController : UIViewController, IViewController
+    public partial class MainViewController : UIViewController, IMainViewController
     {
 
         public int requestID;
         public bool requestSent = false;
 
-        private SViewController sharedViewController;
+        private SMainViewController SVC;
 
-        protected ViewController(IntPtr handle) : base(handle)
+        protected MainViewController(IntPtr handle) : base(handle)
         {
             // Note: this .ctor should not contain any initialization logic.
 
-            sharedViewController = new SViewController(this);
+            SVC = new SMainViewController(this);
         }
 
         public override void ViewDidLoad()
@@ -38,7 +38,7 @@ namespace FootPatrol.iOS
                 string toLocation = DestinationTextBox.Text;
                 string additionalInfo = AdditionalInfoTextBox.Text;
 
-                sharedViewController.RequestButtonClicked(name, fromLocation, toLocation, additionalInfo);
+                SVC.RequestButtonClicked(name, fromLocation, toLocation, additionalInfo);
 
             };
 

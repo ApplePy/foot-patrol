@@ -10,8 +10,8 @@ using System.CodeDom.Compiler;
 
 namespace FootPatrol.iOS
 {
-    [Register ("ViewController")]
-    partial class ViewController
+    [Register ("MainViewController")]
+    partial class MainViewController
     {
         [Outlet]
         UIKit.UIButton Button { get; set; }

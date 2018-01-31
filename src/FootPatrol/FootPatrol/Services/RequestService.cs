@@ -50,7 +50,7 @@ namespace FootPatrol
 
             try
             {
-                HttpResponseMessage response = await Client.Instance.DeleteAsync("requests" + id.ToString());
+                HttpResponseMessage response = await Client.Instance.DeleteAsync("requests/" + id.ToString());
                 response.EnsureSuccessStatusCode();
 
             } 

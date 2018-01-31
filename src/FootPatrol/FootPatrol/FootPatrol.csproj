@@ -29,11 +29,11 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="IViewController.cs" />
-    <Compile Include="Client.cs" />
-    <Compile Include="SViewController.cs" />
     <Compile Include="Services\RequestService.cs" />
     <Compile Include="Models\FPRequest.cs" />
+    <Compile Include="Services\Client.cs" />
+    <Compile Include="Controllers\IMainViewController.cs" />
+    <Compile Include="Controllers\SMainViewController.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Newtonsoft.Json">
@@ -55,6 +55,7 @@
   <ItemGroup>
     <Folder Include="Services\" />
     <Folder Include="Models\" />
+    <Folder Include="Controllers\" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
 </Project>

@@ -4,14 +4,14 @@ using System.Threading.Tasks;
 //using UIKit;
 namespace FootPatrol
 {
-    public class SViewController
+    public class SMainViewController
     {
         public int requestID;
         public bool requestSent = false;
 
-        private IViewController inst;
+        private IMainViewController inst;
 
-        public SViewController(IViewController instance)
+        public SMainViewController(IMainViewController instance)
         {
             inst = instance;
         }
