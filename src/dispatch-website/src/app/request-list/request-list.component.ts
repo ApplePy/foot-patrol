@@ -37,23 +37,20 @@ export class RequestListComponent implements OnInit {
   getFPrequests(): void {
     this.ftpRequestService.getRequests()
     .then(requests => {
-       try {
-         console.log(requests);
+      console.log(requests.length);
         // sort requests in reverse chronological order. oldest last, most recent first
-        requests.sort(this.comparerTimestamp);
-        console.log(requests);
+        if (requests.length > 1) {
+          requests.sort(this.comparerTimestamp);
+        }
 
         // clear displayRequests
         this.displayRequests.length = 0;
-        console.log(requests);
 
         // move requests to displayRequests to display them
         for (let i = 0; i < requests.length; i++) {
           this.displayRequests[i] = requests[i];
         }
-        console.log(requests);
 
-       } catch (error) {this.handleError(error); }
     }).catch(this.handleError);
   }
 

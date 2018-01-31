@@ -51,6 +51,7 @@ export class AddRequestComponent implements OnInit {
     * @param str The string that is being checked
     */
   checkValid(str): Boolean {
+  if (str.length === 0) {return true; }
   const splChars = '*|,\":<>[]{}`\';()@&$#%';
   for (let i = 0; i < str.length; i++) {
     if (splChars.indexOf(str.charAt(i)) !== -1) {
