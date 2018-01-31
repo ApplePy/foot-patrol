@@ -18,12 +18,14 @@ export class RequestListComponent implements OnInit {
 
   constructor(public ftpRequestService: FtpRequestService, private router: Router) {
     router.events.subscribe((val) => {
-      // clearInterval(this.getRepeat);
+      // when the user navigates away from the page, stop getting requests
+      clearInterval(this.getRepeat);
     });
   }
 
   ngOnInit(): void {
-    // this.getRepeat = setInterval(this.getFPrequests.bind(this), 1000);
+    // when the page is loaded start getting requests from the server
+    this.getRepeat = setInterval(this.getFPrequests.bind(this), 1000);
   }
 
   archive(request): void {
@@ -36,21 +38,20 @@ export class RequestListComponent implements OnInit {
    */
   getFPrequests(): void {
     this.ftpRequestService.getRequests()
-    .then(requests => {
-      console.log(requests.length);
-        // sort requests in reverse chronological order. oldest last, most recent first
-        if (requests.length > 1) {
-          requests.sort(this.comparerTimestamp);
-        }
+    .then(resp => {
+      const requests = resp.requests;
+      // sort requests in reverse chronological order. oldest last, most recent first
+      if (requests.length > 1) {
+        requests.sort(this.comparerTimestamp);
+      }
 
-        // clear displayRequests
-        this.displayRequests.length = 0;
+      // clear displayRequests
+      this.displayRequests.length = 0;
 
-        // move requests to displayRequests to display them
-        for (let i = 0; i < requests.length; i++) {
-          this.displayRequests[i] = requests[i];
-        }
-
+      // move requests to displayRequests to display them
+      for (let i = 0; i < requests.length; i++) {
+        this.displayRequests[i] = requests[i];
+      }
     }).catch(this.handleError);
   }
 

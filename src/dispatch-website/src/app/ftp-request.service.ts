@@ -18,7 +18,7 @@ export class FtpRequestService {
   /**
    * Returns a Promise with up to 10 requests from the server
    */
-  getRequests(): Promise<Request[]> {
+  getRequests(): Promise<Object> {
     console.log(this.requestURL + '?offset=0&count=10');
     return this.http.get(this.requestURL + '?offset=0&count=10')
             .toPromise()

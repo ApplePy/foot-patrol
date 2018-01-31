@@ -17,6 +17,7 @@ export class AddRequestComponent implements OnInit {
 
   /**
    * Send the server a new request using the values in the input fields
+   * If the request is valid, navigate to the request-list page
    */
   submitReq() {
     const Iname = (<HTMLInputElement>document.getElementById('name')).value;
