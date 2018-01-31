@@ -26,7 +26,7 @@ namespace FootPatrol
 
             try
             {
-                HttpResponseMessage response = await Client.Instance.PostAsync("api/v1/requests", httpContent);
+                HttpResponseMessage response = await Client.Instance.PostAsync("requests", httpContent);
                 response.EnsureSuccessStatusCode();
 
                 string responseJSON = await response.Content.ReadAsStringAsync();
@@ -50,8 +50,7 @@ namespace FootPatrol
 
             try
             {
-                Debug.WriteLine("api/v1/requests/" + id.ToString());
-                HttpResponseMessage response = await Client.Instance.DeleteAsync("api/v1/requests/" + id.ToString());
+                HttpResponseMessage response = await Client.Instance.DeleteAsync("requests" + id.ToString());
                 response.EnsureSuccessStatusCode();
 
             } 
@@ -63,16 +62,6 @@ namespace FootPatrol
 
         }
 
-    }
-
-    public class FPRequest {
-        public int id;
-        public string name;
-        public string from_location;
-        public string to_location;
-        public string additional_info;
-        public bool? archived;
-        public string timestamp;
     }
 
 }

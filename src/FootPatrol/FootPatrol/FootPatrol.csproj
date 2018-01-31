@@ -33,6 +33,7 @@
     <Compile Include="Client.cs" />
     <Compile Include="SViewController.cs" />
     <Compile Include="Services\RequestService.cs" />
+    <Compile Include="Models\FPRequest.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Newtonsoft.Json">
@@ -53,6 +54,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Services\" />
+    <Folder Include="Models\" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
 </Project>
