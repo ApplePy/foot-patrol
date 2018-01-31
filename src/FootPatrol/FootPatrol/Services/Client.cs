@@ -20,7 +20,7 @@ namespace FootPatrol
 
         static Client()
         {
-            instance.BaseAddress = new Uri("http://staging.capstone.incode.ca");
+            instance.BaseAddress = new Uri("http://staging.capstone.incode.ca/api/v1/");
             instance.DefaultRequestHeaders.Accept.Clear();
             instance.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
         }
