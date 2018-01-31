@@ -45,6 +45,7 @@ describe('AddRequestComponent', () => {
   describe('SubmitRequest()', () => {
     beforeEach(() => {
       spyOn(component, 'checkValid').and.returnValue(true);
+      spyOn(component, 'checkValidExist').and.returnValue(true);
       component.submitReq();
     });
     it('should call ftpService.addRequest', () => {
@@ -85,6 +86,9 @@ describe('AddRequestComponent', () => {
       expect(component.checkValid('$')).toBe(false);
       expect(component.checkValid('#')).toBe(false);
       expect(component.checkValid('%')).toBe(false);
+    });
+    it('should accept empty strings', () => {
+      expect(component.checkValid('')).toBe(true);
     });
   });
 });

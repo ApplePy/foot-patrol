@@ -29,7 +29,7 @@ describe('FtpRequestService', () => {
     it('should return a json with an array of requests',
     async(inject([FtpRequestService, HttpTestingController], (service: FtpRequestService, mockBackend: HttpTestingController) => {
       const mockResponse1 = {
-        request: [{
+        'request': [{
           id: 1,
           name: 'name1',
           from_location: 'SEB',
@@ -46,7 +46,7 @@ describe('FtpRequestService', () => {
           timestamp: '11/1/2017'
         }]
       };
-      service.getRequests();
+      service.getRequests().subscribe();
       const req = mockBackend.expectOne(environment.apiUrl + '/requests?offset=0&count=10');
       expect(req.request.method).toEqual('GET');
       req.flush(mockResponse1);

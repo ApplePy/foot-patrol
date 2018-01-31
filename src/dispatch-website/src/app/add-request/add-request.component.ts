@@ -28,7 +28,9 @@ export class AddRequestComponent implements OnInit {
     if (this.checkValid(Iname) === true &&
       this.checkValid(IfromLocation) === true &&
       this.checkValid(ItoLocation) === true &&
-      this.checkValid(IadditionalInfo) === true
+      this.checkValid(IadditionalInfo) === true &&
+      this.checkValidExist(IfromLocation) === true &&
+      this.checkValidExist(ItoLocation) === true
     ) {
 
     const req = {
@@ -61,6 +63,9 @@ export class AddRequestComponent implements OnInit {
     return true;
   }
 }
+  checkValidExist(str): Boolean {
+    if (str.length > 0) { return true; } else {return false; }
+  }
 
   private handleError(error: any): Promise<any> {
     console.error('An error occurred', error);

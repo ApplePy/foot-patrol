@@ -1,11 +1,23 @@
 import { Injectable } from '@angular/core';
-import {Headers, Http} from '@angular/http';
+import {Headers, Http, Response} from '@angular/http';
 import {HttpParams, HttpClient} from '@angular/common/http';
 import { environment } from '../environments/environment';
 import 'rxjs/add/operator/toPromise';
 import 'rxjs/add/operator/map';
+import 'rxjs/add/operator/catch';
 import {Request} from './request';
-import { Response } from '@angular/http/src/static_response';
+import { Observable } from 'rxjs/Observable';
+import { of } from 'rxjs/observable/of';
+
+class ResponseServ {
+    requests: Request[];
+    meta: {
+      offset: number;
+      count: number;
+      archived: boolean;
+    };
+}
+
 
 @Injectable()
 export class FtpRequestService {
@@ -15,14 +27,21 @@ export class FtpRequestService {
 
   constructor(private http: HttpClient) { }
 
+
   /**
    * Returns a Promise with up to 10 requests from the server
    */
-  getRequests(): Promise<Object> {
-    console.log(this.requestURL + '?offset=0&count=10');
+  // getRequests(): Promise<Request[]> {
+  //   return this.http.get(this.requestURL + '?offset=0&count=10')
+  //           .toPromise().then((res: ResponseServ) => {
+  //             return res.requests;
+  //           })
+  //           .catch(this.handleError);
+  // }
+  getRequests(): Observable<JSON> {
     return this.http.get(this.requestURL + '?offset=0&count=10')
-            .toPromise()
-            .catch(this.handleError);
+                .map(this.extractData)
+                .catch(this.handleErrorO('getRequests', []));
   }
 
   /**
@@ -34,7 +53,7 @@ export class FtpRequestService {
     const patchURL = this.requestURL + '/' + request.id;
     this.http.patch(patchURL, {
       archived: request.archived
-    }).subscribe(resp => {}, error => this.handleError(error));
+    }).subscribe(resp => {}, error => this.handleErrorP(error));
   }
 
   /**
@@ -44,12 +63,35 @@ export class FtpRequestService {
   addRequest(requestMini): Promise<Request> {
     return this.http.post(this.addRequestURL, requestMini)
             .toPromise()
-            .catch(this.handleError);
+            .catch(this.handleErrorP);
   }
-
-   private handleError(error: any): Promise<any> {
+  /**
+   * error handler for promises
+   * @param error the error
+   */
+  private handleErrorP(error: any): Promise<any> {
     console.error('An error occurred', error);
     return Promise.reject(error.message || error);
+  }
+  /**
+   * error handler for observables
+   * @param operation what was being run when the error happenned
+   * @param result return an empty result to keep the app running
+   */
+  private handleErrorO<T> (operation = 'operation', result?: T) {
+    return (error: any): Observable<T> => {
+      // TODO: send the error to remote logging infrastructure
+      console.error(error); // log to console instead
+      // TODO: better job of transforming error for user consumption
+      console.log(`${operation} failed: ${error.message}`);
+      // Let the app keep running by returning an empty result.
+      return of(result as T);
+    };
+  }
+
+  private extractData(res: Response) {
+    const body = res.json();
+    return body;
   }
 
 }
