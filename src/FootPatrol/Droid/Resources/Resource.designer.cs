@@ -3350,6 +3350,9 @@ namespace FootPatrol.Droid
 			// aapt resource value: 0x7f0b00ee
 			public const int badgeCounter = 2131427566;
 			
+			// aapt resource value: 0x7f0b00f2
+			public const int badgeCounter2 = 2131427570;
+			
 			// aapt resource value: 0x7f0b0039
 			public const int beginning = 2131427385;
 			
@@ -3560,8 +3563,11 @@ namespace FootPatrol.Droid
 			// aapt resource value: 0x7f0b00eb
 			public const int map = 2131427563;
 			
-			// aapt resource value: 0x7f0b00f1
-			public const int masked = 2131427569;
+			// aapt resource value: 0x7f0b00ef
+			public const int map2 = 2131427567;
+			
+			// aapt resource value: 0x7f0b00f4
+			public const int masked = 2131427572;
 			
 			// aapt resource value: 0x7f0b00ca
 			public const int media_actions = 2131427530;
@@ -3674,8 +3680,14 @@ namespace FootPatrol.Droid
 			// aapt resource value: 0x7f0b00ed
 			public const int notificationBadge = 2131427565;
 			
+			// aapt resource value: 0x7f0b00f1
+			public const int notificationBadge2 = 2131427569;
+			
 			// aapt resource value: 0x7f0b00ec
 			public const int notificationBase = 2131427564;
+			
+			// aapt resource value: 0x7f0b00f0
+			public const int notificationBase2 = 2131427568;
 			
 			// aapt resource value: 0x7f0b00d3
 			public const int notification_background = 2131427539;
@@ -3802,9 +3814,6 @@ namespace FootPatrol.Droid
 			
 			// aapt resource value: 0x7f0b002f
 			public const int showTitle = 2131427375;
-			
-			// aapt resource value: 0x7f0b00ef
-			public const int sidetab = 2131427567;
 			
 			// aapt resource value: 0x7f0b0094
 			public const int smallLabel = 2131427476;
@@ -3938,8 +3947,8 @@ namespace FootPatrol.Droid
 			// aapt resource value: 0x7f0b0016
 			public const int view_offset_helper = 2131427350;
 			
-			// aapt resource value: 0x7f0b00f0
-			public const int visible = 2131427568;
+			// aapt resource value: 0x7f0b00f3
+			public const int visible = 2131427571;
 			
 			// aapt resource value: 0x7f0b00bc
 			public const int volume_item_container = 2131427516;
@@ -4258,6 +4267,9 @@ namespace FootPatrol.Droid
 			
 			// aapt resource value: 0x7f030048
 			public const int VolunteerScreen = 2130903112;
+			
+			// aapt resource value: 0x7f030049
+			public const int VolunteerScreenMF = 2130903113;
 			
 			static Layout()
 			{

@@ -17,6 +17,7 @@ namespace FootPatrol.Droid
     [Activity(Label = "FootPatrolAdapter")]
     public class FootPatrolAdapter : FragmentPagerAdapter
     {
+        
         public FootPatrolAdapter(Android.Support.V4.App.FragmentManager fm) : base(fm)
         {
 

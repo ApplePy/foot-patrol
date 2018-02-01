@@ -1,6 +1,6 @@
-﻿using Android.App;
-using Android.Content;
-using Android.OS;
+﻿using Android.OS;
+using Android.App;
+using Android.Support.V4.App;
 using Android.Views;
 using Android.Gms.Common.Apis;
 using Android.Gms.Maps;
@@ -21,13 +21,10 @@ using System.Collections.Generic;
 namespace FootPatrol.Droid
 {
     [Activity(Label = "VolunteerActivity")]
-    public class VolunteerActivity : Android.Support.V4.App.Fragment, GoogleApiClient.IOnConnectionFailedListener, GoogleApiClient.IConnectionCallbacks, Android.Gms.Location.ILocationListener, IOnMapReadyCallback
+    public class VolunteerActivityMF : Android.Support.V4.App.Fragment, GoogleApiClient.IOnConnectionFailedListener, GoogleApiClient.IConnectionCallbacks, Android.Gms.Location.ILocationListener, IOnMapReadyCallback
     {
         public string name, to_location, from_location, additional_info;
         private Typeface bentonSans;
-
-        SupportMapFragment mf;
-        MapView mView;
         ImageView notificationBase, notificationBadge;
         TextView badgeCounter;
 
@@ -35,25 +32,24 @@ namespace FootPatrol.Droid
         public int requestCount;
 
         private GoogleMap map;
-        private static View view;
-        private static VolunteerActivity va;
+        private SupportMapFragment mf;
         private static GoogleApiClient client;
         private static Location myLocation;
         private IFusedLocationProviderApi location;
         private LocationRequest locationRequest;
         MarkerOptions myMarker;
 
-        public static VolunteerActivity newInstance()
+        public static VolunteerActivityMF newInstance()
         {
-            System.Diagnostics.Debug.WriteLine("We're using the Map View!");
-            va = new VolunteerActivity();
-            return va;
+            VolunteerActivityMF vActivity = new VolunteerActivityMF();
+            return vActivity;
         }
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
-
+            View 
+           
             try
             {
                 MapsInitializer.Initialize(this.Context);
@@ -64,45 +60,22 @@ namespace FootPatrol.Droid
                 System.Diagnostics.Debug.WriteLine(e.StackTrace);
             }
 
+            notificationBase = (ImageView)view.FindViewById(Resource.Id.notificationBase2);
+            notificationBadge = (ImageView)view.FindViewById(Resource.Id.notificationBadge2);
+            badgeCounter = (TextView)view.FindViewById(Resource.Id.badgeCounter2);
+
+
+            //Take care of correct fonts
+            bentonSans = Typeface.CreateFromAsset(this.Activity.Application.Assets, "BentonSansRegular.otf");
+            setFont(bentonSans, badgeCounter);
+
             myMarker = new MarkerOptions();
-
-            createLocationRequest();
-            clientSetup();
-
-
-            if (Int32.Parse(Build.VERSION.Sdk) > 23)
-            {
-                view = inflater.Inflate(Resource.Layout.VolunteerScreen, container, false);
-                notificationBase = (ImageView)view.FindViewById(Resource.Id.notificationBase);
-                notificationBadge = (ImageView)view.FindViewById(Resource.Id.notificationBadge);
-                badgeCounter = (TextView)view.FindViewById(Resource.Id.badgeCounter);
-
-                //Take care of correct fonts
-                bentonSans = Typeface.CreateFromAsset(this.Activity.Application.Assets, "BentonSansRegular.otf");
-                setFont(bentonSans, badgeCounter);
-
-                mView = (MapView)view.FindViewById(Resource.Id.map);
-                mView.OnStart();
-            }
-
-            else
-            {
-                view = inflater.Inflate(Resource.Layout.VolunteerScreenMF, container, false);
-                notificationBase = (ImageView)view.FindViewById(Resource.Id.notificationBase2);
-                notificationBadge = (ImageView)view.FindViewById(Resource.Id.notificationBadge2);
-                badgeCounter = (TextView)view.FindViewById(Resource.Id.badgeCounter2);
-
-                //Take care of correct fonts
-                bentonSans = Typeface.CreateFromAsset(this.Activity.Application.Assets, "BentonSansRegular.otf");
-                setFont(bentonSans, badgeCounter);
-
-                mf = (SupportMapFragment)this.ChildFragmentManager.FindFragmentById(Resource.Id.map2);
-                mf.OnStart();
-            }
 
             request = Task.Run(() => getRequests()).Result; //get all user requests
             requestCount = request.Count;
 
+            createLocationRequest();
+            clientSetup();
 
             notificationBase.Click += (sender, e) =>
             {
@@ -115,6 +88,7 @@ namespace FootPatrol.Droid
             };
 
             return view;
+
         }
 
         public override void OnStart()
@@ -139,11 +113,7 @@ namespace FootPatrol.Droid
 
         public void mapSetup()
         {
-            if (Int32.Parse(Build.VERSION.Sdk) <= 23)
-                mf.GetMapAsync(this);
-
-            else
-                mView.GetMapAsync(this);
+            mf.GetMapAsync(this);
         }
 
         public void OnConnectionFailed(ConnectionResult result)
@@ -178,17 +148,17 @@ namespace FootPatrol.Droid
 
         public void OnProviderDisabled(string provider)
         {
-            
+
         }
 
         public void OnProviderEnabled(string provider)
         {
-            
+
         }
 
         public void OnStatusChanged(string provider, [GeneratedEnum] Availability status, Bundle extras)
         {
-            
+
         }
 
         public void OnMapReady(GoogleMap googleMap)
@@ -262,9 +232,8 @@ namespace FootPatrol.Droid
 
         public void onRequestClick()
         {
-            
             RequestsActivity ra = RequestsActivity.newInstance(request, requestCount);
-            ra.Show(this.FragmentManager,"Requests");
+            ra.Show(this.FragmentManager , "Request");
         }
 
         public void setFont(Typeface font, TextView text)

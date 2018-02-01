@@ -6,24 +6,25 @@
     p1:fillViewport="true"
     p1:layout_height="match_parent"
     p1:gravity="center_vertical">
-    <com.google.android.gms.maps.MapView
+    <fragment
         p1:minWidth="25px"
         p1:minHeight="25px"
         p1:layout_width="match_parent"
         p1:layout_height="match_parent"
-        p1:id="@+id/map" />
+        p1:id="@+id/map2"
+        class="com.google.android.gms.maps.SupportMapFragment" />
     <ImageView
         p1:src="@drawable/WalkNotification"
         p1:layout_width="80dp"
         p1:layout_height="80dp"
-        p1:id="@+id/notificationBase"
+        p1:id="@+id/notificationBase2"
         p1:layout_alignParentTop="true"
         p1:layout_alignParentRight="true"
         p1:layout_marginTop="20dp"
         p1:layout_marginRight="20dp" />
     <ImageView
         p1:src="@drawable/purplecircle"
-        p1:id="@+id/notificationBadge"
+        p1:id="@+id/notificationBadge2"
         p1:layout_alignParentTop="true"
         p1:layout_alignParentRight="true"
         p1:layout_width="30dp"
@@ -33,7 +34,7 @@
     <TextView
         p1:layout_width="25dp"
         p1:layout_height="25dp"
-        p1:id="@+id/badgeCounter"
+        p1:id="@+id/badgeCounter2"
         p1:layout_alignParentTop="true"
         p1:layout_alignParentRight="true"
         p1:layout_marginTop="12dp"

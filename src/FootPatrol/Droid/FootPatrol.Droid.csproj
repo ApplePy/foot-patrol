@@ -133,6 +133,7 @@
     <Compile Include="VolunteerActivity.cs" />
     <Compile Include="LoginActivity.cs" />
     <Compile Include="RequestsActivity.cs" />
+    <Compile Include="VolunteerActivityMF.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
@@ -157,6 +158,7 @@
     <AndroidResource Include="Resources\drawable\ic_keyboard_arrow_right_black_24dp.png" />
     <AndroidResource Include="Resources\drawable\ic_close_black_24dp.png" />
     <AndroidResource Include="Resources\layout\Requests.xml" />
+    <AndroidResource Include="Resources\layout\VolunteerScreenMF.xml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\drawable\" />
