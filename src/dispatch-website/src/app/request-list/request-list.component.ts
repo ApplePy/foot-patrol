@@ -57,8 +57,7 @@ export class RequestListComponent implements OnInit {
         }
       },
       error => {
-        // TODO: make an error handler that uses Observables instead of Promises
-        this.handleError(error);
+        this.handleErrorO(error);
       }
   );
   }
@@ -82,6 +81,16 @@ export class RequestListComponent implements OnInit {
   private handleError(error: any): Promise<any> {
     console.error('An error occurred', error);
     return Promise.reject(error.message || error);
+  }
+  private handleErrorO<T> (operation = 'operation', result?: T) {
+    return (error: any): Observable<T> => {
+      // TODO: send the error to remote logging infrastructure
+      console.error(error); // log to console instead
+      // TODO: better job of transforming error for user consumption
+      console.log(`${operation} failed: ${error.message}`);
+      // Let the app keep running by returning an empty result.
+      return of(result as T);
+    };
   }
 }
 

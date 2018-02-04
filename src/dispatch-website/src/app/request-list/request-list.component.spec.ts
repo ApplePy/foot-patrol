@@ -11,6 +11,7 @@ import { resolve } from 'path';
 import {Request} from '../request';
 import { HttpClient, HttpHandler } from '@angular/common/http';
 import { RouterTestingModule } from '@angular/router/testing';
+import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 
 describe('RequestListComponent', () => {
   let component: RequestListComponent;
@@ -39,7 +40,8 @@ describe('RequestListComponent', () => {
       imports: [
         FormsModule,
         HttpModule,
-        RouterTestingModule
+        RouterTestingModule,
+        HttpClientTestingModule
       ],
       declarations: [
         RequestListComponent

@@ -44,6 +44,13 @@ export class FtpRequestService {
                 .catch(this.handleErrorO('getRequests', []));
   }
 
+  private extractData(res: Response) {
+    // TODO: remove this line of test code
+    console.log(res);
+    const body = res.json();
+    return body;
+  }
+
   /**
    * archives the request by sending a patch request with the updated status
    *
@@ -89,9 +96,6 @@ export class FtpRequestService {
     };
   }
 
-  private extractData(res: Response) {
-    const body = res.json();
-    return body;
-  }
+
 
 }
