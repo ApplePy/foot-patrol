@@ -14,9 +14,29 @@ export class MapGeneralComponent implements OnInit {
   lat: number = 51.234;
   lng: number = 7.345;
 
+
+  TestList: Volunteer[] = [
+    { name: 'a', late: 1, long: 2 },
+    { name: 'b', late: 3, long: 4 },
+    { name: 'c', late: 5, long: 6 },
+    { name: 'd', late: 7, long: 8 },
+    { name: 'e', late: 9, long: 10 },
+    { name: 'f', late: 11, long: 12 }
+  ];
+
   constructor() { }
 
   ngOnInit() {
   }
 
+
+
+
+
+}
+
+class Volunteer {
+  name: string;
+  late: number;
+  long: number;
 }
