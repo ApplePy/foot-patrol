@@ -13,7 +13,7 @@ export class MapGeneralComponent implements OnInit {
   // ignore lint, the number declaration is needed to make the map work
   lat: number = 43.00959710000001;
   lng: number = -81.27373360000001;
-
+  zoom: number = 15;
 
   TestList: Volunteer[] = [
     { name: 'a', late: 1, long: 2 },
