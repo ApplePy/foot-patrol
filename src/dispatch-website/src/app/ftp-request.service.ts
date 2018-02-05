@@ -38,7 +38,7 @@ export class FtpRequestService {
   //           })
   //           .catch(this.handleError);
   // }
-  getRequests(): Observable<JSON> {
+  getRequests() {
     return this.http.get(this.requestURL + '?offset=0&count=10')
                 .catch(this.handleErrorO('getRequests', []));
   }
