@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Threading.Tasks;
 using System.Threading;
 namespace FootPatrol
@@ -18,7 +18,7 @@ namespace FootPatrol
         }
 
         //Send request
-        public async void SendRequest(string name, string fromLocation, string toLocation, string additionalInfo) 
+        public async Task SendRequest(string name, string fromLocation, string toLocation, string additionalInfo) 
         {
             //Send request
             try
@@ -39,7 +39,7 @@ namespace FootPatrol
         }
 
         //Cancel request
-        public async void CancelRequest() 
+        public async Task CancelRequest() 
         {
             //Cancel footpatrol request
             try
@@ -60,7 +60,7 @@ namespace FootPatrol
         }
 
         //Request button clicked
-        public void RequestButtonClicked (string name, string fromLocation, string toLocation, string additionalInfo) {
+        public async void RequestButtonClicked (string name, string fromLocation, string toLocation, string additionalInfo) {
 
             //Lock mutex and disable button
             mutex.WaitOne();
@@ -74,19 +74,16 @@ namespace FootPatrol
                 {
                     //Display error
                     inst.DisplayPopup("Error", "Please check your input.");
-
-                    //Enable button and release mutex
-                    inst.SetRequestButtonEnabled(true);
-                    mutex.ReleaseMutex();
-                    return;
                 }
-
-                SendRequest(name, fromLocation, toLocation, additionalInfo);
+                else
+                {
+                    await SendRequest(name, fromLocation, toLocation, additionalInfo);
+                }
 
             }
             else //If button is set to cancel
             {
-                CancelRequest();
+                await CancelRequest();
             }
 
             //Enable button and unlock mutex
