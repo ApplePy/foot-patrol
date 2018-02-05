@@ -40,7 +40,6 @@ export class FtpRequestService {
   // }
   getRequests(): Observable<JSON> {
     return this.http.get(this.requestURL + '?offset=0&count=10')
-                .map(this.extractData)
                 .catch(this.handleErrorO('getRequests', []));
   }
 
@@ -89,20 +88,20 @@ export class FtpRequestService {
     };
   }
 
-  private extractData(res: Response) {
-    // TODO: remove this line of test code
-    console.log(res.type);
-    try {
-      const body = res.json();
-      return body;
-    } catch (error) {
-      const body2 = {
-        'requests': []
-      };
-      console.log(error);
-      console.log(`Data Extraction failed: ${error.message}`);
-      return body2;
-    }
-  }
+  // private extractData(res: Response) {
+  //   // TODO: remove this line of test code
+  //   console.log(res.type);
+  //   try {
+  //     const body = res .json();
+  //     return body;
+  //   } catch (error) {
+  //     const body2 = {
+  //       'requests': []
+  //     };
+  //     console.log(error);
+  //     console.log(`Data Extraction failed: ${error.message}`);
+  //     return body2;
+  //   }
+  // }
 
 }
