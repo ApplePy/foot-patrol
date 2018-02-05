@@ -24,7 +24,7 @@ namespace FootPatrol.Droid
         }
 
         public override int Count {
-            get { return 2; }
+            get { return 3; }
         } 
 
         public override Android.Support.V4.App.Fragment GetItem(int position)
@@ -34,10 +34,13 @@ namespace FootPatrol.Droid
                 return LoginActivity.newInstance();
             }
 
-            else
+            else if (position == 1)
             {
                 return VolunteerActivity.newInstance();
             }
+
+            else
+                return PickUpActivity.newInstance();
         }
 
         public override Java.Lang.ICharSequence GetPageTitleFormatted(int position)
@@ -47,8 +50,11 @@ namespace FootPatrol.Droid
                 return new Java.Lang.String("Login");
             }
 
-            else
+            else if (position == 1)
                 return new Java.Lang.String("Volunteer");
+
+            else
+                return new Java.Lang.String("Pickup");
         }
 
     }

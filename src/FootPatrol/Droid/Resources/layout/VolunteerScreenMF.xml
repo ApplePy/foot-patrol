@@ -1,45 +1,54 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:p1="http://schemas.android.com/apk/res/android"
-    p1:minWidth="25px"
-    p1:minHeight="25px"
+<android.support.v4.widget.DrawerLayout xmlns:p1="http://schemas.android.com/apk/res/android"
+    p1:id="@+id/drawer_layout"
     p1:layout_width="match_parent"
-    p1:fillViewport="true"
-    p1:layout_height="match_parent"
-    p1:gravity="center_vertical">
-    <fragment
+    p1:layout_height="match_parent">
+    <RelativeLayout
         p1:minWidth="25px"
         p1:minHeight="25px"
         p1:layout_width="match_parent"
+        p1:fillViewport="true"
         p1:layout_height="match_parent"
-        p1:id="@+id/map2"
-        class="com.google.android.gms.maps.SupportMapFragment" />
-    <ImageView
-        p1:src="@drawable/WalkNotification"
-        p1:layout_width="80dp"
-        p1:layout_height="80dp"
-        p1:id="@+id/notificationBase2"
-        p1:layout_alignParentTop="true"
-        p1:layout_alignParentRight="true"
-        p1:layout_marginTop="20dp"
-        p1:layout_marginRight="20dp" />
-    <ImageView
-        p1:src="@drawable/purplecircle"
-        p1:id="@+id/notificationBadge2"
-        p1:layout_alignParentTop="true"
-        p1:layout_alignParentRight="true"
-        p1:layout_width="30dp"
-        p1:layout_height="30dp"
-        p1:layout_marginTop="10dp"
-        p1:layout_marginRight="20dp" />
-    <TextView
-        p1:layout_width="25dp"
-        p1:layout_height="25dp"
-        p1:id="@+id/badgeCounter2"
-        p1:layout_alignParentTop="true"
-        p1:layout_alignParentRight="true"
-        p1:layout_marginTop="12dp"
-        p1:layout_marginRight="16dp"
-        p1:textStyle="bold"
-        p1:text="0"
-        p1:textSize="20dp" />
-</RelativeLayout>
+        p1:gravity="center_vertical">
+        <fragment
+            p1:minWidth="25px"
+            p1:minHeight="25px"
+            p1:layout_width="match_parent"
+            p1:layout_height="match_parent"
+            p1:id="@+id/map2"
+            class="com.google.android.gms.maps.SupportMapFragment" />
+        <ImageView
+            p1:src="@drawable/WalkNotification"
+            p1:layout_width="80dp"
+            p1:layout_height="80dp"
+            p1:id="@+id/notificationBase2"
+            p1:layout_alignParentTop="true"
+            p1:layout_alignParentRight="true"
+            p1:layout_marginTop="20dp"
+            p1:layout_marginRight="20dp" />
+        <ImageView
+            p1:src="@drawable/purplecircle"
+            p1:id="@+id/notificationBadge2"
+            p1:layout_alignParentTop="true"
+            p1:layout_alignParentRight="true"
+            p1:layout_width="30dp"
+            p1:layout_height="30dp"
+            p1:layout_marginTop="10dp"
+            p1:layout_marginRight="20dp" />
+        <TextView
+            p1:layout_width="25dp"
+            p1:layout_height="25dp"
+            p1:id="@+id/badgeCounter2"
+            p1:layout_alignParentTop="true"
+            p1:layout_alignParentRight="true"
+            p1:layout_marginTop="12dp"
+            p1:layout_marginRight="16dp"
+            p1:textStyle="bold"
+            p1:text="0"
+            p1:textSize="20dp" />
+    </RelativeLayout>
+    <ListView
+        p1:id="@+id/listView1"
+        p1:layout_height="match_parent"
+        p1:layout_width="200dp" />
+</android.support.v4.widget.DrawerLayout>

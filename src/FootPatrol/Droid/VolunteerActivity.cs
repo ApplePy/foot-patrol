@@ -1,5 +1,4 @@
 ﻿using Android.App;
-using Android.Content;
 using Android.OS;
 using Android.Views;
 using Android.Gms.Common.Apis;
@@ -17,6 +16,7 @@ using Android.Widget;
 using Newtonsoft.Json.Linq;
 using System.Threading.Tasks;
 using System.Collections.Generic;
+using Xamarin.Forms.Maps;
 
 namespace FootPatrol.Droid
 {
@@ -30,6 +30,7 @@ namespace FootPatrol.Droid
         MapView mView;
         ImageView notificationBase, notificationBadge;
         TextView badgeCounter;
+        ListView listView;
 
         public List<string> request;
         public int requestCount;
@@ -82,6 +83,7 @@ namespace FootPatrol.Droid
                 setFont(bentonSans, badgeCounter);
 
                 mView = (MapView)view.FindViewById(Resource.Id.map);
+                mView.OnCreate(savedInstanceState);
                 mView.OnStart();
             }
 
@@ -91,12 +93,14 @@ namespace FootPatrol.Droid
                 notificationBase = (ImageView)view.FindViewById(Resource.Id.notificationBase2);
                 notificationBadge = (ImageView)view.FindViewById(Resource.Id.notificationBadge2);
                 badgeCounter = (TextView)view.FindViewById(Resource.Id.badgeCounter2);
+                listView = (ListView)view.FindViewById(Resource.Id.listView1);
 
                 //Take care of correct fonts
                 bentonSans = Typeface.CreateFromAsset(this.Activity.Application.Assets, "BentonSansRegular.otf");
                 setFont(bentonSans, badgeCounter);
 
                 mf = (SupportMapFragment)this.ChildFragmentManager.FindFragmentById(Resource.Id.map2);
+                mf.OnCreate(savedInstanceState);
                 mf.OnStart();
             }
 
@@ -165,12 +169,13 @@ namespace FootPatrol.Droid
 
         public void OnLocationChanged(Location location)
         {
-            myMarker.SetPosition(new LatLng(location.Latitude, location.Longitude)).SetTitle("Volunteer").SetIcon(BitmapDescriptorFactory.DefaultMarker(BitmapDescriptorFactory.HueRed));
-            map.AnimateCamera(CameraUpdateFactory.NewLatLng(new LatLng(location.Latitude, location.Longitude))); //null reference
-            map.AddMarker(myMarker);
+            LatLng newPos = new LatLng(location.Latitude, location.Longitude);
+            myMarker.SetPosition(newPos).SetTitle("Volunteer").SetIcon(BitmapDescriptorFactory.DefaultMarker(BitmapDescriptorFactory.HueRed));
+            map.AnimateCamera(CameraUpdateFactory.NewLatLng(newPos)); //null reference
+            myMarker.SetPosition(newPos);
 
             CameraPosition cp = new CameraPosition.Builder().
-                Target(new LatLng(location.Latitude, location.Longitude)).Zoom(10).Bearing(90).Tilt(40).Build();
+                Target(newPos).Zoom(20).Bearing(90).Tilt(40).Build();
 
             map.AnimateCamera(CameraUpdateFactory.NewCameraPosition(cp));
 
@@ -209,7 +214,7 @@ namespace FootPatrol.Droid
                     map.AnimateCamera(CameraUpdateFactory.NewLatLng(new LatLng(myLocation.Latitude, myLocation.Longitude)));
                     map.AddMarker(myMarker);
                     CameraPosition cp = new CameraPosition.Builder().
-                        Target(new LatLng(myLocation.Latitude, myLocation.Longitude)).Zoom(10).Bearing(90).Tilt(40).Build();
+                        Target(new LatLng(myLocation.Latitude, myLocation.Longitude)).Zoom(20).Bearing(90).Tilt(40).Build();
 
                     map.AnimateCamera(CameraUpdateFactory.NewCameraPosition(cp));
 
@@ -262,7 +267,6 @@ namespace FootPatrol.Droid
 
         public void onRequestClick()
         {
-            
             RequestsActivity ra = RequestsActivity.newInstance(request, requestCount);
             ra.Show(this.FragmentManager,"Requests");
         }
@@ -271,6 +275,34 @@ namespace FootPatrol.Droid
         {
             text.SetTypeface(font, TypefaceStyle.Normal);
         }
+
+        public void onTripAcceptAsync(string name, string toLoc, string fromLoc, string addInfo)
+        {
+            //Xamarin.FormsMaps.Init();
+            Xamarin.Forms.Maps.Geocoder geo = new Xamarin.Forms.Maps.Geocoder();
+            var address = toLoc;
+            var approximateLocations = Task.Run(() => getPositionForAddress(geo, address)).Result;
+
+        }
+        //request = Task.Run(() => getRequests()).Result; //get all user requests
+
+        public async Task<List<string>> getPositionForAddress(Xamarin.Forms.Maps.Geocoder geo, string address)
+        {
+            var approximateLoc = await geo.GetPositionsForAddressAsync(address);
+            List<string> positions = new List<string>();
+            foreach(var position in approximateLoc)
+            {
+                System.Diagnostics.Debug.WriteLine("The approximate position of the location specified is: " + position.Latitude +
+                                                   ", " + position.Longitude);
+                
+                positions.Add(position.Latitude.ToString() + ", " + position.Longitude.ToString());   
+            }
+
+            return positions;
+
+        }
+
+
 
     }
 

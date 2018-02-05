@@ -12,6 +12,7 @@ namespace FootPatrol.Droid
     public class RequestsActivity : Android.Support.V4.App.DialogFragment
     {
         public static RequestsActivity req;
+        public static VolunteerActivity va;
         private static View view;
 
         private static List<string> request, userName, toLoc, fromLoc, addInfo;
@@ -42,6 +43,7 @@ namespace FootPatrol.Droid
             ImageButton rightArrow = (ImageButton)view.FindViewById(Resource.Id.rightArrow);
             ImageButton leftArrow = (ImageButton)view.FindViewById(Resource.Id.leftArrow);
             ImageButton closeBtn = (ImageButton)view.FindViewById(Resource.Id.closeButton);
+            Button acceptReq = (Button)view.FindViewById(Resource.Id.acceptRequest);
 
             currentCount = 0;
 
@@ -113,6 +115,12 @@ namespace FootPatrol.Droid
             closeBtn.Click += (sender, e) =>
             {
                 this.Dismiss();
+            };
+
+            acceptReq.Click += (sender, e) =>
+            {
+                va = new VolunteerActivity();
+                va.onTripAcceptAsync(userName[currentCount], toLoc[currentCount], fromLoc[currentCount], addInfo[currentCount]);
             };
 
             return view;
