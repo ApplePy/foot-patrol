@@ -11,8 +11,8 @@ import { AgmCoreModule } from '@agm/core/core.module';
 export class MapGeneralComponent implements OnInit {
 
   // ignore lint, the number declaration is needed to make the map work
-  lat: number = 51.234;
-  lng: number = 7.345;
+  lat: number = 43.00959710000001;
+  lng: number = -81.27373360000001;
 
 
   TestList: Volunteer[] = [
