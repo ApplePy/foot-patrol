@@ -461,6 +461,7 @@ deploy_review:
     HELM_CHART: deploy/charts/foot-patrol
   script:
     - helm dependency build $HELM_CHART
+    - helm delete --purge $CI_ENVIRONMENT_SLUG --tiller-namespace $NAMESPACE || true    # Remove the old deploy to ensure the containers are updated
     - helm upgrade $CI_ENVIRONMENT_SLUG $HELM_CHART --install $COMMON_INSTALL_HELM --set backend.replicas=1,webapp.replicas=1,imageTag=$TAG,ingress.hosts={"$CI_COMMIT_REF_SLUG.$DOMAIN"},$DB_CONFIG
     - cd src/backend
     - until [ $(kubectl get pods -n $NAMESPACE | grep "$CI_ENVIRONMENT_SLUG-mysql" | grep -o "1/1") ]; do echo "mysql not ready..."; sleep 15; done
