@@ -28,6 +28,7 @@ export class RequestListComponent implements OnInit {
 
   ngOnInit(): void {
     // when the page is loaded start getting requests from the server
+    this.getFPrequests();
     this.getRepeat = setInterval(this.getFPrequests.bind(this), 1000);
   }
 
