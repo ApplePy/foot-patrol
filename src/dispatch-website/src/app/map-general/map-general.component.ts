@@ -15,6 +15,7 @@ export class MapGeneralComponent implements OnInit {
   lng: number = -81.27373360000001;
   zoom: number = 15;
 
+  // this list is here to show that the markers work. delete this once the server connunication stuff for volunteer info is written
   TestList: Volunteer[] = [
     { name: 'a', late: 1, long: 2 },
     { name: 'b', late: 3, long: 4 },

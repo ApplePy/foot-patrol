@@ -33,17 +33,16 @@ export class AddRequestComponent implements OnInit {
       this.checkValidExist(ItoLocation) === true
     ) {
 
-    const req = {
-      'name': Iname,
-      'from_location': IfromLocation,
-      'to_location': ItoLocation,
-      'additional_info': IadditionalInfo
-    };
+      const req = {
+        'name': Iname,
+        'from_location': IfromLocation,
+        'to_location': ItoLocation,
+        'additional_info': IadditionalInfo
+      };
 
-    this.ftpService.addRequest(req).then(response => {
-      this.router.navigateByUrl('/request-list');
-    })
-    .catch(this.handleError);
+      this.ftpService.addRequest(req).subscribe(data => {
+        this.router.navigateByUrl('/request-list');
+      });
     } else {
       alert('Invalid characters detected. Please remove any special characters such as *|,":<>[]{}`\';()@&$#% from the input fields');
     }
@@ -63,13 +62,13 @@ export class AddRequestComponent implements OnInit {
     return true;
   }
 }
+  /**
+  * Checks that the input string is not empty
+  * @param str The string that is being checked
+  */
   checkValidExist(str): Boolean {
-    if (str.length > 0) { return true; } else {return false; }
+    if (str.length > 0) { return true; } else {
+      alert('Error: A required field is empty');
+      return false; }
   }
-
-  private handleError(error: any): Promise<any> {
-    console.error('An error occurred', error);
-    return Promise.reject(error.message || error);
-  }
-
 }

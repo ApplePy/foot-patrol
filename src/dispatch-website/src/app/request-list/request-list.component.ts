@@ -16,7 +16,6 @@ import { of } from 'rxjs/observable/of';
 export class RequestListComponent implements OnInit {
   // requests in displayRequests are displayed in the view
   displayRequests: Request[] = [ ];
-
   getRepeat: number;
 
   constructor(public ftpRequestService: FtpRequestService, private router: Router) {
@@ -32,9 +31,15 @@ export class RequestListComponent implements OnInit {
     this.getRepeat = setInterval(this.getFPrequests.bind(this), 1000);
   }
 
+  /**
+   * Send a patch message to the server which marks the request as archived, removing it from the display list
+   * @param request The request to be archived
+   */
   archive(request): void {
     request.archived = true;
-    this.ftpRequestService.archiveRequest(request);
+    this.ftpRequestService.archiveRequest(request).subscribe(
+      // TODO: maybe add some kind of confirmation that the request was archived. or an undo button or something
+     );
   }
 
   /**
@@ -56,9 +61,6 @@ export class RequestListComponent implements OnInit {
         for (let i = 0; i < requests.length; i++) {
           this.displayRequests[i] = requests[i];
         }
-      },
-      error => {
-        this.handleErrorO(error);
       }
   );
   }
@@ -76,27 +78,5 @@ export class RequestListComponent implements OnInit {
     } else if (a.timestamp > b.timestamp) {
       return -1;
     }
-
-    // return clamp(b.timestamp - a.timestamp, 1, -1);
-  }
-  private handleError(error: any): Promise<any> {
-    console.error('An error occurred', error);
-    return Promise.reject(error.message || error);
-  }
-  private handleErrorO<T> (operation = 'operation', result?: T) {
-    return (error: any): Observable<T> => {
-      // TODO: send the error to remote logging infrastructure
-      console.error(error); // log to console instead
-      // TODO: better job of transforming error for user consumption
-      console.log(`${operation} failed: ${error.message}`);
-      // Let the app keep running by returning an empty result.
-      return of(result as T);
-    };
   }
 }
-
-function clamp(val: number, max: number, min: number) {
-  return Math.max(Math.min(val, max), min);
-}
-
-
