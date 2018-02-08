@@ -79,7 +79,7 @@ describe('FtpRequestService', () => {
         'to_location': 'SEB',
         'additional_info': 'quickly',
       };
-      service.addRequest(mockRequest1);
+      service.addRequest(mockRequest1).subscribe();
       const req = mockBackend.expectOne(environment.apiUrl + '/requests');
       expect(req.request.method).toEqual('POST');
       req.flush(mockRequest1);

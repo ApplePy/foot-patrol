@@ -49,7 +49,8 @@ describe('RequestListComponent', () => {
       providers: [
         HttpModule,
         HttpClient,
-        HttpHandler
+        HttpHandler,
+        FtpRequestService
       ]
     })
     .compileComponents();
@@ -57,17 +58,20 @@ describe('RequestListComponent', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(RequestListComponent);
     component = fixture.componentInstance;
+    spyOn(component, 'getFPrequests');
     fixture.detectChanges();
   });
   it('should create', () => {
     expect(component).toBeTruthy();
   });
+
   describe('archive(request)', () => {
     beforeEach(() => {
       fixture = TestBed.createComponent(RequestListComponent);
       component = fixture.componentInstance;
+      spyOn(component, 'getFPrequests');
       fixture.detectChanges();
-      spyOn(component.ftpRequestService, 'archiveRequest');
+      spyOn(component.ftpRequestService, 'archiveRequest').and.returnValue({ subscribe: () => { }});
     });
     it('archive(request) should set request.archieved to true', () => {
       component.archive(testRequestList[0]);
@@ -78,31 +82,19 @@ describe('RequestListComponent', () => {
       expect(component.ftpRequestService.archiveRequest).toHaveBeenCalled();
     });
   });
-  describe('getFPrequests()', () => {
+
+  describe('displayGetRequests()', () => {
     beforeEach(() => {
       fixture = TestBed.createComponent(RequestListComponent);
       component = fixture.componentInstance;
+      spyOn(component, 'getFPrequests');
       fixture.detectChanges();
-
-      spyOn(component.ftpRequestService, 'getRequests').and.callThrough();
-
+      spyOn(component.ftpRequestService, 'getRequests');
     });
-
-    // becuase getFPrequests calls the ftpRequestService.getRequests.subscribe(), spying on it properly is difficult
-    // time constraints require that this test be removed to expedite code submission
-    // it('should call ftpRequestService.getRequests', () => {
-    //   component.getFPrequests();
-    //   fixture.whenStable().then(() => {
-    //     expect(component.ftpRequestService.getRequests).toHaveBeenCalled();
-    //   });
-    // });
-
     it('should call the sort function', async() => {
       spyOn(Array.prototype, 'sort');
-      component.getFPrequests();
-      fixture.whenStable().then(() => {
-        expect(Array.prototype.sort).toHaveBeenCalled();
-      });
+      component.displayGetRequests(testRequestList);
+      expect(Array.prototype.sort).toHaveBeenCalled();
     });
     it('should sort the result by timestamp and store the result in displayRequests', async() => {
       spyOn(Array.prototype, 'sort').and.callThrough();
@@ -125,13 +117,11 @@ describe('RequestListComponent', () => {
         timestamp: '2017-10-26T06:51:06.000Z',
         archived: true
       }];
-      component.getFPrequests();
-      fixture.whenStable().then(() => {
-        expect(component.displayRequests).toBeDefined();
-        expect(Array.prototype.sort).toHaveBeenCalled();
-        expect(component.displayRequests[0].timestamp).toBe(testRequestListSort[1].timestamp);
-        expect(component.displayRequests[1].timestamp).toBe(testRequestListSort[0].timestamp);
-      });
+      component.displayGetRequests(testRequestList);
+      expect(component.displayRequests).toBeDefined();
+      expect(Array.prototype.sort).toHaveBeenCalled();
+      expect(component.displayRequests[0].timestamp).toBe(testRequestListSort[1].timestamp);
+      expect(component.displayRequests[1].timestamp).toBe(testRequestListSort[0].timestamp);
     });
     it('should clear the existing list of displayed requests when getting the new list', async() => {
       component.getFPrequests();
@@ -149,6 +139,7 @@ describe('RequestListComponent', () => {
     beforeEach(() => {
       fixture = TestBed.createComponent(RequestListComponent);
       component = fixture.componentInstance;
+      spyOn(component, 'getFPrequests');
       fixture.detectChanges();
     });
 

@@ -5,6 +5,7 @@ import { Router, RouterModule } from '@angular/router';
 import {RouterTestingModule} from '@angular/router/testing';
 import { NgModule } from '@angular/core';
 import { HttpClient, HttpHandler } from '@angular/common/http';
+import { Observable } from 'rxjs/Observable';
 
 describe('AddRequestComponent', () => {
   let component: AddRequestComponent;
@@ -32,9 +33,7 @@ describe('AddRequestComponent', () => {
     fixture = TestBed.createComponent(AddRequestComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
-    spyOn(component.ftpService, 'addRequest').and.callFake(() => {
-      return Promise.resolve();
-    });
+    spyOn(component.ftpService, 'addRequest').and.returnValue({ subscribe: () => {} });
     spyOn(component.router, 'navigateByUrl');
   });
 
@@ -51,12 +50,6 @@ describe('AddRequestComponent', () => {
     it('should call ftpService.addRequest', () => {
       expect(component.checkValid).toHaveBeenCalledTimes(4);
       expect(component.ftpService.addRequest).toHaveBeenCalled();
-    });
-    it('should navigate to the request list screen after sending the request', async() => {
-      expect(component.ftpService.addRequest).toHaveBeenCalled();
-      fixture.whenStable().then(() => {
-        expect(component.router.navigateByUrl).toHaveBeenCalled();
-      });
     });
   });
 

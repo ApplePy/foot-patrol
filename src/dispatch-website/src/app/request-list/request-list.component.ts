@@ -25,7 +25,7 @@ export class RequestListComponent implements OnInit {
     });
   }
 
-  ngOnInit(): void {
+  ngOnInit() {
     // when the page is loaded start getting requests from the server
     this.getFPrequests();
     this.getRepeat = setInterval(this.getFPrequests.bind(this), 1000);
@@ -49,20 +49,24 @@ export class RequestListComponent implements OnInit {
     this.ftpRequestService.getRequests().subscribe(
       data => {
         const requests  = data['requests'];
-        // sort requests in reverse chronological order. oldest last, most recent first
-        if (requests.length > 1) {
-          requests.sort(this.comparerTimestamp);
-        }
-
-        // clear displayRequests
-        this.displayRequests.length = 0;
-
-        // move requests to displayRequests to display them
-        for (let i = 0; i < requests.length; i++) {
-          this.displayRequests[i] = requests[i];
-        }
+        this.displayGetRequests(requests);
       }
   );
+  }
+
+  displayGetRequests(requests): void {
+    // sort requests in reverse chronological order. oldest last, most recent first
+    if (requests.length > 1) {
+      requests.sort(this.comparerTimestamp);
+    }
+
+    // clear displayRequests
+    this.displayRequests.length = 0;
+
+    // move requests to displayRequests to display them
+    for (let i = 0; i < requests.length; i++) {
+      this.displayRequests[i] = requests[i];
+    }
   }
 
   /**
