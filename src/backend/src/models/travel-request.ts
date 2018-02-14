@@ -16,30 +16,47 @@ export class TravelRequest {
   /* tslint:enable:variable-name */
 
   constructor(obj?: {[key: string]: any}) {
+    // Set timestamp of creation
+    this.timestamp = new Date();
+
     // Return default object if the obj is undefined
     if (obj === undefined) {
       return;
     }
 
-    // Sanity check on data
-    if (this.checkToFromUniqueness(obj.from_location, obj.to_location)) {
-      throw new Error("Invalid Request Data");
+    const assignment: {[key: string]: any} = {
+      name: String,
+      additional_info: String,
+      id: Number,
+      from_location: String,
+      to_location: String,
+      timestamp: (field: any) => new Date(field),
+      archived: (field: any) => (field === "false") ? false : Boolean(field)
+    };
+
+    // Check if a value is valid before trying assignment
+    for (const key of Object.keys(assignment)) {
+      if (this.isValid(obj[key])) {
+        (this as any)[key] = assignment[key](obj[key]);
+      }
+    }
+  }
+
+  /**
+   * Checks if the object is in a valid state
+   */
+  public Valid() {
+    // Set false and wait until a validity check sets it true
+    let invalid = false;
+
+    // Check fields
+    invalid = invalid || this.checkToFromUniqueness(this.from_location, this.to_location);
+    const fields = [this.id, this.timestamp, this.archived];
+    for (const field of fields) {
+      invalid = invalid || !this.isValid(field);
     }
 
-    // Fill object
-    if (this.isValid(obj.name)) {
-      this.name = String(obj.name);
-    }
-
-    if (this.isValid(obj.additional_info)) {
-      this.additional_info = String(obj.additional_info);
-    }
-
-    this.id = Number(obj.id);
-    this.from_location = String(obj.from_location);
-    this.to_location = String(obj.to_location);
-    this.timestamp = new Date(obj.timestamp);
-    this.archived = (obj.archived === "false") ? false : Boolean(obj.archived);
+    return !invalid;
   }
 
   /**
