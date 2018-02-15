@@ -512,6 +512,7 @@ export class RequestsRoute implements IRoute {
     if (err.message === "Not Found") {
       return new StatusError(404, "Not Found", `ID was not found.`);
     } else {
+      console.error(err.toString());
       return new StatusError(500, "Internal Server Error", "An error has occurred.");
     }
   }

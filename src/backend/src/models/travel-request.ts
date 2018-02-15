@@ -5,20 +5,17 @@ export class TravelRequest {
 
   /* tslint:disable:variable-name */
 
-  public id: number;
+  public id: number = 0;
   public name: string | null = null;
-  public from_location: string;
-  public to_location: string;
+  public from_location: string = "";
+  public to_location: string = "";
   public additional_info: string | null = null;
-  public archived: boolean;
-  public timestamp: Date;
+  public archived: boolean = false;
+  public timestamp: Date = new Date();
 
   /* tslint:enable:variable-name */
 
   constructor(obj?: {[key: string]: any}) {
-    // Set timestamp of creation
-    this.timestamp = new Date();
-
     // Return default object if the obj is undefined
     if (obj === undefined) {
       return;
@@ -46,17 +43,7 @@ export class TravelRequest {
    * Checks if the object is in a valid state
    */
   public Valid() {
-    // Set false and wait until a validity check sets it true
-    let invalid = false;
-
-    // Check fields
-    invalid = invalid || this.checkToFromUniqueness(this.from_location, this.to_location);
-    const fields = [this.id, this.timestamp, this.archived];
-    for (const field of fields) {
-      invalid = invalid || !this.isValid(field);
-    }
-
-    return !invalid;
+    return !this.checkToFromUniqueness(this.from_location, this.to_location);
   }
 
   /**
@@ -65,7 +52,7 @@ export class TravelRequest {
    * @param variable Variable to check
    */
   private isValid(variable: any) {
-    return variable !== null && variable !== undefined;
+    return variable !== null && variable !== undefined && variable !== "";
   }
 
   /**
@@ -75,6 +62,6 @@ export class TravelRequest {
    * @param from
    */
   private checkToFromUniqueness(to: string, from: string) {
-    return (to == null || from == null || to === from);
+    return (to == null || from == null || to === "" || from === "" || to === from);
   }
 }
