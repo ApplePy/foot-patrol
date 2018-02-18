@@ -43,45 +43,50 @@ describe('AddRequestComponent', () => {
 
   describe('SubmitRequest()', () => {
     beforeEach(() => {
-      spyOn(component, 'checkValid').and.returnValue(true);
-      spyOn(component, 'checkValidExist').and.returnValue(true);
+      spyOn(component, 'checkValidSubmitReq').and.returnValue(true);
       component.submitReq();
     });
     it('should call ftpService.addRequest', () => {
-      expect(component.checkValid).toHaveBeenCalledTimes(4);
+      expect(component.checkValidSubmitReq).toHaveBeenCalled();
       expect(component.ftpService.addRequest).toHaveBeenCalled();
     });
   });
 
   describe('checkValid(string)', () => {
-    it('should accept strings with no special characters', () => {
-      expect(component.checkValid('a valid string')).toBe(true);
+    it('should accept inputs with no special characters', () => {
+      expect(component.checkValidSubmitReq(
+        'John Johnson',
+        'TEB',
+        'seb',
+        'quickly please'
+    )).toBe(true);
+    expect(component.errorMsg).toBe('');
     });
-    it('should reject invalid strings', () => {
-      expect(component.checkValid('*')).toBe(false);
-      expect(component.checkValid('|')).toBe(false);
-      expect(component.checkValid(',')).toBe(false);
-      expect(component.checkValid('\"')).toBe(false);
-      expect(component.checkValid(':')).toBe(false);
-      expect(component.checkValid('<')).toBe(false);
-      expect(component.checkValid('>')).toBe(false);
-      expect(component.checkValid('[')).toBe(false);
-      expect(component.checkValid(']')).toBe(false);
-      expect(component.checkValid('{')).toBe(false);
-      expect(component.checkValid('}')).toBe(false);
-      expect(component.checkValid('`')).toBe(false);
-      expect(component.checkValid('\'')).toBe(false);
-      expect(component.checkValid(';')).toBe(false);
-      expect(component.checkValid('(')).toBe(false);
-      expect(component.checkValid(')')).toBe(false);
-      expect(component.checkValid('@')).toBe(false);
-      expect(component.checkValid('&')).toBe(false);
-      expect(component.checkValid('$')).toBe(false);
-      expect(component.checkValid('#')).toBe(false);
-      expect(component.checkValid('%')).toBe(false);
+    it('should accept inputs with empty optional fields', () => {
+      expect(component.checkValidSubmitReq('', 'TEB', 'seb', 'quickly please')).toBe(true);
+      expect(component.checkValidSubmitReq('John Johnson', 'TEB', 'seb', '')).toBe(true);
+      expect(component.checkValidSubmitReq('', 'TEB', 'seb', '')).toBe(true);
+      expect(component.errorMsg).toBe('');
     });
-    it('should accept empty strings', () => {
-      expect(component.checkValid('')).toBe(true);
+
+    it('should reject inputs with empty required fields', () => {
+      expect(component.checkValidSubmitReq('John Johnson', '', 'seb', 'quickly please')).toBe(false);
+      expect(component.checkValidSubmitReq('John Johnson', 'TEB', '', 'quickly please')).toBe(false);
+      expect(component.checkValidSubmitReq('John Johnson', '', '', 'quickly please')).toBe(false);
+      expect(component.errorMsg).toBe('Error: A required field is empty');
+    });
+
+    it('should reject inputs with special characters', () => {
+      expect(component.checkValidSubmitReq('John J@hnson', 'TEB', 'seb', 'quickly please')).toBe(false);
+      expect(component.checkValidSubmitReq('John Johnson', 'T{B', 'seb', 'quickly please')).toBe(false);
+      expect(component.checkValidSubmitReq('John Johnson', 'TEB', 's&b', 'quickly please')).toBe(false);
+      expect(component.checkValidSubmitReq('John Johnson', 'TEB', 'seb', 'quickl* please')).toBe(false);
+      expect(component.errorMsg).toBe('Error: Invalid characters detected. Please remove any special characters such as !?*|":<>`\';()@&$#% from the input fields');
+    });
+
+    it('should reject inputs with matching to and from locations', () => {
+      expect(component.checkValidSubmitReq('John Johnson', 'TEB', 'teb', 'quickly please')).toBe(false);
+      expect(component.errorMsg).toBe('Error: To and From locations must be different');
     });
   });
 });

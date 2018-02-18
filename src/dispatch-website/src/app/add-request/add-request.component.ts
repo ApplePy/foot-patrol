@@ -11,8 +11,9 @@ import { FtpRequestService } from '../ftp-request.service';
 export class AddRequestComponent implements OnInit {
 
   constructor(public router: Router, public ftpService: FtpRequestService) { }
-
+  errorMsg: string;
   ngOnInit() {
+    this.errorMsg = '';
   }
 
   /**
@@ -25,14 +26,7 @@ export class AddRequestComponent implements OnInit {
     const ItoLocation = (<HTMLInputElement>document.getElementById('toLocation')).value;
     const IadditionalInfo = (<HTMLInputElement>document.getElementById('additionalInfo')).value;
 
-    if (this.checkValid(Iname) === true &&
-      this.checkValid(IfromLocation) === true &&
-      this.checkValid(ItoLocation) === true &&
-      this.checkValid(IadditionalInfo) === true &&
-      this.checkValidExist(IfromLocation) === true &&
-      this.checkValidExist(ItoLocation) === true
-    ) {
-
+    if (this.checkValidSubmitReq(Iname, IfromLocation, ItoLocation, IadditionalInfo)) {
       const req = {
         'name': Iname,
         'from_location': IfromLocation,
@@ -43,32 +37,53 @@ export class AddRequestComponent implements OnInit {
       this.ftpService.addRequest(req).subscribe(data => {
         this.router.navigateByUrl('/request-list');
       });
-    } else {
-      alert('Invalid characters detected. Please remove any special characters such as *|,":<>[]{}`\';()@&$#% from the input fields');
     }
   }
 
-   /**
-    * Checks that the input string contains no special characters
-    * @param str The string that is being checked
-    */
-  checkValid(str): Boolean {
-  if (str.length === 0) {return true; }
-  const splChars = '*|,\":<>[]{}`\';()@&$#%';
-  for (let i = 0; i < str.length; i++) {
-    if (splChars.indexOf(str.charAt(i)) !== -1) {
+/**
+ * check that the input strings for SubmitReq are valid
+ * if any of the strings are invalid the user will recieve an alert
+ * @param strName the string from the name field
+ * @param strFromLocation the string from the fromLocation field
+ * @param strToLocation the string from the toLocation field
+ * @param strAdditionalInfo the string from the additionalInfo field
+ */
+  checkValidSubmitReq(strName: string, strFromLocation: string, strToLocation: string, strAdditionalInfo: string): Boolean {
+    this.errorMsg = '';
+    const regVal = /[^A-Za-z0-9_.,]/;
+    const regWhi = new RegExp('\\s', 'g');
+    let check = true;
+
+    strName = strName.replace(regWhi, ''); // remove whitespace
+    strFromLocation = strFromLocation.replace(regWhi, '');
+    strFromLocation = strFromLocation.toLowerCase();
+    strToLocation = strToLocation.replace(regWhi, '');
+    strToLocation = strToLocation.toLowerCase();
+    strAdditionalInfo = strAdditionalInfo.replace(regWhi, '');
+    const b1 = regVal.test(strName);
+    const b2 = regVal.test(strFromLocation);
+    const b3 = regVal.test(strToLocation);
+    const b4 = regVal.test(strAdditionalInfo);
+
+    if (b1 || b2 || b3 || b4 === true) {
+      this.errorMsg = 'Error: Invalid characters detected. Please remove any special characters such as !?*|":<>`\';()@&$#% from the input fields';
+      check = false;
+    }
+
+    if (strFromLocation === strToLocation) {
+      this.errorMsg = 'Error: To and From locations must be different';
+      check = false;
+    }
+
+    if (strFromLocation.length === 0 || strToLocation.length === 0) {
+      this.errorMsg = 'Error: A required field is empty';
+      check = false;
+    }
+
+    if (check) {
+      return true;
+    } else {
       return false;
     }
-    return true;
-  }
-}
-  /**
-  * Checks that the input string is not empty
-  * @param str The string that is being checked
-  */
-  checkValidExist(str): Boolean {
-    if (str.length > 0) { return true; } else {
-      alert('Error: A required field is empty');
-      return false; }
   }
 }

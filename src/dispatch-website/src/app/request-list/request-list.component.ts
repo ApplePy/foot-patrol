@@ -38,7 +38,7 @@ export class RequestListComponent implements OnInit {
   archive(request): void {
     request.archived = true;
     this.ftpRequestService.archiveRequest(request).subscribe(
-      // TODO: maybe add some kind of confirmation that the request was archived. or an undo button or something
+      // TODO: maybe add some kind of confirmation that the request was archived or a message when there's an error
      );
   }
 
@@ -54,7 +54,7 @@ export class RequestListComponent implements OnInit {
   );
   }
 
-  displayGetRequests(requests): void {
+  displayGetRequests(requests: Array<Request>): void {
     // sort requests in reverse chronological order. oldest last, most recent first
     if (requests.length > 1) {
       requests.sort(this.comparerTimestamp);
@@ -64,9 +64,7 @@ export class RequestListComponent implements OnInit {
     this.displayRequests.length = 0;
 
     // move requests to displayRequests to display them
-    for (let i = 0; i < requests.length; i++) {
-      this.displayRequests[i] = requests[i];
-    }
+    this.displayRequests = requests.slice();
   }
 
   /**
@@ -76,8 +74,7 @@ export class RequestListComponent implements OnInit {
    * @param b request b
    */
   comparerTimestamp(a, b) {
-
-    if (a.timestamp < b.timestamp) {
+    if (a.timestamp <= b.timestamp) {
       return 1;
     } else if (a.timestamp > b.timestamp) {
       return -1;

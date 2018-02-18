@@ -10,10 +10,11 @@ import { AgmCoreModule } from '@agm/core/core.module';
 
 export class MapGeneralComponent implements OnInit {
 
-  // ignore lint, the number declaration is needed to make the map work
+  /* tslint:disable:no-magic-numbers number-literal-format */
   lat: number = 43.00959710000001;
   lng: number = -81.27373360000001;
   zoom: number = 15;
+  /* tslint:enable:no-magic-numbers number-literal-format */
 
   // this list is here to show that the markers work. delete this once the server connunication stuff for volunteer info is written
   TestList: Volunteer[] = [
