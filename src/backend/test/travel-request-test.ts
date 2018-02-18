@@ -41,7 +41,9 @@ class TravelRequestTest {
     expected.archived = false;
     expected.timestamp = new Date("2018-01-09T01:44:12.926Z");
 
-    new TravelRequest(testData).should.deep.equal(expected);
+    const testReq = new TravelRequest(testData);
+    testReq.should.deep.equal(expected);
+    testReq.Valid().should.equal(true);
   }
 
   @test("Converting an object with missing fields should succeed")
@@ -61,6 +63,26 @@ class TravelRequestTest {
     expected.archived = false;
     expected.timestamp = new Date("2018-01-09T01:44:12.926Z");
 
-    new TravelRequest(testData).should.deep.equal(expected);
+    const testReq = new TravelRequest(testData);
+    testReq.should.deep.equal(expected);
+    testReq.Valid().should.equal(true);
+  }
+
+  @test("Converting an object with missing required fields should succeed but be marked invalid")
+  public missingRequiredConvert() {
+    // Setup
+    const testData = {
+      id: 1,
+      archived: 0,
+      timestamp: "2018-01-09T01:44:12.926Z"
+    };
+    const expected = new TravelRequest();
+    expected.id = 1;
+    expected.archived = false;
+    expected.timestamp = new Date("2018-01-09T01:44:12.926Z");
+
+    const testReq = new TravelRequest(testData);
+    testReq.should.deep.equal(expected);
+    testReq.Valid().should.equal(false);
   }
 }

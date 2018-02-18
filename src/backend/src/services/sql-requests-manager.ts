@@ -70,6 +70,11 @@ export class SQLRequestsManager implements IRequestsManager {
    * @param request The new travel request to store.
    */
   public createRequest(req: TravelRequest) {
+    // Sanity check
+    if (!req.Valid()) {
+      return Promise.reject("Requesting save of invalid TravelRequest");
+    }
+
     return this.db.makeQuery(
       "INSERT INTO `requests` (name, from_location, to_location, additional_info) VALUES(?,?,?,?)",
       [req.name, req.from_location, req.to_location, req.additional_info])

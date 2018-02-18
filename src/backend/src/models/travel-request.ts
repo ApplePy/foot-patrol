@@ -5,13 +5,13 @@ export class TravelRequest {
 
   /* tslint:disable:variable-name */
 
-  public id: number;
+  public id: number = 0;
   public name: string | null = null;
-  public from_location: string;
-  public to_location: string;
+  public from_location: string = "";
+  public to_location: string = "";
   public additional_info: string | null = null;
-  public archived: boolean;
-  public timestamp: Date;
+  public archived: boolean = false;
+  public timestamp: Date = new Date();
 
   /* tslint:enable:variable-name */
 
@@ -21,25 +21,29 @@ export class TravelRequest {
       return;
     }
 
-    // Sanity check on data
-    if (this.checkToFromUniqueness(obj.from_location, obj.to_location)) {
-      throw new Error("Invalid Request Data");
-    }
+    const assignment: {[key: string]: any} = {
+      name: String,
+      additional_info: String,
+      id: Number,
+      from_location: String,
+      to_location: String,
+      timestamp: (field: any) => new Date(field),
+      archived: (field: any) => (field === "false") ? false : Boolean(field)
+    };
 
-    // Fill object
-    if (this.isValid(obj.name)) {
-      this.name = String(obj.name);
+    // Check if a value is valid before trying assignment
+    for (const key of Object.keys(assignment)) {
+      if (this.isValid(obj[key])) {
+        (this as any)[key] = assignment[key](obj[key]);
+      }
     }
+  }
 
-    if (this.isValid(obj.additional_info)) {
-      this.additional_info = String(obj.additional_info);
-    }
-
-    this.id = Number(obj.id);
-    this.from_location = String(obj.from_location);
-    this.to_location = String(obj.to_location);
-    this.timestamp = new Date(obj.timestamp);
-    this.archived = (obj.archived === "false") ? false : Boolean(obj.archived);
+  /**
+   * Checks if the object is in a valid state
+   */
+  public Valid() {
+    return !this.checkToFromUniqueness(this.from_location, this.to_location);
   }
 
   /**
@@ -48,7 +52,7 @@ export class TravelRequest {
    * @param variable Variable to check
    */
   private isValid(variable: any) {
-    return variable !== null && variable !== undefined;
+    return variable !== null && variable !== undefined && variable !== "";
   }
 
   /**
@@ -58,6 +62,6 @@ export class TravelRequest {
    * @param from
    */
   private checkToFromUniqueness(to: string, from: string) {
-    return (to == null || from == null || to === from);
+    return (to == null || from == null || to === "" || from === "" || to === from);
   }
 }

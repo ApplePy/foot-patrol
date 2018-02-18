@@ -1,3 +1,4 @@
+<button routerLink='/add-request'>Add new request</button>
 <h2>Requests</h2>
 <table>
   <tr>
@@ -17,6 +18,6 @@
     <td>{{request.to_location}}</td>
     <td>{{request.additional_info}}</td>
     <td>{{request.timestamp}}</td>
-    <td><input type="checkbox" (change)="archive(request)" [(ngModel)]="request.archived"></td>
+    <td><button (click)="archive(request)">Archive</button></td>
   </tr>
 </table>

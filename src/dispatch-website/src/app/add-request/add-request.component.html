@@ -1,0 +1,26 @@
+
+<h2>Add a Request</h2>
+
+<div>
+  Name:<br>
+  <input type="text" id="name"><br>
+  Walk from (required):<br>
+  <input type="text" id="fromLocation"><br>
+  Walk to (required):<br>
+  <input type="text" id="toLocation"><br>
+  Additional information:<br>
+  <input type="text" id="additionalInfo"><br>
+</div>
+
+<div>
+  <br>
+  <button (click)="submitReq()" type="button">Submit</button>
+  <button routerLink='/request-list' type="button">Cancel</button>
+</div>
+
+<div>
+  <br>
+  <p>
+    {{errorMsg}}
+  </p>
+</div>
