@@ -53,19 +53,19 @@ export class AddRequestComponent implements OnInit {
     const regVal = /[^A-Za-z0-9_.,]/;
     const regWhi = new RegExp('\\s', 'g');
     let check = true;
-
+    let charCheck = false;
     strName = strName.replace(regWhi, ''); // remove whitespace
     strFromLocation = strFromLocation.replace(regWhi, '');
     strFromLocation = strFromLocation.toLowerCase();
     strToLocation = strToLocation.replace(regWhi, '');
     strToLocation = strToLocation.toLowerCase();
     strAdditionalInfo = strAdditionalInfo.replace(regWhi, '');
-    const b1 = regVal.test(strName);
-    const b2 = regVal.test(strFromLocation);
-    const b3 = regVal.test(strToLocation);
-    const b4 = regVal.test(strAdditionalInfo);
+    charCheck = charCheck || regVal.test(strName);
+    charCheck = charCheck || regVal.test(strFromLocation);
+    charCheck = charCheck || regVal.test(strToLocation);
+    charCheck = charCheck || regVal.test(strAdditionalInfo);
 
-    if (b1 || b2 || b3 || b4 === true) {
+    if (charCheck === true) {
       this.errorMsg = 'Error: Invalid characters detected. Please remove any special characters such as !?*|":<>`\';()@&$#% from the input fields';
       check = false;
     }
@@ -80,10 +80,6 @@ export class AddRequestComponent implements OnInit {
       check = false;
     }
 
-    if (check) {
-      return true;
-    } else {
-      return false;
-    }
+    return check;
   }
 }
