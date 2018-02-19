@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+﻿<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="packages\Xamarin.Forms.2.5.0.122203\build\netstandard1.0\Xamarin.Forms.props" Condition="Exists('packages\Xamarin.Forms.2.5.0.122203\build\netstandard1.0\Xamarin.Forms.props')" />
   <Import Project="..\packages\Xamarin.Build.Download.0.4.7\build\Xamarin.Build.Download.props" Condition="Exists('..\packages\Xamarin.Build.Download.0.4.7\build\Xamarin.Build.Download.props')" />
   <PropertyGroup>
@@ -150,11 +149,10 @@
     <Compile Include="Resources\Resource.designer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="PickupActivity.cs" />
-    <Compile Include="FootPatrolAdapter.cs" />
     <Compile Include="MapsActivity.cs" />
+    <Compile Include="RequestsActivity.cs" />
     <Compile Include="VolunteerActivity.cs" />
     <Compile Include="LoginActivity.cs" />
-    <Compile Include="RequestsActivity.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
@@ -180,6 +178,8 @@
     <AndroidResource Include="Resources\drawable\ic_close_black_24dp.png" />
     <AndroidResource Include="Resources\layout\Requests.xml" />
     <AndroidResource Include="Resources\layout\VolunteerScreenMF.xml" />
+    <AndroidResource Include="Resources\layout\EnterAnimation.xml" />
+    <AndroidResource Include="Resources\layout\ExitAnimation.xml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\drawable\" />

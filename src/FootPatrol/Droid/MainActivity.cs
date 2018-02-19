@@ -1,15 +1,8 @@
 ﻿using Android.App;
-using Android.Widget;
-using Android.OS;
-using Android.Runtime;
 using Android.Content;
-using System;
-using Android.Net;
-using Android.Net.Wifi;
+using Android.OS;
 using Android.Support.V4.App;
-using Android.Support.V4.View;
-using Android.Support.V4.Content;
-using System.Threading.Tasks;
+using Android.Views;
 
 namespace FootPatrol.Droid
 {
@@ -19,14 +12,14 @@ namespace FootPatrol.Droid
         protected override void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
-
-            // Set our view from the "main" layout resource
             SetContentView(Resource.Layout.Main);
-
-            ViewPager viewpager = FindViewById<ViewPager>(Resource.Id.viewPager1);
-            FootPatrolAdapter adapter = new FootPatrolAdapter(SupportFragmentManager);
-            viewpager.Adapter = adapter;
-
+            Android.Support.V4.App.Fragment newFrag = new LoginActivity();
+            Android.Support.V4.App.FragmentTransaction fragmentTransaction = SupportFragmentManager.BeginTransaction();
+            fragmentTransaction.Replace(Resource.Id.frameLayout1, newFrag, "LoginActivity");
+            fragmentTransaction.AddToBackStack(null);
+            fragmentTransaction.Commit();
         }
     }
 }
+
+

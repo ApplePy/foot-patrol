@@ -46,8 +46,8 @@
             p1:text="0"
             p1:textSize="20dp" />
     </RelativeLayout>
-    <ListView
-        p1:id="@+id/listView2"
+    <android.support.v7.widget.RecyclerView
+        p1:id="@+id/recycleView"
         p1:layout_height="match_parent"
         p1:layout_width="200dp" />
 </android.support.v4.widget.DrawerLayout>

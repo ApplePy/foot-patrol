@@ -6,7 +6,8 @@
     p1:foregroundTint="#ff4f1f8a"
     p1:backgroundTint="#ff4f2683"
     p1:minWidth="25px"
-    p1:minHeight="25px">
+    p1:minHeight="25px"
+    p1:id="@+id/frameLayout2">
     <ImageView
         p1:src="@drawable/westernfootpatrol"
         p1:layout_width="200dp"

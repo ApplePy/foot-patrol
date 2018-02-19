@@ -10,11 +10,12 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using System.Runtime.Serialization;
 using System.Diagnostics.Contracts;
+using Android.App;
 
 namespace FootPatrol.Droid
 {
     
-    public class PickUpActivity : Android.Support.V4.App.Fragment
+    public class PickUpActivity : Activity
     {
         [JsonProperty]
         public string name, from_location, to_location, additional_info;
@@ -27,16 +28,17 @@ namespace FootPatrol.Droid
             return pickUp;
         }
 
-        public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+        protected override void OnCreate(Bundle savedInstanceState)
         {
-            View view = inflater.Inflate(Resource.Layout.PickupLayout, container, false);
-
-            Button requestButton = (Button)view.FindViewById(Resource.Id.button1);
-            Button cancelButton = (Button)view.FindViewById(Resource.Id.button2);
-            EditText userName = (EditText)view.FindViewById(Resource.Id.nameText);
-            EditText fromLocation = (EditText)view.FindViewById(Resource.Id.locationText);
-            EditText toLocation = (EditText)view.FindViewById(Resource.Id.destinationText);
-            EditText addInfo = (EditText)view.FindViewById(Resource.Id.additionalInformationText);
+            
+            base.OnCreate(savedInstanceState);
+            SetContentView(Resource.Layout.PickupLayout);
+            Button requestButton = (Button)FindViewById(Resource.Id.button1);
+            Button cancelButton = (Button)FindViewById(Resource.Id.button2);
+            EditText userName = (EditText)FindViewById(Resource.Id.nameText);
+            EditText fromLocation = (EditText)FindViewById(Resource.Id.locationText);
+            EditText toLocation = (EditText)FindViewById(Resource.Id.destinationText);
+            EditText addInfo = (EditText)FindViewById(Resource.Id.additionalInformationText);
 
             cancelButton.Enabled = false;
 
@@ -76,7 +78,6 @@ namespace FootPatrol.Droid
                     System.Diagnostics.Debug.WriteLine("The status returned is correct!");
                     statusLine = await response.Content.ReadAsStringAsync();
                     PickUpActivity p = JsonConvert.DeserializeObject<PickUpActivity>(statusLine);
-                    pickupID = p.Id;
                     //System.Diagnostics.Debug.WriteLine(pickupID);
                     //System.Diagnostics.Debug.WriteLine(statusLine);
                 }
@@ -95,8 +96,6 @@ namespace FootPatrol.Droid
                 cancelButton.Enabled = false;
                 requestButton.Enabled = true;
             }; */
-
-            return view;
         }
 
     }

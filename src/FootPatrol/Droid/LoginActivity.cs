@@ -4,10 +4,8 @@ using Android.Views;
 using Android.Graphics;
 using Android.Widget;
 
-
 namespace FootPatrol.Droid
 {
-    [Activity(Label = "LoginActivity")]
     public class LoginActivity : Android.Support.V4.App.Fragment
     {
         TextView continueAsUser;
@@ -38,9 +36,17 @@ namespace FootPatrol.Droid
             userName.SetTypeface(bentonSans, TypefaceStyle.Normal);
             password.SetTypeface(bentonSans, TypefaceStyle.Normal);
 
+            signIn.Click += (sender, e) =>
+            {
+                Android.Support.V4.App.Fragment newFrag = new VolunteerActivity();
+                Android.Support.V4.App.FragmentTransaction fragmentTransaction = FragmentManager.BeginTransaction();
+                fragmentTransaction.SetCustomAnimations(Resource.Layout.EnterAnimation, Resource.Layout.ExitAnimation);
+                fragmentTransaction.Replace(Resource.Id.frameLayout2, newFrag, "VolunteerActivity");
+                fragmentTransaction.AddToBackStack(null);
+                fragmentTransaction.Commit();
+            };
+
             return views;
         }
-
-
     }
 }

@@ -16,7 +16,6 @@ using Android.Widget;
 using Newtonsoft.Json.Linq;
 using System.Threading.Tasks;
 using System.Collections.Generic;
-using Xamarin.Forms.Maps;
 
 namespace FootPatrol.Droid
 {
@@ -131,6 +130,7 @@ namespace FootPatrol.Droid
         {
             client = new GoogleApiClient.Builder(Application.Context.ApplicationContext).AddConnectionCallbacks(this).AddOnConnectionFailedListener(this).AddApi(LocationServices.API).Build(); //create new client
             location = LocationServices.FusedLocationApi;
+            client.Connect();
         }
 
         public void createLocationRequest()
@@ -159,6 +159,7 @@ namespace FootPatrol.Droid
         {
             myLocation = location.GetLastLocation(client);
             mapSetup();
+            while(!(client.IsConnected))
             location.RequestLocationUpdates(client, locationRequest, this);
         }
 
@@ -278,28 +279,32 @@ namespace FootPatrol.Droid
 
         public void onTripAcceptAsync(string name, string toLoc, string fromLoc, string addInfo)
         {
-            //Xamarin.FormsMaps.Init();
-            Xamarin.Forms.Maps.Geocoder geo = new Xamarin.Forms.Maps.Geocoder();
             var address = toLoc;
-            var approximateLocations = Task.Run(() => getPositionForAddress(geo, address)).Result;
+            var approximateLocations = Task.Run(() => getPositionForAddress(address)).Result;
 
         }
-        //request = Task.Run(() => getRequests()).Result; //get all user requests
 
-        public async Task<List<string>> getPositionForAddress(Xamarin.Forms.Maps.Geocoder geo, string address)
+        public async Task<string> getPositionForAddress(string address)
         {
-            var approximateLoc = await geo.GetPositionsForAddressAsync(address);
-            List<string> positions = new List<string>();
-            foreach(var position in approximateLoc)
+            HttpClient httpClient = new HttpClient();
+            Uri customURI = new Uri("https://maps.googleapis.com/maps/api/geocode/json?address=" + address +
+                                    "&key=AIzaSyCMJ3Pw9W7IVXtT0AWi8Vb6iL9Y9JZJnZw");
+            
+            HttpResponseMessage response = await httpClient.GetAsync(customURI);
+
+            try
             {
-                System.Diagnostics.Debug.WriteLine("The approximate position of the location specified is: " + position.Latitude +
-                                                   ", " + position.Longitude);
-                
-                positions.Add(position.Latitude.ToString() + ", " + position.Longitude.ToString());   
+                response.EnsureSuccessStatusCode();
             }
 
-            return positions;
+            catch (Exception error)
+            {
+                System.Diagnostics.Debug.WriteLine("The exception is: " + error);
+            }
 
+            var content = response.Content.ReadAsStreamAsync();
+            System.Diagnostics.Debug.WriteLine(content);
+            return "";
         }
 
 
