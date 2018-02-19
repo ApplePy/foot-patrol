@@ -11,6 +11,7 @@ namespace FootPatrol.Droid
         TextView continueAsUser;
         Button signIn;
         EditText userName, password;
+        ProgressBar spinner;
 
         private Typeface bentonSans;
 
@@ -29,6 +30,9 @@ namespace FootPatrol.Droid
             signIn = (Button)views.FindViewById(Resource.Id.loginBtn);
             userName = (EditText)views.FindViewById(Resource.Id.usernameField);
             password = (EditText)views.FindViewById(Resource.Id.passwordField);
+            spinner = (ProgressBar)views.FindViewById(Resource.Id.progressBar1);
+
+            spinner.Visibility = ViewStates.Gone;
 
             bentonSans = Typeface.CreateFromAsset(this.Activity.Application.Assets, "BentonSansRegular.otf");
             signIn.SetTypeface(bentonSans, TypefaceStyle.Normal);
@@ -38,8 +42,9 @@ namespace FootPatrol.Droid
 
             signIn.Click += (sender, e) =>
             {
+                spinner.Visibility = ViewStates.Visible;
                 Android.Support.V4.App.Fragment newFrag = new VolunteerActivity();
-                Android.Support.V4.App.FragmentTransaction fragmentTransaction = FragmentManager.BeginTransaction();
+                Android.Support.V4.App.FragmentTransaction fragmentTransaction = ChildFragmentManager.BeginTransaction();
                 fragmentTransaction.SetCustomAnimations(Resource.Layout.EnterAnimation, Resource.Layout.ExitAnimation);
                 fragmentTransaction.Replace(Resource.Id.frameLayout2, newFrag, "VolunteerActivity");
                 fragmentTransaction.AddToBackStack(null);

@@ -36,23 +36,41 @@
         p1:layout_centerHorizontal="true"
         p1:hint="Password"
         p1:typeface="normal" />
-    <Button
-        p1:layout_width="wrap_content"
-        p1:layout_height="wrap_content"
-        p1:id="@+id/loginBtn"
-        p1:layout_below="@id/passwordField"
-        p1:layout_marginTop="10dp"
-        p1:layout_centerHorizontal="true"
-        p1:text="SIGN IN"
-        p1:foreground="#ff807f83"
-        p1:foregroundTint="#ff807f83"
-        p1:backgroundTint="#ff807f83" />
     <TextView
         p1:layout_width="wrap_content"
         p1:layout_height="wrap_content"
         p1:id="@+id/textView1"
         p1:text="CONTINUE AS USER"
-        p1:layout_below="@id/loginBtn"
+        p1:layout_below="@+id/frameLayout3"
         p1:layout_centerHorizontal="true"
         p1:layout_marginTop="10dp" />
+    <ProgressBar
+        style="?android:attr/progressBarStyleLarge"
+        p1:layout_width="wrap_content"
+        p1:layout_height="wrap_content"
+        p1:id="@+id/progressBar1"
+        p1:layout_centerHorizontal="true"
+        p1:spinnerMode="dialog"
+        p1:layout_below="@id/WesternLogo" />
+    <FrameLayout
+        p1:orientation="vertical"
+        p1:minWidth="25px"
+        p1:minHeight="25px"
+        p1:layout_width="wrap_content"
+        p1:layout_height="wrap_content"
+        p1:id="@+id/frameLayout3"
+        p1:layout_below="@id/passwordField"
+        p1:layout_centerHorizontal="true">
+        <Button
+            p1:layout_width="wrap_content"
+            p1:layout_height="wrap_content"
+            p1:id="@+id/loginBtn"
+            p1:layout_below="@id/passwordField"
+            p1:layout_marginTop="10dp"
+            p1:layout_centerHorizontal="true"
+            p1:text="SIGN IN"
+            p1:foreground="#ff807f83"
+            p1:foregroundTint="#ff807f83"
+            p1:backgroundTint="#ff807f83" />
+    </FrameLayout>
 </RelativeLayout>
