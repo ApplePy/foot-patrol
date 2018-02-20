@@ -14,9 +14,10 @@ using System.Linq;
 using Android.Gms.Common;
 using Android.Runtime;
 using Android.Widget;
-using Newtonsoft.Json.Linq;
+using Newtonsoft.Json;
 using System.Threading.Tasks;
 using System.Collections.Generic;
+using Newtonsoft.Json.Linq;
 
 namespace FootPatrol.Droid
 {
@@ -170,8 +171,10 @@ namespace FootPatrol.Droid
         {
             myLocation = location.GetLastLocation(client);
             mapSetup();
-            while(!(client.IsConnected))
-            location.RequestLocationUpdates(client, locationRequest, this);
+            if (!client.IsConnected)
+                client.Reconnect();
+            else
+                location.RequestLocationUpdates(client, locationRequest, this);
         }
 
         public void OnConnectionSuspended(int cause)
@@ -290,8 +293,10 @@ namespace FootPatrol.Droid
 
         public void onTripAcceptAsync(string name, string toLoc, string fromLoc, string addInfo)
         {
-            var address = toLoc;
-            var approximateLocations = Task.Run(() => getPositionForAddress(address)).Result;
+            var address = fromLoc;
+            address = address + " Western University";
+            var approximateLocation = Task.Run(() => getPositionForAddress(address)).Result;
+            System.Diagnostics.Debug.WriteLine("The approximate location is:" + approximateLocation);
 
         }
 
@@ -313,13 +318,12 @@ namespace FootPatrol.Droid
                 System.Diagnostics.Debug.WriteLine("The exception is: " + error);
             }
 
-            var content = response.Content.ReadAsStreamAsync();
+            var content = await response.Content.ReadAsStringAsync();
             System.Diagnostics.Debug.WriteLine(content);
+            JObject obj = JObject.Parse(content);
+            var latitudePos = obj.SelectToken("results[0].geometry.location.lat");
+            var longitudePos = obj.SelectToken("results[0].geometry.location.lng");
             return "";
         }
-
-
-
     }
-
 }
