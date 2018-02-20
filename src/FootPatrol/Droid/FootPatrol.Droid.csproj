@@ -180,6 +180,7 @@
     <AndroidResource Include="Resources\layout\VolunteerScreenMF.xml" />
     <AndroidResource Include="Resources\layout\EnterAnimation.xml" />
     <AndroidResource Include="Resources\layout\ExitAnimation.xml" />
+    <AndroidResource Include="Resources\layout\ListElement.xml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\drawable\" />

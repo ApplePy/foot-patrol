@@ -7,6 +7,7 @@ using Android.Gms.Maps.Model;
 using Android.Gms.Location;
 using Android.Graphics;
 using Android.Locations;
+using System.Collections;
 using System.Net.Http;
 using System;
 using System.Linq;
@@ -24,15 +25,17 @@ namespace FootPatrol.Droid
     {
         public string name, to_location, from_location, additional_info;
         private Typeface bentonSans;
+        private ArrayAdapter<String> listAdapter;
 
         SupportMapFragment mf;
         MapView mView;
         ImageView notificationBase, notificationBadge;
         TextView badgeCounter;
-        ListView listView;
+        ListView mListView, mfListView;
 
         public List<string> request;
         public int requestCount;
+        public string[] menuItems;
 
         private GoogleMap map;
         private static View view;
@@ -53,6 +56,9 @@ namespace FootPatrol.Droid
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
+            menuItems = new string[] { "EMERGENCY CONTACTS", "CAMPUS MAPS", "PAIR FOOT PATROLLERS"};
+
+            listAdapter = new ArrayAdapter<string>(this.Context, Resource.Layout.ListElement, menuItems);
 
             try
             {
@@ -76,6 +82,9 @@ namespace FootPatrol.Droid
                 notificationBase = (ImageView)view.FindViewById(Resource.Id.notificationBase);
                 notificationBadge = (ImageView)view.FindViewById(Resource.Id.notificationBadge);
                 badgeCounter = (TextView)view.FindViewById(Resource.Id.badgeCounter);
+                mListView = (ListView)view.FindViewById(Resource.Id.navigationList1);
+
+                mListView.SetAdapter(listAdapter);
 
                 //Take care of correct fonts
                 bentonSans = Typeface.CreateFromAsset(this.Activity.Application.Assets, "BentonSansRegular.otf");
@@ -92,7 +101,9 @@ namespace FootPatrol.Droid
                 notificationBase = (ImageView)view.FindViewById(Resource.Id.notificationBase2);
                 notificationBadge = (ImageView)view.FindViewById(Resource.Id.notificationBadge2);
                 badgeCounter = (TextView)view.FindViewById(Resource.Id.badgeCounter2);
-                listView = (ListView)view.FindViewById(Resource.Id.listView1);
+                mfListView = (ListView)view.FindViewById(Resource.Id.listView1);
+
+                mfListView.SetAdapter(listAdapter);
 
                 //Take care of correct fonts
                 bentonSans = Typeface.CreateFromAsset(this.Activity.Application.Assets, "BentonSansRegular.otf");
