@@ -114,7 +114,7 @@ namespace FootPatrol.Droid
 
             closeBtn.Click += (sender, e) =>
             {
-                this.Dismiss();
+                dismissFragment();
             };
 
             acceptReq.Click += (sender, e) =>
@@ -136,6 +136,11 @@ namespace FootPatrol.Droid
         {
             button.Enabled = true;
             button.SetBackgroundColor(Color.White);
+        }
+
+        public void dismissFragment()
+        {
+            this.Dismiss();
         }
 
     }

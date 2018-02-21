@@ -37,8 +37,9 @@ namespace FootPatrol.Droid
         public List<string> request;
         public int requestCount;
         public string[] menuItems;
+        public static RequestsActivity ra;
 
-        private GoogleMap map;
+        private static GoogleMap map;
         private static View view;
         private static VolunteerActivity va;
         private static GoogleApiClient client;
@@ -282,7 +283,7 @@ namespace FootPatrol.Droid
 
         public void onRequestClick()
         {
-            RequestsActivity ra = RequestsActivity.newInstance(request, requestCount);
+            ra = RequestsActivity.newInstance(request, requestCount);
             ra.Show(this.FragmentManager,"Requests");
         }
 
@@ -296,11 +297,19 @@ namespace FootPatrol.Droid
             var address = fromLoc;
             address = address + " Western University";
             var approximateLocation = Task.Run(() => getPositionForAddress(address)).Result;
-            System.Diagnostics.Debug.WriteLine("The approximate location is:" + approximateLocation);
+
+            double latitude = Double.Parse(approximateLocation[0]);
+            double longitude = Double.Parse(approximateLocation[1]);
+
+            MarkerOptions userMarker = new MarkerOptions();
+            LatLng userCoordinates = new LatLng(latitude, longitude);
+            ra.dismissFragment();
+            userMarker.SetPosition(userCoordinates).SetTitle(name).SetIcon(BitmapDescriptorFactory.DefaultMarker(BitmapDescriptorFactory.HueBlue));
+            map.AddMarker(userMarker);
 
         }
 
-        public async Task<string> getPositionForAddress(string address)
+        public async Task<string[]> getPositionForAddress(string address)
         {
             HttpClient httpClient = new HttpClient();
             Uri customURI = new Uri("https://maps.googleapis.com/maps/api/geocode/json?address=" + address +
@@ -319,11 +328,14 @@ namespace FootPatrol.Droid
             }
 
             var content = await response.Content.ReadAsStringAsync();
-            System.Diagnostics.Debug.WriteLine(content);
             JObject obj = JObject.Parse(content);
-            var latitudePos = obj.SelectToken("results[0].geometry.location.lat");
-            var longitudePos = obj.SelectToken("results[0].geometry.location.lng");
-            return "";
+            var latitudePos = (string)obj.SelectToken("results[0].geometry.location.lat");
+            var longitudePos = (string)obj.SelectToken("results[0].geometry.location.lng");
+
+            string[] coords = new string[2];
+            coords[0] = latitudePos;
+            coords[1] = longitudePos;
+            return coords;
         }
     }
 }
