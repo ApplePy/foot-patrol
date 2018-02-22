@@ -18,6 +18,7 @@ using Newtonsoft.Json;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using Newtonsoft.Json.Linq;
+using Android.Support.V7.Widget;
 
 namespace FootPatrol.Droid
 {
@@ -28,11 +29,12 @@ namespace FootPatrol.Droid
         private Typeface bentonSans;
         private ArrayAdapter<String> listAdapter;
 
-        SupportMapFragment mf;
-        MapView mView;
-        ImageView notificationBase, notificationBadge;
-        TextView badgeCounter;
-        ListView mListView, mfListView;
+        private static SupportMapFragment mf;
+        private static MapView mView;
+        private static ImageView notificationBase, notificationBadge;
+        private static TextView badgeCounter;
+        private static ListView mListView, mfListView;
+        private static RecyclerView mRecyclerView, mfRecyclerView;
 
         public List<string> request;
         public int requestCount;
@@ -85,6 +87,8 @@ namespace FootPatrol.Droid
                 notificationBadge = (ImageView)view.FindViewById(Resource.Id.notificationBadge);
                 badgeCounter = (TextView)view.FindViewById(Resource.Id.badgeCounter);
                 mListView = (ListView)view.FindViewById(Resource.Id.navigationList1);
+                mRecyclerView = (RecyclerView)view.FindViewById(Resource.Id.recyclerView1);
+
 
                 mListView.SetAdapter(listAdapter);
 
@@ -104,6 +108,7 @@ namespace FootPatrol.Droid
                 notificationBadge = (ImageView)view.FindViewById(Resource.Id.notificationBadge2);
                 badgeCounter = (TextView)view.FindViewById(Resource.Id.badgeCounter2);
                 mfListView = (ListView)view.FindViewById(Resource.Id.listView1);
+                mfRecyclerView = (RecyclerView)view.FindViewById(Resource.Id.recyclerView2);
 
                 mfListView.SetAdapter(listAdapter);
 
@@ -187,11 +192,10 @@ namespace FootPatrol.Droid
         {
             LatLng newPos = new LatLng(location.Latitude, location.Longitude);
             myMarker.SetPosition(newPos).SetTitle("Volunteer").SetIcon(BitmapDescriptorFactory.DefaultMarker(BitmapDescriptorFactory.HueRed));
-            map.AnimateCamera(CameraUpdateFactory.NewLatLng(newPos)); //null reference
             myMarker.SetPosition(newPos);
 
             CameraPosition cp = new CameraPosition.Builder().
-                Target(newPos).Zoom(20).Bearing(90).Tilt(40).Build();
+                Target(newPos).Zoom(15).Bearing(90).Tilt(40).Build();
 
             map.AnimateCamera(CameraUpdateFactory.NewCameraPosition(cp));
 
@@ -307,6 +311,37 @@ namespace FootPatrol.Droid
             userMarker.SetPosition(userCoordinates).SetTitle(name).SetIcon(BitmapDescriptorFactory.DefaultMarker(BitmapDescriptorFactory.HueBlue));
             map.AddMarker(userMarker);
 
+            notificationBase.Visibility = ViewStates.Gone;
+            notificationBadge.Visibility = ViewStates.Gone;
+            badgeCounter.Visibility = ViewStates.Gone;
+
+            string currentLocation = myLocation.Latitude.ToString() + "," + myLocation.Longitude.ToString();
+            string destinationLocation = userCoordinates.Latitude.ToString() + "," + userCoordinates.Longitude.ToString();
+           
+            var polyPattern = Task.Run(() => getPolyPat(currentLocation, destinationLocation)).Result;
+
+            List<LatLng> polyline = DecodePolyline(polyPattern);
+            var polyOption = new PolylineOptions().InvokeColor(Color.Blue).InvokeWidth(10);
+
+            foreach(LatLng point in polyline)
+            {
+                polyOption.Add(point);
+            }
+
+            map.AddPolyline(polyOption);
+
+            if (Int32.Parse(Build.VERSION.Sdk) > 23)
+            {
+                
+            }
+
+            else
+            {
+                
+            }
+                
+
+
         }
 
         public async Task<string[]> getPositionForAddress(string address)
@@ -337,5 +372,93 @@ namespace FootPatrol.Droid
             coords[1] = longitudePos;
             return coords;
         }
+
+        public async Task<string> getPolyPat(string start, string dest)
+        {
+            string[] directions = new string[1];
+            HttpClient httpClient = new HttpClient();
+            Uri customURI = new Uri("https://maps.googleapis.com/maps/api/directions/json?origin=" + start + "&destination=" + dest + "&mode=walking&key=AIzaSyDQMcKBqfQwfRC88Lt02V8FP5yGPUqIq04");
+            HttpResponseMessage response = await httpClient.GetAsync(customURI);
+
+            try
+            {
+                response.EnsureSuccessStatusCode();
+            }
+
+            catch (Exception error)
+            {
+                System.Diagnostics.Debug.WriteLine("The exception is: " + error);
+            }
+
+            var content = await response.Content.ReadAsStringAsync();
+            JObject dir = JObject.Parse(content);
+            System.Diagnostics.Debug.WriteLine(dir);
+            string polyPattern = (string)dir.SelectToken("routes[0].overview_polyline.points");
+            System.Diagnostics.Debug.WriteLine("The poly pattern is: " + polyPattern);
+            return polyPattern;
+        }
+
+        private List<LatLng> DecodePolyline(string encodedPoints)
+        {
+            if (string.IsNullOrWhiteSpace(encodedPoints))
+            {
+                return null;
+            }
+
+            int index = 0;
+            var polylineChars = encodedPoints.ToCharArray();
+            var poly = new List<LatLng>();
+            int currentLat = 0;
+            int currentLng = 0;
+            int next5Bits;
+
+            while (index < polylineChars.Length)
+            {
+                // calculate next latitude
+                int sum = 0;
+                int shifter = 0;
+
+                do
+                {
+                    next5Bits = polylineChars[index++] - 63;
+                    sum |= (next5Bits & 31) << shifter;
+                    shifter += 5;
+                }
+                while (next5Bits >= 32 && index < polylineChars.Length);
+
+                if (index >= polylineChars.Length)
+                {
+                    break;
+                }
+
+                currentLat += (sum & 1) == 1 ? ~(sum >> 1) : (sum >> 1);
+
+                // calculate next longitude
+                sum = 0;
+                shifter = 0;
+
+                do
+                {
+                    next5Bits = polylineChars[index++] - 63;
+                    sum |= (next5Bits & 31) << shifter;
+                    shifter += 5;
+                }
+                while (next5Bits >= 32 && index < polylineChars.Length);
+
+                if (index >= polylineChars.Length && next5Bits >= 32)
+                {
+                    break;
+                }
+
+                currentLng += (sum & 1) == 1 ? ~(sum >> 1) : (sum >> 1);
+
+                var mLatLng = new LatLng(Convert.ToDouble(currentLat) / 100000.0, Convert.ToDouble(currentLng) / 100000.0);
+                poly.Add(mLatLng);
+            }
+
+            return poly;
+        }
+
+
     }
 }

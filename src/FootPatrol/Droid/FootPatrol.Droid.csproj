@@ -143,6 +143,9 @@
     <Reference Include="Xamarin.Forms.Maps">
       <HintPath>packages\Xamarin.Forms.Maps.2.5.0.122203\lib\MonoAndroid10\Xamarin.Forms.Maps.dll</HintPath>
     </Reference>
+    <Reference Include="GoogleMapsUtilityBinding">
+      <HintPath>packages\Xamarin.Android.Maps.Utils.0.5.0\lib\MonoAndroid10\GoogleMapsUtilityBinding.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="MainActivity.cs" />
@@ -162,7 +165,6 @@
   <ItemGroup>
     <AndroidResource Include="Resources\layout\Main.axml" />
     <AndroidResource Include="Resources\values\Strings.xml" />
-    <AndroidResource Include="Resources\layout\PickupLayout.xml" />
     <AndroidResource Include="Resources\layout\MapsLayout.xml" />
     <AndroidResource Include="Resources\drawable\WesternFootPatrolMap.jpg" />
     <AndroidResource Include="Resources\drawable\WesternMap.jpg" />
