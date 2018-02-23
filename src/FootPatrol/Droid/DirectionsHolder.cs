@@ -20,7 +20,7 @@ namespace FootPatrol.Droid
     {
         public TextView directions;
 
-        public DirectionsHolder(View itemView, Context context) : base (itemView)
+        public DirectionsHolder(View itemView) : base (itemView)
         {
             directions = (TextView)itemView.FindViewById(Resource.Id.directionsText);
         }
