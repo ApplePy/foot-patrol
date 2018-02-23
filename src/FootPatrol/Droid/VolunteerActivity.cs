@@ -7,14 +7,12 @@ using Android.Gms.Maps.Model;
 using Android.Gms.Location;
 using Android.Graphics;
 using Android.Locations;
-using System.Collections;
 using System.Net.Http;
 using System;
 using System.Linq;
 using Android.Gms.Common;
 using Android.Runtime;
 using Android.Widget;
-using Newtonsoft.Json;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using Newtonsoft.Json.Linq;
@@ -35,8 +33,10 @@ namespace FootPatrol.Droid
         private static TextView badgeCounter;
         private static ListView mListView, mfListView;
         private static RecyclerView mRecyclerView, mfRecyclerView;
+        private static RecyclerView.Adapter adapter;
+        private static RecyclerView.LayoutManager layoutManager;
 
-        public List<string> request;
+        public List<string> request, steps;
         public int requestCount;
         public string[] menuItems;
         public static RequestsActivity ra;
@@ -52,7 +52,6 @@ namespace FootPatrol.Droid
 
         public static VolunteerActivity newInstance()
         {
-            System.Diagnostics.Debug.WriteLine("We're using the Map View!");
             va = new VolunteerActivity();
             return va;
         }
@@ -60,9 +59,11 @@ namespace FootPatrol.Droid
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
+
             menuItems = new string[] { "EMERGENCY CONTACTS", "CAMPUS MAPS", "PAIR FOOT PATROLLERS"};
 
             listAdapter = new ArrayAdapter<string>(this.Context, Resource.Layout.ListElement, menuItems);
+            layoutManager = new LinearLayoutManager(this.Context, LinearLayoutManager.Horizontal,false);
 
             try
             {
@@ -87,8 +88,10 @@ namespace FootPatrol.Droid
                 notificationBadge = (ImageView)view.FindViewById(Resource.Id.notificationBadge);
                 badgeCounter = (TextView)view.FindViewById(Resource.Id.badgeCounter);
                 mListView = (ListView)view.FindViewById(Resource.Id.navigationList1);
-                mRecyclerView = (RecyclerView)view.FindViewById(Resource.Id.recyclerView1);
 
+                mRecyclerView = (RecyclerView)view.FindViewById(Resource.Id.recyclerView1);
+                mRecyclerView.Visibility = ViewStates.Gone;
+                mRecyclerView.SetLayoutManager(layoutManager);
 
                 mListView.SetAdapter(listAdapter);
 
@@ -108,7 +111,10 @@ namespace FootPatrol.Droid
                 notificationBadge = (ImageView)view.FindViewById(Resource.Id.notificationBadge2);
                 badgeCounter = (TextView)view.FindViewById(Resource.Id.badgeCounter2);
                 mfListView = (ListView)view.FindViewById(Resource.Id.listView1);
+
                 mfRecyclerView = (RecyclerView)view.FindViewById(Resource.Id.recyclerView2);
+                mfRecyclerView.Visibility = ViewStates.Gone;
+                mfRecyclerView.SetLayoutManager(layoutManager);
 
                 mfListView.SetAdapter(listAdapter);
 
@@ -332,16 +338,16 @@ namespace FootPatrol.Droid
 
             if (Int32.Parse(Build.VERSION.Sdk) > 23)
             {
-                
+                mRecyclerView.Visibility = ViewStates.Visible;
+                mRecyclerView.SetAdapter(new DirectionsAdapter(steps));
             }
 
             else
             {
-                
+                mfRecyclerView.Visibility = ViewStates.Visible;
+                mfRecyclerView.SetAdapter(new DirectionsAdapter(steps));
             }
                 
-
-
         }
 
         public async Task<string[]> getPositionForAddress(string address)
@@ -375,7 +381,6 @@ namespace FootPatrol.Droid
 
         public async Task<string> getPolyPat(string start, string dest)
         {
-            string[] directions = new string[1];
             HttpClient httpClient = new HttpClient();
             Uri customURI = new Uri("https://maps.googleapis.com/maps/api/directions/json?origin=" + start + "&destination=" + dest + "&mode=walking&key=AIzaSyDQMcKBqfQwfRC88Lt02V8FP5yGPUqIq04");
             HttpResponseMessage response = await httpClient.GetAsync(customURI);
@@ -394,7 +399,20 @@ namespace FootPatrol.Droid
             JObject dir = JObject.Parse(content);
             System.Diagnostics.Debug.WriteLine(dir);
             string polyPattern = (string)dir.SelectToken("routes[0].overview_polyline.points");
-            System.Diagnostics.Debug.WriteLine("The poly pattern is: " + polyPattern);
+            var stepDirections = dir.SelectTokens("routes[0].legs[0].steps[*].html_instructions");
+            steps = new List<string>();
+
+            foreach(JToken step in stepDirections)
+            {
+               steps.Add(step.ToString());
+            }
+
+            for (int i = 0; i < steps.Count;i++)
+            {
+                steps[i] = steps[i].Replace("<b>", "");
+                steps[i] = steps[i].Replace("</b>", "");
+            }
+
             return polyPattern;
         }
 
@@ -455,10 +473,7 @@ namespace FootPatrol.Droid
                 var mLatLng = new LatLng(Convert.ToDouble(currentLat) / 100000.0, Convert.ToDouble(currentLng) / 100000.0);
                 poly.Add(mLatLng);
             }
-
             return poly;
         }
-
-
     }
 }

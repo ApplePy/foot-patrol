@@ -20,10 +20,11 @@
             class="com.google.android.gms.maps.SupportMapFragment" />
         <android.support.v7.widget.RecyclerView
             p1:layout_width="match_parent"
-            p1:layout_height="wrap_content"
+            p1:layout_height="100dp"
             p1:scrollbars="horizontal"
             p1:id="@+id/recyclerView2"
-            p1:background="#ff4f2683" />
+            p1:background="#ff4f2683"
+            p1:orientation="horizontal" />
         <ImageView
             p1:src="@drawable/WalkNotification"
             p1:layout_width="80dp"

@@ -153,8 +153,10 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="MapsActivity.cs" />
     <Compile Include="RequestsActivity.cs" />
-    <Compile Include="VolunteerActivity.cs" />
     <Compile Include="LoginActivity.cs" />
+    <Compile Include="DirectionsAdapter.cs" />
+    <Compile Include="VolunteerActivity.cs" />
+    <Compile Include="DirectionsHolder.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
@@ -182,6 +184,7 @@
     <AndroidResource Include="Resources\layout\EnterAnimation.xml" />
     <AndroidResource Include="Resources\layout\ExitAnimation.xml" />
     <AndroidResource Include="Resources\layout\ListElement.xml" />
+    <AndroidResource Include="Resources\layout\DirectionsLayout.xml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\drawable\" />
