@@ -54,6 +54,36 @@
             p1:textStyle="bold"
             p1:text="0"
             p1:textSize="20dp" />
+        <RelativeLayout
+            p1:minWidth="25px"
+            p1:minHeight="25px"
+            p1:layout_width="match_parent"
+            p1:layout_height="80dp"
+            p1:id="@+id/innerRelative1"
+            p1:layout_alignParentBottom="true"
+            p1:background="#ff4f2683">
+            <Button
+                p1:layout_width="wrap_content"
+                p1:layout_height="wrap_content"
+                p1:id="@+id/cancelTripBtn1"
+                p1:layout_centerVertical="true"
+                p1:text="CANCEL TRIP" />
+            <Button
+                p1:layout_width="wrap_content"
+                p1:layout_height="wrap_content"
+                p1:id="@+id/completeTripBtn1"
+                p1:layout_centerVertical="true"
+                p1:layout_alignParentRight="true"
+                p1:text="COMPLETE TRIP" />
+        </RelativeLayout>
+        <ImageButton
+            p1:src="@drawable/ic_chevron_right_black_24dp"
+            p1:layout_width="20dp"
+            p1:layout_height="100dp"
+            p1:id="@+id/sideTabBtn1"
+            p1:background="#ff4f2683"
+            p1:layout_centerVertical="true"
+            p1:scaleType="centerInside" />
     </RelativeLayout>
     <ListView
         p1:id="@+id/listView1"
