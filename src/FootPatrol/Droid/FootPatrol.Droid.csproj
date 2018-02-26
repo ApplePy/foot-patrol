@@ -186,6 +186,7 @@
     <AndroidResource Include="Resources\layout\ListElement.xml" />
     <AndroidResource Include="Resources\layout\DirectionsLayout.xml" />
     <AndroidResource Include="Resources\drawable\ic_chevron_right_black_24dp.png" />
+    <AndroidResource Include="Resources\drawable\BorderResource.xml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\drawable\" />

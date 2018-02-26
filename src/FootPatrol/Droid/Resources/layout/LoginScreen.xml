@@ -71,6 +71,7 @@
             p1:text="SIGN IN"
             p1:foreground="#ff807f83"
             p1:foregroundTint="#ff807f83"
-            p1:backgroundTint="#ff807f83" />
+            p1:backgroundTint="#ff807f83"
+            p1:background="#807F83" />
     </FrameLayout>
 </RelativeLayout>

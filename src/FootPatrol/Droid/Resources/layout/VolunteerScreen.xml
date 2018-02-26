@@ -14,7 +14,7 @@
             p1:layout_width="match_parent"
             p1:layout_height="100dp"
             p1:id="@+id/recyclerView1"
-            p1:background="#ff4f2683"
+            p1:background="@drawable/BorderResource"
             p1:scrollbars="horizontal"
             p1:orientation="horizontal" />
         <com.google.android.gms.maps.MapView
@@ -59,27 +59,31 @@
             p1:layout_height="80dp"
             p1:id="@+id/innerRelative"
             p1:layout_alignParentBottom="true"
-            p1:background="#ff4f2683">
+            p1:background="@drawable/BorderResource">
             <Button
-                p1:layout_width="wrap_content"
-                p1:layout_height="wrap_content"
+                p1:layout_width="110dp"
+                p1:layout_height="40dp"
                 p1:id="@+id/cancelTripBtn"
                 p1:layout_centerVertical="true"
-                p1:text="CANCEL TRIP" />
+                p1:text="CANCEL TRIP"
+                p1:background="#807F83"
+                p1:layout_marginLeft="50dp" />
             <Button
-                p1:layout_width="wrap_content"
-                p1:layout_height="wrap_content"
+                p1:layout_width="110dp"
+                p1:layout_height="40dp"
                 p1:id="@+id/completeTripBtn"
                 p1:layout_centerVertical="true"
                 p1:layout_alignParentRight="true"
-                p1:text="COMPLETE TRIP" />
+                p1:text="COMPLETE TRIP"
+                p1:background="#807F83"
+                p1:layout_marginRight="50dp" />
         </RelativeLayout>
         <ImageButton
             p1:src="@drawable/ic_chevron_right_black_24dp"
             p1:layout_width="20dp"
             p1:layout_height="100dp"
             p1:id="@+id/sideTabBtn"
-            p1:background="#ff4f2683"
+            p1:background="@drawable/BorderResource"
             p1:layout_centerVertical="true"
             p1:scaleType="centerInside" />
     </RelativeLayout>
@@ -88,5 +92,6 @@
         p1:layout_width="150dp"
         p1:layout_height="200dp"
         p1:layout_gravity="left|center_vertical"
-        p1:background="#ff4f2683" />
+        p1:background="@drawable/BorderResource"
+        p1:divider="#807F83" />
 </android.support.v4.widget.DrawerLayout>

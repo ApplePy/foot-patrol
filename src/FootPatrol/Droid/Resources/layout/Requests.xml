@@ -42,7 +42,8 @@
         p1:text="ACCEPT REQUEST"
         p1:layout_below="@id/additionalInfo"
         p1:layout_centerHorizontal="true"
-        p1:layout_marginTop="10dp" />
+        p1:layout_marginTop="10dp"
+        p1:background="#807F83" />
     <ImageButton
         p1:src="@drawable/ic_keyboard_arrow_left_black_24dp"
         p1:layout_width="60dp"
@@ -69,5 +70,5 @@
         p1:layout_alignParentTop="true"
         p1:layout_alignParentRight="true"
         p1:scaleType="fitCenter"
-        p1:background="#ffffffff" />
+        p1:background="#807F83" />
 </RelativeLayout>

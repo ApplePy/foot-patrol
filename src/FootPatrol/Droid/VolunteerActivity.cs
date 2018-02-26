@@ -17,6 +17,7 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using Newtonsoft.Json.Linq;
 using Android.Support.V7.Widget;
+using Android.Support.V4.Widget;
 
 namespace FootPatrol.Droid
 {
@@ -28,6 +29,8 @@ namespace FootPatrol.Droid
         private ArrayAdapter<String> listAdapter;
 
         private static SupportMapFragment mf;
+        private static DrawerLayout mDrawerLayout, mfDrawerLayout;
+        private static ImageButton mSideTab, mfSideTab;
         private static MapView mView;
         private static ImageView notificationBase, notificationBadge;
         private static TextView badgeCounter;
@@ -35,6 +38,7 @@ namespace FootPatrol.Droid
         private static RecyclerView mRecyclerView, mfRecyclerView;
         private static RecyclerView.Adapter adapter;
         private static RecyclerView.LayoutManager layoutManager;
+        private static RelativeLayout mRelativeLayout, mfRelativeLayout;
 
         public List<string> request, steps;
         public int requestCount;
@@ -88,10 +92,19 @@ namespace FootPatrol.Droid
                 notificationBadge = (ImageView)view.FindViewById(Resource.Id.notificationBadge);
                 badgeCounter = (TextView)view.FindViewById(Resource.Id.badgeCounter);
                 mListView = (ListView)view.FindViewById(Resource.Id.navigationList1);
+                mSideTab = (ImageButton)view.FindViewById(Resource.Id.sideTabBtn);
+                mDrawerLayout = (DrawerLayout)view.FindViewById(Resource.Id.drawer_layout);
+                mRelativeLayout = (RelativeLayout)view.FindViewById(Resource.Id.innerRelative);
+                mRelativeLayout.Visibility = ViewStates.Gone;
 
                 mRecyclerView = (RecyclerView)view.FindViewById(Resource.Id.recyclerView1);
                 mRecyclerView.Visibility = ViewStates.Gone;
                 mRecyclerView.SetLayoutManager(layoutManager);
+
+                mSideTab.Click += (sender, e) =>
+                {
+                    sideTabClicked(mSideTab, mDrawerLayout, mListView);
+                };
 
                 mListView.SetAdapter(listAdapter);
 
@@ -110,7 +123,11 @@ namespace FootPatrol.Droid
                 notificationBase = (ImageView)view.FindViewById(Resource.Id.notificationBase2);
                 notificationBadge = (ImageView)view.FindViewById(Resource.Id.notificationBadge2);
                 badgeCounter = (TextView)view.FindViewById(Resource.Id.badgeCounter2);
+                mfSideTab = (ImageButton)view.FindViewById(Resource.Id.sideTabBtn1);
                 mfListView = (ListView)view.FindViewById(Resource.Id.listView1);
+                mfDrawerLayout = (DrawerLayout)view.FindViewById(Resource.Id.drawer_layout1);
+                mfRelativeLayout = (RelativeLayout)view.FindViewById(Resource.Id.innerRelative1);
+                mfRelativeLayout.Visibility = ViewStates.Gone;
 
                 mfRecyclerView = (RecyclerView)view.FindViewById(Resource.Id.recyclerView2);
                 mfRecyclerView.Visibility = ViewStates.Gone;
@@ -121,6 +138,11 @@ namespace FootPatrol.Droid
                 //Take care of correct fonts
                 bentonSans = Typeface.CreateFromAsset(this.Activity.Application.Assets, "BentonSansRegular.otf");
                 setFont(bentonSans, badgeCounter);
+
+                mfSideTab.Click += (sender, e) =>
+                {
+                    sideTabClicked(mfSideTab, mfDrawerLayout, mfListView);
+                };
 
                 mf = (SupportMapFragment)this.ChildFragmentManager.FindFragmentById(Resource.Id.map2);
                 mf.OnCreate(savedInstanceState);
@@ -150,14 +172,14 @@ namespace FootPatrol.Droid
             client.Connect(); //connect the client
         }
 
-        public void clientSetup()
+        private void clientSetup()
         {
             client = new GoogleApiClient.Builder(Application.Context.ApplicationContext).AddConnectionCallbacks(this).AddOnConnectionFailedListener(this).AddApi(LocationServices.API).Build(); //create new client
             location = LocationServices.FusedLocationApi;
             client.Connect();
         }
 
-        public void createLocationRequest()
+        private void createLocationRequest()
         {
             locationRequest = LocationRequest.Create();
             locationRequest.SetPriority(LocationRequest.PriorityHighAccuracy);
@@ -165,7 +187,7 @@ namespace FootPatrol.Droid
             locationRequest.SetFastestInterval(1000);
         }
 
-        public void mapSetup()
+        private void mapSetup()
         {
             if (Int32.Parse(Build.VERSION.Sdk) <= 23)
                 mf.GetMapAsync(this);
@@ -251,7 +273,7 @@ namespace FootPatrol.Droid
                 client.Reconnect();
         }
 
-        public async Task<List<string>> getRequests()
+        private async Task<List<string>> getRequests()
         {
             HttpClient httpClient = new HttpClient();
             Uri customURI = new Uri("http://staging.capstone.incode.ca/api/v1/requests?offset=0&count=9&archived=true");
@@ -291,18 +313,18 @@ namespace FootPatrol.Droid
             }
         }
 
-        public void onRequestClick()
+        private void onRequestClick()
         {
             ra = RequestsActivity.newInstance(request, requestCount);
             ra.Show(this.FragmentManager,"Requests");
         }
 
-        public void setFont(Typeface font, TextView text)
+        private void setFont(Typeface font, TextView text)
         {
             text.SetTypeface(font, TypefaceStyle.Normal);
         }
 
-        public void onTripAcceptAsync(string name, string toLoc, string fromLoc, string addInfo)
+        public void onTripAcceptAsync(string username, string toLoc, string fromLoc, string addInfo)
         {
             var address = fromLoc;
             address = address + " Western University";
@@ -314,7 +336,7 @@ namespace FootPatrol.Droid
             MarkerOptions userMarker = new MarkerOptions();
             LatLng userCoordinates = new LatLng(latitude, longitude);
             ra.dismissFragment();
-            userMarker.SetPosition(userCoordinates).SetTitle(name).SetIcon(BitmapDescriptorFactory.DefaultMarker(BitmapDescriptorFactory.HueBlue));
+            userMarker.SetPosition(userCoordinates).SetTitle(username).SetIcon(BitmapDescriptorFactory.DefaultMarker(BitmapDescriptorFactory.HueBlue));
             map.AddMarker(userMarker);
 
             notificationBase.Visibility = ViewStates.Gone;
@@ -340,17 +362,20 @@ namespace FootPatrol.Droid
             {
                 mRecyclerView.Visibility = ViewStates.Visible;
                 mRecyclerView.SetAdapter(new DirectionsAdapter(steps));
+                mRelativeLayout.Visibility = ViewStates.Visible;
+
             }
 
             else
             {
                 mfRecyclerView.Visibility = ViewStates.Visible;
                 mfRecyclerView.SetAdapter(new DirectionsAdapter(steps));
+                mfRelativeLayout.Visibility = ViewStates.Visible;
             }
                 
         }
 
-        public async Task<string[]> getPositionForAddress(string address)
+        private async Task<string[]> getPositionForAddress(string address)
         {
             HttpClient httpClient = new HttpClient();
             Uri customURI = new Uri("https://maps.googleapis.com/maps/api/geocode/json?address=" + address +
@@ -379,7 +404,7 @@ namespace FootPatrol.Droid
             return coords;
         }
 
-        public async Task<string> getPolyPat(string start, string dest)
+        private async Task<string> getPolyPat(string start, string dest)
         {
             HttpClient httpClient = new HttpClient();
             Uri customURI = new Uri("https://maps.googleapis.com/maps/api/directions/json?origin=" + start + "&destination=" + dest + "&mode=walking&key=AIzaSyDQMcKBqfQwfRC88Lt02V8FP5yGPUqIq04");
@@ -475,5 +500,23 @@ namespace FootPatrol.Droid
             }
             return poly;
         }
+
+        private void sideTabClicked(ImageButton btn, DrawerLayout drawer, ListView list)
+        {
+            if(drawer.IsDrawerOpen(list))
+            {
+                System.Diagnostics.Debug.WriteLine(drawer.GetX());
+                btn.SetX(-10);
+                drawer.CloseDrawer(list);
+
+            }
+
+            else
+            {
+                btn.SetX(drawer.GetX() - 10);
+                drawer.OpenDrawer(list);
+            }
+        }
+
     }
 }
