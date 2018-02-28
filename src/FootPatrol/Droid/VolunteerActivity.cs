@@ -10,12 +10,14 @@ using Android.Locations;
 using System.Net.Http;
 using System;
 using System.Linq;
+using System.Text;
 using Android.Gms.Common;
 using Android.Runtime;
 using Android.Widget;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using Newtonsoft.Json.Linq;
+using Newtonsoft.Json;
 using Android.Support.V7.Widget;
 using Android.Support.V4.Widget;
 
@@ -29,6 +31,7 @@ namespace FootPatrol.Droid
         private ArrayAdapter<String> listAdapter;
 
         private static SupportMapFragment mf;
+        private static Button completeTripBtn, cancelTripBtn;
         private static DrawerLayout mDrawerLayout, mfDrawerLayout;
         private static ImageButton mSideTab, mfSideTab;
         private static MapView mView;
@@ -36,7 +39,6 @@ namespace FootPatrol.Droid
         private static TextView badgeCounter;
         private static ListView mListView, mfListView;
         private static RecyclerView mRecyclerView, mfRecyclerView;
-        private static RecyclerView.Adapter adapter;
         private static RecyclerView.LayoutManager layoutManager;
         private static RelativeLayout mRelativeLayout, mfRelativeLayout;
 
@@ -46,13 +48,16 @@ namespace FootPatrol.Droid
         public static RequestsActivity ra;
 
         private static GoogleMap map;
+        private static Marker userMark;
         private static View view;
         private static VolunteerActivity va;
         private static GoogleApiClient client;
         private static Location myLocation;
         private IFusedLocationProviderApi location;
         private LocationRequest locationRequest;
-        MarkerOptions myMarker;
+        private MarkerOptions myMarker,userMarker;
+        private PolylineOptions polyOptions;
+        private static Polyline poly;
 
         public static VolunteerActivity newInstance()
         {
@@ -95,6 +100,9 @@ namespace FootPatrol.Droid
                 mSideTab = (ImageButton)view.FindViewById(Resource.Id.sideTabBtn);
                 mDrawerLayout = (DrawerLayout)view.FindViewById(Resource.Id.drawer_layout);
                 mRelativeLayout = (RelativeLayout)view.FindViewById(Resource.Id.innerRelative);
+                cancelTripBtn = (Button)view.FindViewById(Resource.Id.cancelTripBtn);
+                completeTripBtn = (Button)view.FindViewById(Resource.Id.completeTripBtn);
+
                 mRelativeLayout.Visibility = ViewStates.Gone;
 
                 mRecyclerView = (RecyclerView)view.FindViewById(Resource.Id.recyclerView1);
@@ -104,6 +112,16 @@ namespace FootPatrol.Droid
                 mSideTab.Click += (sender, e) =>
                 {
                     sideTabClicked(mSideTab, mDrawerLayout, mListView);
+                };
+
+                cancelTripBtn.Click += (sender, e) =>
+                {
+                    cancelBtnClicked();
+                };
+
+                completeTripBtn.Click += (sender, e) =>
+                {
+                    completeBtnClicked();
                 };
 
                 mListView.SetAdapter(listAdapter);
@@ -127,6 +145,8 @@ namespace FootPatrol.Droid
                 mfListView = (ListView)view.FindViewById(Resource.Id.listView1);
                 mfDrawerLayout = (DrawerLayout)view.FindViewById(Resource.Id.drawer_layout1);
                 mfRelativeLayout = (RelativeLayout)view.FindViewById(Resource.Id.innerRelative1);
+                cancelTripBtn = (Button)view.FindViewById(Resource.Id.cancelTripBtn1);
+                completeTripBtn = (Button)view.FindViewById(Resource.Id.completeTripBtn1);
                 mfRelativeLayout.Visibility = ViewStates.Gone;
 
                 mfRecyclerView = (RecyclerView)view.FindViewById(Resource.Id.recyclerView2);
@@ -142,6 +162,16 @@ namespace FootPatrol.Droid
                 mfSideTab.Click += (sender, e) =>
                 {
                     sideTabClicked(mfSideTab, mfDrawerLayout, mfListView);
+                };
+
+                cancelTripBtn.Click += (sender, e) =>
+                {
+                    cancelBtnClicked();
+                };
+
+                completeTripBtn.Click += (sender, e) =>
+                {
+                    completeBtnClicked();
                 };
 
                 mf = (SupportMapFragment)this.ChildFragmentManager.FindFragmentById(Resource.Id.map2);
@@ -231,17 +261,17 @@ namespace FootPatrol.Droid
 
         public void OnProviderDisabled(string provider)
         {
-            
+           //Do nothing 
         }
 
         public void OnProviderEnabled(string provider)
         {
-            
+            //Do nothing
         }
 
         public void OnStatusChanged(string provider, [GeneratedEnum] Availability status, Bundle extras)
         {
-            
+            //Do nothing
         }
 
         public void OnMapReady(GoogleMap googleMap)
@@ -324,8 +354,14 @@ namespace FootPatrol.Droid
             text.SetTypeface(font, TypefaceStyle.Normal);
         }
 
-        public void onTripAcceptAsync(string username, string toLoc, string fromLoc, string addInfo)
+        public void onTripAcceptAsync(string username, string toLoc, string fromLoc, string addInfo, int Id)
         {
+            //Set variables to accept trip request to be used if trip is cancelled
+            name = username;
+            to_location = toLoc;
+            from_location = fromLoc;
+            additional_info = addInfo;
+
             var address = fromLoc;
             address = address + " Western University";
             var approximateLocation = Task.Run(() => getPositionForAddress(address)).Result;
@@ -333,11 +369,11 @@ namespace FootPatrol.Droid
             double latitude = Double.Parse(approximateLocation[0]);
             double longitude = Double.Parse(approximateLocation[1]);
 
-            MarkerOptions userMarker = new MarkerOptions();
+            userMarker = new MarkerOptions();
             LatLng userCoordinates = new LatLng(latitude, longitude);
             ra.dismissFragment();
             userMarker.SetPosition(userCoordinates).SetTitle(username).SetIcon(BitmapDescriptorFactory.DefaultMarker(BitmapDescriptorFactory.HueBlue));
-            map.AddMarker(userMarker);
+            userMark = map.AddMarker(userMarker);
 
             notificationBase.Visibility = ViewStates.Gone;
             notificationBadge.Visibility = ViewStates.Gone;
@@ -349,14 +385,14 @@ namespace FootPatrol.Droid
             var polyPattern = Task.Run(() => getPolyPat(currentLocation, destinationLocation)).Result;
 
             List<LatLng> polyline = DecodePolyline(polyPattern);
-            var polyOption = new PolylineOptions().InvokeColor(Color.Blue).InvokeWidth(10);
+            polyOptions = new PolylineOptions().InvokeColor(Color.Blue).InvokeWidth(10);
 
             foreach(LatLng point in polyline)
             {
-                polyOption.Add(point);
+                polyOptions.Add(point);
             }
 
-            map.AddPolyline(polyOption);
+            poly = map.AddPolyline(polyOptions);
 
             if (Int32.Parse(Build.VERSION.Sdk) > 23)
             {
@@ -372,6 +408,10 @@ namespace FootPatrol.Droid
                 mfRecyclerView.SetAdapter(new DirectionsAdapter(steps));
                 mfRelativeLayout.Visibility = ViewStates.Visible;
             }
+
+            HttpClient httpClient = new HttpClient();
+            Uri customURI = new Uri("http://staging.capstone.incode.ca/api/v1/requests" + Id.ToString());
+            httpClient.DeleteAsync(customURI);
                 
         }
 
@@ -450,7 +490,7 @@ namespace FootPatrol.Droid
 
             int index = 0;
             var polylineChars = encodedPoints.ToCharArray();
-            var poly = new List<LatLng>();
+            var polyline = new List<LatLng>();
             int currentLat = 0;
             int currentLng = 0;
             int next5Bits;
@@ -496,9 +536,9 @@ namespace FootPatrol.Droid
                 currentLng += (sum & 1) == 1 ? ~(sum >> 1) : (sum >> 1);
 
                 var mLatLng = new LatLng(Convert.ToDouble(currentLat) / 100000.0, Convert.ToDouble(currentLng) / 100000.0);
-                poly.Add(mLatLng);
+                polyline.Add(mLatLng);
             }
-            return poly;
+            return polyline;
         }
 
         private void sideTabClicked(ImageButton btn, DrawerLayout drawer, ListView list)
@@ -506,17 +546,77 @@ namespace FootPatrol.Droid
             if(drawer.IsDrawerOpen(list))
             {
                 System.Diagnostics.Debug.WriteLine(drawer.GetX());
-                btn.SetX(-10);
+                btn.SetX(0);
                 drawer.CloseDrawer(list);
-
             }
 
             else
             {
-                btn.SetX(drawer.GetX() - 10);
                 drawer.OpenDrawer(list);
             }
         }
 
+        private void cancelBtnClicked()
+        {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this.Context);
+            builder.SetTitle("Cancel Trip").SetMessage("Are you sure you want to cancel the trip?").SetPositiveButton("Yes", async (sender, e) =>
+            {
+                HttpClient httpClient = new HttpClient();
+                Uri customURI = new Uri("http://staging.capstone.incode.ca/api/v1/requests");
+
+                VolunteerActivity volunteer = new VolunteerActivity();
+                volunteer.name = name;
+                volunteer.from_location = from_location;
+                volunteer.to_location = to_location;
+                volunteer.additional_info = additional_info;
+                string vObj = JsonConvert.SerializeObject(volunteer);
+                System.Diagnostics.Debug.WriteLine("The volunteer object is: " + vObj);
+
+                StringContent content = new StringContent(vObj, Encoding.UTF8, "application/json");
+                var result = await httpClient.PostAsync(customURI, content);
+
+                poly.Remove();
+
+
+            }).SetNegativeButton("No", (sender, e) =>
+            {
+                //Do nothing
+            });
+
+            Dialog dialog = builder.Create();
+            dialog.Show();
+        }
+
+        private void completeBtnClicked()
+        {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this.Context);
+            builder.SetTitle("Complete Trip").SetMessage("Are you sure you want to complete the trip?").SetPositiveButton("Yes", (sender, e) =>
+            {
+            poly.Remove();
+            if (Int32.Parse(Build.VERSION.Sdk) > 23)
+            {
+                mRecyclerView.Visibility = ViewStates.Gone;
+                mRelativeLayout.Visibility = ViewStates.Gone;
+            }
+
+            else
+            {
+                mfRecyclerView.Visibility = ViewStates.Gone;
+                mfRelativeLayout.Visibility = ViewStates.Gone;
+            }
+
+            badgeCounter.Visibility = ViewStates.Visible;
+            notificationBase.Visibility = ViewStates.Visible;
+            notificationBadge.Visibility = ViewStates.Visible;
+            userMark.Remove();
+
+            }).SetNegativeButton("No", (sender, e) =>
+            {
+                //Do nothing
+            });
+                                                                                                                          
+            Dialog dialog = builder.Create();
+            dialog.Show();
+        }
     }
 }

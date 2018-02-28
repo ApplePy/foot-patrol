@@ -5,6 +5,7 @@ using Android.OS;
 using Android.Views;
 using Android.Widget;
 using Newtonsoft.Json.Linq;
+using System;
 
 namespace FootPatrol.Droid 
 {               
@@ -16,6 +17,7 @@ namespace FootPatrol.Droid
         private static View view;
 
         private static List<string> request, userName, toLoc, fromLoc, addInfo;
+        private static List<int> idList;
         private static int reqCount;
 
         private int currentCount;
@@ -51,6 +53,7 @@ namespace FootPatrol.Droid
             toLoc = new List<string>();
             fromLoc = new List<string>();
             addInfo = new List<string>();
+            idList = new List<int>();
 
             foreach(string req in request)
             {
@@ -59,18 +62,21 @@ namespace FootPatrol.Droid
                 string n = (string)o.SelectToken("name");
                 string to = (string)o.SelectToken("to_location");
                 string from = (string)o.SelectToken("from_location");
-                string aInfo = (string)o.SelectToken("additional_info"); 
+                string aInfo = (string)o.SelectToken("additional_info");
+                string id = (string)o.SelectToken("id");
 
                 userName.Add(n);
                 toLoc.Add(to);
                 fromLoc.Add(from);
                 addInfo.Add(aInfo);
+                idList.Add(Int32.Parse(id));
             }
 
             name.Text = "NAME: " + userName[currentCount];
             fromLocation.Text = "START LOCATION: " + fromLoc[currentCount];
             toLocation.Text = "END LOCATION: " + toLoc[currentCount];
             additionalInfo.Text = "ADDITIONAL INFO: " + addInfo[currentCount];
+
 
             disableArrow(leftArrow);
 
@@ -95,7 +101,7 @@ namespace FootPatrol.Droid
 
             rightArrow.Click += (sender, e) =>
             {
-                if(currentCount == reqCount - 1)
+                if(currentCount >= reqCount - 2)
                 {
                     disableArrow(rightArrow);
                 }
@@ -120,7 +126,7 @@ namespace FootPatrol.Droid
             acceptReq.Click += (sender, e) =>
             {
                 va = new VolunteerActivity();
-                va.onTripAcceptAsync(userName[currentCount], toLoc[currentCount], fromLoc[currentCount], addInfo[currentCount]);
+                va.onTripAcceptAsync(userName[currentCount], toLoc[currentCount], fromLoc[currentCount], addInfo[currentCount], idList[currentCount]);
             };
 
             return view;

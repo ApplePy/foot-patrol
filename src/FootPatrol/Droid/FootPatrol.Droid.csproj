@@ -157,6 +157,7 @@
     <Compile Include="DirectionsAdapter.cs" />
     <Compile Include="VolunteerActivity.cs" />
     <Compile Include="DirectionsHolder.cs" />
+    <Compile Include="DrawerItemClickListener.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
@@ -167,9 +168,6 @@
   <ItemGroup>
     <AndroidResource Include="Resources\layout\Main.axml" />
     <AndroidResource Include="Resources\values\Strings.xml" />
-    <AndroidResource Include="Resources\layout\MapsLayout.xml" />
-    <AndroidResource Include="Resources\drawable\WesternFootPatrolMap.jpg" />
-    <AndroidResource Include="Resources\drawable\WesternMap.jpg" />
     <AndroidResource Include="Resources\layout\LoginScreen.xml" />
     <AndroidResource Include="Resources\drawable\WesternFootPatrolNoBack.png" />
     <AndroidResource Include="Resources\drawable\westernfootpatrol.png" />
@@ -187,6 +185,13 @@
     <AndroidResource Include="Resources\layout\DirectionsLayout.xml" />
     <AndroidResource Include="Resources\drawable\ic_chevron_right_black_24dp.png" />
     <AndroidResource Include="Resources\drawable\BorderResource.xml" />
+    <AndroidResource Include="Resources\layout\CampusMaps.xml" />
+    <AndroidResource Include="Resources\drawable\westernUniversity.jpg" />
+    <AndroidResource Include="Resources\drawable\WesternCampusPolice.jpeg" />
+    <AndroidResource Include="Resources\drawable\ic_phone_black_24dp.png" />
+    <AndroidResource Include="Resources\layout\EmergencyContact.xml" />
+    <AndroidResource Include="Resources\drawable\WesternCampusMap.png" />
+    <AndroidResource Include="Resources\drawable\WesternFootPatrolMap.png" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\drawable\" />

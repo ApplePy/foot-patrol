@@ -4,5 +4,5 @@
     p1:layout_width="fill_parent"
     p1:layout_height="wrap_content"
     p1:textSize="16sp"
-    p1:padding="16dp"
+    p1:padding="16.4dp"
     p1:background="@drawable/borderresource" />

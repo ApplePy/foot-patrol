@@ -24,7 +24,7 @@ namespace FootPatrol.Droid
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
-            View views = inflater.Inflate(Resource.Layout.MapsLayout, container, false);
+            View views = inflater.Inflate(Resource.Layout.CampusMaps, container, false);
             return views;
         }
     }
