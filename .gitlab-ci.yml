@@ -43,18 +43,18 @@ variables:
   before_script:
   - docker pull codeclimate/codeclimate
 
-quality_top:
+.quality_top:
   <<: *quality_base
   script:
   - docker run --env CODECLIMATE_CODE="$PWD" --env DOCKER_HOST="$DOCKER_PORT" --volume "$PWD":/code --volume /tmp/cc:/tmp/cc codeclimate/codeclimate analyze -f json > top.json
 
-quality_backend:
+.quality_backend:
   <<: *quality_base
   script:
   - cd src/backend
   - docker run --env CODECLIMATE_CODE="$PWD" --env DOCKER_HOST="$DOCKER_PORT" --volume "$PWD":/code --volume /tmp/cc:/tmp/cc codeclimate/codeclimate analyze -f json > ../../backend.json
 
-quality_frontend:
+.quality_frontend:
   <<: *quality_base
   cache:
     key: frontend
@@ -143,7 +143,7 @@ test_dispatch_website:
 
 
 # Handle linting and other code quality errors
-codequality:
+.codequality:
   <<: *test_common
   stage: posttest
   image: python:3
