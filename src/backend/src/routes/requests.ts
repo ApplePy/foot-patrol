@@ -1,11 +1,13 @@
 import { NextFunction, Request, Response, Router } from "express";
 import { Container, inject, injectable } from "inversify";
 import { IFACES, TAGS } from "../ids";
+import { IVolunteerPairingManager } from "../interfaces/ipairing-manager";
 import { IRequestsManager } from "../interfaces/irequests-manager";
 import { IRoute } from "../interfaces/iroute";
 import { ISanitizer } from "../interfaces/isanitizer";
 import { StatusError } from "../models/status-error";
 import { TravelRequest, TravelStatus } from "../models/travel-request";
+import { VolunteerPairing } from "../models/volunteer-pairing";
 
 @injectable()
 export class RequestsRoute implements IRoute {
@@ -13,6 +15,7 @@ export class RequestsRoute implements IRoute {
   public router: Router;
   private data: IRequestsManager;
   private sanitizer: ISanitizer;
+  private volmgr: IVolunteerPairingManager;
 
   get Router(): Router {
     return this.router;
@@ -23,6 +26,7 @@ export class RequestsRoute implements IRoute {
    */
   constructor(
     @inject(IFACES.IREQUESTSMANAGER) data: IRequestsManager,
+    @inject(IFACES.IVOLUNTEERPAIRINGMANAGER) volunteers: IVolunteerPairingManager,
     @inject(IFACES.ISANITIZER) sanitizer: ISanitizer) {
     // Log
     console.log("[RequestsRoute::create] Creating requests route.");
@@ -32,6 +36,9 @@ export class RequestsRoute implements IRoute {
 
     // Get database (envvars were checked by index.js)
     this.data = data;
+
+    // Save volunteer manager
+    this.volmgr = volunteers;
 
     // Create router
     this.router = Router();
@@ -43,6 +50,7 @@ export class RequestsRoute implements IRoute {
     this.router.put("/:id", this.putRequest.bind(this));
     this.router.patch("/:id", this.patchRequest.bind(this));
     this.router.delete("/:id", this.deleteRequest.bind(this));
+    this.router.get("/:id/volunteers", this.getVolunteers.bind(this));
   }
 
   /**
@@ -97,6 +105,7 @@ export class RequestsRoute implements IRoute {
    * @apiSuccess {boolean} requests.archived Specifies if this request completed and archived.
    * @apiSuccess {string} requests.timestamp Timestamp the record was created.
    * @apiSuccess {string} requests.status Status of the request. Can be 'ASSIGNED', 'COMPLETED', 'REQUESTED', 'REJECTED', or 'IN_PROGRESS'
+   * @apiSuccess {number} [request.pairing] ID of volunteer pair for this request.
    * @apiSuccess {object} meta The parameters used to generate the response.
    * @apiSuccess {number} meta.offset The offset from_location the start of the dataset.
    * @apiSuccess {number} meta.count The max number of elements requested.
@@ -117,6 +126,7 @@ export class RequestsRoute implements IRoute {
    *            additional_info: null,
    *            archived: false,
    *            timestamp: "2017-10-26T06:51:05.000Z",
+   *            pairing: 5,
    *            status: "REQUESTED"
    *          }
    *        ],
@@ -181,6 +191,7 @@ export class RequestsRoute implements IRoute {
    * @apiSuccess {boolean} archived Specifies if this request completed and archived.
    * @apiSuccess {string} timestamp Timestamp the record was created.
    * @apiSuccess {string} status Status of the request. Can be 'ASSIGNED', 'COMPLETED', 'REQUESTED', 'REJECTED', or 'IN_PROGRESS'
+   * @apiSuccess {number} [pairing] ID of volunteer pair for this request.
    *
    * @apiExample Example usage:
    * curl -i http://localhost/requests/1
@@ -222,6 +233,98 @@ export class RequestsRoute implements IRoute {
     .catch((err) => next(this.translateErrors(err))); // Send generic error
   }
 
+  /**
+   * Get specific request's assigned volunteers.
+   *
+   * @param req {Request} The express Request object.
+   * @param res {Response} The express Response object.
+   * @param next {NextFunction} Execute the next method.
+   *
+   * @api {get} /api/v1/requests/:id/volunteers Get specific request's volunteers.
+   * @apiVersion 1.2.0
+   * @apiName GetRequestVolunteers
+   * @apiGroup Requests
+   *
+   * @apiParam (URL Parameter) {number} id The id of the request to retrieve.
+   *
+   * @apiSuccess {object} volunteers The volunteers assigned to this request.
+   * @apiSuccess {number} volunteers.id The volunteer record ID.
+   * @apiSuccess {string} volunteers.first_name First name of the volunteer.
+   * @apiSuccess {string} volunteers.last_name Last name of the volunteer.
+   *
+   * @apiExample Example usage:
+   * curl -i http://localhost/requests/1/volunteers
+   *
+   * @apiSuccessExample Success Response:
+   *     HTTP/1.1 200 OK
+   *     {
+   *        volunteers: [
+   *          {
+   *            id: 3,
+   *            first_name: "John",
+   *            last_name: "Doe"
+   *          },
+   *          {
+   *            id: 8,
+   *            first_name: "Jane",
+   *            last_name: "Doe"
+   *          }
+   *        ]
+   *     }
+   *
+   * @apiError (Error 400) InvalidQueryParameters The requested ID was invalid format.
+   * @apiError (Error 404) RequestNotFound The request ID was not found.
+   * @apiErrorExample Error Response:
+   *     HTTP/1.1 404 NOT FOUND
+   *     {
+   *        error: "RequestNotFound",
+   *        message: "Request ID '1' was not found."
+   *     }
+   */
+  public getVolunteers(req: Request, res: Response, next: NextFunction) {
+    const id = Number(req.params.id);
+
+    // Ensure valid id
+    if (isNaN(id) || id < 0) {
+      next(new StatusError(400, "Invalid Query Parameter", "Offset and/or count are not numbers >= 0."));
+      return;
+    }
+
+    // Get data
+    this.data.getRequest(id)
+    .then((request) => {
+      // Swap out the pair ID number for the full pairing.
+      if (typeof request.pairing === "number") {
+        return this.volmgr.getPairing(request.pairing)
+        .then((pairing) => {
+          request.pairing = pairing;
+          return request;
+        });
+      }
+
+      // Return request if the pair is empty or already filled out
+      return request;
+    })
+    .then((request) => {
+      if (request.pairing === null) {
+        // No pair assigned
+        res.send();
+      } else {
+        // Pair assigned and retrieved, send array
+        const pairData = request.pairing as VolunteerPairing;
+        const output = {
+          volunteers: [
+            pairData.volunteer_one.CensorSensitiveData(),
+            pairData.volunteer_two.CensorSensitiveData()
+          ]
+        };
+
+        res.send(output);
+      }
+    })
+    .catch((err) => next(this.translateErrors(err))); // Send generic error
+  }
+
   /* tslint:disable:max-line-length */
   /**
    * Post new walk escort request.
@@ -248,6 +351,7 @@ export class RequestsRoute implements IRoute {
    * @apiSuccess (Created 201) {boolean} archived Specifies if this request completed and archived.
    * @apiSuccess (Created 201) {string} timestamp Timestamp the record was created.
    * @apiSuccess (Created 201) {string} status Status of the request. Can be 'ASSIGNED', 'COMPLETED', 'REQUESTED', 'REJECTED', or 'IN_PROGRESS'
+   * @apiSuccess (Created 201) {number} [pairing] ID of volunteer pair for this request.
    *
    * @apiSuccessExample Success Response:
    *     HTTP/1.1 201 CREATED
@@ -321,6 +425,7 @@ export class RequestsRoute implements IRoute {
    * @apiParam {string} [additional_info] Additional request information.
    * @apiParam {boolean} archived Specifies if this request is completed and archived.
    * @apiParam {string} status Status of the request. Can be 'ASSIGNED', 'COMPLETED', 'REQUESTED', 'REJECTED', or 'IN_PROGRESS'
+   * @apiSuccess {number} [pairing] ID of volunteer pair for this request.
    *
    * @apiSuccess {number} id The record ID.
    * @apiSuccess {string} [name] Name of the requester.
@@ -330,6 +435,7 @@ export class RequestsRoute implements IRoute {
    * @apiSuccess {boolean} archived Specifies if this request completed and archived.
    * @apiSuccess {string} timestamp Timestamp the record was created.
    * @apiSuccess {string} status Status of the request. Can be 'ASSIGNED', 'COMPLETED', 'REQUESTED', 'REJECTED', or 'IN_PROGRESS'
+   * @apiSuccess {number} [pairing] ID of volunteer pair for this request.
    *
    * @apiSuccessExample Success Response:
    *     HTTP/1.1 200 OK
@@ -339,6 +445,7 @@ export class RequestsRoute implements IRoute {
    *        from_location: "UCC",
    *        to_location: "SEB",
    *        archived: false,
+   *        pairing: 5,
    *        timestamp: "2017-10-26T06:51:05.000Z",
    *        status: "REQUESTED"
    *     }
@@ -418,6 +525,7 @@ export class RequestsRoute implements IRoute {
    * @apiParam {string} [additional_info] Additional request information.
    * @apiParam {boolean} [archived] Specifies if this request is completed and archived.
    * @apiSuccess {string} [status] Status of the request. Can be 'ASSIGNED', 'COMPLETED', 'REQUESTED', 'REJECTED', or 'IN_PROGRESS'
+   * @apiSuccess {number} [pairing] ID of volunteer pair for this request.
    *
    * @apiSuccess {number} id The record ID.
    * @apiSuccess {string} [name] Name of the requester.
@@ -427,6 +535,7 @@ export class RequestsRoute implements IRoute {
    * @apiSuccess {boolean} archived Specifies if this request completed and archived.
    * @apiSuccess {string} timestamp Timestamp the record was created.
    * @apiSuccess {string} status Status of the request. Can be 'ASSIGNED', 'COMPLETED', 'REQUESTED', 'REJECTED', or 'IN_PROGRESS'
+   * @apiSuccess {number} [pairing] ID of volunteer pair for this request.
    *
    * @apiSuccessExample Success Response:
    *     HTTP/1.1 200 OK
@@ -436,6 +545,7 @@ export class RequestsRoute implements IRoute {
    *        from_location: "UCC",
    *        to_location: "SEB",
    *        archived: false,
+   *        pairing: 3,
    *        timestamp: "2017-10-26T06:51:05.000Z",
    *        status: "REQUESTED"
    *     }

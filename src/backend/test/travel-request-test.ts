@@ -17,7 +17,7 @@ const eventually = chai.use(chaiAsPromised);
 /**
  * Test the Locations API
  */
-@suite.only
+@suite
 class TravelRequestTest {
 
   @test("Converting an object with all fields should succeed")

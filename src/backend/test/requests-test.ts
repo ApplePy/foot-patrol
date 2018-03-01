@@ -106,7 +106,7 @@ class RequestsAPITest {
       id: 1, name: "John Doe", from_location: "SEB",
       to_location: "UCC", additional_info: null,
       archived: 0, timestamp: "2017-10-26T06:51:05.000Z",
-      status: "ASSIGNED"
+      status: "ASSIGNED", pairing: 3
     };
 
     // Expected return
@@ -116,7 +116,7 @@ class RequestsAPITest {
           id: 1, name: "John Doe", from_location: "SEB",
           to_location: "UCC", additional_info: null,
           archived: false, timestamp: "2017-10-26T06:51:05.000Z",
-          status: "ASSIGNED"
+          status: "ASSIGNED", pairing: 3
         }
       ],
       meta: { offset: 0, count: 2, archived: false }
@@ -166,7 +166,7 @@ class RequestsAPITest {
           id: 1, name: "John Doe", from_location: "SEB",
           to_location: "UCC", additional_info: null,
           archived: false, timestamp: "2017-10-26T06:51:05.000Z",
-          status: "REQUESTED"
+          status: "REQUESTED", pairing: null
         }
       ],
       meta: { offset: 0, count: 100, archived: false }
@@ -220,7 +220,7 @@ class RequestsAPITest {
           id: 2, name: "John Doe", from_location: "SEB",
           to_location: "UCC", additional_info: null,
           archived: false, timestamp: "2017-10-26T06:51:05.000Z",
-          status: "REQUESTED"
+          status: "REQUESTED", pairing: null
         }
       ],
       meta: { offset: 0, count: 2, archived: false }
@@ -260,7 +260,7 @@ class RequestsAPITest {
        id: 1, name: "John Doe", from_location: "SEB",
        to_location: "UCC", additional_info: null,
        archived: 1, timestamp: "2017-10-26T06:51:05.000Z",
-       status: "COMPLETED"
+       status: "COMPLETED", pairing: 5
      },
      {
        id: 2, name: "John Doe", from_location: "SEB",
@@ -274,13 +274,13 @@ class RequestsAPITest {
           id: 1, name: "John Doe", from_location: "SEB",
           to_location: "UCC", additional_info: null,
           archived: true, timestamp: "2017-10-26T06:51:05.000Z",
-          status: "COMPLETED"
+          status: "COMPLETED", pairing: 5
         },
         {
           id: 2, name: "John Doe", from_location: "SEB",
           to_location: "UCC", additional_info: null,
           archived: false, timestamp: "2017-10-26T06:51:05.000Z",
-          status: "REQUESTED"
+          status: "REQUESTED", pairing: null
         }
       ],
       meta: { offset: 0, count: 2, archived: true }
@@ -423,7 +423,7 @@ class RequestsAPITest {
       id: 1, name: "John Doe", from_location: "SEB",
       to_location: "UCC", additional_info: null,
       archived: false, timestamp: "2017-10-26T06:51:05.000Z",
-      status: "REJECTED"
+      status: "REJECTED", pairing: null
     };
 
     // Setup fake data
@@ -476,7 +476,8 @@ class RequestsAPITest {
       archived: true,
       timestamp: "lol",
       extra: "testme",
-      status: "COMPLETED"
+      status: "COMPLETED",
+      pairing: 20
     };
     const EXPECTED_RESULTS = {
       name: "John Doe",
@@ -484,7 +485,8 @@ class RequestsAPITest {
       to_location: "SEB",
       additional_info: "test",
       archived: false,
-      status: "REQUESTED"
+      status: "REQUESTED",
+      pairing: null
     };
     const REQUESTS_DATA = (query: string, values: any[]) => {
       const newId = 2;
@@ -683,7 +685,8 @@ class RequestsAPITest {
       archived: true,
       timestamp: "2017-12-26T06:51:05.000Z",
       extra: "testme",
-      status: "COMPLETED"
+      status: "COMPLETED",
+      pairing: 10
     };
     const EXPECTED_RESULTS = {
       id: 1,
@@ -693,7 +696,8 @@ class RequestsAPITest {
       to_location: "SEB",
       archived: true,
       timestamp: "2017-10-26T06:51:05.000Z",
-      status: "COMPLETED"
+      status: "COMPLETED",
+      pairing: 10
     };
 
     // Setup DB responses
@@ -871,7 +875,8 @@ class RequestsAPITest {
       additional_info: "additional info",
       archived: false,
       timestamp: "2017-10-26T06:51:05.000Z",
-      status: "REJECTED"
+      status: "REJECTED",
+      pairing: null
     };
     FakeSQL.response = (query: string, values: any[]) => {
       if (query.search("^UPDATE") >= 0) {
