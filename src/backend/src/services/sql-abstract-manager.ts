@@ -1,3 +1,6 @@
+import { injectable } from "inversify";
+
+@injectable()
 export abstract class SQLAbstractManager {
   /**
    * Generate strings of "'column name'=?, ..." for SQL prepared statements
