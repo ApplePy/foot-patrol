@@ -17,7 +17,7 @@ const eventually = chai.use(chaiAsPromised);
 /**
  * Test the Locations API
  */
-@suite
+@suite.only
 class TravelRequestTest {
 
   @test("Converting an object with all fields should succeed")
@@ -31,6 +31,7 @@ class TravelRequestTest {
       additional_info: "test",
       archived: 0,
       timestamp: "2018-01-09T01:44:12.926Z",
+      pairing: 5,
       status: TravelStatus.COMPLETED
     };
     const expected = new TravelRequest();
@@ -42,6 +43,7 @@ class TravelRequestTest {
     expected.archived = false;
     expected.timestamp = new Date("2018-01-09T01:44:12.926Z");
     expected.status = TravelStatus.COMPLETED;
+    expected.pairing = 5;
 
     const testReq = new TravelRequest(testData);
     testReq.should.deep.equal(expected);

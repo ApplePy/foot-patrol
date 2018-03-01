@@ -26,7 +26,7 @@ export class TravelRequest {
   public archived: boolean = false;
   public timestamp: Date = new Date();
   public status: TravelStatus = TravelStatus.REQUESTED;
-  // public pairing: VolunteerPairing | null = null;
+  public pairing: VolunteerPairing | number | null = null;
 
   /* tslint:enable:variable-name */
 
@@ -42,6 +42,7 @@ export class TravelRequest {
       id: Number,
       from_location: String,
       to_location: String,
+      pairing: (field: any) => (field instanceof VolunteerPairing) ? field : Number(field),
       status: (field: any) => TravelStatus[field],
       timestamp: (field: any) => new Date(field),
       archived: (field: any) => (field === "false") ? false : Boolean(field)
