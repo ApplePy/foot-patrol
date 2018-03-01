@@ -20,6 +20,7 @@ using Newtonsoft.Json.Linq;
 using Newtonsoft.Json;
 using Android.Support.V7.Widget;
 using Android.Support.V4.Widget;
+using System.Threading;
 
 namespace FootPatrol.Droid
 {
@@ -28,7 +29,7 @@ namespace FootPatrol.Droid
     {
         public string name, to_location, from_location, additional_info;
         private Typeface bentonSans;
-        private ArrayAdapter<String> listAdapter;
+        private ArrayAdapter<System.String> listAdapter;
         private bool pickupComplete = false;
 
         private static SupportMapFragment mf;
@@ -37,14 +38,13 @@ namespace FootPatrol.Droid
         private static ImageButton mSideTab, mfSideTab;
         private static MapView mView;
         private static ImageView notificationBase, notificationBadge;
-        private static TextView badgeCounter;
+        public static TextView badgeCounter;
         private static ListView mListView, mfListView;
         private static RecyclerView mRecyclerView, mfRecyclerView;
         private static RecyclerView.LayoutManager layoutManager;
         private static RelativeLayout mRelativeLayout, mfRelativeLayout;
 
-        public List<string> request, steps;
-        public int requestCount;
+        public static List<string> request, steps;
         public string[] menuItems;
         public static RequestsActivity ra;
 
@@ -73,7 +73,10 @@ namespace FootPatrol.Droid
             menuItems = new string[] { "EMERGENCY CONTACTS", "CAMPUS MAPS", "PAIR FOOT PATROLLERS"};
 
             listAdapter = new ArrayAdapter<string>(this.Context, Resource.Layout.ListElement, menuItems);
-            layoutManager = new LinearLayoutManager(this.Context, LinearLayoutManager.Horizontal,false);
+            layoutManager = new LinearLayoutManager(this.Context, LinearLayoutManager.Horizontal, false);
+
+            TimerCallback time = new TimerCallback(retrieveRequests);
+            Timer timer = new Timer(time, 0, 0, 1000);
 
             try
             {
@@ -89,7 +92,6 @@ namespace FootPatrol.Droid
 
             createLocationRequest();
             clientSetup();
-
 
             if (Int32.Parse(Build.VERSION.Sdk) > 23)
             {
@@ -184,19 +186,16 @@ namespace FootPatrol.Droid
                 mf.OnStart();
             }
 
-            request = Task.Run(() => getRequests()).Result; //get all user requests
-            requestCount = request.Count;
-
-
             notificationBase.Click += (sender, e) =>
             {
-                onRequestClick();
+                onRequestClick(handler.ObtainMessage().Arg1);
             };
 
             notificationBadge.Click += (sender, e) =>
             {
-                onRequestClick();
+                onRequestClick(handler.ObtainMessage().Arg1);
             };
+
 
             return view;
         }
@@ -258,7 +257,7 @@ namespace FootPatrol.Droid
             myMarker.SetPosition(newPos);
 
             CameraPosition cp = new CameraPosition.Builder().
-                Target(newPos).Zoom(15).Bearing(90).Tilt(40).Build();
+                Target(newPos).Zoom(20).Bearing(90).Tilt(40).Build();
 
             map.AnimateCamera(CameraUpdateFactory.NewCameraPosition(cp));
 
@@ -318,7 +317,7 @@ namespace FootPatrol.Droid
                 response.EnsureSuccessStatusCode();
             }
 
-            catch (Exception error)
+            catch (System.Exception error)
             {
                 System.Diagnostics.Debug.WriteLine("The exception is: " + error);
             }
@@ -336,7 +335,6 @@ namespace FootPatrol.Droid
                     requestArray.Add(a.ToString());
                 }
 
-                badgeCounter.Text = requests.Count.ToString();
                 return requestArray;
             }
 
@@ -347,7 +345,7 @@ namespace FootPatrol.Droid
             }
         }
 
-        private void onRequestClick()
+        private void onRequestClick(int requestCount)
         {
             if (requestCount == 0)
             {
@@ -378,8 +376,8 @@ namespace FootPatrol.Droid
             address = address + " Western University";
             var approximateLocation = Task.Run(() => getPositionForAddress(address)).Result;
 
-            double latitude = Double.Parse(approximateLocation[0]);
-            double longitude = Double.Parse(approximateLocation[1]);
+            double latitude = System.Double.Parse(approximateLocation[0]);
+            double longitude = System.Double.Parse(approximateLocation[1]);
 
             userMarker = new MarkerOptions();
             LatLng userCoordinates = new LatLng(latitude, longitude);
@@ -442,7 +440,7 @@ namespace FootPatrol.Droid
                 response.EnsureSuccessStatusCode();
             }
 
-            catch (Exception error)
+            catch (System.Exception error)
             {
                 System.Diagnostics.Debug.WriteLine("The exception is: " + error);
             }
@@ -469,7 +467,7 @@ namespace FootPatrol.Droid
                 response.EnsureSuccessStatusCode();
             }
 
-            catch (Exception error)
+            catch (System.Exception error)
             {
                 System.Diagnostics.Debug.WriteLine("The exception is: " + error);
             }
@@ -657,6 +655,21 @@ namespace FootPatrol.Droid
 
             Dialog dialog = builder.Create();
             dialog.Show();
+        }
+
+        protected Handler handler = new Handler((Message obj) =>
+        {
+            int requestCount = obj.Arg1;
+            badgeCounter.Text = requestCount.ToString();
+        });
+
+        private void retrieveRequests(object state)
+        {
+            request = Task.Run(() => getRequests()).Result;
+            int requestCount = request.Count;
+            Message msg = handler.ObtainMessage();
+            msg.Arg1 = requestCount;
+            handler.SendMessage(msg);
         }
     }
 }
