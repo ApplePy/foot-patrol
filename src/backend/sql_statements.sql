@@ -60,8 +60,7 @@ CREATE TABLE IF NOT EXISTS volunteer_pairing
   id INT NOT NULL AUTO_INCREMENT,
   volunteer_one INT NOT NULL,
   volunteer_two INT NOT NULL,
-  status ENUM('ACTIVE', 'EXPIRED') NOT NULL,
-  timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+  active TINYINT(1) NOT NULL,
   PRIMARY KEY (id),
   KEY pairing_one_fk (volunteer_one),
   KEY pairing_two_fk (volunteer_two),
@@ -69,7 +68,7 @@ CREATE TABLE IF NOT EXISTS volunteer_pairing
   CONSTRAINT pairing_two_fk FOREIGN KEY (volunteer_two) REFERENCES volunteers (id)
 );
 
-CALL CreateUniqueIndex('foot_patrol', 'volunteer_pairing', 'vol_one_two_time_uindex', 'volunteer_one, volunteer_two, timestamp');
+CALL CreateUniqueIndex('foot_patrol', 'volunteer_pairing', 'vol_one_two_time_uindex', 'volunteer_one, volunteer_two');
 
 CREATE TABLE IF NOT EXISTS requests
 (
@@ -87,3 +86,14 @@ CREATE TABLE IF NOT EXISTS requests
 );
 
 CALL CreateUniqueIndex('foot_patrol', 'requests', 'requests_uindex', 'name, timestamp');
+
+CREATE OR REPLACE SQL SECURITY INVOKER VIEW active_volunteers AS
+  SELECT volunteers.* FROM
+    (SELECT volunteer_one as id FROM volunteer_pairing WHERE active=1
+     UNION SELECT volunteer_two FROM volunteer_pairing WHERE active=1) AS volIds
+    JOIN volunteers ON volIds.id = volunteers.id;
+
+CREATE OR REPLACE SQL SECURITY INVOKER VIEW inactive_volunteers AS
+  SELECT * FROM volunteers WHERE id NOT IN
+    (SELECT volunteer_one as id FROM volunteer_pairing WHERE active=1
+     UNION SELECT volunteer_two FROM volunteer_pairing WHERE active=1);
