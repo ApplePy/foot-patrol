@@ -16,9 +16,11 @@ namespace FootPatrol.Droid
         public static VolunteerActivity va;
         private static View view;
 
-        private static List<string> request, userName, toLoc, fromLoc, addInfo;
-        private static List<int> idList;
+        public static List<string> request, userName, toLoc, fromLoc, addInfo;
+        public static List<int> idList;
         private static int reqCount;
+
+        public TextView name, toLocation, fromLocation, additionalInfo;
 
         private int currentCount;
 
@@ -38,10 +40,10 @@ namespace FootPatrol.Droid
             Dialog.Window.SetLayout(ViewGroup.LayoutParams.MatchParent,ViewGroup.LayoutParams.WrapContent);
             view = inflater.Inflate(Resource.Layout.Requests, container, false);
 
-            TextView name = (TextView)view.FindViewById(Resource.Id.userName);
-            TextView toLocation = (TextView)view.FindViewById(Resource.Id.toLocation);
-            TextView fromLocation = (TextView)view.FindViewById(Resource.Id.fromLocation);
-            TextView additionalInfo = (TextView)view.FindViewById(Resource.Id.additionalInfo);
+            name = (TextView)view.FindViewById(Resource.Id.userName);
+            toLocation = (TextView)view.FindViewById(Resource.Id.toLocation);
+            fromLocation = (TextView)view.FindViewById(Resource.Id.fromLocation);
+            additionalInfo = (TextView)view.FindViewById(Resource.Id.additionalInfo);
             ImageButton rightArrow = (ImageButton)view.FindViewById(Resource.Id.rightArrow);
             ImageButton leftArrow = (ImageButton)view.FindViewById(Resource.Id.leftArrow);
             ImageButton closeBtn = (ImageButton)view.FindViewById(Resource.Id.closeButton);
@@ -55,7 +57,7 @@ namespace FootPatrol.Droid
             addInfo = new List<string>();
             idList = new List<int>();
 
-            foreach(string req in request)
+            foreach (string req in request)
             {
                 JObject o = JObject.Parse(req);
 
@@ -72,51 +74,42 @@ namespace FootPatrol.Droid
                 idList.Add(Int32.Parse(id));
             }
 
-            name.Text = "NAME: " + userName[currentCount];
-            fromLocation.Text = "START LOCATION: " + fromLoc[currentCount];
-            toLocation.Text = "END LOCATION: " + toLoc[currentCount];
-            additionalInfo.Text = "ADDITIONAL INFO: " + addInfo[currentCount];
-
-
-            disableArrow(leftArrow);
-
-            leftArrow.Click += (sender, e) =>
+            if (userName.Count > 1)
             {
-                if(currentCount == 0)
-                {
-                    disableArrow(leftArrow);
-                }
+                setInfo(currentCount);
 
-                else
+                disableArrow(leftArrow);
+
+                leftArrow.Click += (sender, e) =>
                 {
-                    enableArrow(leftArrow);
                     enableArrow(rightArrow);
-                    name.Text = "NAME: " + userName[currentCount];
-                    fromLocation.Text = "START LOCATION: " + fromLoc[currentCount];
-                    toLocation.Text = "END LOCATION: " + toLoc[currentCount];
-                    additionalInfo.Text = "ADDITIONAL INFO: " + addInfo[currentCount];
                     currentCount--;
-                }
-            };
+                    if (currentCount == 0)
+                    {
+                        disableArrow(leftArrow);
+                    }
+                    setInfo(currentCount);
+                };
 
-            rightArrow.Click += (sender, e) =>
-            {
-                if(currentCount >= reqCount - 2)
-                {
-                    disableArrow(rightArrow);
-                }
-
-                else
+                rightArrow.Click += (sender, e) =>
                 {
                     enableArrow(leftArrow);
-                    enableArrow(rightArrow);
-                    name.Text = "NAME: " + userName[currentCount];
-                    fromLocation.Text = "START LOCATION: " + fromLoc[currentCount];
-                    toLocation.Text = "END LOCATION: " + toLoc[currentCount];
-                    additionalInfo.Text = "ADDITIONAL INFO: " + addInfo[currentCount];
                     currentCount++;
-                }
-            };
+                    if (currentCount == reqCount - 1)
+                    {
+                        disableArrow(rightArrow);
+                    }
+                    setInfo(currentCount);
+
+                };
+            }
+
+            else
+            {
+                disableArrow(leftArrow);
+                disableArrow(rightArrow);
+                setInfo(0);
+            }
 
             closeBtn.Click += (sender, e) =>
             {
@@ -147,6 +140,14 @@ namespace FootPatrol.Droid
         public void dismissFragment()
         {
             this.Dismiss();
+        }
+
+        public void setInfo(int currentCount)
+        {
+            name.Text = "NAME: " + userName[currentCount];
+            fromLocation.Text = "START LOCATION: " + fromLoc[currentCount];
+            toLocation.Text = "END LOCATION: " + toLoc[currentCount];
+            additionalInfo.Text = "ADDITIONAL INFO: " + addInfo[currentCount];
         }
 
     }

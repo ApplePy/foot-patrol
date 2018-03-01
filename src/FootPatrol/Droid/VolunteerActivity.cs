@@ -29,6 +29,7 @@ namespace FootPatrol.Droid
         public string name, to_location, from_location, additional_info;
         private Typeface bentonSans;
         private ArrayAdapter<String> listAdapter;
+        private bool pickupComplete = false;
 
         private static SupportMapFragment mf;
         private static Button completeTripBtn, cancelTripBtn;
@@ -121,7 +122,11 @@ namespace FootPatrol.Droid
 
                 completeTripBtn.Click += (sender, e) =>
                 {
-                    completeBtnClicked();
+                    if (pickupComplete)
+                        completeBtnClicked();
+
+                    else
+                        pickUpClicked();
                 };
 
                 mListView.SetAdapter(listAdapter);
@@ -295,7 +300,6 @@ namespace FootPatrol.Droid
                         Target(new LatLng(myLocation.Latitude, myLocation.Longitude)).Zoom(20).Bearing(90).Tilt(40).Build();
 
                     map.AnimateCamera(CameraUpdateFactory.NewCameraPosition(cp));
-
                 }
             }
 
@@ -345,8 +349,16 @@ namespace FootPatrol.Droid
 
         private void onRequestClick()
         {
-            ra = RequestsActivity.newInstance(request, requestCount);
-            ra.Show(this.FragmentManager,"Requests");
+            if (requestCount == 0)
+            {
+                createAlert();
+            }
+
+            else
+            {
+                ra = RequestsActivity.newInstance(request, requestCount);
+                ra.Show(this.FragmentManager, "Requests");
+            }
         }
 
         private void setFont(Typeface font, TextView text)
@@ -381,9 +393,11 @@ namespace FootPatrol.Droid
 
             string currentLocation = myLocation.Latitude.ToString() + "," + myLocation.Longitude.ToString();
             string destinationLocation = userCoordinates.Latitude.ToString() + "," + userCoordinates.Longitude.ToString();
-           
+
             var polyPattern = Task.Run(() => getPolyPat(currentLocation, destinationLocation)).Result;
 
+            System.Diagnostics.Debug.WriteLine("The pattern is: " + polyPattern);
+            
             List<LatLng> polyline = DecodePolyline(polyPattern);
             polyOptions = new PolylineOptions().InvokeColor(Color.Blue).InvokeWidth(10);
 
@@ -410,7 +424,7 @@ namespace FootPatrol.Droid
             }
 
             HttpClient httpClient = new HttpClient();
-            Uri customURI = new Uri("http://staging.capstone.incode.ca/api/v1/requests" + Id.ToString());
+            Uri customURI = new Uri("http://staging.capstone.incode.ca/api/v1/requests/" + Id.ToString());
             httpClient.DeleteAsync(customURI);
                 
         }
@@ -572,11 +586,10 @@ namespace FootPatrol.Droid
                 string vObj = JsonConvert.SerializeObject(volunteer);
                 System.Diagnostics.Debug.WriteLine("The volunteer object is: " + vObj);
 
-                StringContent content = new StringContent(vObj, Encoding.UTF8, "application/json");
+                HttpContent content = new StringContent(vObj, Encoding.UTF8, "application/json");
                 var result = await httpClient.PostAsync(customURI, content);
 
-                poly.Remove();
-
+                postTripUI();
 
             }).SetNegativeButton("No", (sender, e) =>
             {
@@ -587,12 +600,33 @@ namespace FootPatrol.Droid
             dialog.Show();
         }
 
+        private void pickUpClicked()
+        {
+            completeTripBtn.Text = "COMPLETE TRIP";
+            pickupComplete = true;
+
+        }
+
         private void completeBtnClicked()
         {
             AlertDialog.Builder builder = new AlertDialog.Builder(this.Context);
             builder.SetTitle("Complete Trip").SetMessage("Are you sure you want to complete the trip?").SetPositiveButton("Yes", (sender, e) =>
             {
-            poly.Remove();
+                postTripUI();
+                completeTripBtn.Text = "PICKED UP USER";
+                pickupComplete = false;
+
+            }).SetNegativeButton("No", (sender, e) =>
+            {
+                //Do nothing
+            });
+                                                                                                                          
+            Dialog dialog = builder.Create();
+            dialog.Show();
+        }
+
+        private void postTripUI()
+        {
             if (Int32.Parse(Build.VERSION.Sdk) > 23)
             {
                 mRecyclerView.Visibility = ViewStates.Gone;
@@ -608,13 +642,19 @@ namespace FootPatrol.Droid
             badgeCounter.Visibility = ViewStates.Visible;
             notificationBase.Visibility = ViewStates.Visible;
             notificationBadge.Visibility = ViewStates.Visible;
-            userMark.Remove();
 
-            }).SetNegativeButton("No", (sender, e) =>
+            poly.Remove();
+            userMark.Remove();
+        }
+
+        private void createAlert()
+        {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this.Context);
+            builder.SetMessage("There are no requests to be fulfilled!").SetNeutralButton("OK", (sender, e) =>
             {
                 //Do nothing
             });
-                                                                                                                          
+
             Dialog dialog = builder.Create();
             dialog.Show();
         }
