@@ -1,3 +1,16 @@
+import { VolunteerPairing } from "./volunteer-pairing";
+
+/**
+ * Represents the current state of a travel request.
+ */
+export enum TravelStatus {
+  ASSIGNED = "ASSIGNED",
+  IN_PROGRESS = "IN_PROGRESS",
+  COMPLETED = "COMPLETED",
+  REQUESTED = "REQUESTED",
+  REJECTED = "REJECTED"
+}
+
 /**
  * Represents a request object from the DB.
  */
@@ -12,6 +25,8 @@ export class TravelRequest {
   public additional_info: string | null = null;
   public archived: boolean = false;
   public timestamp: Date = new Date();
+  public status: TravelStatus = TravelStatus.REQUESTED;
+  // public pairing: VolunteerPairing | null = null;
 
   /* tslint:enable:variable-name */
 
@@ -27,6 +42,7 @@ export class TravelRequest {
       id: Number,
       from_location: String,
       to_location: String,
+      status: (field: any) => TravelStatus[field],
       timestamp: (field: any) => new Date(field),
       archived: (field: any) => (field === "false") ? false : Boolean(field)
     };
@@ -43,7 +59,11 @@ export class TravelRequest {
    * Checks if the object is in a valid state
    */
   public Valid() {
-    return !this.checkToFromUniqueness(this.from_location, this.to_location);
+    let invalid = false;
+    invalid = invalid || this.checkToFromUniqueness(this.from_location, this.to_location);
+    invalid = invalid || status == null;
+
+    return !invalid;
   }
 
   /**

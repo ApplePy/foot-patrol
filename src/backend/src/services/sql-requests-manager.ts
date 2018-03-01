@@ -79,8 +79,8 @@ export class SQLRequestsManager extends SQLAbstractManager implements IRequestsM
     }
 
     return this.db.makeQuery(
-      "INSERT INTO `requests` (name, from_location, to_location, additional_info) VALUES(?,?,?,?)",
-      [req.name, req.from_location, req.to_location, req.additional_info])
+      "INSERT INTO `requests` (name, from_location, to_location, additional_info, status) VALUES(?,?,?,?,?)",
+      [req.name, req.from_location, req.to_location, req.additional_info, req.status])
     .then((results: any) => results.insertId as number);
   }
 
@@ -109,6 +109,7 @@ export class SQLRequestsManager extends SQLAbstractManager implements IRequestsM
       "from_location",
       "to_location",
       "additional_info",
+      "status",
       "archived"]
   ) {
 

@@ -5,7 +5,7 @@ import { IRequestsManager } from "../interfaces/irequests-manager";
 import { IRoute } from "../interfaces/iroute";
 import { ISanitizer } from "../interfaces/isanitizer";
 import { StatusError } from "../models/status-error";
-import { TravelRequest } from "../models/travel-request";
+import { TravelRequest, TravelStatus } from "../models/travel-request";
 
 @injectable()
 export class RequestsRoute implements IRoute {
@@ -71,6 +71,7 @@ export class RequestsRoute implements IRoute {
     return updateList;
   }
 
+  /* tslint:disable:max-line-length */
   /**
    * Get requests
    *
@@ -79,7 +80,7 @@ export class RequestsRoute implements IRoute {
    * @param next {NextFunction} Execute the next method.
    *
    * @api {get} /api/v1/requests Get walking escort requests
-   * @apiVersion 1.1.1
+   * @apiVersion 1.2.0
    * @apiName GetRequests
    * @apiGroup Requests
    *
@@ -95,6 +96,7 @@ export class RequestsRoute implements IRoute {
    * @apiSuccess {string} [requests.additional_info] Additional request information.
    * @apiSuccess {boolean} requests.archived Specifies if this request completed and archived.
    * @apiSuccess {string} requests.timestamp Timestamp the record was created.
+   * @apiSuccess {string} requests.status Status of the request. Can be 'ASSIGNED', 'COMPLETED', 'REQUESTED', 'REJECTED', or 'IN_PROGRESS'
    * @apiSuccess {object} meta The parameters used to generate the response.
    * @apiSuccess {number} meta.offset The offset from_location the start of the dataset.
    * @apiSuccess {number} meta.count The max number of elements requested.
@@ -114,7 +116,8 @@ export class RequestsRoute implements IRoute {
    *            to_location: "UCC",
    *            additional_info: null,
    *            archived: false,
-   *            timestamp: "2017-10-26T06:51:05.000Z"
+   *            timestamp: "2017-10-26T06:51:05.000Z",
+   *            status: "REQUESTED"
    *          }
    *        ],
    *        meta: {offset: 0, count: 10, archived: true}
@@ -129,6 +132,7 @@ export class RequestsRoute implements IRoute {
    *     }
    */
   public getRequests(req: Request, res: Response, next: NextFunction) {
+    /* tslint:enable:max-line-length */
     const offset = Number(req.query.offset);
     const count = Math.min(Number(req.query.count), 100);
 
@@ -154,6 +158,7 @@ export class RequestsRoute implements IRoute {
     .catch((err) => next(this.translateErrors(err))); // Send generic error
   }
 
+  /* tslint:disable:max-line-length */
   /**
    * Get specific request
    *
@@ -162,7 +167,7 @@ export class RequestsRoute implements IRoute {
    * @param next {NextFunction} Execute the next method.
    *
    * @api {get} /api/v1/requests/:id Get specific request
-   * @apiVersion 1.0.0
+   * @apiVersion 1.2.0
    * @apiName GetRequest
    * @apiGroup Requests
    *
@@ -175,6 +180,7 @@ export class RequestsRoute implements IRoute {
    * @apiSuccess {string} [additional_info] Additional request information.
    * @apiSuccess {boolean} archived Specifies if this request completed and archived.
    * @apiSuccess {string} timestamp Timestamp the record was created.
+   * @apiSuccess {string} status Status of the request. Can be 'ASSIGNED', 'COMPLETED', 'REQUESTED', 'REJECTED', or 'IN_PROGRESS'
    *
    * @apiExample Example usage:
    * curl -i http://localhost/requests/1
@@ -188,7 +194,8 @@ export class RequestsRoute implements IRoute {
    *        to_location: "UCC",
    *        additional_info: null,
    *        archived: false,
-   *        timestamp: "2017-10-26T06:51:05.000Z"
+   *        timestamp: "2017-10-26T06:51:05.000Z",
+   *        status: "REQUESTED"
    *     }
    *
    * @apiError (Error 400) InvalidQueryParameters The requested ID was invalid format.
@@ -201,6 +208,7 @@ export class RequestsRoute implements IRoute {
    *     }
    */
   public getRequest(req: Request, res: Response, next: NextFunction) {
+    /* tslint:enable:max-line-length */
     const id = Number(req.params.id);
 
     // Ensure valid id
@@ -214,6 +222,7 @@ export class RequestsRoute implements IRoute {
     .catch((err) => next(this.translateErrors(err))); // Send generic error
   }
 
+  /* tslint:disable:max-line-length */
   /**
    * Post new walk escort request.
    *
@@ -222,7 +231,7 @@ export class RequestsRoute implements IRoute {
    * @param next {NextFunction} Execute the next method.
    *
    * @api {post} /api/v1/requests Create a new walk escort request
-   * @apiVersion 1.1.0
+   * @apiVersion 1.2.0
    * @apiName PostRequest
    * @apiGroup Requests
    *
@@ -238,6 +247,7 @@ export class RequestsRoute implements IRoute {
    * @apiSuccess (Created 201) {string} [additional_info] Additional request information.
    * @apiSuccess (Created 201) {boolean} archived Specifies if this request completed and archived.
    * @apiSuccess (Created 201) {string} timestamp Timestamp the record was created.
+   * @apiSuccess (Created 201) {string} status Status of the request. Can be 'ASSIGNED', 'COMPLETED', 'REQUESTED', 'REJECTED', or 'IN_PROGRESS'
    *
    * @apiSuccessExample Success Response:
    *     HTTP/1.1 201 CREATED
@@ -247,7 +257,8 @@ export class RequestsRoute implements IRoute {
    *        from_location: "UCC",
    *        to_location: "SEB",
    *        archived: false,
-   *        timestamp: "2017-10-26T06:51:05.000Z"
+   *        timestamp: "2017-10-26T06:51:05.000Z",
+   *        status: "REQUESTED"
    *     }
    *
    * @apiError (Error 400) MissingParameters One of the post request parameters was missing or invalid.
@@ -259,6 +270,7 @@ export class RequestsRoute implements IRoute {
    *     }
    */
   public postRequest(req: Request, res: Response, next: NextFunction) {
+    /* tslint:enable:max-line-length */
     // Catch missing data
     if (this.checkToFromUniqueness(req.body.to_location, req.body.from_location)) {
       next (new StatusError(
@@ -284,6 +296,7 @@ export class RequestsRoute implements IRoute {
     .catch((err) => next(this.translateErrors(err))); // Send generic error
   }
 
+  /* tslint:disable:max-line-length */
   /**
    * Replace a walk escort request.
    *
@@ -306,6 +319,7 @@ export class RequestsRoute implements IRoute {
    * @apiParam {string} to_location Escort destination.
    * @apiParam {string} [additional_info] Additional request information.
    * @apiParam {boolean} archived Specifies if this request is completed and archived.
+   * @apiParam {string} status Status of the request. Can be 'ASSIGNED', 'COMPLETED', 'REQUESTED', 'REJECTED', or 'IN_PROGRESS'
    *
    * @apiSuccess {number} id The record ID.
    * @apiSuccess {string} [name] Name of the requester.
@@ -314,6 +328,7 @@ export class RequestsRoute implements IRoute {
    * @apiSuccess {string} [additional_info] Additional request information.
    * @apiSuccess {boolean} archived Specifies if this request completed and archived.
    * @apiSuccess {string} timestamp Timestamp the record was created.
+   * @apiSuccess {string} status Status of the request. Can be 'ASSIGNED', 'COMPLETED', 'REQUESTED', 'REJECTED', or 'IN_PROGRESS'
    *
    * @apiSuccessExample Success Response:
    *     HTTP/1.1 200 OK
@@ -323,7 +338,8 @@ export class RequestsRoute implements IRoute {
    *        from_location: "UCC",
    *        to_location: "SEB",
    *        archived: false,
-   *        timestamp: "2017-10-26T06:51:05.000Z"
+   *        timestamp: "2017-10-26T06:51:05.000Z",
+   *        status: "REQUESTED"
    *     }
    *
    * @apiError (Error 400) MissingOrInvalidParameters One of the request parameters was missing or invalid.
@@ -336,6 +352,7 @@ export class RequestsRoute implements IRoute {
    *     }
    */
   public putRequest(req: Request, res: Response, next: NextFunction) {
+    /* tslint:enable:max-line-length */
     const id = Number(req.params.id);
 
     // Catch invalid id
@@ -345,7 +362,12 @@ export class RequestsRoute implements IRoute {
     }
 
     // Catch missing data
-    if (req.body.archived == null || this.checkToFromUniqueness(req.body.to_location, req.body.from_location)) {
+    if (
+      req.body.archived == null ||
+      req.body.status == null ||
+      TravelStatus[req.body.status] === undefined ||
+      this.checkToFromUniqueness(req.body.to_location, req.body.from_location)
+    ) {
       next (new StatusError(
         400,
         "Missing Or Invalid Parameters",
@@ -354,6 +376,7 @@ export class RequestsRoute implements IRoute {
     }
 
     // Sanitize data
+    req.body.status = TravelStatus[req.body.status];
     req.body.archived = (req.body.archived === true || req.body.archived === "true") ? true : false;
     req.body.name = this.sanitizer.sanitize(req.body.name);
     req.body.additional_info = this.sanitizer.sanitize(req.body.additional_info);
@@ -370,6 +393,7 @@ export class RequestsRoute implements IRoute {
     .catch((err) => next(this.translateErrors(err))); // Send generic error
   }
 
+  /* tslint:disable:max-line-length */
   /**
    * Update a walk escort request.
    *
@@ -392,6 +416,7 @@ export class RequestsRoute implements IRoute {
    * @apiParam {string} [to_location] Escort destination.
    * @apiParam {string} [additional_info] Additional request information.
    * @apiParam {boolean} [archived] Specifies if this request is completed and archived.
+   * @apiSuccess {string} [status] Status of the request. Can be 'ASSIGNED', 'COMPLETED', 'REQUESTED', 'REJECTED', or 'IN_PROGRESS'
    *
    * @apiSuccess {number} id The record ID.
    * @apiSuccess {string} [name] Name of the requester.
@@ -400,6 +425,7 @@ export class RequestsRoute implements IRoute {
    * @apiSuccess {string} [additional_info] Additional request information.
    * @apiSuccess {boolean} archived Specifies if this request completed and archived.
    * @apiSuccess {string} timestamp Timestamp the record was created.
+   * @apiSuccess {string} status Status of the request. Can be 'ASSIGNED', 'COMPLETED', 'REQUESTED', 'REJECTED', or 'IN_PROGRESS'
    *
    * @apiSuccessExample Success Response:
    *     HTTP/1.1 200 OK
@@ -409,7 +435,8 @@ export class RequestsRoute implements IRoute {
    *        from_location: "UCC",
    *        to_location: "SEB",
    *        archived: false,
-   *        timestamp: "2017-10-26T06:51:05.000Z"
+   *        timestamp: "2017-10-26T06:51:05.000Z",
+   *        status: "REQUESTED"
    *     }
    * @apiError (Error 400) InvalidQueryParameters The requested ID was invalid format.
    * @apiError (Error 400) InvalidLocation One of the location parameters equal.
@@ -422,6 +449,7 @@ export class RequestsRoute implements IRoute {
    *     }
    */
   public patchRequest(req: Request, res: Response, next: NextFunction) {
+    /* tslint:enable:max-line-length */
     // Check for invalid ID
     if (isNaN(Number(req.params.id)) || Number(req.params.id) < 0) {
       next(new StatusError(400, "Invalid Query Parameter", "ID is required"));
@@ -434,11 +462,17 @@ export class RequestsRoute implements IRoute {
       archived: Boolean,
       from_location: this.sanitizer.sanitize,
       name: this.sanitizer.sanitize,
-      to_location: this.sanitizer.sanitize
+      to_location: this.sanitizer.sanitize,
+      status: (obj: any) => TravelStatus[obj]
     };
 
     // List of sanitized data
     const updateDict = this.sanitizeMap(sanitizeMap, req.body);
+
+    if (updateDict.status === undefined) {
+      next(new StatusError(400, "Invalid Status", "Request status must be a valid string."));
+      return;
+    }
 
     // Locaion check
     if (updateDict.from_location !== undefined
@@ -460,14 +494,14 @@ export class RequestsRoute implements IRoute {
   }
 
   /**
-   * Get specific request
+   * Delete specific request.
    *
    * @param req {Request} The express Request object.
    * @param res {Response} The express Response object.
    * @param next {NextFunction} Execute the next method.
    *
    * @api {delete} /api/v1/requests/:id Delete specific request
-   * @apiVersion 1.1.0
+   * @apiVersion 1.2.0
    * @apiName DeleteRequest
    * @apiGroup Requests
    *
