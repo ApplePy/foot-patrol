@@ -89,3 +89,4 @@ This repository contains numerous tools - some code-level and some wrapped in ha
 1. Create new **TAG** in `ids.ts`
 1. Add new route to `server.ts` constructor with tag, and hook up to express router.
 1. Add route with tag to IoC container in `index.ts` with tag.
+1. (Recommended) Abstract data access from the routes so that other routes can reuse data manipulation code (see `sql-*-manager.ts` for example.).

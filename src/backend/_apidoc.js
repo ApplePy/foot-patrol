@@ -1,31 +1,4 @@
 /**
- * The locations route
- *
- * @param req {Request} The express Request object.
- * @param res {Response} The express Response object.
- * @param next {NextFunction} Execute the next method.
- *
- * @api {get} /api/v1/locations Request all Foot Patrol destinations.
- * @apiDescription Currently not paginated.
- * @apiVersion 1.0.0
- * @apiName GetLocations
- * @apiGroup Locations
- * @apiDeprecated
- *
- *
- * @apiExample Example usage:
- * curl -i http://localhost/locations
- *
- * @apiSuccess {string[]} locations Array of locations.
- *
- * @apiSuccessExample Success Response:
- *     HTTP/1.1 200 OK
- *     {
- *        locations: ["SEB", "UCC"]
- *     }
- */
-
-/**
  * Get requests
  *
  * @param req {Request} The express Request object.

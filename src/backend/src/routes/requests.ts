@@ -413,7 +413,7 @@ export class RequestsRoute implements IRoute {
    * @apiDescription Omitting a parameter from the new object will delete the
    *                  field if it currently exists.
    *                  Other parameters (e.g. id), if specified, will be ignored.
-   * @apiVersion 1.1.0
+   * @apiVersion 1.2.0
    * @apiName PutRequest
    * @apiGroup Requests
    *
@@ -425,7 +425,7 @@ export class RequestsRoute implements IRoute {
    * @apiParam {string} [additional_info] Additional request information.
    * @apiParam {boolean} archived Specifies if this request is completed and archived.
    * @apiParam {string} status Status of the request. Can be 'ASSIGNED', 'COMPLETED', 'REQUESTED', 'REJECTED', or 'IN_PROGRESS'
-   * @apiSuccess {number} [pairing] ID of volunteer pair for this request.
+   * @apiParam {number} [pairing] ID of volunteer pair for this request.
    *
    * @apiSuccess {number} id The record ID.
    * @apiSuccess {string} [name] Name of the requester.
@@ -513,7 +513,7 @@ export class RequestsRoute implements IRoute {
    * @apiDescription Omitting a parameter from the new object will preserve the
    *                  existing value (if it exists).
    *                  Other parameters (e.g. id), if specified, will be ignored.
-   * @apiVersion 1.1.0
+   * @apiVersion 1.2.0
    * @apiName PatchRequest
    * @apiGroup Requests
    *
@@ -524,8 +524,8 @@ export class RequestsRoute implements IRoute {
    * @apiParam {string} [to_location] Escort destination.
    * @apiParam {string} [additional_info] Additional request information.
    * @apiParam {boolean} [archived] Specifies if this request is completed and archived.
-   * @apiSuccess {string} [status] Status of the request. Can be 'ASSIGNED', 'COMPLETED', 'REQUESTED', 'REJECTED', or 'IN_PROGRESS'
-   * @apiSuccess {number} [pairing] ID of volunteer pair for this request.
+   * @apiParam {string} [status] Status of the request. Can be 'ASSIGNED', 'COMPLETED', 'REQUESTED', 'REJECTED', or 'IN_PROGRESS'
+   * @apiParam {number} [pairing] ID of volunteer pair for this request.
    *
    * @apiSuccess {number} id The record ID.
    * @apiSuccess {string} [name] Name of the requester.
