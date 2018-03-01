@@ -17,7 +17,7 @@ import { IRoute } from "./interfaces/iroute";
 @injectable()
 export class Server {
   public app: express.Application;
-  private cookieSecret: "myTotallySecretSecret";
+  private cookieSecret = "myTotallySecretSecret";
 
   // Routes
   private requestRoute: IRoute;
