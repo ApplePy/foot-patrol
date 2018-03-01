@@ -470,11 +470,6 @@ export class RequestsRoute implements IRoute {
     // List of sanitized data
     const updateDict = this.sanitizeMap(sanitizeMap, req.body);
 
-    if (updateDict.status === undefined) {
-      next(new StatusError(400, "Invalid Status", "Request status must be a valid string."));
-      return;
-    }
-
     // Locaion check
     if (updateDict.from_location !== undefined
         && updateDict.to_location !== undefined

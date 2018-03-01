@@ -8,7 +8,7 @@ import "reflect-metadata";
 import * as mock from "ts-mockito";
 
 // Class under test
-import { TravelRequest } from "../src/models/travel-request";
+import { TravelRequest, TravelStatus } from "../src/models/travel-request";
 
 // Chai setup
 const should = chai.should();
@@ -30,7 +30,8 @@ class TravelRequestTest {
       to_location: "SEB",
       additional_info: "test",
       archived: 0,
-      timestamp: "2018-01-09T01:44:12.926Z"
+      timestamp: "2018-01-09T01:44:12.926Z",
+      status: TravelStatus.COMPLETED
     };
     const expected = new TravelRequest();
     expected.id = 1;
@@ -40,6 +41,7 @@ class TravelRequestTest {
     expected.additional_info = "test";
     expected.archived = false;
     expected.timestamp = new Date("2018-01-09T01:44:12.926Z");
+    expected.status = TravelStatus.COMPLETED;
 
     const testReq = new TravelRequest(testData);
     testReq.should.deep.equal(expected);
@@ -62,6 +64,7 @@ class TravelRequestTest {
     expected.to_location = "SEB";
     expected.archived = false;
     expected.timestamp = new Date("2018-01-09T01:44:12.926Z");
+    expected.status = TravelStatus.REQUESTED;
 
     const testReq = new TravelRequest(testData);
     testReq.should.deep.equal(expected);

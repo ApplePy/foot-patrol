@@ -49,7 +49,7 @@ import { SQLRequestsManager } from "./services/sql-requests-manager";
  * Setup server with environment
  */
 class ServerEnvironmentSetup {
-  public expressServer: Server;
+  public expressServer: Server | undefined;
   public nodeServer: any;
   public container: inversify.Container;  // IoC Container
 

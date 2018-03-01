@@ -105,7 +105,8 @@ class RequestsAPITest {
     const DB_DATA = {
       id: 1, name: "John Doe", from_location: "SEB",
       to_location: "UCC", additional_info: null,
-      archived: 0, timestamp: "2017-10-26T06:51:05.000Z"
+      archived: 0, timestamp: "2017-10-26T06:51:05.000Z",
+      status: "ASSIGNED"
     };
 
     // Expected return
@@ -114,7 +115,8 @@ class RequestsAPITest {
         {
           id: 1, name: "John Doe", from_location: "SEB",
           to_location: "UCC", additional_info: null,
-          archived: false, timestamp: "2017-10-26T06:51:05.000Z"
+          archived: false, timestamp: "2017-10-26T06:51:05.000Z",
+          status: "ASSIGNED"
         }
       ],
       meta: { offset: 0, count: 2, archived: false }
@@ -163,7 +165,8 @@ class RequestsAPITest {
         {
           id: 1, name: "John Doe", from_location: "SEB",
           to_location: "UCC", additional_info: null,
-          archived: false, timestamp: "2017-10-26T06:51:05.000Z"
+          archived: false, timestamp: "2017-10-26T06:51:05.000Z",
+          status: "REQUESTED"
         }
       ],
       meta: { offset: 0, count: 100, archived: false }
@@ -216,7 +219,8 @@ class RequestsAPITest {
         {
           id: 2, name: "John Doe", from_location: "SEB",
           to_location: "UCC", additional_info: null,
-          archived: false, timestamp: "2017-10-26T06:51:05.000Z"
+          archived: false, timestamp: "2017-10-26T06:51:05.000Z",
+          status: "REQUESTED"
         }
       ],
       meta: { offset: 0, count: 2, archived: false }
@@ -255,7 +259,8 @@ class RequestsAPITest {
      const DB_DATA = [{
        id: 1, name: "John Doe", from_location: "SEB",
        to_location: "UCC", additional_info: null,
-       archived: 1, timestamp: "2017-10-26T06:51:05.000Z"
+       archived: 1, timestamp: "2017-10-26T06:51:05.000Z",
+       status: "COMPLETED"
      },
      {
        id: 2, name: "John Doe", from_location: "SEB",
@@ -268,12 +273,14 @@ class RequestsAPITest {
         {
           id: 1, name: "John Doe", from_location: "SEB",
           to_location: "UCC", additional_info: null,
-          archived: true, timestamp: "2017-10-26T06:51:05.000Z"
+          archived: true, timestamp: "2017-10-26T06:51:05.000Z",
+          status: "COMPLETED"
         },
         {
           id: 2, name: "John Doe", from_location: "SEB",
           to_location: "UCC", additional_info: null,
-          archived: false, timestamp: "2017-10-26T06:51:05.000Z"
+          archived: false, timestamp: "2017-10-26T06:51:05.000Z",
+          status: "REQUESTED"
         }
       ],
       meta: { offset: 0, count: 2, archived: true }
@@ -407,14 +414,16 @@ class RequestsAPITest {
     const DB_DATA = {
       id: 1, name: "John Doe", from_location: "SEB",
       to_location: "UCC", additional_info: null,
-      archived: 0, timestamp: "2017-10-26T06:51:05.000Z"
+      archived: 0, timestamp: "2017-10-26T06:51:05.000Z",
+      status: "REJECTED"
     };
 
     // Expected return
     const EXPECTED_RESULTS = {
       id: 1, name: "John Doe", from_location: "SEB",
       to_location: "UCC", additional_info: null,
-      archived: false, timestamp: "2017-10-26T06:51:05.000Z"
+      archived: false, timestamp: "2017-10-26T06:51:05.000Z",
+      status: "REJECTED"
     };
 
     // Setup fake data
@@ -466,14 +475,16 @@ class RequestsAPITest {
       additional_info: "test",
       archived: true,
       timestamp: "lol",
-      extra: "testme"
+      extra: "testme",
+      status: "COMPLETED"
     };
     const EXPECTED_RESULTS = {
       name: "John Doe",
       from_location: "UCC",
       to_location: "SEB",
       additional_info: "test",
-      archived: false
+      archived: false,
+      status: "REQUESTED"
     };
     const REQUESTS_DATA = (query: string, values: any[]) => {
       const newId = 2;
@@ -671,7 +682,8 @@ class RequestsAPITest {
       to_location: "SEB",
       archived: true,
       timestamp: "2017-12-26T06:51:05.000Z",
-      extra: "testme"
+      extra: "testme",
+      status: "COMPLETED"
     };
     const EXPECTED_RESULTS = {
       id: 1,
@@ -680,7 +692,8 @@ class RequestsAPITest {
       from_location: "UCC",
       to_location: "SEB",
       archived: true,
-      timestamp: "2017-10-26T06:51:05.000Z"
+      timestamp: "2017-10-26T06:51:05.000Z",
+      status: "COMPLETED"
     };
 
     // Setup DB responses
@@ -696,6 +709,7 @@ class RequestsAPITest {
           "from_location",
           "to_location",
           "additional_info",
+          "status",
           "archived"
         ].forEach((val) => query.search(val).should.not.equal(-1));
         return {affectedRows: 1};
@@ -756,7 +770,8 @@ class RequestsAPITest {
     const INPUT = {
       from_location: 1,
       to_location: 2,
-      archived: true
+      archived: true,
+      status: "REJECTED"
     };
     const REQUESTS_DATA = undefined;
     FakeSQL.response = REQUESTS_DATA;
@@ -806,7 +821,8 @@ class RequestsAPITest {
     const INPUT = {
       from_location: 10,
       to_location: 1,
-      archived: false
+      archived: false,
+      status: "REJECTED"
     };
     const REQUESTS_DATA = {affectedRows: 0};
     FakeSQL.response = REQUESTS_DATA;
@@ -844,7 +860,8 @@ class RequestsAPITest {
       from_location: "UCC",
       to_location: "SEB",
       timestamp: "2017-11-26T06:51:05.000Z",
-      extra: "testme"
+      extra: "testme",
+      status: "REJECTED"
     };
     const EXPECTED_RESULTS = {
       id: 1,
@@ -853,16 +870,17 @@ class RequestsAPITest {
       to_location: "SEB",
       additional_info: "additional info",
       archived: false,
-      timestamp: "2017-10-26T06:51:05.000Z"
+      timestamp: "2017-10-26T06:51:05.000Z",
+      status: "REJECTED"
     };
     FakeSQL.response = (query: string, values: any[]) => {
       if (query.search("^UPDATE") >= 0) {
         // Check query to ensure proper formation
-        query.should.equal("UPDATE `requests` SET from_location=?, to_location=? WHERE id=?");
+        query.should.equal("UPDATE `requests` SET from_location=?, to_location=?, status=? WHERE id=?");
 
         // Check values
         values.splice(-1);  // Remove ID
-        values.should.deep.equal(["UCC", "SEB"]);
+        values.should.deep.equal(["UCC", "SEB", "REJECTED"]);
 
         // Remove WHERE parameter since it has the ID
         query = query.substr(0, query.search("WHERE") - 1);
@@ -871,7 +889,7 @@ class RequestsAPITest {
         ["id", "extra", "timestamp", "archived"].forEach((val) => query.search(val).should.equal(-1));
 
         // Ensure wanted properties are being added
-        ["from_location", "to_location"].forEach((val) => query.search(val).should.not.equal(-1));
+        ["from_location", "to_location", "status"].forEach((val) => query.search(val).should.not.equal(-1));
 
         return {affectedRows: 1};
       } else {
