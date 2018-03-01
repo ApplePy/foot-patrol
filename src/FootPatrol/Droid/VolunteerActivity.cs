@@ -27,10 +27,10 @@ namespace FootPatrol.Droid
     [Activity(Label = "VolunteerActivity")]
     public class VolunteerActivity : Android.Support.V4.App.Fragment, GoogleApiClient.IOnConnectionFailedListener, GoogleApiClient.IConnectionCallbacks, Android.Gms.Location.ILocationListener, IOnMapReadyCallback
     {
-        public string name, to_location, from_location, additional_info;
+        public static string name, to_location, from_location, additional_info;
         private Typeface bentonSans;
         private ArrayAdapter<System.String> listAdapter;
-        private bool pickupComplete = false;
+        //private bool pickupComplete = false;
 
         private static SupportMapFragment mf;
         private static Button completeTripBtn, cancelTripBtn;
@@ -64,6 +64,11 @@ namespace FootPatrol.Droid
         {
             va = new VolunteerActivity();
             return va;
+        }
+
+        struct Volunteer
+        {
+            public string name, from_location, to_location, additional_info;
         }
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
@@ -124,11 +129,11 @@ namespace FootPatrol.Droid
 
                 completeTripBtn.Click += (sender, e) =>
                 {
-                    if (pickupComplete)
-                        completeBtnClicked();
+                    //if (pickupComplete)
+                    completeBtnClicked();
 
-                    else
-                        pickUpClicked();
+                    //else
+                        //pickUpClicked();
                 };
 
                 mListView.SetAdapter(listAdapter);
@@ -188,12 +193,12 @@ namespace FootPatrol.Droid
 
             notificationBase.Click += (sender, e) =>
             {
-                onRequestClick(handler.ObtainMessage().Arg1);
+                onRequestClick(Int32.Parse(badgeCounter.Text));
             };
 
             notificationBadge.Click += (sender, e) =>
             {
-                onRequestClick(handler.ObtainMessage().Arg1);
+                onRequestClick(Int32.Parse(badgeCounter.Text));
             };
 
 
@@ -257,7 +262,7 @@ namespace FootPatrol.Droid
             myMarker.SetPosition(newPos);
 
             CameraPosition cp = new CameraPosition.Builder().
-                Target(newPos).Zoom(20).Bearing(90).Tilt(40).Build();
+                Target(newPos).Zoom(15).Bearing(90).Tilt(40).Build();
 
             map.AnimateCamera(CameraUpdateFactory.NewCameraPosition(cp));
 
@@ -296,7 +301,7 @@ namespace FootPatrol.Droid
                     map.AnimateCamera(CameraUpdateFactory.NewLatLng(new LatLng(myLocation.Latitude, myLocation.Longitude)));
                     map.AddMarker(myMarker);
                     CameraPosition cp = new CameraPosition.Builder().
-                        Target(new LatLng(myLocation.Latitude, myLocation.Longitude)).Zoom(20).Bearing(90).Tilt(40).Build();
+                        Target(new LatLng(myLocation.Latitude, myLocation.Longitude)).Zoom(15).Bearing(90).Tilt(40).Build();
 
                     map.AnimateCamera(CameraUpdateFactory.NewCameraPosition(cp));
                 }
@@ -576,17 +581,15 @@ namespace FootPatrol.Droid
                 HttpClient httpClient = new HttpClient();
                 Uri customURI = new Uri("http://staging.capstone.incode.ca/api/v1/requests");
 
-                VolunteerActivity volunteer = new VolunteerActivity();
+                Volunteer volunteer = new Volunteer();
                 volunteer.name = name;
                 volunteer.from_location = from_location;
                 volunteer.to_location = to_location;
                 volunteer.additional_info = additional_info;
                 string vObj = JsonConvert.SerializeObject(volunteer);
-                System.Diagnostics.Debug.WriteLine("The volunteer object is: " + vObj);
 
                 HttpContent content = new StringContent(vObj, Encoding.UTF8, "application/json");
                 var result = await httpClient.PostAsync(customURI, content);
-
                 postTripUI();
 
             }).SetNegativeButton("No", (sender, e) =>
@@ -600,8 +603,8 @@ namespace FootPatrol.Droid
 
         private void pickUpClicked()
         {
-            completeTripBtn.Text = "COMPLETE TRIP";
-            pickupComplete = true;
+            //completeTripBtn.Text = "COMPLETE TRIP";
+            //pickupComplete = true;
 
         }
 
@@ -611,8 +614,8 @@ namespace FootPatrol.Droid
             builder.SetTitle("Complete Trip").SetMessage("Are you sure you want to complete the trip?").SetPositiveButton("Yes", (sender, e) =>
             {
                 postTripUI();
-                completeTripBtn.Text = "PICKED UP USER";
-                pickupComplete = false;
+                //completeTripBtn.Text = "PICKED UP USER";
+                //pickupComplete = false;
 
             }).SetNegativeButton("No", (sender, e) =>
             {

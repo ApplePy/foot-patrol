@@ -75,7 +75,7 @@
                 p1:layout_height="40dp"
                 p1:id="@+id/completeTripBtn1"
                 p1:layout_centerVertical="true"
-                p1:text="PICKED UP USER"
+                p1:text="COMPLETE TRIP"
                 p1:background="#807F83"
                 p1:layout_toRightOf="@id/cancelTripBtn"
                 p1:layout_alignParentRight="true"
