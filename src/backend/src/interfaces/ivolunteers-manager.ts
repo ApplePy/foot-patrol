@@ -14,11 +14,29 @@ export interface IVolunteersManager {
   /**
    * Get a list of volunteers from the backend.
    *
-   * Defaults to not returning disabled volunteers.
+   * Defaults to returning disabled volunteers.
    *
    * @param filter Dictionary to be plugged into the SQL `WHERE` parameter as "AND"
    */
   getVolunteers(filter?: Map<string, any>): Promise<Volunteer[]>;
+
+  /**
+   * Get a list of actively-paired volunteers from the backend.
+   *
+   * Defaults to returning disabled volunteers.
+   *
+   * @param filter Dictionary to be plugged into the SQL `WHERE` parameter as "AND"
+   */
+  getPairedVolunteers(filter?: Map<string, any>): Promise<Volunteer[]>;
+
+  /**
+   * Get a list of unpaired volunteers from the backend.
+   *
+   * Defaults to returning disabled volunteers.
+   *
+   * @param filter Dictionary to be plugged into the SQL `WHERE` parameter as "AND"
+   */
+  getUnpairedVolunteers(filter?: Map<string, any>): Promise<Volunteer[]>;
 
   /**
    * Create a new volunteer. Returns new ID.

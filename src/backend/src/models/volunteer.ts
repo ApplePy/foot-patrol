@@ -1,5 +1,5 @@
 /**
- * Represents a request object from the DB.
+ * Represents a volunteer object from the DB.
  */
 export class Volunteer {
 

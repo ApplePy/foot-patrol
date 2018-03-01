@@ -49,15 +49,29 @@ export class SQLVolunteersManager extends SQLAbstractManager implements IVolunte
    * @param filter Dictionary to be plugged into the SQL `WHERE` parameter as "AND"
    */
   public getVolunteers(filter?: Map<string, any>) {
-    // Get filter array
-    const filterArray = (filter !== undefined) ? filter.values() : [];
-    const questionMarks = this.generateQuestionMarks((filter !== undefined) ? filter.keys() : [], " AND ");
+    return this.queryVolunteers("volunteers", filter);
+  }
 
-    // Query for data
-    return this.db.makeQuery(
-      `SELECT * FROM \`volunteers\`${(questionMarks.length > 0) ? " WHERE " : ""}${questionMarks}`,
-      [...filterArray])
-    .then((volunteers) => volunteers.map((x: any) => new Volunteer(x)) as Volunteer[]);
+  /**
+   * Get a list of actively-paired volunteers from the backend.
+   *
+   * Defaults to returning disabled volunteers.
+   *
+   * @param filter Dictionary to be plugged into the SQL `WHERE` parameter as "AND"
+   */
+  public getPairedVolunteers(filter?: Map<string, any>) {
+    return this.queryVolunteers("active_volunteers", filter);
+  }
+
+  /**
+   * Get a list of unpaired volunteers from the backend.
+   *
+   * Defaults to returning disabled volunteers.
+   *
+   * @param filter Dictionary to be plugged into the SQL `WHERE` parameter as "AND"
+   */
+  public getUnpairedVolunteers(filter?: Map<string, any>) {
+    return this.queryVolunteers("inactive_volunteers", filter);
   }
 
   /**
@@ -113,5 +127,23 @@ export class SQLVolunteersManager extends SQLAbstractManager implements IVolunte
     .then((result) => (result.affectedRows > 0) ?
                       Promise.resolve() :
                       Promise.reject(new Error("Not Found")));
+  }
+
+  /**
+   * Queries a table for Volunteer objects.
+   *
+   * @param table Table to query.
+   * @param filter Dictionary to be plugged into the SQL `WHERE` parameter as "AND"
+   */
+  private queryVolunteers(table: string, filter?: Map<string, any>) {
+    // Get filter array
+    const filterArray = (filter !== undefined) ? filter.values() : [];
+    const questionMarks = this.generateQuestionMarks((filter !== undefined) ? filter.keys() : [], " AND ");
+
+    // Query for data
+    return this.db.makeQuery(
+      `SELECT * FROM \`${table}\`${(questionMarks.length > 0) ? " WHERE " : ""}${questionMarks}`,
+      [...filterArray])
+    .then((volunteers) => volunteers.map((x: any) => new Volunteer(x)) as Volunteer[]);
   }
 }
