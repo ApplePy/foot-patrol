@@ -79,7 +79,7 @@ CREATE TABLE IF NOT EXISTS requests
 	additional_info TEXT NULL,
 	archived TINYINT(1) DEFAULT 0 NOT NULL,
 	timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
-  pairing INT(11) NOT NULL,
+  pairing INT(11),
   status ENUM('ASSIGNED', 'COMPLETED', 'REQUESTED', 'REJECTED', 'IN_PROGRESS') NOT NULL,
   KEY pairing_fk (pairing),
   CONSTRAINT pairing_fk FOREIGN KEY (pairing) REFERENCES volunteer_pairing (id)

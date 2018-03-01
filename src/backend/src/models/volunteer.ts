@@ -37,6 +37,22 @@ export class Volunteer {
   }
 
   /**
+   * Returns a JS object with sensitive fields removed.
+   */
+  public CensorSensitiveData() {
+    // Make new object
+    // tslint:disable-next-line:prefer-const
+    let censored: any = {};
+    Object.assign(censored, this);
+
+    // Remove sensitive fields
+    censored.uwo_id = undefined;
+    censored.disabled = undefined;
+
+    return censored;
+  }
+
+  /**
    * Checks if the object is in a valid state
    */
   public Valid() {
