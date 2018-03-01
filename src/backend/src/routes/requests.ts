@@ -282,12 +282,13 @@ export class RequestsRoute implements IRoute {
     }
 
     // Sanitize data
-    req.body.name = this.sanitizer.sanitize(req.body.name);
-    req.body.additional_info = this.sanitizer.sanitize(req.body.additional_info);
-    req.body.from_location = this.sanitizer.sanitize(req.body.from_location);
-    req.body.to_location = this.sanitizer.sanitize(req.body.to_location);
+    const cleanData: any = {};
+    cleanData.name = this.sanitizer.sanitize(req.body.name);
+    cleanData.additional_info = this.sanitizer.sanitize(req.body.additional_info);
+    cleanData.from_location = this.sanitizer.sanitize(req.body.from_location);
+    cleanData.to_location = this.sanitizer.sanitize(req.body.to_location);
 
-    const postData = new TravelRequest(req.body);
+    const postData = new TravelRequest(cleanData);
 
     // Insert into database and get resulting record
     this.data.createRequest(postData)

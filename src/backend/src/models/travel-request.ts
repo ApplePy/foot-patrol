@@ -61,7 +61,7 @@ export class TravelRequest {
   public Valid() {
     let invalid = false;
     invalid = invalid || this.checkToFromUniqueness(this.from_location, this.to_location);
-    invalid = invalid || status == null;
+    invalid = invalid || this.status == null;
 
     return !invalid;
   }
