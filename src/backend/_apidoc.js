@@ -14,7 +14,7 @@
  * @apiParam (Query Parameter) {number} count The maximum number of elements return.
  * @apiParam (Query Parameter) {boolean} [archived=false] Include archived requests in the response.
  *
- * @apiSuccess {string[]} requests Array of requests.
+ * @apiSuccess {object[]} requests Array of requests.
  * @apiSuccess {number} requests.id The record ID.
  * @apiSuccess {string} [requests.name] Name of the requester.
  * @apiSuccess {string} requests.from_location Escort start location.
@@ -253,7 +253,7 @@
  * @apiParam (Query Parameter) {number} count The maximum number of elements return; capped at 100.
  * @apiParam (Query Parameter) {boolean} [archived=false] Include archived requests in the response.
  *
- * @apiSuccess {string[]} requests Array of requests.
+ * @apiSuccess {object[]} requests Array of requests.
  * @apiSuccess {number} requests.id The record ID.
  * @apiSuccess {string} [requests.name] Name of the requester.
  * @apiSuccess {string} requests.from_location Escort start location.

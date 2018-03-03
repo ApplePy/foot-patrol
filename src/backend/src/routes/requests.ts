@@ -96,7 +96,7 @@ export class RequestsRoute implements IRoute {
    * @apiParam (Query Parameter) {number} count The maximum number of elements return; capped at 100.
    * @apiParam (Query Parameter) {boolean} [archived=false] Include archived requests in the response.
    *
-   * @apiSuccess {string[]} requests Array of requests.
+   * @apiSuccess {object[]} requests Array of requests.
    * @apiSuccess {number} requests.id The record ID.
    * @apiSuccess {string} [requests.name] Name of the requester.
    * @apiSuccess {string} requests.from_location Escort start location.
@@ -224,7 +224,7 @@ export class RequestsRoute implements IRoute {
 
     // Ensure valid id
     if (isNaN(id) || id < 0) {
-      next(new StatusError(400, "Invalid Query Parameter", "Offset and/or count are not numbers >= 0."));
+      next(new StatusError(400, "Invalid Query Parameter", "ID must be above 0."));
       return;
     }
 
@@ -286,7 +286,7 @@ export class RequestsRoute implements IRoute {
 
     // Ensure valid id
     if (isNaN(id) || id < 0) {
-      next(new StatusError(400, "Invalid Query Parameter", "Offset and/or count are not numbers >= 0."));
+      next(new StatusError(400, "Invalid Query Parameter", "ID must be above 0."));
       return;
     }
 
