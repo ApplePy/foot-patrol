@@ -35,7 +35,7 @@ export class VolunteerPairing {
     let invalid = false;
     invalid = invalid || this.volunteer_one === VolunteerPairing.NullVolunteer;
     invalid = invalid || this.volunteer_two === VolunteerPairing.NullVolunteer;
-    invalid = invalid || this.checkUniqueness(this.volunteer_one, this.volunteer_two);
+    invalid = invalid || this.checkOrdering(this.volunteer_one, this.volunteer_two);
 
     return !invalid;
   }
@@ -46,7 +46,7 @@ export class VolunteerPairing {
    * @param first
    * @param second
    */
-  private checkUniqueness(first: Volunteer, second: Volunteer) {
-    return (first == null || second == null || first.id === second.id);
+  private checkOrdering(first: Volunteer, second: Volunteer) {
+    return (first == null || second == null || first.id >= second.id);
   }
 }

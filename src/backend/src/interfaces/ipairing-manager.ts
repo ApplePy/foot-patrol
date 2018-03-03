@@ -33,7 +33,8 @@ export interface IVolunteerPairingManager {
   /**
    * Update a volunteer pairing with new active status.
    *
-   * @param pairing The volunteer pairing to be updated.
+   * @param id The ID of the volunteer pairing to toggle.
+   * @param active The new active state of the pairing.
    */
-  toggleActive(pairing: VolunteerPairing): Promise<void>;
+  toggleActive(id: number, active: boolean): Promise<void>;
 }

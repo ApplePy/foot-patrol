@@ -99,11 +99,12 @@ export class SQLVolunteerPairingManager extends SQLAbstractManager implements IV
   /**
    * Update a volunteer pairing with new active status.
    *
-   * @param pairing The volunteer pairing to be updated.
+   * @param id The ID of the volunteer pairing to toggle.
+   * @param active The new active state of the pairing.
    */
-  public toggleActive(pairing: VolunteerPairing) {
+  public toggleActive(id: number, active: boolean) {
     return this.db.makeQuery(`UPDATE \`volunteer_pairing\` SET active=? WHERE id=?`,
-    [Number(pairing.active), pairing.id])
+    [active, id])
     .then((result) => (result.affectedRows > 0) ?
                       Promise.resolve() :
                       Promise.reject(new Error("Not Found")));
