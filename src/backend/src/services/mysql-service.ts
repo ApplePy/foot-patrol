@@ -7,7 +7,7 @@ import { ISQLService } from "../interfaces/isql-service";
  */
 @injectable()
 export class MySQLService implements ISQLService {
-  private connectionPool: mysql.Pool;
+  private connectionPool: mysql.Pool | undefined;
 
   /**
    * Initialize object
@@ -41,6 +41,7 @@ export class MySQLService implements ISQLService {
       // Catch uninitialized
       if (pool === undefined) {
         rej(new Error("Database connection not initialized!"));
+        return;
       }
 
       // Open a new connection

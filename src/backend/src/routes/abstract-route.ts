@@ -18,12 +18,12 @@ export abstract class AbstractRoute {
    */
   protected translateErrors(err: Error) {
     if (err.message === "Not Found") {
-      return new StatusError(400,
+      return new StatusError(404,
         errStrings.NotFoundError.Title,
         errStrings.NotFoundError.Msg);
     } else {
       console.error(err.toString());
-      return new StatusError(400,
+      return new StatusError(500,
         errStrings.InternalServerError.Title,
         errStrings.InternalServerError.Msg);
     }

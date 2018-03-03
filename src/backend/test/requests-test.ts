@@ -59,42 +59,6 @@ class RequestsAPITest {
     });
   }
 
-  @test("sanitizeMap should properly sanitize data")
-  public sanitizeTest() {
-    // Data
-    const SAN_MAP = {
-      first: Number,
-      second: Boolean,
-      third: (val: any) => val,
-      fifth: Number,
-      sixth: Boolean
-    };
-
-    const DATA_MAP = {
-      first: "123",
-      second: "stuff",
-      third: {hello: "moto"},
-      fourth: "ignore me",
-      fifth: "invalid number",
-      sixth: 0
-    };
-
-    const EXPECTED_RESULTS = {
-      first: 123,
-      second: true,
-      third: {hello: "moto"},
-      fifth: NaN,
-      sixth: false
-    };
-
-    // Test
-    const requestsRoute = serverEnv.container.getNamed<RequestsRoute>(IFACES.IROUTE, TAGS.REQUESTS);
-    const results = requestsRoute.sanitizeMap(SAN_MAP, DATA_MAP);
-
-    // Assert
-    results.should.deep.equal(EXPECTED_RESULTS);
-  }
-
   @test("GET should return a list of requests")
   public requestsList(done: MochaDone) {
     // Get SQL connector instance
@@ -772,8 +736,8 @@ class RequestsAPITest {
 
     // Setup fake data
     const INPUT = {
-      from_location: 1,
-      to_location: 2,
+      from_location: "UCC",
+      to_location: "TEB",
       archived: true,
       status: "REJECTED"
     };
@@ -823,8 +787,8 @@ class RequestsAPITest {
   public putBadId(done: MochaDone) {
     // Setup fake data
     const INPUT = {
-      from_location: 10,
-      to_location: 1,
+      from_location: "UCC",
+      to_location: "TEB",
       archived: false,
       status: "REJECTED"
     };
@@ -950,8 +914,8 @@ class RequestsAPITest {
   public patchDupLocations(done: MochaDone) {
     // Setup fake data
     const INPUT = {
-      from_location: 1,
-      to_location: 1
+      from_location: "HI",
+      to_location: "HI"
     };
     const REQUESTS_DATA = undefined;
     FakeSQL.response = REQUESTS_DATA;
@@ -974,8 +938,8 @@ class RequestsAPITest {
   public patchBadId(done: MochaDone) {
     // Setup fake data
     const INPUT = {
-      from_location: 10,
-      to_location: 1,
+      from_location: "UCC",
+      to_location: "TEB",
       archived: false
     };
     const REQUESTS_DATA = {affectedRows: 0};

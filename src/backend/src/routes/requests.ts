@@ -465,12 +465,20 @@ export class RequestsRoute extends AbstractRoute implements IRoute {
     }
 
     // Sanitize data
-    req.body.status = TravelStatus[req.body.status];
-    req.body.archived = (req.body.archived === true || req.body.archived === "true") ? true : false;
-    req.body.name = this.sanitizer.sanitize(req.body.name);
-    req.body.additional_info = this.sanitizer.sanitize(req.body.additional_info);
-    req.body.from_location = this.sanitizer.sanitize(req.body.from_location);
-    req.body.to_location = this.sanitizer.sanitize(req.body.to_location);
+    try {
+      req.body.status = TravelStatus[req.body.status];
+      req.body.archived = (req.body.archived === true || req.body.archived === "true") ? true : false;
+      req.body.name = (typeof req.body.name === "string") ? this.sanitizer.sanitize(req.body.name) : undefined;
+      req.body.from_location = this.sanitizer.sanitize(req.body.from_location);
+      req.body.to_location = this.sanitizer.sanitize(req.body.to_location);
+      req.body.additional_info = (typeof req.body.additional_info === "string") ?
+      this.sanitizer.sanitize(req.body.additional_info) : undefined;
+    } catch (badError) {
+      next (new StatusError(400,
+        errStrings.InvalidBodyParameter.Title,
+        errStrings.InvalidBodyParameter.Msg));
+      return;
+    }
 
     // Replace records
     const putData = new TravelRequest(req.body);
