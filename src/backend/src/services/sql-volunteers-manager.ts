@@ -44,7 +44,7 @@ export class SQLVolunteersManager extends SQLAbstractManager implements IVolunte
   /**
    * Get a list of volunteers from the backend.
    *
-   * Defaults to not returning disabled volunteers.
+   * Defaults to returning disabled volunteers.
    *
    * @param filter Dictionary to be plugged into the SQL `WHERE` parameter as "AND"
    */

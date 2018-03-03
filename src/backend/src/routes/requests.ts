@@ -685,6 +685,12 @@ export class RequestsRoute implements IRoute {
     return (to == null || from == null || to === from);
   }
 
+  /**
+   * Check if an object is one of a set of valid values.
+   *
+   * @param subject Object to check.
+   * @param valids The allowed valid values.
+   */
   private validValues(subject: any, ...valids: any[]) {
     let valid = false;
 
