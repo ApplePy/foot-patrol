@@ -88,6 +88,7 @@ namespace FootPatrol.Droid
 
             listAdapter = new ArrayAdapter<string>(this.Context, Resource.Layout.ListElement, menuItems); //initializes ArrayAdapter to be displayed in listView
             layoutManager = new LinearLayoutManager(this.Context, LinearLayoutManager.Horizontal, false); //initializs the directions layout to be horizontal and sidescrolling
+            request = new List<string>();
 
             TimerCallback time = new TimerCallback(retrieveRequests); //create a new timerCallback to be used in timer
             Timer timer = new Timer(time, 0, 0, 1000); //use the timerCallback to check for user requests every second
@@ -342,6 +343,7 @@ namespace FootPatrol.Droid
 
             if (client.IsConnected) //if the client is still connected
             {
+                volunteerMarker = new MarkerOptions();
                 volunteerMarker.SetPosition(new LatLng(myLocation.Latitude, myLocation.Longitude)).SetTitle("Volunteer").SetIcon(BitmapDescriptorFactory.DefaultMarker(BitmapDescriptorFactory.HueRed)); //set the current position of the volunteer using a marker
                 map.AddMarker(volunteerMarker); //add the marker on the map
                 CameraPosition cp = new CameraPosition.Builder().Target(new LatLng(myLocation.Latitude, myLocation.Longitude)).Zoom(15).Bearing(90).Tilt(40).Build(); //setup a new camera position
@@ -392,6 +394,7 @@ namespace FootPatrol.Droid
         /// </summary>
         private void onRequestClick()
         {
+            
             if (request.Count == 0)
             {
                 createAlert("There are no requests to be fulfilled!"); //if there are no requests, display alert
