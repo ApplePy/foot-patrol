@@ -8,6 +8,7 @@ import { ISanitizer } from "../interfaces/isanitizer";
 import { StatusError } from "../models/status-error";
 import { TravelRequest, TravelStatus } from "../models/travel-request";
 import { VolunteerPairing } from "../models/volunteer-pairing";
+import { default as errStrings } from "../strings";
 
 @injectable()
 export class RequestsRoute implements IRoute {
@@ -133,12 +134,12 @@ export class RequestsRoute implements IRoute {
    *        meta: {offset: 0, count: 10, archived: true}
    *     }
    *
-   * @apiError (Error 400) InvalidQueryParameters One of the URL query parameters was invalid.
+   * @apiError (Error 400) InvalidQueryParameter One of the URL query parameters was invalid.
    * @apiErrorExample Error Response:
    *     HTTP/1.1 400 BAD REQUEST
    *     {
-   *        error: "InvalidQueryParameters",
-   *        message: "Offset and/or count are not numbers >= 0."
+   *        error: "Invalid Query Parameter",
+   *        message: "A required query parameter is missing or out of range."
    *     }
    */
   public getRequests(req: Request, res: Response, next: NextFunction) {
@@ -148,13 +149,17 @@ export class RequestsRoute implements IRoute {
 
     // Ensure valid parameters
     if (isNaN(offset) || isNaN(count) || offset < 0 || count < 0) {
-      next(new StatusError(400, "Invalid Query Parameter", "Offset and/or count are not numbers >= 0."));
+      next(new StatusError(400,
+                           errStrings.InvalidQueryParameter.Title,
+                           errStrings.InvalidQueryParameter.Msg));
       return;
     }
 
     // Test to ensure archived is valid
     if (this.validValues(req.query.archived, undefined, "true", "false") === false) {
-      next(new StatusError(400, "Invalid Query Parameter", "Archived must be 'true', 'false' or undefined."));
+      next(new StatusError(400,
+        errStrings.InvalidQueryParameter.Title,
+        errStrings.InvalidQueryParameter.Msg));
       return;
     }
 
@@ -209,13 +214,13 @@ export class RequestsRoute implements IRoute {
    *        status: "REQUESTED"
    *     }
    *
-   * @apiError (Error 400) InvalidQueryParameters The requested ID was invalid format.
-   * @apiError (Error 404) RequestNotFound The request ID was not found.
+   * @apiError (Error 400) InvalidQueryParameter The requested ID was invalid format.
+   * @apiError (Error 404) NotFoundError The request ID was not found.
    * @apiErrorExample Error Response:
    *     HTTP/1.1 404 NOT FOUND
    *     {
-   *        error: "RequestNotFound",
-   *        message: "Request ID '1' was not found."
+   *        error: "Not Found Error",
+   *        message: "The requested data was not found."
    *     }
    */
   public getRequest(req: Request, res: Response, next: NextFunction) {
@@ -224,7 +229,9 @@ export class RequestsRoute implements IRoute {
 
     // Ensure valid id
     if (isNaN(id) || id < 0) {
-      next(new StatusError(400, "Invalid Query Parameter", "ID must be above 0."));
+      next(new StatusError(400,
+        errStrings.InvalidURLParameter.Title,
+        errStrings.InvalidURLParameter.Msg));
       return;
     }
 
@@ -272,13 +279,13 @@ export class RequestsRoute implements IRoute {
    *        ]
    *     }
    *
-   * @apiError (Error 400) InvalidQueryParameters The requested ID was invalid format.
-   * @apiError (Error 404) RequestNotFound The request ID was not found.
+   * @apiError (Error 400) InvalidQueryParameter The requested ID was invalid format.
+   * @apiError (Error 404) NotFoundError The request ID was not found.
    * @apiErrorExample Error Response:
    *     HTTP/1.1 404 NOT FOUND
    *     {
-   *        error: "RequestNotFound",
-   *        message: "Request ID '1' was not found."
+   *        error: "Not Found Error",
+   *        message: "The requested data was not found."
    *     }
    */
   public getVolunteers(req: Request, res: Response, next: NextFunction) {
@@ -286,7 +293,9 @@ export class RequestsRoute implements IRoute {
 
     // Ensure valid id
     if (isNaN(id) || id < 0) {
-      next(new StatusError(400, "Invalid Query Parameter", "ID must be above 0."));
+      next(new StatusError(400,
+        errStrings.InvalidURLParameter.Title,
+        errStrings.InvalidURLParameter.Msg));
       return;
     }
 
@@ -365,23 +374,21 @@ export class RequestsRoute implements IRoute {
    *        status: "REQUESTED"
    *     }
    *
-   * @apiError (Error 400) MissingParameters One of the post request parameters was missing or invalid.
+   * @apiError (Error 400) NonUniqueParameter One of the post request parameters was missing or invalid.
    * @apiErrorExample Error Response:
    *     HTTP/1.1 400 BAD REQUEST
    *     {
-   *        error: "MissingParameters",
-   *        message: "'from_location' and 'to' are required parameters."
+   *        error: "Non-Unique Parameter",
+   *        message: "Parameters that were required to be unique were found to be the same."
    *     }
    */
   public postRequest(req: Request, res: Response, next: NextFunction) {
     /* tslint:enable:max-line-length */
     // Catch missing data
     if (this.checkToFromUniqueness(req.body.to_location, req.body.from_location)) {
-      next (new StatusError(
-        400,
-        "Missing Parameters",
-        "'from_location' and 'to_location' must be supplied and not equal to each other" +
-        " are required parameters."));
+      next (new StatusError(400,
+        errStrings.NonUniqueParameter.Title,
+        errStrings.NonUniqueParameter.Msg));
       return;
     }
 
@@ -450,13 +457,13 @@ export class RequestsRoute implements IRoute {
    *        status: "REQUESTED"
    *     }
    *
-   * @apiError (Error 400) MissingOrInvalidParameters One of the request parameters was missing or invalid.
-   * @apiError (Error 404) RequestNotFound The request ID was not found.
+   * @apiError (Error 400) InvalidBodyParameter One of the request parameters was missing or invalid.
+   * @apiError (Error 404) NotFoundError The request ID was not found.
    * @apiErrorExample Error Response:
    *     HTTP/1.1 400 BAD REQUEST
    *     {
-   *        error: "MissingParameters",
-   *        message: "'from_location' parameter is missing."
+   *        error: "Invalid Body Parameter",
+   *        message: "A required body parameter is missing or out of range."
    *     }
    */
   public putRequest(req: Request, res: Response, next: NextFunction) {
@@ -465,7 +472,9 @@ export class RequestsRoute implements IRoute {
 
     // Catch invalid id
     if (isNaN(id) || id < 0) {
-      next(new StatusError(400, "Invalid URL Parameter", "Id is not a number >= 0."));
+      next(new StatusError(400,
+        errStrings.InvalidURLParameter.Title,
+        errStrings.InvalidURLParameter.Msg));
       return;
     }
 
@@ -476,10 +485,9 @@ export class RequestsRoute implements IRoute {
       TravelStatus[req.body.status] === undefined ||
       this.checkToFromUniqueness(req.body.to_location, req.body.from_location)
     ) {
-      next (new StatusError(
-        400,
-        "Missing Or Invalid Parameters",
-        "A required valid parameter is missing."));
+      next (new StatusError(400,
+        errStrings.InvalidBodyParameter.Title,
+        errStrings.InvalidBodyParameter.Msg));
       return;
     }
 
@@ -549,21 +557,23 @@ export class RequestsRoute implements IRoute {
    *        timestamp: "2017-10-26T06:51:05.000Z",
    *        status: "REQUESTED"
    *     }
-   * @apiError (Error 400) InvalidQueryParameters The requested ID was invalid format.
-   * @apiError (Error 400) InvalidLocation One of the location parameters equal.
-   * @apiError (Error 404) RequestNotFound The request ID was not found.
+   * @apiError (Error 400) InvalidURLParameter The requested ID was invalid format.
+   * @apiError (Error 400) NonUniqueParameter One of the location parameters equal.
+   * @apiError (Error 404) NotFoundError The request ID was not found.
    * @apiErrorExample Error Response:
    *     HTTP/1.1 404 NOT FOUND
    *     {
-   *        error: "RequestNotFound",
-   *        message: "Request ID 1 was not found."
+   *        error: "Not Found Error",
+   *        message: "The requested data was not found."
    *     }
    */
   public patchRequest(req: Request, res: Response, next: NextFunction) {
     /* tslint:enable:max-line-length */
     // Check for invalid ID
     if (isNaN(Number(req.params.id)) || Number(req.params.id) < 0) {
-      next(new StatusError(400, "Invalid Query Parameter", "ID is required"));
+      next(new StatusError(400,
+        errStrings.InvalidURLParameter.Title,
+        errStrings.InvalidURLParameter.Msg));
       return;
     }
 
@@ -585,7 +595,9 @@ export class RequestsRoute implements IRoute {
         && updateDict.to_location !== undefined
         && updateDict.from_location === updateDict.to_location
     ) {
-      next(new StatusError(400, "Invalid Location", "Locations should not equal."));
+      next(new StatusError(400,
+        errStrings.NonUniqueParameter.Title,
+        errStrings.NonUniqueParameter.Msg));
       return;
     }
 
@@ -619,13 +631,13 @@ export class RequestsRoute implements IRoute {
    * @apiSuccessExample Success Response:
    *     HTTP/1.1 204 NO CONTENT
    *
-   * @apiError (Error 400) InvalidQueryParameters The requested ID was invalid format.
-   * @apiError (Error 404) RequestNotFound The request ID was not found.
+   * @apiError (Error 400) InvalidURLParameter The requested ID was invalid format.
+   * @apiError (Error 404) NotFoundError The request ID was not found.
    * @apiErrorExample Error Response:
    *     HTTP/1.1 404 NOT FOUND
    *     {
-   *        error: "RequestNotFound",
-   *        message: "Request ID 1 was not found."
+   *        error: "Not Found Error",
+   *        message: "The requested data was not found."
    *     }
    */
   public deleteRequest(req: Request, res: Response, next: NextFunction) {
@@ -633,7 +645,9 @@ export class RequestsRoute implements IRoute {
 
     // Check for invalid id
     if (isNaN(id) || id < 0) {
-      next(new StatusError(400, "Invalid Query Parameter", "Offset and/or count are not numbers >= 0."));
+      next(new StatusError(400,
+        errStrings.InvalidURLParameter.Title,
+        errStrings.InvalidURLParameter.Msg));
       return;
     }
 
@@ -650,10 +664,14 @@ export class RequestsRoute implements IRoute {
    */
   private translateErrors(err: Error) {
     if (err.message === "Not Found") {
-      return new StatusError(404, "Not Found", `ID was not found.`);
+      return new StatusError(400,
+        errStrings.NotFoundError.Title,
+        errStrings.NotFoundError.Msg);
     } else {
       console.error(err.toString());
-      return new StatusError(500, "Internal Server Error", "An error has occurred.");
+      return new StatusError(400,
+        errStrings.InternalServerError.Title,
+        errStrings.InternalServerError.Msg);
     }
   }
 
