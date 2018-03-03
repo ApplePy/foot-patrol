@@ -7,17 +7,14 @@ import { IVolunteersManager } from "../interfaces/ivolunteers-manager";
 import { StatusError } from "../models/status-error";
 import { Volunteer } from "../models/volunteer";
 import { default as errStrings } from "../strings";
+import { AbstractRoute } from "./abstract-route";
 
 @injectable()
-export class VolunteersRoute implements IRoute {
+export class VolunteersRoute extends AbstractRoute implements IRoute {
 
   public router: Router;
   private data: IVolunteersManager;
   private sanitizer: ISanitizer;
-
-  get Router(): Router {
-    return this.router;
-  }
 
   /**
    * Constructor
@@ -26,6 +23,8 @@ export class VolunteersRoute implements IRoute {
     @inject(IFACES.IVOLUNTEERSMANAGER) data: IVolunteersManager,
     @inject(IFACES.ISANITIZER) sanitizer: ISanitizer
   ) {
+    super();
+
     // Log
     console.log("[RequestsRoute::create] Creating volunteers route.");
 
@@ -46,33 +45,6 @@ export class VolunteersRoute implements IRoute {
     this.router.patch("/:id", this.patchVolunteer.bind(this));
     this.router.get("/active", this.activeVolunteers.bind(this));
     this.router.get("/inactive", this.inactiveVolunteers.bind(this));
-  }
-
-  // TODO: Copy-pasted from requests.ts
-  /**
-   * Sanitizes a flat map with the mapped sanitize functions
-   *
-   * @param sanitizeMap The functions to use to sanitize different keys
-   * @param newData The flat map to sanitize
-   * @returns an array of key-value objects
-   */
-  public sanitizeMap(sanitizeMap: any, newData: any) {
-    const updateList: {[key: string]: any} = {};
-
-    for (const key in sanitizeMap) {
-      // Don't look down the prototype chain
-      if (!sanitizeMap.hasOwnProperty(key)) { continue; }
-
-      // If a property with that column is found, sanitize and add to updateList
-      if (newData[key] !== undefined) {
-        const sanFunc = sanitizeMap[key];
-        updateList[key as string] = sanFunc(newData[key]);
-        // Final structure of updateList: {column: value, ...}
-      }
-    }
-
-    // Return data
-    return updateList;
   }
 
   /**
@@ -407,7 +379,7 @@ export class VolunteersRoute implements IRoute {
     };
 
     // List of sanitized data
-    const updateDict = this.sanitizeMap(sanitizeMap, req.body);
+    const updateDict = this.sanitizer.sanitizeMap(sanitizeMap, req.body);
 
     // Empty string check
     for (const prop of ["uwo_id", "first_name", "last_name"]) {
@@ -514,45 +486,6 @@ export class VolunteersRoute implements IRoute {
     this.data.getPairedVolunteers()
     .then((volunteers) => res.send({volunteers}))
     .catch((err) => next(this.translateErrors(err))); // Send generic error
-  }
-
-  // TODO: Copied from requests
-  /**
-   * Translate generic errors from data layer into HTTP errors.
-   *
-   * @param err
-   */
-  private translateErrors(err: Error) {
-    if (err.message === "Not Found") {
-      return new StatusError(400,
-        errStrings.NotFoundError.Title,
-        errStrings.NotFoundError.Msg);
-    } else {
-      console.error(err.toString());
-      return new StatusError(400,
-        errStrings.InternalServerError.Title,
-        errStrings.InternalServerError.Msg);
-    }
-  }
-
-  // TODO: Copied from requests
-  /**
-   * Check if an object is one of a set of valid values.
-   *
-   * @param subject Object to check.
-   * @param valids The allowed valid values.
-   */
-  private validValues(subject: any, ...valids: any[]) {
-    let valid = false;
-
-    for (const validOption of valids) {
-      if (subject === validOption) {
-        valid = true;
-        break;
-      }
-    }
-
-    return valid;
   }
 
   /**

@@ -26,4 +26,30 @@ export class Sanitizer implements ISanitizer {
         .replace(/>/g, "&gt;")
         .replace(/\//g, "&#x2F;");
   }
+
+  /**
+   * Sanitizes a flat map with the mapped sanitize functions
+   *
+   * @param sanitizeMap The functions to use to sanitize different keys
+   * @param newData The flat map to sanitize
+   * @returns an array of key-value objects
+   */
+  public sanitizeMap(sanitizeMap: any, newData: any) {
+    const updateList: {[key: string]: any} = {};
+
+    for (const key in sanitizeMap) {
+      // Don't look down the prototype chain
+      if (!sanitizeMap.hasOwnProperty(key)) { continue; }
+
+      // If a property with that column is found, sanitize and add to updateList
+      if (newData[key] !== undefined) {
+        const sanFunc = sanitizeMap[key];
+        updateList[key as string] = sanFunc(newData[key]);
+        // Final structure of updateList: {column: value, ...}
+      }
+    }
+
+    // Return data
+    return updateList;
+  }
 }

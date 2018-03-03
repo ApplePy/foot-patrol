@@ -9,18 +9,15 @@ import { StatusError } from "../models/status-error";
 import { TravelRequest, TravelStatus } from "../models/travel-request";
 import { VolunteerPairing } from "../models/volunteer-pairing";
 import { default as errStrings } from "../strings";
+import { AbstractRoute } from "./abstract-route";
 
 @injectable()
-export class RequestsRoute implements IRoute {
+export class RequestsRoute extends AbstractRoute implements IRoute {
 
   public router: Router;
   private data: IRequestsManager;
   private sanitizer: ISanitizer;
   private volmgr: IVolunteerPairingManager;
-
-  get Router(): Router {
-    return this.router;
-  }
 
   /**
    * Constructor
@@ -29,6 +26,8 @@ export class RequestsRoute implements IRoute {
     @inject(IFACES.IREQUESTSMANAGER) data: IRequestsManager,
     @inject(IFACES.IVOLUNTEERPAIRINGMANAGER) volunteers: IVolunteerPairingManager,
     @inject(IFACES.ISANITIZER) sanitizer: ISanitizer) {
+    super();
+
     // Log
     console.log("[RequestsRoute::create] Creating requests route.");
 
@@ -52,32 +51,6 @@ export class RequestsRoute implements IRoute {
     this.router.patch("/:id", this.patchRequest.bind(this));
     this.router.delete("/:id", this.deleteRequest.bind(this));
     this.router.get("/:id/volunteers", this.getVolunteers.bind(this));
-  }
-
-  /**
-   * Sanitizes a flat map with the mapped sanitize functions
-   *
-   * @param sanitizeMap The functions to use to sanitize different keys
-   * @param newData The flat map to sanitize
-   * @returns an array of key-value objects
-   */
-  public sanitizeMap(sanitizeMap: any, newData: any) {
-    const updateList: {[key: string]: any} = {};
-
-    for (const key in sanitizeMap) {
-      // Don't look down the prototype chain
-      if (!sanitizeMap.hasOwnProperty(key)) { continue; }
-
-      // If a property with that column is found, sanitize and add to updateList
-      if (newData[key] !== undefined) {
-        const sanFunc = sanitizeMap[key];
-        updateList[key as string] = sanFunc(newData[key]);
-        // Final structure of updateList: {column: value, ...}
-      }
-    }
-
-    // Return data
-    return updateList;
   }
 
   /* tslint:disable:max-line-length */
@@ -588,7 +561,7 @@ export class RequestsRoute implements IRoute {
     };
 
     // List of sanitized data
-    const updateDict = this.sanitizeMap(sanitizeMap, req.body);
+    const updateDict = this.sanitizer.sanitizeMap(sanitizeMap, req.body);
 
     // Locaion check
     if (updateDict.from_location !== undefined
@@ -658,24 +631,6 @@ export class RequestsRoute implements IRoute {
   }
 
   /**
-   * Translate generic errors from data layer into HTTP errors.
-   *
-   * @param err
-   */
-  private translateErrors(err: Error) {
-    if (err.message === "Not Found") {
-      return new StatusError(400,
-        errStrings.NotFoundError.Title,
-        errStrings.NotFoundError.Msg);
-    } else {
-      console.error(err.toString());
-      return new StatusError(400,
-        errStrings.InternalServerError.Title,
-        errStrings.InternalServerError.Msg);
-    }
-  }
-
-  /**
    * Check if to and from are the same.
    *
    * @param to
@@ -683,24 +638,5 @@ export class RequestsRoute implements IRoute {
    */
   private checkToFromUniqueness(to: string, from: string) {
     return (to == null || from == null || to === from);
-  }
-
-  /**
-   * Check if an object is one of a set of valid values.
-   *
-   * @param subject Object to check.
-   * @param valids The allowed valid values.
-   */
-  private validValues(subject: any, ...valids: any[]) {
-    let valid = false;
-
-    for (const validOption of valids) {
-      if (subject === validOption) {
-        valid = true;
-        break;
-      }
-    }
-
-    return valid;
   }
 }
