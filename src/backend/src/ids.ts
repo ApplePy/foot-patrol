@@ -14,5 +14,7 @@ export const IFACES = {
  * Names to retrieve specific implementations of interfaces.
  */
 export const TAGS = {
-  REQUESTS: Symbol("REQUESTS")
+  REQUESTS: Symbol("REQUESTS"),
+  VOLUNTEERS: Symbol("VOLUNTEERS"),
+  PAIRINGS: Symbol("PAIRINGS")
 };

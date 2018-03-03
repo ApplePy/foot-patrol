@@ -26,7 +26,7 @@ export class VolunteersRoute extends AbstractRoute implements IRoute {
     super();
 
     // Log
-    console.log("[RequestsRoute::create] Creating volunteers route.");
+    console.log("[VolunteersRoute::create] Creating volunteers route.");
 
     // Save sanitizer
     this.sanitizer = sanitizer;
@@ -40,11 +40,11 @@ export class VolunteersRoute extends AbstractRoute implements IRoute {
     // Add to router
     this.router.get("/", this.getVolunteers.bind(this));
     this.router.post("/", this.postVolunteer.bind(this));
+    this.router.get("/active", this.activeVolunteers.bind(this));
+    this.router.get("/inactive", this.inactiveVolunteers.bind(this));
     this.router.get("/:id", this.getVolunteer.bind(this));
     this.router.put("/:id", this.putVolunteer.bind(this));
     this.router.patch("/:id", this.patchVolunteer.bind(this));
-    this.router.get("/active", this.activeVolunteers.bind(this));
-    this.router.get("/inactive", this.inactiveVolunteers.bind(this));
   }
 
   /**
@@ -191,7 +191,7 @@ export class VolunteersRoute extends AbstractRoute implements IRoute {
    * @apiSuccess (Created 201) {string} uwo_id UWO ID of the new volunteer.
    * @apiSuccess (Created 201) {string} first_name First name of the new volunteer.
    * @apiSuccess (Created 201) {string} last_name Last name of the new volunteer.
-   * @apiSuccess (Created 201) {boolean} [disabled] Whether the volunteer is disabled.
+   * @apiSuccess (Created 201) {boolean} disabled Whether the volunteer is disabled.
    *
    * @apiSuccessExample Success Response:
    *     HTTP/1.1 201 CREATED
@@ -379,7 +379,15 @@ export class VolunteersRoute extends AbstractRoute implements IRoute {
     };
 
     // List of sanitized data
-    const updateDict = this.sanitizer.sanitizeMap(sanitizeMap, req.body);
+    let updateDict: any;
+    try {
+      updateDict = this.sanitizer.sanitizeMap(sanitizeMap, req.body);
+    } catch (err) {
+      next(new StatusError(400,
+        errStrings.InvalidBodyParameter.Title,
+        errStrings.InvalidBodyParameter.Msg));
+      return;
+    }
 
     // Empty string check
     for (const prop of ["uwo_id", "first_name", "last_name"]) {
@@ -403,13 +411,13 @@ export class VolunteersRoute extends AbstractRoute implements IRoute {
   }
 
   /**
-   * Get list of inactive, not-disabled volunteers.
+   * Get list of inactive, not-disabled volunteers
    *
    * @param req {Request} The express Request object.
    * @param res {Response} The express Response object.
    * @param next {NextFunction} Execute the next method.
    *
-   * @api {delete} /api/v1/volunteers/inactive Get list of inactive, not-disabled volunteers.
+   * @api {get} /api/v1/volunteers/inactive Get list of inactive, not-disabled volunteers
    * @apiVersion 1.2.0
    * @apiName GetInactiveVolunteers
    * @apiGroup Volunteers
@@ -446,13 +454,13 @@ export class VolunteersRoute extends AbstractRoute implements IRoute {
   }
 
   /**
-   * Get list of actively patrolling volunteers.
+   * Get list of actively patrolling volunteers
    *
    * @param req {Request} The express Request object.
    * @param res {Response} The express Response object.
    * @param next {NextFunction} Execute the next method.
    *
-   * @api {delete} /api/v1/volunteers/active Get list of actively patrolling volunteers.
+   * @api {get} /api/v1/volunteers/active Get list of actively patrolling volunteers
    * @apiVersion 1.2.0
    * @apiName GetActiveVolunteers
    * @apiGroup Volunteers
@@ -494,20 +502,24 @@ export class VolunteersRoute extends AbstractRoute implements IRoute {
    * @param req The request to check for missing data.
    */
   private checkRecordData(req: Request) {
-    // tslint:disable:variable-name
-    const uwo_id = this.sanitizer.sanitize(req.body.uwo_id);
-    const first_name = this.sanitizer.sanitize(req.body.first_name);
-    const last_name = this.sanitizer.sanitize(req.body.last_name);
-    const disabled = (req.body.disabled === true || req.body.disabled === "true") ? true : false;
-    // tslint:enable:variable-name
+    try {
+      // tslint:disable:variable-name
+      const uwo_id = this.sanitizer.sanitize(req.body.uwo_id);
+      const first_name = this.sanitizer.sanitize(req.body.first_name);
+      const last_name = this.sanitizer.sanitize(req.body.last_name);
+      const disabled = (req.body.disabled === true || req.body.disabled === "true") ? true : false;
+      // tslint:enable:variable-name
 
-    // Check that the strings aren't empty
-    for (const prop of [uwo_id, first_name, last_name]) {
-      if (prop.length <= 0) {
-        return false;
+      // Check that the strings aren't empty
+      for (const prop of [uwo_id, first_name, last_name]) {
+        if (prop.length <= 0) {
+          return false;
+        }
       }
-    }
 
-    return {uwo_id, first_name, last_name, disabled};
+      return {uwo_id, first_name, last_name, disabled};
+    } catch (err) {
+      return false;
+    }
   }
 }

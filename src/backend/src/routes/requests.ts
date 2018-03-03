@@ -220,7 +220,7 @@ export class RequestsRoute extends AbstractRoute implements IRoute {
    * @param res {Response} The express Response object.
    * @param next {NextFunction} Execute the next method.
    *
-   * @api {get} /api/v1/requests/:id/volunteers Get specific request's volunteers.
+   * @api {get} /api/v1/requests/:id/volunteers Get specific request's volunteers
    * @apiVersion 1.2.0
    * @apiName GetRequestVolunteers
    * @apiGroup Requests
@@ -367,10 +367,18 @@ export class RequestsRoute extends AbstractRoute implements IRoute {
 
     // Sanitize data
     const cleanData: any = {};
-    cleanData.name = this.sanitizer.sanitize(req.body.name);
-    cleanData.additional_info = this.sanitizer.sanitize(req.body.additional_info);
-    cleanData.from_location = this.sanitizer.sanitize(req.body.from_location);
-    cleanData.to_location = this.sanitizer.sanitize(req.body.to_location);
+    try {
+      cleanData.name = (typeof req.body.name === "string") ? this.sanitizer.sanitize(req.body.name) : undefined;
+      cleanData.from_location = this.sanitizer.sanitize(req.body.from_location);
+      cleanData.to_location = this.sanitizer.sanitize(req.body.to_location);
+      cleanData.additional_info = (typeof req.body.additional_info === "string") ?
+      this.sanitizer.sanitize(req.body.additional_info) : undefined;
+    } catch (err) {
+      next (new StatusError(400,
+        errStrings.InvalidBodyParameter.Title,
+        errStrings.InvalidBodyParameter.Msg));
+      return;
+    }
 
     const postData = new TravelRequest(cleanData);
 
@@ -569,7 +577,15 @@ export class RequestsRoute extends AbstractRoute implements IRoute {
     };
 
     // List of sanitized data
-    const updateDict = this.sanitizer.sanitizeMap(sanitizeMap, req.body);
+    let updateDict: any;
+    try {
+      updateDict = this.sanitizer.sanitizeMap(sanitizeMap, req.body);
+    } catch (err) {
+      next(new StatusError(400,
+        errStrings.InvalidBodyParameter.Title,
+        errStrings.InvalidBodyParameter.Msg));
+      return;
+    }
 
     // Locaion check
     if (updateDict.from_location !== undefined
