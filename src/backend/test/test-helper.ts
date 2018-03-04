@@ -3,13 +3,13 @@ import { FakeSQL } from "./fake-sql";
 
 /**
  * Class of miscellaneous test help functions.
- * 
+ *
  * TODO: Very tied to the MySQLService and FakeSQLService implementations.
  */
 export class TestReplaceHelper {
     /**
      * Execute a 'REPLACE INTO' call onto a MySQL database
-     * 
+     *
      * @param queryFunction The function to call that will make the replacement
      * @param table         The table to do the replacement in
      * @param data          The data to use
@@ -31,7 +31,7 @@ export class TestReplaceHelper {
 
     /**
      * Execute a 'REPLACE INTO' call onto a MySQL database, handling date conversions
-     * 
+     *
      * @param queryFunction The function to call that will make the replacement
      * @param table         The table to do the replacement in
      * @param dataInfo      The data to use
