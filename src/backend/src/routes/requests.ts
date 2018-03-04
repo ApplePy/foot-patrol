@@ -324,6 +324,7 @@ export class RequestsRoute extends AbstractRoute implements IRoute {
    * @apiParam {string} from_location Escort start location.
    * @apiParam {string} to_location Escort destination.
    * @apiParam {string} [additional_info] Additional request information.
+   * @apiParam {number} [pairing] Pairing ID for this request.
    *
    * @apiSuccess (Created 201) {number} id The record ID.
    * @apiSuccess (Created 201) {string} [name] Name of the requester.
@@ -344,7 +345,8 @@ export class RequestsRoute extends AbstractRoute implements IRoute {
    *        to_location: "SEB",
    *        archived: false,
    *        timestamp: "2017-10-26T06:51:05.000Z",
-   *        status: "REQUESTED"
+   *        status: "REQUESTED",
+   *        pairing: 2
    *     }
    *
    * @apiError (Error 400) NonUniqueParameter One of the post request parameters was missing or invalid.
@@ -368,6 +370,7 @@ export class RequestsRoute extends AbstractRoute implements IRoute {
     // Sanitize data
     const cleanData: any = {};
     try {
+      cleanData.pairing = (Number.isInteger(req.body.pairing)) ? Number(req.body.pairing) : undefined;
       cleanData.name = (typeof req.body.name === "string") ? this.sanitizer.sanitize(req.body.name) : undefined;
       cleanData.from_location = this.sanitizer.sanitize(req.body.from_location);
       cleanData.to_location = this.sanitizer.sanitize(req.body.to_location);
@@ -474,6 +477,7 @@ export class RequestsRoute extends AbstractRoute implements IRoute {
 
     // Sanitize data
     try {
+      req.body.pairing = (Number.isInteger(req.body.pairing)) ? Number(req.body.pairing) : undefined;
       req.body.status = TravelStatus[req.body.status];
       req.body.archived = (req.body.archived === true || req.body.archived === "true") ? true : false;
       req.body.name = (typeof req.body.name === "string") ? this.sanitizer.sanitize(req.body.name) : undefined;
@@ -573,7 +577,8 @@ export class RequestsRoute extends AbstractRoute implements IRoute {
       from_location: this.sanitizer.sanitize,
       name: this.sanitizer.sanitize,
       to_location: this.sanitizer.sanitize,
-      status: (obj: any) => TravelStatus[obj]
+      status: (obj: any) => TravelStatus[obj],
+      pairing: (obj: any) => (Number.isInteger(obj)) ? Number(obj) : undefined
     };
 
     // List of sanitized data
