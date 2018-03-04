@@ -118,7 +118,7 @@ export class SQLVolunteerPairingManager extends SQLAbstractManager implements IV
   private reconstructVolunteerPairing(obj: {[key: string]: any}) {
     // Retrieve volunteers for this pairing
     const volOnePromise = this.volmgr.getVolunteer(Number(obj.volunteer_one));
-    const volTwoPromise = this.volmgr.getVolunteer(Number(obj.volunteer_one));
+    const volTwoPromise = this.volmgr.getVolunteer(Number(obj.volunteer_two));
     return Promise.all([volOnePromise, volTwoPromise])
     .then((volunteers) => new VolunteerPairing(
         volunteers[0],

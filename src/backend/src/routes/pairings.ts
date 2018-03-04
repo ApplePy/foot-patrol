@@ -122,7 +122,7 @@ export class VolunteerPairingsRoute extends AbstractRoute implements IRoute {
     }
 
     const inactive = (req.query.inactive === "true") ? true : false;
-    const filterMap = (inactive === false) ? new Map([["disabled", inactive]]) : undefined;
+    const filterMap = (inactive === false) ? new Map([["active", !inactive]]) : undefined;
 
     // If archived records are not requested, filter by 'false'. Otherwise, don't filter to get both true and false
     this.data.getPairings(filterMap)
