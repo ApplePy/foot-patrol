@@ -133,11 +133,11 @@ export class SQLVolunteersManager extends SQLAbstractManager implements IVolunte
    * Queries a table for Volunteer objects.
    *
    * @param table Table to query.
-   * @param filter Dictionary to be plugged into the SQL `WHERE` parameter as "AND"
+   * @param filter Dictionary to be plugged into the SQL `WHERE` parameter as "AND". Parameters cannot equal null.
    */
   private queryVolunteers(table: string, filter?: Map<string, any>) {
     // Get filter array
-    const filterArray = (filter !== undefined) ? filter.values() : [];
+    const filterArray = (filter !== undefined) ? Array.from(filter.values()) : [];
     const questionMarks = this.generateQuestionMarks((filter !== undefined) ? filter.keys() : [], " AND ");
 
     // Query for data

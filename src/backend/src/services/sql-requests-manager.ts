@@ -57,7 +57,7 @@ export class SQLRequestsManager extends SQLAbstractManager implements IRequestsM
     }
 
     // Get filter array
-    const filterArray = (filter !== undefined) ? filter.values() : [];
+    const filterArray = (filter !== undefined) ? Array.from(filter.values()) : [];
     const questionMarks = this.generateQuestionMarks((filter !== undefined) ? filter.keys() : [], " AND ");
 
     // Query for data

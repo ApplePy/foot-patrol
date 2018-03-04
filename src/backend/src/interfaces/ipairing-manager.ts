@@ -17,7 +17,7 @@ export interface IVolunteerPairingManager {
    *
    * Defaults to returning inactive pairs.
    *
-   * @param filter Dictionary to be plugged into the SQL `WHERE` parameter as "AND"
+   * @param filter Dictionary to be plugged into the SQL `WHERE` parameter as "AND". Parameters cannot equal null.
    */
   getPairings(filter?: Map<string, any>): Promise<VolunteerPairing[]>;
 

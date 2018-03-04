@@ -34,7 +34,7 @@ export interface IVolunteersManager {
    *
    * Defaults to returning disabled volunteers.
    *
-   * @param filter Dictionary to be plugged into the SQL `WHERE` parameter as "AND"
+   * @param filter Dictionary to be plugged into the SQL `WHERE` parameter as "AND". Parameters cannot equal null.
    */
   getUnpairedVolunteers(filter?: Map<string, any>): Promise<Volunteer[]>;
 

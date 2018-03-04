@@ -53,11 +53,11 @@ export class SQLVolunteerPairingManager extends SQLAbstractManager implements IV
    *
    * Defaults to returning inactive pairs.
    *
-   * @param filter Dictionary to be plugged into the SQL `WHERE` parameter as "AND"
+   * @param filter Dictionary to be plugged into the SQL `WHERE` parameter as "AND". Parameters cannot equal null.
    */
   public getPairings(filter?: Map<string, any>) {
     // Get filter array
-    const filterArray = (filter !== undefined) ? filter.values() : [];
+    const filterArray = (filter !== undefined) ? Array.from(filter.values()) : [];
     const questionMarks = this.generateQuestionMarks((filter !== undefined) ? filter.keys() : [], " AND ");
 
     // Query for data
