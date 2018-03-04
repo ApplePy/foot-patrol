@@ -48,7 +48,7 @@ export class SQLRequestsManager extends SQLAbstractManager implements IRequestsM
    *
    * @param offset Number >= 0 of results to skip before returning results.
    * @param count  Number >= 0 results to return.
-   * @param filter Dictionary to be plugged into the SQL `WHERE` parameter as "AND"
+   * @param filter Dictionary to be plugged into the SQL `WHERE` parameter as "AND". Parameters cannot equal null.
    */
   public getRequests(offset: number, count: number, filter?: Map<string, any>) {
     // Sanity check

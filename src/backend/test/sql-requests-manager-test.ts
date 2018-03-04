@@ -133,7 +133,7 @@ class SQLRequestsManagerTest {
       archived: 0,
       timestamp: "2018-01-09T02:36:58.000Z",
       status: "REQUESTED",
-      pairing: 5
+      pairing: null
     };
 
     // Setup FakeSQL response
@@ -163,7 +163,7 @@ class SQLRequestsManagerTest {
       archived: 0,
       timestamp: "2018-01-09T02:36:58.000Z",
       status: "IN_PROGRESS",
-      pairing: 5
+      pairing: null
     };
 
     // Setup FakeSQL response
@@ -171,8 +171,7 @@ class SQLRequestsManagerTest {
       return (
         values[0] === "John" &&
         values[1] === 0 &&
-        values[2] === "IN_PROGRESS" &&
-        values[3] === 5) ? [DATA] : [];
+        values[2] === "IN_PROGRESS") ? [DATA] : [];
     };
 
     return TestReplaceHelper.dateReplace(this.sqlQuery, "requests", DATA, "timestamp")
@@ -182,14 +181,12 @@ class SQLRequestsManagerTest {
       promises.push(this.reqMgr.getRequests(0, 1, new Map<string, any>([
         ["name", "John"],
         ["archived", 0],
-        ["status", "IN_PROGRESS"],
-        ["pairing", 5]
+        ["status", "IN_PROGRESS"]
       ])).should.eventually.deep.equal([new TravelRequest(DATA)]));
       promises.push(this.reqMgr.getRequests(0, 1, new Map<string, any>([
         ["name", "Jane"],
         ["archived", 0],
-        ["status", "IN_PROGRESS"],
-        ["pairing", 5]
+        ["status", "IN_PROGRESS"]
       ])).should.eventually.deep.equal([]));
       return Promise.all(promises);
     });
