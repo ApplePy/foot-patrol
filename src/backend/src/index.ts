@@ -41,6 +41,7 @@ import { IRoute } from "./interfaces/iroute";
 import { ISanitizer } from "./interfaces/isanitizer";
 import { ISQLService } from "./interfaces/isql-service";
 import { IVolunteersManager } from "./interfaces/ivolunteers-manager";
+import { VolunteerPairingsRoute } from "./routes/pairings";
 import { RequestsRoute } from "./routes/requests";
 import { VolunteersRoute } from "./routes/volunteers";
 import { Server } from "./server";
@@ -72,6 +73,10 @@ class ServerEnvironmentSetup {
     this.container.bind<IRoute>(IFACES.IROUTE)
       .to(VolunteersRoute)
       .whenTargetNamed(TAGS.VOLUNTEERS);
+
+    this.container.bind<IRoute>(IFACES.IROUTE)
+      .to(VolunteerPairingsRoute)
+      .whenTargetNamed(TAGS.PAIRINGS);
 
     this.container.bind<ISanitizer>(IFACES.ISANITIZER)
       .to(Sanitizer);
