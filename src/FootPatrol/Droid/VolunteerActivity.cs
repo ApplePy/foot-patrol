@@ -232,7 +232,9 @@ namespace FootPatrol.Droid
         /// </summary>
         private void clientSetup()
         {
-            client = new GoogleApiClient.Builder(Application.Context.ApplicationContext).AddConnectionCallbacks(this).AddOnConnectionFailedListener(this).AddApi(LocationServices.API).Build(); //create new client and add needed callbacks
+            client = new GoogleApiClient.Builder(Application.Context.ApplicationContext).AddConnectionCallbacks(this)
+                                        .AddOnConnectionFailedListener(this)
+                                        .AddApi(LocationServices.API).Build(); //create new client and add needed callbacks
             location = LocationServices.FusedLocationApi; //initialize
             client.Connect(); //conncet to the client on 
         }
