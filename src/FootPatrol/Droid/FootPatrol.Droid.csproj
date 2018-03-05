@@ -9,7 +9,7 @@
     <OutputType>Library</OutputType>
     <RootNamespace>FootPatrol.Droid</RootNamespace>
     <AssemblyName>FootPatrol.Droid</AssemblyName>
-    <TargetFrameworkVersion>v8.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v8.1</TargetFrameworkVersion>
     <AndroidApplication>True</AndroidApplication>
     <AndroidResgenFile>Resources\Resource.designer.cs</AndroidResgenFile>
     <AndroidResgenClass>Resource</AndroidResgenClass>
@@ -157,7 +157,7 @@
     <Compile Include="VolunteerActivity.cs" />
     <Compile Include="DirectionsHolder.cs" />
     <Compile Include="DrawerItemClickListener.cs" />
-    <Compile Include="Requests.cs" />
+    <Compile Include="UserRequests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />

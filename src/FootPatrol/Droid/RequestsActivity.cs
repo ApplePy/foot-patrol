@@ -12,12 +12,12 @@ namespace FootPatrol.Droid
     [Activity(Label = "Requests")]
     public class RequestsActivity : Android.Support.V4.App.DialogFragment
     {
-        public static RequestsActivity req; //reference to RequestsActivity
+        public static RequestsActivity ra; //reference to RequestsActivity
         public static VolunteerActivity va; //reference to VolunteerActivity
         private static View view; //reference of the current view
 
         public static List<string> request; //list of requests and associated name, start/end locations and additional info
-        public static List<Requests.Request> activeRequests;
+        public static List<UserRequests.Request> activeRequests;
         private static int reqCount; //number of requests
 
         public TextView name, toLocation, fromLocation, additionalInfo; //UI components to be displayed in each request
@@ -31,10 +31,10 @@ namespace FootPatrol.Droid
         /// <param name="requests">List of requests</param>
         public static RequestsActivity newInstance(List<string> requests)
         {
-            req = new RequestsActivity(); //create new instance
+            ra = new RequestsActivity(); //create new instance
             reqCount = requests.Count; //save the count into request count variable
             request = requests; //save the list of requests into request list
-            return req;
+            return ra;
         }
 
         /// <summary>
@@ -51,7 +51,7 @@ namespace FootPatrol.Droid
 
             Dialog.Window.SetLayout(ViewGroup.LayoutParams.MatchParent,ViewGroup.LayoutParams.WrapContent); //set the layout of the dialog fragment
             view = inflater.Inflate(Resource.Layout.Requests, container, false);
-            activeRequests = new List<Requests.Request>();
+            activeRequests = new List<UserRequests.Request>();
 
             //initialize each variable to its view component
             name = (TextView)view.FindViewById(Resource.Id.userName);
@@ -76,7 +76,7 @@ namespace FootPatrol.Droid
                 string aInfo = (string)o.SelectToken("additional_info");
                 string requestId = (string)o.SelectToken("id");
 
-                activeRequests.Add(new Requests.Request(userName, toLoc, fromLoc, aInfo, Int32.Parse(requestId)));
+                activeRequests.Add(new UserRequests.Request(userName, toLoc, fromLoc, aInfo, Int32.Parse(requestId)));
             }
 
             //if there exists more than 1 request
@@ -116,7 +116,7 @@ namespace FootPatrol.Droid
                 //disable both arrows 
                 disableArrow(leftArrow);
                 disableArrow(rightArrow);
-                setInfo(0); //set info of the only request
+                setInfo(activeRequests[0]); //set info of the only request
             }
 
             //close button click listener
@@ -167,7 +167,7 @@ namespace FootPatrol.Droid
         /// Set the info in the request UI to the current request information.
         /// </summary>
         /// <param name="request">The current request</param>
-        public void setInfo(Requests.Request request)
+        public void setInfo(UserRequests.Request request)
         {
             name.Text = "NAME: " + request.name; 
             fromLocation.Text = "START LOCATION: " + request.fromLoc;

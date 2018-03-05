@@ -44,6 +44,8 @@ namespace FootPatrol.Droid
         private static RecyclerView.LayoutManager layoutManager; //layout manager for recycler view
         private static RelativeLayout mRelativeLayout, mfRelativeLayout; //relative layouts to display status of complete, cancel and pickup on trip
 
+        private string backendURI, getURI;
+
         public static List<string> request, steps; //lists to hold information on requests and direction steps
         public string[] menuItems; //list of menu items to be displayed in side tab
         public static RequestsActivity ra; //get a reference to each request object
@@ -80,6 +82,8 @@ namespace FootPatrol.Droid
 
             listAdapter = new ArrayAdapter<string>(this.Context, Resource.Layout.ListElement, menuItems); //initializes ArrayAdapter to be displayed in listView
             layoutManager = new LinearLayoutManager(this.Context, LinearLayoutManager.Horizontal, false); //initializs the directions layout to be horizontal and sidescrolling
+            backendURI = "http://staging.capstone.incode.ca/api/v1/requests";
+            getURI = "?offset=0&count=9&archived=true";
             request = new List<string>();
 
             TimerCallback time = new TimerCallback(retrieveRequests); //create a new timerCallback to be used in timer
@@ -277,13 +281,7 @@ namespace FootPatrol.Droid
         /// <param name="location">Current location</param>
         public void OnLocationChanged(Location location)
         {
-            LatLng newPos = new LatLng(location.Latitude, location.Longitude); //create new LatLng object representing new volunteer position
-            volunteerMarker.SetPosition(newPos)
-                           .SetTitle("Volunteer")
-                           .SetIcon(BitmapDescriptorFactory.DefaultMarker(BitmapDescriptorFactory.HueRed)); //set the new position of the volunteer
-            CameraPosition cp = new CameraPosition.Builder().Target(newPos).Zoom(15).Bearing(90).Tilt(40).Build(); //create a new camera position
-            map.AnimateCamera(CameraUpdateFactory.NewCameraPosition(cp)); //animate the camera to the new position of the volunteer
-
+            setMarker(new LatLng(location.Latitude, location.Longitude)); //create new LatLng object representing new volunteer position
         }
 
         /// <summary>
@@ -328,12 +326,8 @@ namespace FootPatrol.Droid
             if (client.IsConnected) //if the client is still connected
             {
                 volunteerMarker = new MarkerOptions();
-                volunteerMarker.SetPosition(new LatLng(myLocation.Latitude, myLocation.Longitude))
-                               .SetTitle("Volunteer")
-                               .SetIcon(BitmapDescriptorFactory.DefaultMarker(BitmapDescriptorFactory.HueRed)); //set the current position of the volunteer using a marker
+                setMarker(new LatLng(myLocation.Latitude, myLocation.Longitude));
                 map.AddMarker(volunteerMarker); //add the marker on the map
-                CameraPosition cp = new CameraPosition.Builder().Target(new LatLng(myLocation.Latitude, myLocation.Longitude)).Zoom(15).Bearing(90).Tilt(40).Build(); //setup a new camera position
-                map.AnimateCamera(CameraUpdateFactory.NewCameraPosition(cp)); //animate the camera to the new camera position
             }
 
             else
@@ -347,7 +341,7 @@ namespace FootPatrol.Droid
         private async Task<List<string>> getRequests()
         {
             HttpClient httpClient = new HttpClient(); //create a new HttpClient
-            Uri customURI = new Uri("http://staging.capstone.incode.ca/api/v1/requests?offset=0&count=9&archived=true"); //get the URI to the API
+            Uri customURI = new Uri(backendURI + getURI); //get the URI to the API
             var response = await httpClient.GetAsync(customURI); //get the asynchronous response
 
             try
@@ -408,7 +402,7 @@ namespace FootPatrol.Droid
         /// Finally remove the request from the list of requests.
         /// </summary>
         /// <param name="request">The accepted request</param>
-        public void onTripAcceptAsync(Requests.Request request)
+        public void onTripAcceptAsync(UserRequests.Request request)
         {
             //Set variables to save user information from request
             name = request.name;
@@ -468,7 +462,7 @@ namespace FootPatrol.Droid
             }
 
             HttpClient httpClient = new HttpClient(); //create a new HTTP client
-            Uri customURI = new Uri("http://staging.capstone.incode.ca/api/v1/requests/" + request.id.ToString());
+            Uri customURI = new Uri(backendURI + request.id.ToString());
             httpClient.DeleteAsync(customURI); //delete the accepted request from all requests
                 
         }
@@ -564,10 +558,12 @@ namespace FootPatrol.Droid
                 return null;
             }
 
-            int index = 0;
-            var polylineChars = encodedPoints.ToCharArray();
-            var polyline = new List<LatLng>();
-            int currentLat = 0;
+            int index = 0; //start with the first character
+            var polylineChars = encodedPoints.ToCharArray(); //change the string to a character array to analyze each character
+            var polyline = new List<LatLng>(); //initialize the new list of LatLng points
+
+            //initialize each variable
+            int currentLat = 0; 
             int currentLng = 0;
             int next5Bits;
 
@@ -579,26 +575,26 @@ namespace FootPatrol.Droid
 
                 do
                 {
-                    next5Bits = polylineChars[index++] - 63;
-                    sum |= (next5Bits & 31) << shifter;
-                    shifter += 5;
+                    next5Bits = polylineChars[index++] - 63; //subtract 63 from each value
+                    sum |= (next5Bits & 31) << shifter; //bitwise or each set of 5 bits with the address of the last value and left shift by an increment of 5 bits
+                    shifter += 5; //increment shift by 5 to look at the next 5 bits
                 }
-                while (next5Bits >= 32 && index < polylineChars.Length);
+                while (next5Bits >= 32 && index < polylineChars.Length); //do this while there are still 5-bit chunks
 
-                if (index >= polylineChars.Length)
+                if (index >= polylineChars.Length) //break out of the while loop if the character array is empty or the index is larger than the size of the char array
                 {
                     break;
                 }
 
-                currentLat += (sum & 1) == 1 ? ~(sum >> 1) : (sum >> 1);
+                currentLat += (sum & 1) == 1 ? ~(sum >> 1) : (sum >> 1); //convert the binary value to decimal
 
-                // calculate next longitude
+                // calculate longitude using same steps as above
                 sum = 0;
                 shifter = 0;
 
                 do
                 {
-                    next5Bits = polylineChars[index++] - 63;
+                    next5Bits = polylineChars[index++] - 63; 
                     sum |= (next5Bits & 31) << shifter;
                     shifter += 5;
                 }
@@ -611,8 +607,8 @@ namespace FootPatrol.Droid
 
                 currentLng += (sum & 1) == 1 ? ~(sum >> 1) : (sum >> 1);
 
-                var mLatLng = new LatLng(Convert.ToDouble(currentLat) / 100000.0, Convert.ToDouble(currentLng) / 100000.0);
-                polyline.Add(mLatLng);
+                var mLatLng = new LatLng(Convert.ToDouble(currentLat) / 100000.0, Convert.ToDouble(currentLng) / 100000.0); //divide each result by 1e5 to get the decimal value
+                polyline.Add(mLatLng); //add the polyline to the set of LatLng points
             }
             return polyline;
         }
@@ -754,6 +750,19 @@ namespace FootPatrol.Droid
             {
                 createAlert("Could not connect to google API client, please try again later."); //if the client cannot be connected, display alert
             }
+        }
+
+        private void setMarker(LatLng position)
+        {
+            volunteerMarker.SetPosition(position)
+                               .SetTitle("Volunteer")
+                               .SetIcon(BitmapDescriptorFactory.DefaultMarker(BitmapDescriptorFactory.HueRed)); //set the current position of the volunteer using a marker
+            CameraPosition cp = new CameraPosition.Builder().Target(position)
+                                                  .Zoom(15)
+                                                  .Bearing(90)
+                                                  .Tilt(40)
+                                                  .Build(); //setup a new camera position
+            map.AnimateCamera(CameraUpdateFactory.NewCameraPosition(cp)); //animate the camera to the new camera position
         }
     }
 }

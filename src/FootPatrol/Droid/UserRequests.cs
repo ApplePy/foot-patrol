@@ -13,8 +13,8 @@ using Android.Widget;
 
 namespace FootPatrol.Droid
 {
-    [Activity(Label = "Requests")]
-    public class Requests : Activity
+    [Activity(Label = "UserRequests")]
+    public class UserRequests
     {
         public struct Request
         {
