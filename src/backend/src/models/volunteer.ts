@@ -24,7 +24,6 @@ export class Volunteer {
       uwo_id: String,
       first_name: String,
       last_name: String,
-      to_location: String,
       disabled: (field: any) => (field === "false") ? false : Boolean(field)
     };
 
@@ -53,17 +52,16 @@ export class Volunteer {
   }
 
   /**
-   * Checks if the object is in a valid state
+   * Checks if the object is in a valid state. (ID is ignored for POSTs)
    */
   public Valid() {
     // Let errors snowball
     let invalid = false;
-    invalid = invalid || this.id <= 0;
     invalid = invalid || this.uwo_id.length <= 0;
     invalid = invalid || this.first_name.length <= 0;
     invalid = invalid || this.last_name.length <= 0;
 
-    return invalid;
+    return !invalid;
   }
 
   /**

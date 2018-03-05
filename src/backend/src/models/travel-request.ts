@@ -57,7 +57,7 @@ export class TravelRequest {
   }
 
   /**
-   * Checks if the object is in a valid state
+   * Checks if the object is in a valid state. (ID is ignored for POSTs)
    */
   public Valid() {
     let invalid = false;

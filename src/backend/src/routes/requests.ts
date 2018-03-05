@@ -290,7 +290,7 @@ export class RequestsRoute extends AbstractRoute implements IRoute {
     .then((request) => {
       if (request.pairing === null) {
         // No pair assigned
-        res.send();
+        res.send({volunteers: []});
       } else {
         // Pair assigned and retrieved, send array
         const pairData = request.pairing as VolunteerPairing;
