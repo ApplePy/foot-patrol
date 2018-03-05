@@ -16,13 +16,27 @@ namespace FootPatrol.Droid
         public static VolunteerActivity va; //reference to VolunteerActivity
         private static View view; //reference of the current view
 
-        public static List<string> request, userName, toLoc, fromLoc, addInfo; //list of requests and associated name, start/end locations and additional info
-        public static List<int> idList; //list of ids of each request
+        public static List<string> request; //list of requests and associated name, start/end locations and additional info
+        public static List<Requests> activeRequests;
         private static int reqCount; //number of requests
 
         public TextView name, toLocation, fromLocation, additionalInfo; //UI components to be displayed in each request
 
         private int currentCount;
+
+        public struct Requests
+        {
+            public string name, toLoc, fromLoc, addInfo;
+            public int id;
+
+            public Requests(string name, string toLocation, string fromLocation, string additionalInfo, int Id) {
+                this.name = name;
+                this.toLoc = toLocation;
+                this.fromLoc = fromLocation;
+                this.addInfo = additionalInfo;
+                this.id = Id;
+            }
+        };
 
         /// <summary>
         /// Create a new instance of RequestsActivity and pass the list of requests into the constructor
@@ -32,7 +46,7 @@ namespace FootPatrol.Droid
         public static RequestsActivity newInstance(List<string> requests)
         {
             req = new RequestsActivity(); //create new instance
-            reqCount = request.Count; //save the count into request count variable
+            reqCount = requests.Count; //save the count into request count variable
             request = requests; //save the list of requests into request list
             return req;
         }
@@ -51,6 +65,7 @@ namespace FootPatrol.Droid
 
             Dialog.Window.SetLayout(ViewGroup.LayoutParams.MatchParent,ViewGroup.LayoutParams.WrapContent); //set the layout of the dialog fragment
             view = inflater.Inflate(Resource.Layout.Requests, container, false);
+            activeRequests = new List<Requests>();
 
             //initialize each variable to its view component
             name = (TextView)view.FindViewById(Resource.Id.userName);
@@ -64,34 +79,22 @@ namespace FootPatrol.Droid
 
             currentCount = 0; //set the initial count to zero
 
-            //initialize each of the created lists
-            userName = new List<string>();
-            toLoc = new List<string>();
-            fromLoc = new List<string>();
-            addInfo = new List<string>();
-            idList = new List<int>();
-
             foreach (string req in request)
             {
                 JObject o = JObject.Parse(req); //parse the request into a string
 
                 //get each respective string using the selectToken method
-                string n = (string)o.SelectToken("name");
-                string to = (string)o.SelectToken("to_location");
-                string from = (string)o.SelectToken("from_location");
+                string userName = (string)o.SelectToken("name");
+                string toLoc = (string)o.SelectToken("to_location");
+                string fromLoc = (string)o.SelectToken("from_location");
                 string aInfo = (string)o.SelectToken("additional_info");
-                string id = (string)o.SelectToken("id");
+                string requestId = (string)o.SelectToken("id");
 
-                //add each string to its corresponding list
-                userName.Add(n);
-                toLoc.Add(to);
-                fromLoc.Add(from);
-                addInfo.Add(aInfo);
-                idList.Add(Int32.Parse(id));
+                activeRequests.Add(new Requests(userName, toLoc, fromLoc, aInfo, Int32.Parse(requestId)));
             }
 
             //if there exists more than 1 request
-            if (userName.Count > 1)
+            if (activeRequests.Count > 1)
             {
                 setInfo(currentCount); //set the current info
 
@@ -141,7 +144,9 @@ namespace FootPatrol.Droid
             acceptReq.Click += (sender, e) =>
             {
                 va = new VolunteerActivity(); //initialize the new instance of the VolunteerActivity class
-                va.onTripAcceptAsync(userName[currentCount], toLoc[currentCount], fromLoc[currentCount], addInfo[currentCount], idList[currentCount]); //pass the accepted request into the trip accept function
+
+                va.onTripAcceptAsync(activeRequests[currentCount].name, activeRequests[currentCount].toLoc, activeRequests[currentCount].fromLoc,
+                                    activeRequests[currentCount].addInfo, activeRequests[currentCount].id); //pass the accepted request into the trip accept function
             };
 
             return view;
@@ -181,10 +186,10 @@ namespace FootPatrol.Droid
         /// <param name="currentCount">Current count</param>
         public void setInfo(int currentCount)
         {
-            name.Text = "NAME: " + userName[currentCount]; 
-            fromLocation.Text = "START LOCATION: " + fromLoc[currentCount];
-            toLocation.Text = "END LOCATION: " + toLoc[currentCount];
-            additionalInfo.Text = "ADDITIONAL INFO: " + addInfo[currentCount];
+            name.Text = "NAME: " + activeRequests[currentCount].name; 
+            fromLocation.Text = "START LOCATION: " + activeRequests[currentCount].fromLoc;
+            toLocation.Text = "END LOCATION: " + activeRequests[currentCount].toLoc;
+            additionalInfo.Text = "ADDITIONAL INFO: " + activeRequests[currentCount].addInfo;
         }
 
     }
