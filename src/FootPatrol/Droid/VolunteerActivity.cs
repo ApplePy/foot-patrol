@@ -243,9 +243,9 @@ namespace FootPatrol.Droid
         private void createLocationRequest()
         {
             locationRequest = LocationRequest.Create(); //create a new location request
-            locationRequest.SetPriority(LocationRequest.PriorityHighAccuracy); //set the location request priority to high
-            locationRequest.SetInterval(10000); //set the interval for location updates to every minute
-            locationRequest.SetFastestInterval(1000); //set the fastest interval for location updates to every second
+            locationRequest.SetPriority(LocationRequest.PriorityHighAccuracy) //set the location request priority to high
+                           .SetInterval(10000) //set the interval for location updates to every minute
+                           .SetFastestInterval(1000); //set the fastest interval for location updates to every second
         }
 
         /// <summary>
@@ -296,7 +296,9 @@ namespace FootPatrol.Droid
         public void OnLocationChanged(Location location)
         {
             LatLng newPos = new LatLng(location.Latitude, location.Longitude); //create new LatLng object representing new volunteer position
-            volunteerMarker.SetPosition(newPos).SetTitle("Volunteer").SetIcon(BitmapDescriptorFactory.DefaultMarker(BitmapDescriptorFactory.HueRed)); //set the new position of the volunteer
+            volunteerMarker.SetPosition(newPos)
+                           .SetTitle("Volunteer")
+                           .SetIcon(BitmapDescriptorFactory.DefaultMarker(BitmapDescriptorFactory.HueRed)); //set the new position of the volunteer
             CameraPosition cp = new CameraPosition.Builder().Target(newPos).Zoom(15).Bearing(90).Tilt(40).Build(); //create a new camera position
             map.AnimateCamera(CameraUpdateFactory.NewCameraPosition(cp)); //animate the camera to the new position of the volunteer
 
@@ -344,7 +346,9 @@ namespace FootPatrol.Droid
             if (client.IsConnected) //if the client is still connected
             {
                 volunteerMarker = new MarkerOptions();
-                volunteerMarker.SetPosition(new LatLng(myLocation.Latitude, myLocation.Longitude)).SetTitle("Volunteer").SetIcon(BitmapDescriptorFactory.DefaultMarker(BitmapDescriptorFactory.HueRed)); //set the current position of the volunteer using a marker
+                volunteerMarker.SetPosition(new LatLng(myLocation.Latitude, myLocation.Longitude))
+                               .SetTitle("Volunteer")
+                               .SetIcon(BitmapDescriptorFactory.DefaultMarker(BitmapDescriptorFactory.HueRed)); //set the current position of the volunteer using a marker
                 map.AddMarker(volunteerMarker); //add the marker on the map
                 CameraPosition cp = new CameraPosition.Builder().Target(new LatLng(myLocation.Latitude, myLocation.Longitude)).Zoom(15).Bearing(90).Tilt(40).Build(); //setup a new camera position
                 map.AnimateCamera(CameraUpdateFactory.NewCameraPosition(cp)); //animate the camera to the new camera position
@@ -449,7 +453,9 @@ namespace FootPatrol.Droid
 
             ra.dismissFragment(); //dismiss the request dialog fragment
 
-            userMarker.SetPosition(userCoordinates).SetTitle(username).SetIcon(BitmapDescriptorFactory.DefaultMarker(BitmapDescriptorFactory.HueBlue)); //add the user starting location as a marker on the screen
+            userMarker.SetPosition(userCoordinates)
+                      .SetTitle(username)
+                      .SetIcon(BitmapDescriptorFactory.DefaultMarker(BitmapDescriptorFactory.HueBlue)); //add the user starting location as a marker on the screen
             userMark = map.AddMarker(userMarker); //add the map marker to the screen and return a reference so that it can be removed
 
             removeRequestUI(); //remove the trip UI so that the volunteer can accept more requests
@@ -544,14 +550,13 @@ namespace FootPatrol.Droid
                 response.EnsureSuccessStatusCode();
             }
 
-            catch (System.Exception error)
+            catch (Exception error)
             {
                 System.Diagnostics.Debug.WriteLine("The exception is: " + error);
             }
 
             var content = await response.Content.ReadAsStringAsync();
             JObject dir = JObject.Parse(content);
-            System.Diagnostics.Debug.WriteLine(dir);
             string polyPattern = (string)dir.SelectToken("routes[0].overview_polyline.points");
             var stepDirections = dir.SelectTokens("routes[0].legs[0].steps[*].html_instructions");
             steps = new List<string>();
@@ -662,7 +667,9 @@ namespace FootPatrol.Droid
         private void cancelBtnClicked()
         {
             AlertDialog.Builder builder = new AlertDialog.Builder(this.Context); //create a new alert dialog
-            builder.SetTitle("Cancel Trip").SetMessage("Are you sure you want to cancel the trip?").SetPositiveButton("Yes", async (sender, e) =>
+            builder.SetTitle("Cancel Trip")
+                   .SetMessage("Are you sure you want to cancel the trip?")
+                   .SetPositiveButton("Yes", async (sender, e) =>
             {
                 //if the volunteer decides to cancel the trip, must re-add request to list of requests
                 HttpClient httpClient = new HttpClient(); //create new Http Client
@@ -702,7 +709,9 @@ namespace FootPatrol.Droid
         private void completeBtnClicked()
         {
             AlertDialog.Builder builder = new AlertDialog.Builder(this.Context);
-            builder.SetTitle("Complete Trip").SetMessage("Are you sure you want to complete the trip?").SetPositiveButton("Yes", (sender, e) =>
+            builder.SetTitle("Complete Trip")
+                   .SetMessage("Are you sure you want to complete the trip?")
+                   .SetPositiveButton("Yes", (sender, e) =>
             {
                 postTripUI(); //on completed trip, update UI to accept more requests
                 //completeTripBtn.Text = "PICKED UP USER";
@@ -759,7 +768,8 @@ namespace FootPatrol.Droid
         private void createAlert(string alert)
         {
             AlertDialog.Builder builder = new AlertDialog.Builder(this.Context);
-            builder.SetMessage(alert).SetNeutralButton("OK", (sender, e) =>
+            builder.SetMessage(alert)
+                   .SetNeutralButton("OK", (sender, e) =>
             {
                 //Do nothing
             });

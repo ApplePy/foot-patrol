@@ -3,6 +3,7 @@ using Android.OS;
 using Android.Views;
 using Android.Graphics;
 using Android.Widget;
+using System.Windows;
 
 namespace FootPatrol.Droid
 {
@@ -57,13 +58,29 @@ namespace FootPatrol.Droid
             //sign In button click listener
             signIn.Click += (sender, e) =>
             {
-                spinner.Visibility = ViewStates.Visible; //make the spinner visible
-                Android.Support.V4.App.Fragment newFrag = new VolunteerActivity(); //create a new instance of VolunteerActivity and save it
-                Android.Support.V4.App.FragmentTransaction fragmentTransaction = ChildFragmentManager.BeginTransaction(); //begin the fragment transaction
-                fragmentTransaction.SetCustomAnimations(Resource.Layout.EnterAnimation, Resource.Layout.ExitAnimation); //add animation to slide new fragment to the left
-                fragmentTransaction.Replace(Resource.Id.frameLayout2, newFrag, "VolunteerActivity"); //replace the old fragment with the new one
-                fragmentTransaction.AddToBackStack(null); //add the transaction to the back stack
-                fragmentTransaction.Commit(); //commit the transaction
+                if (string.IsNullOrWhiteSpace(userName.Text) || string.IsNullOrWhiteSpace(password.Text))
+                {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(this.Context);
+                    builder.SetMessage("The username or password field cannot be left empty!")
+                           .SetNeutralButton("OK", (sender2, args) =>
+                    {
+                        //Do nothing
+                    });
+
+                    Dialog dialog = builder.Create();
+                    dialog.Show();
+                }
+
+                else
+                {
+                    spinner.Visibility = ViewStates.Visible; //make the spinner visible
+                    Android.Support.V4.App.Fragment newFrag = new VolunteerActivity(); //create a new instance of VolunteerActivity and save it
+                    Android.Support.V4.App.FragmentTransaction fragmentTransaction = ChildFragmentManager.BeginTransaction(); //begin the fragment transaction
+                    fragmentTransaction.SetCustomAnimations(Resource.Layout.EnterAnimation, Resource.Layout.ExitAnimation); //add animation to slide new fragment to the left
+                    fragmentTransaction.Replace(Resource.Id.frameLayout2, newFrag, "VolunteerActivity"); //replace the old fragment with the new one
+                    fragmentTransaction.AddToBackStack(null); //add the transaction to the back stack
+                    fragmentTransaction.Commit(); //commit the transaction
+                }
             };
 
             return views;
