@@ -435,7 +435,7 @@ class RequestsAPITest {
     });
   }
 
-  @test("GET should fail with 404")
+  @test("GET for non-existent ID should fail with 404")
   public getBadId(done: MochaDone) {
     // Setup fake data
     FakeSQL.response = [];
@@ -449,6 +449,187 @@ class RequestsAPITest {
         res.body.should.have.property("error");
         res.body.should.have.property("message");
         res.body.should.not.have.property("stack");
+        done();
+      });
+  }
+
+  @test("GET for invalid ID should fail with 400")
+  public getInvalidId(done: MochaDone) {
+    // Setup fake data
+    FakeSQL.response = [];
+
+    // Start request
+    chai.request(serverEnv.nodeServer)
+      .get(pathPrefix + "/requests/-1")
+      .end((err, res) => {
+        // Verify results
+        res.should.have.status(400);
+        res.body.should.have.property("error");
+        res.body.should.have.property("message");
+        res.body.should.not.have.property("stack");
+        done();
+      });
+  }
+
+  @test("GET should return one request's volunteers")
+  public getRequestVolunteers(done: MochaDone) {
+    // Get SQL connector instance
+    const sqlInstance = serverEnv.container.get<ISQLService>(IFACES.ISQLSERVICE);
+    const sqlQuery = sqlInstance.makeQuery.bind(sqlInstance);
+
+    // Fake data
+    const DB_REQUESTS_DATA = {
+      id: 1, name: "John Doe", from_location: "SEB",
+      to_location: "UCC", additional_info: null,
+      archived: 0, timestamp: "2017-10-26T06:51:05.000Z",
+      status: "REJECTED", pairing: 1
+    };
+
+    const DB_PAIRING_DATA = {
+      id: 1, active: 1, volunteer_one: 1, volunteer_two: 2
+    };
+
+    const DB_VOLUNTEERS_DATA = [
+      { id: 1, uwo_id: "jdoe37", first_name: "John", last_name: "Doe", disabled: 0 },
+      { id: 2, uwo_id: "jdoe38", first_name: "Jane", last_name: "Doe", disabled: 0 }
+    ];
+
+    // Expected return
+    const EXPECTED_RESULTS = {
+      volunteers: [
+        { id: 1, first_name: "John", last_name: "Doe" },
+        { id: 2, first_name: "Jane", last_name: "Doe" }
+      ]
+    };
+
+    // Setup fake data
+    FakeSQL.response = (query: string, values: any[]) => {
+      // Silence the REPLACE calls
+      if (query.indexOf("REPLACE") !== -1) {
+        return {};
+      } else if (query.indexOf("volunteer_pairing") !== -1) {
+        values.should.deep.equal([1]);
+        return [DB_PAIRING_DATA];
+      } else if (query.indexOf("volunteers") !== -1) {
+        values[0].should.be.within(1, 2);
+        // Return the right volunteer
+        if (values[0] === 1) {
+          return [DB_VOLUNTEERS_DATA[0]];
+        } else {
+          return [DB_VOLUNTEERS_DATA[1]];
+        }
+      } else {
+        values.should.deep.equal([1]);
+        return [DB_REQUESTS_DATA];
+      }
+    };
+
+    // Insert all the test data into the DB
+    Promise.all(DB_VOLUNTEERS_DATA.map((val) => TestReplaceHelper.replace(sqlQuery, "volunteers", val)))
+    .then(() => TestReplaceHelper.replace(sqlQuery, "volunteer_pairing", DB_PAIRING_DATA))
+    .then(() => TestReplaceHelper.dateReplace(sqlQuery, "requests", DB_REQUESTS_DATA, "timestamp"))
+    .then(() => {
+
+    // Start request
+    chai.request(serverEnv.nodeServer)
+      .get(pathPrefix + "/requests/1/volunteers")
+      .end((err, res) => {
+        // Verify results
+        res.should.have.status(200);
+        res.body.should.deep.equal(EXPECTED_RESULTS);
+        done();
+      });
+    });
+  }
+
+  @test("GET for an unassigned request should return no volunteers")
+  public getRequestVolunteersNull(done: MochaDone) {
+    // Get SQL connector instance
+    const sqlInstance = serverEnv.container.get<ISQLService>(IFACES.ISQLSERVICE);
+    const sqlQuery = sqlInstance.makeQuery.bind(sqlInstance);
+
+    // Fake data
+    const DB_REQUESTS_DATA = {
+      id: 1, name: "John Doe", from_location: "SEB",
+      to_location: "UCC", additional_info: null,
+      archived: 0, timestamp: "2017-10-26T06:51:05.000Z",
+      status: "REJECTED", pairing: null
+    };
+
+    const DB_PAIRING_DATA = {
+      id: 1, active: 1, volunteer_one: 1, volunteer_two: 2
+    };
+
+    const DB_VOLUNTEERS_DATA = [
+      { id: 1, uwo_id: "jdoe37", first_name: "John", last_name: "Doe", disabled: 0 },
+      { id: 2, uwo_id: "jdoe38", first_name: "Jane", last_name: "Doe", disabled: 0 }
+    ];
+
+    // Expected return
+    const EXPECTED_RESULTS = {
+      volunteers: []
+    };
+
+    // Setup fake data
+    FakeSQL.response = (query: string, values: any[]) => {
+      if (query.indexOf("requests") !== -1) {
+        values.should.deep.equal([1]);
+        return [DB_REQUESTS_DATA];
+      }
+
+      return {};  // Fallthrough case
+    };
+
+    // Insert all the test data into the DB
+    Promise.all(DB_VOLUNTEERS_DATA.map((val) => TestReplaceHelper.replace(sqlQuery, "volunteers", val)))
+    .then(() => TestReplaceHelper.replace(sqlQuery, "volunteer_pairing", DB_PAIRING_DATA))
+    .then(() => TestReplaceHelper.dateReplace(sqlQuery, "requests", DB_REQUESTS_DATA, "timestamp"))
+    .then(() => {
+
+    // Start request
+    chai.request(serverEnv.nodeServer)
+      .get(pathPrefix + "/requests/1/volunteers")
+      .end((err, res) => {
+        // Verify results
+        res.should.have.status(200);
+        res.body.should.deep.equal(EXPECTED_RESULTS);
+        done();
+      });
+    });
+  }
+
+  @test("GET volunteers for non-existent ID should return 404")
+  public getRequestVolunteersBadId(done: MochaDone) {
+    // Setup fake data
+    FakeSQL.response = (query: string, values: any[]) => {
+      values.should.deep.equal([0]);
+      return {};
+    };
+
+    // Start request
+    chai.request(serverEnv.nodeServer)
+      .get(pathPrefix + "/requests/0/volunteers")
+      .end((err, res) => {
+        // Verify results
+        res.should.have.status(404);
+        done();
+      });
+  }
+
+  @test("GET volunteers for badly-formed ID should return 400")
+  public getRequestVolunteersInvalidId(done: MochaDone) {
+    // Setup fake data
+    FakeSQL.response = {};
+
+    // Start request
+    chai.request(serverEnv.nodeServer)
+      .get(pathPrefix + "/requests/fake/volunteers")
+      .end((err, res) => {
+        // Verify results
+        res.should.have.status(400);
+        res.body.should.contain.property("error");
+        res.body.should.contain.property("message");
+        res.body.should.not.contain.property("stack");
         done();
       });
   }
@@ -504,7 +685,7 @@ class RequestsAPITest {
       });
   }
 
-  @test("POST should fail when a variable is missing")
+  @test("POST should fail when a location is missing")
   public postFail(done: MochaDone) {
     // Setup fake data
     const INPUT = {
@@ -622,6 +803,26 @@ class RequestsAPITest {
       .end((err, res) => {
         // Verify results
         res.should.have.status(404);
+        res.body.should.contain.property("error");
+        res.body.should.contain.property("message");
+        res.body.should.not.contain.property("stack");
+        done();
+      });
+  }
+
+  @test("DELETE should fail on invalid ID")
+  public deleteInvalidId(done: MochaDone) {
+    // Setup fake data
+    const INPUT = {};
+    FakeSQL.response = {};
+
+    // Start request
+    chai.request(serverEnv.nodeServer)
+      .del(pathPrefix + "/requests/fake")
+      .send(INPUT)
+      .end((err, res) => {
+        // Verify results
+        res.should.have.status(400);
         res.body.should.contain.property("error");
         res.body.should.contain.property("message");
         res.body.should.not.contain.property("stack");
@@ -765,7 +966,9 @@ class RequestsAPITest {
       from_location: "UCC",
       to_location: "TEB",
       archived: true,
-      status: "REJECTED"
+      status: "REJECTED",
+      name: "John Doe",
+      additional_info: "test string"
     };
     const REQUESTS_DATA = undefined;
     FakeSQL.response = REQUESTS_DATA;
@@ -828,6 +1031,26 @@ class RequestsAPITest {
       .end((err, res) => {
         // Verify results
         res.should.have.status(404);
+        res.body.should.contain.property("error");
+        res.body.should.contain.property("message");
+        res.body.should.not.contain.property("stack");
+        done();
+      });
+  }
+
+  @test("PUT should fail on invalid ID")
+  public putInvalidId(done: MochaDone) {
+    // Setup fake data
+    const INPUT = {};
+    FakeSQL.response = {};
+
+    // Start request
+    chai.request(serverEnv.nodeServer)
+      .put(pathPrefix + "/requests/fake")
+      .send(INPUT)
+      .end((err, res) => {
+        // Verify results
+        res.should.have.status(400);
         res.body.should.contain.property("error");
         res.body.should.contain.property("message");
         res.body.should.not.contain.property("stack");
@@ -979,6 +1202,26 @@ class RequestsAPITest {
       .end((err, res) => {
         // Verify results
         res.should.have.status(404);
+        res.body.should.contain.property("error");
+        res.body.should.contain.property("message");
+        res.body.should.not.contain.property("stack");
+        done();
+      });
+  }
+
+  @test("PATCH should fail on invalid ID")
+  public patchInvalidId(done: MochaDone) {
+    // Setup fake data
+    const INPUT = {};
+    FakeSQL.response = {};
+
+    // Start request
+    chai.request(serverEnv.nodeServer)
+      .patch(pathPrefix + "/requests/fake")
+      .send(INPUT)
+      .end((err, res) => {
+        // Verify results
+        res.should.have.status(400);
         res.body.should.contain.property("error");
         res.body.should.contain.property("message");
         res.body.should.not.contain.property("stack");
