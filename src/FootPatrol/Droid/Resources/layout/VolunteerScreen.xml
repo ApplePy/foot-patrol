@@ -63,20 +63,11 @@
             <Button
                 p1:layout_width="110dp"
                 p1:layout_height="40dp"
-                p1:id="@+id/cancelTripBtn"
-                p1:layout_centerVertical="true"
-                p1:text="CANCEL TRIP"
-                p1:background="#807F83"
-                p1:layout_marginLeft="50dp" />
-            <Button
-                p1:layout_width="110dp"
-                p1:layout_height="40dp"
                 p1:id="@+id/completeTripBtn"
                 p1:layout_centerVertical="true"
-                p1:layout_alignParentRight="true"
                 p1:text="COMPLETE TRIP"
                 p1:background="#807F83"
-                p1:layout_marginRight="50dp" />
+                p1:layout_centerHorizontal="true" />
         </RelativeLayout>
         <ImageButton
             p1:src="@drawable/ic_chevron_right_black_24dp"

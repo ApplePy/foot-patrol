@@ -17,26 +17,12 @@ namespace FootPatrol.Droid
         private static View view; //reference of the current view
 
         public static List<string> request; //list of requests and associated name, start/end locations and additional info
-        public static List<Requests> activeRequests;
+        public static List<Requests.Request> activeRequests;
         private static int reqCount; //number of requests
 
         public TextView name, toLocation, fromLocation, additionalInfo; //UI components to be displayed in each request
 
         private int currentCount;
-
-        public struct Requests
-        {
-            public string name, toLoc, fromLoc, addInfo;
-            public int id;
-
-            public Requests(string name, string toLocation, string fromLocation, string additionalInfo, int Id) {
-                this.name = name;
-                this.toLoc = toLocation;
-                this.fromLoc = fromLocation;
-                this.addInfo = additionalInfo;
-                this.id = Id;
-            }
-        };
 
         /// <summary>
         /// Create a new instance of RequestsActivity and pass the list of requests into the constructor
@@ -65,7 +51,7 @@ namespace FootPatrol.Droid
 
             Dialog.Window.SetLayout(ViewGroup.LayoutParams.MatchParent,ViewGroup.LayoutParams.WrapContent); //set the layout of the dialog fragment
             view = inflater.Inflate(Resource.Layout.Requests, container, false);
-            activeRequests = new List<Requests>();
+            activeRequests = new List<Requests.Request>();
 
             //initialize each variable to its view component
             name = (TextView)view.FindViewById(Resource.Id.userName);
@@ -90,13 +76,13 @@ namespace FootPatrol.Droid
                 string aInfo = (string)o.SelectToken("additional_info");
                 string requestId = (string)o.SelectToken("id");
 
-                activeRequests.Add(new Requests(userName, toLoc, fromLoc, aInfo, Int32.Parse(requestId)));
+                activeRequests.Add(new Requests.Request(userName, toLoc, fromLoc, aInfo, Int32.Parse(requestId)));
             }
 
             //if there exists more than 1 request
             if (activeRequests.Count > 1)
             {
-                setInfo(currentCount); //set the current info
+                setInfo(activeRequests[currentCount]); //set the current info
 
                 disableArrow(leftArrow); //disable the left arrow
 
@@ -109,7 +95,7 @@ namespace FootPatrol.Droid
                     {
                         disableArrow(leftArrow); //if the count is 0, no more requests to the left
                     }
-                    setInfo(currentCount); //set the current info
+                    setInfo(activeRequests[currentCount]); //set the current info
                 };
 
                 //right arrow click listener
@@ -121,8 +107,7 @@ namespace FootPatrol.Droid
                     {
                         disableArrow(rightArrow); //if it is the last request, no more requests to the right
                     }
-                    setInfo(currentCount); //set the current info
-
+                    setInfo(activeRequests[currentCount]); //set the current info
                 };
             }
 
@@ -144,9 +129,7 @@ namespace FootPatrol.Droid
             acceptReq.Click += (sender, e) =>
             {
                 va = new VolunteerActivity(); //initialize the new instance of the VolunteerActivity class
-
-                va.onTripAcceptAsync(activeRequests[currentCount].name, activeRequests[currentCount].toLoc, activeRequests[currentCount].fromLoc,
-                                    activeRequests[currentCount].addInfo, activeRequests[currentCount].id); //pass the accepted request into the trip accept function
+                va.onTripAcceptAsync(activeRequests[currentCount]); //pass the accepted request into the trip accept function
             };
 
             return view;
@@ -183,13 +166,13 @@ namespace FootPatrol.Droid
         /// <summary>
         /// Set the info in the request UI to the current request information.
         /// </summary>
-        /// <param name="currentCount">Current count</param>
-        public void setInfo(int currentCount)
+        /// <param name="request">The current request</param>
+        public void setInfo(Requests.Request request)
         {
-            name.Text = "NAME: " + activeRequests[currentCount].name; 
-            fromLocation.Text = "START LOCATION: " + activeRequests[currentCount].fromLoc;
-            toLocation.Text = "END LOCATION: " + activeRequests[currentCount].toLoc;
-            additionalInfo.Text = "ADDITIONAL INFO: " + activeRequests[currentCount].addInfo;
+            name.Text = "NAME: " + request.name; 
+            fromLocation.Text = "START LOCATION: " + request.fromLoc;
+            toLocation.Text = "END LOCATION: " + request.toLoc;
+            additionalInfo.Text = "ADDITIONAL INFO: " + request.addInfo;
         }
 
     }

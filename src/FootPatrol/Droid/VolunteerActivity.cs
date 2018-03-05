@@ -33,7 +33,7 @@ namespace FootPatrol.Droid
         //private bool pickupComplete = false;
 
         private static SupportMapFragment mf; //fragment that displays map on < API 24
-        private static Button completeTripBtn, cancelTripBtn; //buttons to complete and cancel trip
+        private static Button completeTripBtn; //buttons to complete trip
         private static DrawerLayout mDrawerLayout, mfDrawerLayout; //drawer layouts for new and older android devices
         private static ImageButton mSideTab, mfSideTab; //side tab buttons for each view
         private static MapView mView; //mapView that displays map on >= API 24
@@ -67,14 +67,6 @@ namespace FootPatrol.Droid
         {
             va = new VolunteerActivity();
             return va;
-        }
-
-        /// <summary>
-        /// Struct used for use with Newtonsoft JSON and adding requests if cancel trip is selected
-        /// </summary>
-        struct Volunteer
-        {
-            public string name, from_location, to_location, additional_info;
         }
 
         ///  <summary>
@@ -119,7 +111,6 @@ namespace FootPatrol.Droid
                 mSideTab = (ImageButton)view.FindViewById(Resource.Id.sideTabBtn);
                 mDrawerLayout = (DrawerLayout)view.FindViewById(Resource.Id.drawer_layout);
                 mRelativeLayout = (RelativeLayout)view.FindViewById(Resource.Id.innerRelative);
-                cancelTripBtn = (Button)view.FindViewById(Resource.Id.cancelTripBtn);
                 completeTripBtn = (Button)view.FindViewById(Resource.Id.completeTripBtn);
                 mRecyclerView = (RecyclerView)view.FindViewById(Resource.Id.recyclerView1);
                 mView = (MapView)view.FindViewById(Resource.Id.map);
@@ -133,11 +124,6 @@ namespace FootPatrol.Droid
                 mSideTab.Click += (sender, e) =>
                 {
                     sideTabClicked(mSideTab, mDrawerLayout, mListView);
-                };
-
-                cancelTripBtn.Click += (sender, e) =>
-                {
-                    cancelBtnClicked();
                 };
 
                 completeTripBtn.Click += (sender, e) =>
@@ -166,7 +152,6 @@ namespace FootPatrol.Droid
                 mfListView = (ListView)view.FindViewById(Resource.Id.listView1);
                 mfDrawerLayout = (DrawerLayout)view.FindViewById(Resource.Id.drawer_layout1);
                 mfRelativeLayout = (RelativeLayout)view.FindViewById(Resource.Id.innerRelative1);
-                cancelTripBtn = (Button)view.FindViewById(Resource.Id.cancelTripBtn1);
                 completeTripBtn = (Button)view.FindViewById(Resource.Id.completeTripBtn1);
                 mf = (SupportMapFragment)this.ChildFragmentManager.FindFragmentById(Resource.Id.map2);
                 mfRecyclerView = (RecyclerView)view.FindViewById(Resource.Id.recyclerView2);
@@ -183,11 +168,6 @@ namespace FootPatrol.Droid
                 mfSideTab.Click += (sender, e) =>
                 {
                     sideTabClicked(mfSideTab, mfDrawerLayout, mfListView);
-                };
-
-                cancelTripBtn.Click += (sender, e) =>
-                {
-                    cancelBtnClicked();
                 };
 
                 completeTripBtn.Click += (sender, e) =>
@@ -392,7 +372,6 @@ namespace FootPatrol.Droid
                 createAlert("The task to get user requests failed! The error is: " + error);
                 return null;
             }
-
         }
 
         /// <summary>
@@ -400,7 +379,6 @@ namespace FootPatrol.Droid
         /// </summary>
         private void onRequestClick()
         {
-            
             if (request.Count == 0)
             {
                 createAlert("There are no requests to be fulfilled!"); //if there are no requests, display alert
@@ -429,20 +407,16 @@ namespace FootPatrol.Droid
         /// Then retrieve the polyline pattern from the Google Directions API and decode the polyline and display the result on the map.
         /// Finally remove the request from the list of requests.
         /// </summary>
-        /// <param name="username">Name of user</param>
-        /// <param name="toLoc">Destination location of accepted request</param>
-        /// <param name="fromLoc">Start location of accepted request</param>
-        /// <param name="addInfo">Additional info of accepted request</param>
-        /// <param name="Id">Id of the accepted request</param>
-        public void onTripAcceptAsync(string username, string toLoc, string fromLoc, string addInfo, int Id)
+        /// <param name="request">The accepted request</param>
+        public void onTripAcceptAsync(Requests.Request request)
         {
-            //Set variables to accept trip request to be used if trip is cancelled
-            name = username;
-            to_location = toLoc;
-            from_location = fromLoc;
-            additional_info = addInfo;
+            //Set variables to save user information from request
+            name = request.name;
+            to_location = request.toLoc;
+            from_location = request.fromLoc;
+            additional_info = request.addInfo;
 
-            var address = fromLoc; //set the starting user destination as the address
+            var address = from_location; //set the starting user destination as the address
             address = address + " Western University"; //concatenate the address with Western University to narrow the search
             var approximateLocation = Task.Run(() => getPositionForAddress(address)).Result; //get GPS coordinates of the approximate location
 
@@ -456,7 +430,7 @@ namespace FootPatrol.Droid
             ra.dismissFragment(); //dismiss the request dialog fragment
 
             userMarker.SetPosition(userCoordinates)
-                      .SetTitle(username)
+                      .SetTitle(name)
                       .SetIcon(BitmapDescriptorFactory.DefaultMarker(BitmapDescriptorFactory.HueBlue)); //add the user starting location as a marker on the screen
             userMark = map.AddMarker(userMarker); //add the map marker to the screen and return a reference so that it can be removed
 
@@ -494,7 +468,7 @@ namespace FootPatrol.Droid
             }
 
             HttpClient httpClient = new HttpClient(); //create a new HTTP client
-            Uri customURI = new Uri("http://staging.capstone.incode.ca/api/v1/requests/" + Id.ToString());
+            Uri customURI = new Uri("http://staging.capstone.incode.ca/api/v1/requests/" + request.id.ToString());
             httpClient.DeleteAsync(customURI); //delete the accepted request from all requests
                 
         }
@@ -651,7 +625,7 @@ namespace FootPatrol.Droid
         /// <param name="list">List</param>
         private void sideTabClicked(ImageButton btn, DrawerLayout drawer, ListView list)
         {
-            if(drawer.IsDrawerOpen(list))
+            if (drawer.IsDrawerOpen(list))
             {
                 btn.SetX(0); //set the button to its initial position
                 drawer.CloseDrawer(list); //close the drawer
@@ -661,42 +635,6 @@ namespace FootPatrol.Droid
             {
                 drawer.OpenDrawer(list); //if the drawer isn't open, open it
             }
-        }
-
-        /// <summary>
-        /// Button listener for the cancel trip button.
-        /// </summary>
-        private void cancelBtnClicked()
-        {
-            AlertDialog.Builder builder = new AlertDialog.Builder(this.Context); //create a new alert dialog
-            builder.SetTitle("Cancel Trip")
-                   .SetMessage("Are you sure you want to cancel the trip?")
-                   .SetPositiveButton("Yes", async (sender, e) =>
-            {
-                //if the volunteer decides to cancel the trip, must re-add request to list of requests
-                HttpClient httpClient = new HttpClient(); //create new Http Client
-                Uri customURI = new Uri("http://staging.capstone.incode.ca/api/v1/requests");
-
-                Volunteer volunteer = new Volunteer(); //get a reference to the struct of volunteers
-                //get name, start/end location and additional info from cancelled trip
-                volunteer.name = name;
-                volunteer.from_location = from_location;
-                volunteer.to_location = to_location;
-                volunteer.additional_info = additional_info;
-
-                string vObj = JsonConvert.SerializeObject(volunteer); //serialize the object into Json format to be added back into the system
-
-                HttpContent content = new StringContent(vObj, Encoding.UTF8, "application/json"); //create new HttpContent to use in post request
-                var result = await httpClient.PostAsync(customURI, content); //asynchronously post the request
-                postTripUI(); //update UI to accept more requests
-
-            }).SetNegativeButton("No", (sender, e) =>
-            {
-                //Do nothing
-            });
-
-            Dialog dialog = builder.Create();
-            dialog.Show(); //show the dialog
         }
 
         private void pickUpClicked()

@@ -157,6 +157,7 @@
     <Compile Include="VolunteerActivity.cs" />
     <Compile Include="DirectionsHolder.cs" />
     <Compile Include="DrawerItemClickListener.cs" />
+    <Compile Include="Requests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
