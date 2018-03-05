@@ -86,14 +86,14 @@ export class VolunteerPairingsRoute extends AbstractRoute implements IRoute {
    *            volunteers: [
    *              {
    *                id: 1,
-   *                uwo_id: "jdoe37@uwo.ca",
+   *                uwo_id: "jdoe37",
    *                first_name: "John",
    *                last_name: "Doe",
    *                disabled: false
    *              },
    *              {
    *                id: 2,
-   *                uwo_id: "jdoe38@uwo.ca",
+   *                uwo_id: "jdoe38",
    *                first_name: "Jane",
    *                last_name: "Doe",
    *                disabled: false
@@ -164,14 +164,14 @@ export class VolunteerPairingsRoute extends AbstractRoute implements IRoute {
    *        volunteers: [
    *          {
    *            id: 1,
-   *            uwo_id: "jdoe37@uwo.ca",
+   *            uwo_id: "jdoe37",
    *            first_name: "John",
    *            last_name: "Doe",
    *            disabled: false
    *          },
    *          {
    *            id: 2,
-   *            uwo_id: "jdoe38@uwo.ca",
+   *            uwo_id: "jdoe38",
    *            first_name: "Jane",
    *            last_name: "Doe",
    *            disabled: false
@@ -236,14 +236,14 @@ export class VolunteerPairingsRoute extends AbstractRoute implements IRoute {
    *        volunteers: [
    *          {
    *            id: 1,
-   *            uwo_id: "jdoe37@uwo.ca",
+   *            uwo_id: "jdoe37",
    *            first_name: "John",
    *            last_name: "Doe",
    *            disabled: false
    *          },
    *          {
    *            id: 2,
-   *            uwo_id: "jdoe38@uwo.ca",
+   *            uwo_id: "jdoe38",
    *            first_name: "Jane",
    *            last_name: "Doe",
    *            disabled: false

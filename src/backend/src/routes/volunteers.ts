@@ -77,7 +77,7 @@ export class VolunteersRoute extends AbstractRoute implements IRoute {
    *        volunteers: [
    *          {
    *            id: 1,
-   *            uwo_id: "jdoe37@uwo.ca",
+   *            uwo_id: "jdoe37",
    *            first_name: "John",
    *            last_name: "Doe",
    *            disabled: false
@@ -139,7 +139,7 @@ export class VolunteersRoute extends AbstractRoute implements IRoute {
    *     HTTP/1.1 200 OK
    *     {
    *        id: 1,
-   *        uwo_id: "jdoe37@uwo.ca",
+   *        uwo_id: "jdoe37",
    *        first_name: "John",
    *        last_name: "Doe",
    *        disabled: false
@@ -197,7 +197,7 @@ export class VolunteersRoute extends AbstractRoute implements IRoute {
    *     HTTP/1.1 201 CREATED
    *     {
    *        id: 1,
-   *        uwo_id: "jdoe37@uwo.ca",
+   *        uwo_id: "jdoe37",
    *        first_name: "John",
    *        last_name: "Doe",
    *        disabled: false
@@ -265,7 +265,7 @@ export class VolunteersRoute extends AbstractRoute implements IRoute {
    *     HTTP/1.1 200 OK
    *     {
    *        id: 1,
-   *        uwo_id: "jdoe37@uwo.ca",
+   *        uwo_id: "jdoe37",
    *        first_name: "John",
    *        last_name: "Doe",
    *        disabled: false
@@ -345,7 +345,7 @@ export class VolunteersRoute extends AbstractRoute implements IRoute {
    *     HTTP/1.1 200 OK
    *     {
    *        id: 1,
-   *        uwo_id: "jdoe37@uwo.ca",
+   *        uwo_id: "jdoe37",
    *        first_name: "John",
    *        last_name: "Doe",
    *        disabled: false
@@ -438,7 +438,7 @@ export class VolunteersRoute extends AbstractRoute implements IRoute {
    *        volunteers: [
    *          {
    *            id: 1,
-   *            uwo_id: "jdoe37@uwo.ca",
+   *            uwo_id: "jdoe37",
    *            first_name: "John",
    *            last_name: "Doe",
    *            disabled: false
@@ -481,7 +481,7 @@ export class VolunteersRoute extends AbstractRoute implements IRoute {
    *        volunteers: [
    *          {
    *            id: 1,
-   *            uwo_id: "jdoe37@uwo.ca",
+   *            uwo_id: "jdoe37",
    *            first_name: "John",
    *            last_name: "Doe",
    *            disabled: false
