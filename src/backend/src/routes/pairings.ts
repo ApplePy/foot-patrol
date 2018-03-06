@@ -74,7 +74,7 @@ export class VolunteerPairingsRoute extends AbstractRoute implements IRoute {
    * @apiSuccess {boolean} pairs.volunteers.disabled Designates if the volunteer has left Foot Patrol.
    *
    * @apiExample Example usage:
-   * curl -i http://localhost/volunteerpairs?disabled=true
+   * curl -i http://localhost/volunteerpairs?inactive=true
    *
    * @apiSuccessExample Success Response:
    *     HTTP/1.1 200 OK
