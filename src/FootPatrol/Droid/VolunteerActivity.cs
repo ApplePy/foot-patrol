@@ -28,6 +28,8 @@ namespace FootPatrol.Droid
     public class VolunteerActivity : Android.Support.V4.App.Fragment, GoogleApiClient.IOnConnectionFailedListener, GoogleApiClient.IConnectionCallbacks, Android.Gms.Location.ILocationListener, IOnMapReadyCallback
     {
         public static string name, to_location, from_location, additional_info; //variables to keep name, location and additional information of user
+        public static int id;
+
         private Typeface bentonSans; //font to be used in application
         private ArrayAdapter<System.String> listAdapter; //adapter to help display directions
         //private bool pickupComplete = false;
@@ -44,7 +46,7 @@ namespace FootPatrol.Droid
         private static RecyclerView.LayoutManager layoutManager; //layout manager for recycler view
         private static RelativeLayout mRelativeLayout, mfRelativeLayout; //relative layouts to display status of complete, cancel and pickup on trip
 
-        private string backendURI, getURI;
+        private static string backendURI, getURI;
 
         public static List<string> request, steps; //lists to hold information on requests and direction steps
         public string[] menuItems; //list of menu items to be displayed in side tab
@@ -78,11 +80,11 @@ namespace FootPatrol.Droid
         {
             base.OnCreate(savedInstanceState);
 
-            menuItems = new string[] { "EMERGENCY CONTACTS", "CAMPUS MAPS", "PAIR FOOT PATROLLERS"}; //initializes list to displayed in listView 
+            menuItems = new string[] { "EMERGENCY CONTACTS", "CAMPUS MAPS", "PAIR FOOT PATROLLERS", "CHECK-IN"}; //initializes list to displayed in listView 
 
             listAdapter = new ArrayAdapter<string>(this.Context, Resource.Layout.ListElement, menuItems); //initializes ArrayAdapter to be displayed in listView
             layoutManager = new LinearLayoutManager(this.Context, LinearLayoutManager.Horizontal, false); //initializs the directions layout to be horizontal and sidescrolling
-            backendURI = "http://staging.capstone.incode.ca/api/v1/requests";
+            backendURI = "http://staging.capstone.incode.ca/api/v1/requests/";
             getURI = "?offset=0&count=9&archived=true";
             request = new List<string>();
 
@@ -94,9 +96,9 @@ namespace FootPatrol.Droid
                 MapsInitializer.Initialize(this.Context); //initialize the Google Maps Android API
             }
 
-            catch (Java.Lang.Exception e)
+            catch (Exception e)
             {
-                System.Diagnostics.Debug.WriteLine(e.StackTrace);
+                createAlert("Unable to initialize the map, the error is: " + e);
             }
 
             volunteerMarker = new MarkerOptions(); //initialize the volunteer MarkerOptions
@@ -409,6 +411,7 @@ namespace FootPatrol.Droid
             to_location = request.toLoc;
             from_location = request.fromLoc;
             additional_info = request.addInfo;
+            id = request.id;
 
             var address = from_location; //set the starting user destination as the address
             address = address + " Western University"; //concatenate the address with Western University to narrow the search
@@ -462,7 +465,9 @@ namespace FootPatrol.Droid
             }
 
             HttpClient httpClient = new HttpClient(); //create a new HTTP client
-            Uri customURI = new Uri(backendURI + request.id.ToString());
+            string userID = id.ToString();
+            System.Diagnostics.Debug.WriteLine("The custom uri is: " + backendURI + userID);
+            Uri customURI = new Uri(backendURI + userID);
             httpClient.DeleteAsync(customURI); //delete the accepted request from all requests
                 
         }

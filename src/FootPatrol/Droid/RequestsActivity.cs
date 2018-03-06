@@ -16,8 +16,7 @@ namespace FootPatrol.Droid
         public static VolunteerActivity va; //reference to VolunteerActivity
         private static View view; //reference of the current view
 
-        public static List<string> request; //list of requests and associated name, start/end locations and additional info
-        public static List<UserRequests.Request> activeRequests;
+        public static List<UserRequests.Request> activeRequests; //list of user requests
         private static int reqCount; //number of requests
 
         public TextView name, toLocation, fromLocation, additionalInfo; //UI components to be displayed in each request
@@ -32,8 +31,10 @@ namespace FootPatrol.Droid
         public static RequestsActivity newInstance(List<string> requests)
         {
             ra = new RequestsActivity(); //create new instance
+            activeRequests = new List<UserRequests.Request>();//initialize new list of requests
+
             reqCount = requests.Count; //save the count into request count variable
-            request = requests; //save the list of requests into request list
+            saveRequests(requests);
             return ra;
         }
 
@@ -51,7 +52,6 @@ namespace FootPatrol.Droid
 
             Dialog.Window.SetLayout(ViewGroup.LayoutParams.MatchParent,ViewGroup.LayoutParams.WrapContent); //set the layout of the dialog fragment
             view = inflater.Inflate(Resource.Layout.Requests, container, false);
-            activeRequests = new List<UserRequests.Request>();
 
             //initialize each variable to its view component
             name = (TextView)view.FindViewById(Resource.Id.userName);
@@ -64,20 +64,6 @@ namespace FootPatrol.Droid
             Button acceptReq = (Button)view.FindViewById(Resource.Id.acceptRequest);
 
             currentCount = 0; //set the initial count to zero
-
-            foreach (string req in request)
-            {
-                JObject o = JObject.Parse(req); //parse the request into a string
-
-                //get each respective string using the selectToken method
-                string userName = (string)o.SelectToken("name");
-                string toLoc = (string)o.SelectToken("to_location");
-                string fromLoc = (string)o.SelectToken("from_location");
-                string aInfo = (string)o.SelectToken("additional_info");
-                string requestId = (string)o.SelectToken("id");
-
-                activeRequests.Add(new UserRequests.Request(userName, toLoc, fromLoc, aInfo, Int32.Parse(requestId)));
-            }
 
             //if there exists more than 1 request
             if (activeRequests.Count > 1)
@@ -139,7 +125,7 @@ namespace FootPatrol.Droid
         /// Disables the arrow passed in the parameter.
         /// </summary>
         /// <param name="button">Button.</param>
-        public void disableArrow(ImageButton button)
+        private void disableArrow(ImageButton button)
         {
             button.Enabled = false;
             button.SetBackgroundColor(Color.Gray);
@@ -149,7 +135,7 @@ namespace FootPatrol.Droid
         /// Enables the arrow passed in the parameter
         /// </summary>
         /// <param name="button">Button.</param>
-        public void enableArrow(ImageButton button)
+        private void enableArrow(ImageButton button)
         {
             button.Enabled = true;
             button.SetBackgroundColor(Color.White);
@@ -167,7 +153,7 @@ namespace FootPatrol.Droid
         /// Set the info in the request UI to the current request information.
         /// </summary>
         /// <param name="request">The current request</param>
-        public void setInfo(UserRequests.Request request)
+        private void setInfo(UserRequests.Request request)
         {
             name.Text = "NAME: " + request.name; 
             fromLocation.Text = "START LOCATION: " + request.fromLoc;
@@ -175,5 +161,21 @@ namespace FootPatrol.Droid
             additionalInfo.Text = "ADDITIONAL INFO: " + request.addInfo;
         }
 
+        public static void saveRequests(List<string> requests)
+        {
+            foreach (string req in requests)
+            {
+                JObject o = JObject.Parse(req); //parse the request into a string
+
+                //get each respective string using the selectToken method
+                string userName = (string)o.SelectToken("name");
+                string toLoc = (string)o.SelectToken("to_location");
+                string fromLoc = (string)o.SelectToken("from_location");
+                string aInfo = (string)o.SelectToken("additional_info");
+                string requestId = (string)o.SelectToken("id");
+
+                activeRequests.Add(new UserRequests.Request(userName, toLoc, fromLoc, aInfo, Int32.Parse(requestId)));
+            }
+        }
     }
 }
