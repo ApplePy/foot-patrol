@@ -22,6 +22,11 @@ namespace FootPatrol.Droid
             fragmentTransaction.AddToBackStack(null); //add the transaction to the back stack
             fragmentTransaction.Commit(); //commit the transaction
         }
+
+        public virtual void OnBackPressed()
+        {
+            
+        }
     }
 }
 

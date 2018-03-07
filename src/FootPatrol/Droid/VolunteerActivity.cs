@@ -20,6 +20,7 @@ using Android.Support.V7.Widget;
 using Android.Support.V4.Widget;
 using System.Threading;
 using static Android.Widget.AdapterView;
+using Android.Content;
 
 namespace FootPatrol.Droid
 {
@@ -811,13 +812,13 @@ namespace FootPatrol.Droid
 
             if (Int32.Parse(Build.VERSION.Sdk) > 23)
             {
-                mDrawerLayout.CloseDrawer(mListView);
-                fragmentTransaction.Replace(Resource.Id.drawer_layout, fragment, tag); //replace the old fragment with the new on
+                mDrawerLayout.CloseDrawer(mListView); //close the drawer when entering new view
+                fragmentTransaction.Replace(Resource.Id.drawer_layout, fragment, tag); //replace the old fragment with the new one
             }
 
             else
             {
-                mfDrawerLayout.CloseDrawer(mfListView);
+                mfDrawerLayout.CloseDrawer(mfListView); //close the drawer when entering new view
                 fragmentTransaction.Replace(Resource.Id.drawer_layout1, fragment, tag);
             }
 

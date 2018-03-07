@@ -159,6 +159,8 @@
     <Compile Include="UserRequests.cs" />
     <Compile Include="CampusMapsActivity.cs" />
     <Compile Include="EmergencyContactsActivity.cs" />
+    <Compile Include="PairFootPatrollersActivity.cs" />
+    <Compile Include="CheckInActivity.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
@@ -193,6 +195,7 @@
     <AndroidResource Include="Resources\layout\EmergencyContact.xml" />
     <AndroidResource Include="Resources\drawable\WesternCampusMap.png" />
     <AndroidResource Include="Resources\drawable\WesternFootPatrolMap.png" />
+    <AndroidResource Include="Resources\drawable\ic_arrow_back_black_24dp.png" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\drawable\" />
