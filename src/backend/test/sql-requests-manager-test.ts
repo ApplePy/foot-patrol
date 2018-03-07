@@ -72,7 +72,7 @@ class SQLRequestsManagerTest {
     this.reqMgr = new SQLRequestsManager(backend);
   }
 
-  // hook for before each test; make static to be after the suite
+  // hook for before each test; make static to be before the suite
   public before(done: MochaDone) {
     // Clear DB state
     FakeSQL.response = undefined;
