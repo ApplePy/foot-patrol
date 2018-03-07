@@ -22,7 +22,6 @@ export abstract class AbstractRoute {
         errStrings.NotFoundError.Title,
         errStrings.NotFoundError.Msg);
     } else {
-      console.error(err.toString());
       return new StatusError(500,
         errStrings.InternalServerError.Title,
         errStrings.InternalServerError.Msg);
