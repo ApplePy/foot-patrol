@@ -1,32 +1,29 @@
 ﻿using Android.App;
-using Android.Widget;
-using Android.OS;
-using Android.Runtime;
 using Android.Content;
-using System;
-using Android.Net;
-using Android.Net.Wifi;
+using Android.OS;
 using Android.Support.V4.App;
-using Android.Support.V4.View;
-using Android.Support.V4.Content;
-using System.Threading.Tasks;
+using Android.Views;
 
 namespace FootPatrol.Droid
 {
     [Activity(Label = "Safe Walk", MainLauncher = true, Icon = "@drawable/WesternFootPatrol")]
     public class MainActivity : FragmentActivity
     {
+        /// <summary>
+        /// When the view is created, create a fragment transaction to transition to the login screen.
+        /// </summary>
+        /// <param name="savedInstanceState">Saved instance state</param>
         protected override void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
-
-            // Set our view from the "main" layout resource
-            SetContentView(Resource.Layout.Main);
-
-            ViewPager viewpager = FindViewById<ViewPager>(Resource.Id.viewPager1);
-            FootPatrolAdapter adapter = new FootPatrolAdapter(SupportFragmentManager);
-            viewpager.Adapter = adapter;
-
+            SetContentView(Resource.Layout.Main); //set the content view to the main layout
+            Android.Support.V4.App.Fragment newFrag = new LoginActivity(); //create new instance of LoginActivity and save it in a new fragment
+            Android.Support.V4.App.FragmentTransaction fragmentTransaction = SupportFragmentManager.BeginTransaction(); //begin the new fragment transaction
+            fragmentTransaction.Replace(Resource.Id.frameLayout1, newFrag, "LoginActivity"); //replace the main activity fragment with the Login Fragment
+            fragmentTransaction.AddToBackStack(null); //add the transaction to the back stack
+            fragmentTransaction.Commit(); //commit the transaction
         }
     }
 }
+
+

@@ -1,7 +1,6 @@
-<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="..\packages\Xamarin.Forms.2.5.0.122203\build\netstandard1.0\Xamarin.Forms.props" Condition="Exists('..\packages\Xamarin.Forms.2.5.0.122203\build\netstandard1.0\Xamarin.Forms.props')" />
-  <Import Project="..\packages\Xamarin.Build.Download.0.4.2\build\Xamarin.Build.Download.props" Condition="Exists('..\packages\Xamarin.Build.Download.0.4.2\build\Xamarin.Build.Download.props')" />
+﻿<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="packages\Xamarin.Forms.2.5.0.122203\build\netstandard1.0\Xamarin.Forms.props" Condition="Exists('packages\Xamarin.Forms.2.5.0.122203\build\netstandard1.0\Xamarin.Forms.props')" />
+  <Import Project="..\packages\Xamarin.Build.Download.0.4.7\build\Xamarin.Build.Download.props" Condition="Exists('..\packages\Xamarin.Build.Download.0.4.7\build\Xamarin.Build.Download.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
@@ -10,7 +9,7 @@
     <OutputType>Library</OutputType>
     <RootNamespace>FootPatrol.Droid</RootNamespace>
     <AssemblyName>FootPatrol.Droid</AssemblyName>
-    <TargetFrameworkVersion>v8.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v8.1</TargetFrameworkVersion>
     <AndroidApplication>True</AndroidApplication>
     <AndroidResgenFile>Resources\Resource.designer.cs</AndroidResgenFile>
     <AndroidResgenClass>Resource</AndroidResgenClass>
@@ -108,49 +107,57 @@
     <Reference Include="Xamarin.Android.Support.v7.MediaRouter">
       <HintPath>..\packages\Xamarin.Android.Support.v7.MediaRouter.26.1.0.1\lib\MonoAndroid80\Xamarin.Android.Support.v7.MediaRouter.dll</HintPath>
     </Reference>
-    <Reference Include="FormsViewGroup">
-      <HintPath>..\packages\Xamarin.Forms.2.5.0.122203\lib\MonoAndroid10\FormsViewGroup.dll</HintPath>
-    </Reference>
-    <Reference Include="Xamarin.Forms.Core">
-      <HintPath>..\packages\Xamarin.Forms.2.5.0.122203\lib\MonoAndroid10\Xamarin.Forms.Core.dll</HintPath>
-    </Reference>
-    <Reference Include="Xamarin.Forms.Platform.Android">
-      <HintPath>..\packages\Xamarin.Forms.2.5.0.122203\lib\MonoAndroid10\Xamarin.Forms.Platform.Android.dll</HintPath>
-    </Reference>
-    <Reference Include="Xamarin.Forms.Platform">
-      <HintPath>..\packages\Xamarin.Forms.2.5.0.122203\lib\MonoAndroid10\Xamarin.Forms.Platform.dll</HintPath>
-    </Reference>
-    <Reference Include="Xamarin.Forms.Xaml">
-      <HintPath>..\packages\Xamarin.Forms.2.5.0.122203\lib\MonoAndroid10\Xamarin.Forms.Xaml.dll</HintPath>
-    </Reference>
     <Reference Include="Xamarin.GooglePlayServices.Basement">
-      <HintPath>..\packages\Xamarin.GooglePlayServices.Basement.42.1021.1\lib\MonoAndroid70\Xamarin.GooglePlayServices.Basement.dll</HintPath>
+      <HintPath>..\packages\Xamarin.GooglePlayServices.Basement.60.1142.0\lib\MonoAndroid80\Xamarin.GooglePlayServices.Basement.dll</HintPath>
     </Reference>
     <Reference Include="Xamarin.GooglePlayServices.Tasks">
-      <HintPath>..\packages\Xamarin.GooglePlayServices.Tasks.42.1021.1\lib\MonoAndroid70\Xamarin.GooglePlayServices.Tasks.dll</HintPath>
+      <HintPath>..\packages\Xamarin.GooglePlayServices.Tasks.60.1142.0\lib\MonoAndroid80\Xamarin.GooglePlayServices.Tasks.dll</HintPath>
     </Reference>
     <Reference Include="Xamarin.GooglePlayServices.Base">
-      <HintPath>..\packages\Xamarin.GooglePlayServices.Base.42.1021.1\lib\MonoAndroid70\Xamarin.GooglePlayServices.Base.dll</HintPath>
+      <HintPath>..\packages\Xamarin.GooglePlayServices.Base.60.1142.0\lib\MonoAndroid80\Xamarin.GooglePlayServices.Base.dll</HintPath>
+    </Reference>
+    <Reference Include="Xamarin.GooglePlayServices.Location">
+      <HintPath>..\packages\Xamarin.GooglePlayServices.Location.60.1142.0\lib\MonoAndroid80\Xamarin.GooglePlayServices.Location.dll</HintPath>
     </Reference>
     <Reference Include="Xamarin.GooglePlayServices.Maps">
-      <HintPath>..\packages\Xamarin.GooglePlayServices.Maps.42.1021.1\lib\MonoAndroid70\Xamarin.GooglePlayServices.Maps.dll</HintPath>
+      <HintPath>..\packages\Xamarin.GooglePlayServices.Maps.60.1142.0\lib\MonoAndroid80\Xamarin.GooglePlayServices.Maps.dll</HintPath>
+    </Reference>
+    <Reference Include="FormsViewGroup">
+      <HintPath>packages\Xamarin.Forms.2.5.0.122203\lib\MonoAndroid10\FormsViewGroup.dll</HintPath>
+    </Reference>
+    <Reference Include="Xamarin.Forms.Core">
+      <HintPath>packages\Xamarin.Forms.2.5.0.122203\lib\MonoAndroid10\Xamarin.Forms.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Xamarin.Forms.Platform.Android">
+      <HintPath>packages\Xamarin.Forms.2.5.0.122203\lib\MonoAndroid10\Xamarin.Forms.Platform.Android.dll</HintPath>
+    </Reference>
+    <Reference Include="Xamarin.Forms.Platform">
+      <HintPath>packages\Xamarin.Forms.2.5.0.122203\lib\MonoAndroid10\Xamarin.Forms.Platform.dll</HintPath>
+    </Reference>
+    <Reference Include="Xamarin.Forms.Xaml">
+      <HintPath>packages\Xamarin.Forms.2.5.0.122203\lib\MonoAndroid10\Xamarin.Forms.Xaml.dll</HintPath>
     </Reference>
     <Reference Include="Xamarin.Forms.Maps.Android">
-      <HintPath>..\packages\Xamarin.Forms.Maps.2.5.0.122203\lib\MonoAndroid10\Xamarin.Forms.Maps.Android.dll</HintPath>
+      <HintPath>packages\Xamarin.Forms.Maps.2.5.0.122203\lib\MonoAndroid10\Xamarin.Forms.Maps.Android.dll</HintPath>
     </Reference>
     <Reference Include="Xamarin.Forms.Maps">
-      <HintPath>..\packages\Xamarin.Forms.Maps.2.5.0.122203\lib\MonoAndroid10\Xamarin.Forms.Maps.dll</HintPath>
+      <HintPath>packages\Xamarin.Forms.Maps.2.5.0.122203\lib\MonoAndroid10\Xamarin.Forms.Maps.dll</HintPath>
+    </Reference>
+    <Reference Include="GoogleMapsUtilityBinding">
+      <HintPath>packages\Xamarin.Android.Maps.Utils.0.5.0\lib\MonoAndroid10\GoogleMapsUtilityBinding.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="MainActivity.cs" />
     <Compile Include="Resources\Resource.designer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="PickupActivity.cs" />
-    <Compile Include="FootPatrolAdapter.cs" />
-    <Compile Include="FeedbackActivity.cs" />
-    <Compile Include="MapsActivity.cs" />
+    <Compile Include="RequestsActivity.cs" />
+    <Compile Include="LoginActivity.cs" />
+    <Compile Include="DirectionsAdapter.cs" />
     <Compile Include="VolunteerActivity.cs" />
+    <Compile Include="DirectionsHolder.cs" />
+    <Compile Include="DrawerItemClickListener.cs" />
+    <Compile Include="UserRequests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
@@ -161,15 +168,30 @@
   <ItemGroup>
     <AndroidResource Include="Resources\layout\Main.axml" />
     <AndroidResource Include="Resources\values\Strings.xml" />
-    <AndroidResource Include="Resources\layout\PickupLayout.xml" />
-    <AndroidResource Include="Resources\layout\FeedbackLayout.xml" />
-    <AndroidResource Include="Resources\layout\MapsLayout.xml" />
-    <AndroidResource Include="Resources\drawable\WesternFootPatrolMap.jpg" />
-    <AndroidResource Include="Resources\drawable\WesternMap.jpg" />
     <AndroidResource Include="Resources\layout\LoginScreen.xml" />
     <AndroidResource Include="Resources\drawable\WesternFootPatrolNoBack.png" />
     <AndroidResource Include="Resources\drawable\westernfootpatrol.png" />
     <AndroidResource Include="Resources\layout\VolunteerScreen.xml" />
+    <AndroidResource Include="Resources\drawable\WalkNotification.png" />
+    <AndroidResource Include="Resources\drawable\purplecircle.png" />
+    <AndroidResource Include="Resources\drawable\ic_keyboard_arrow_left_black_24dp.png" />
+    <AndroidResource Include="Resources\drawable\ic_keyboard_arrow_right_black_24dp.png" />
+    <AndroidResource Include="Resources\drawable\ic_close_black_24dp.png" />
+    <AndroidResource Include="Resources\layout\Requests.xml" />
+    <AndroidResource Include="Resources\layout\VolunteerScreenMF.xml" />
+    <AndroidResource Include="Resources\layout\EnterAnimation.xml" />
+    <AndroidResource Include="Resources\layout\ExitAnimation.xml" />
+    <AndroidResource Include="Resources\layout\ListElement.xml" />
+    <AndroidResource Include="Resources\layout\DirectionsLayout.xml" />
+    <AndroidResource Include="Resources\drawable\ic_chevron_right_black_24dp.png" />
+    <AndroidResource Include="Resources\drawable\BorderResource.xml" />
+    <AndroidResource Include="Resources\layout\CampusMaps.xml" />
+    <AndroidResource Include="Resources\drawable\westernUniversity.jpg" />
+    <AndroidResource Include="Resources\drawable\WesternCampusPolice.jpeg" />
+    <AndroidResource Include="Resources\drawable\ic_phone_black_24dp.png" />
+    <AndroidResource Include="Resources\layout\EmergencyContact.xml" />
+    <AndroidResource Include="Resources\drawable\WesternCampusMap.png" />
+    <AndroidResource Include="Resources\drawable\WesternFootPatrolMap.png" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\drawable\" />
@@ -180,7 +202,7 @@
     <Folder Include="Resources\mipmap-xxxhdpi\" />
   </ItemGroup>
   <ItemGroup>
-    <AndroidAsset Include="Assets\BentonSans Regular.otf" />
+    <AndroidAsset Include="Assets\BentonSansRegular.otf" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />
   <Import Project="..\packages\Xamarin.Android.Support.Annotations.26.1.0.1\build\MonoAndroid80\Xamarin.Android.Support.Annotations.targets" Condition="Exists('..\packages\Xamarin.Android.Support.Annotations.26.1.0.1\build\MonoAndroid80\Xamarin.Android.Support.Annotations.targets')" />
@@ -202,10 +224,11 @@
   <Import Project="..\packages\Xamarin.Android.Support.v7.AppCompat.26.1.0.1\build\MonoAndroid80\Xamarin.Android.Support.v7.AppCompat.targets" Condition="Exists('..\packages\Xamarin.Android.Support.v7.AppCompat.26.1.0.1\build\MonoAndroid80\Xamarin.Android.Support.v7.AppCompat.targets')" />
   <Import Project="..\packages\Xamarin.Android.Support.Design.26.1.0.1\build\MonoAndroid80\Xamarin.Android.Support.Design.targets" Condition="Exists('..\packages\Xamarin.Android.Support.Design.26.1.0.1\build\MonoAndroid80\Xamarin.Android.Support.Design.targets')" />
   <Import Project="..\packages\Xamarin.Android.Support.v7.MediaRouter.26.1.0.1\build\MonoAndroid80\Xamarin.Android.Support.v7.MediaRouter.targets" Condition="Exists('..\packages\Xamarin.Android.Support.v7.MediaRouter.26.1.0.1\build\MonoAndroid80\Xamarin.Android.Support.v7.MediaRouter.targets')" />
-  <Import Project="..\packages\Xamarin.Build.Download.0.4.2\build\Xamarin.Build.Download.targets" Condition="Exists('..\packages\Xamarin.Build.Download.0.4.2\build\Xamarin.Build.Download.targets')" />
-  <Import Project="..\packages\Xamarin.Forms.2.5.0.122203\build\netstandard1.0\Xamarin.Forms.targets" Condition="Exists('..\packages\Xamarin.Forms.2.5.0.122203\build\netstandard1.0\Xamarin.Forms.targets')" />
-  <Import Project="..\packages\Xamarin.GooglePlayServices.Basement.42.1021.1\build\MonoAndroid70\Xamarin.GooglePlayServices.Basement.targets" Condition="Exists('..\packages\Xamarin.GooglePlayServices.Basement.42.1021.1\build\MonoAndroid70\Xamarin.GooglePlayServices.Basement.targets')" />
-  <Import Project="..\packages\Xamarin.GooglePlayServices.Tasks.42.1021.1\build\MonoAndroid70\Xamarin.GooglePlayServices.Tasks.targets" Condition="Exists('..\packages\Xamarin.GooglePlayServices.Tasks.42.1021.1\build\MonoAndroid70\Xamarin.GooglePlayServices.Tasks.targets')" />
-  <Import Project="..\packages\Xamarin.GooglePlayServices.Base.42.1021.1\build\MonoAndroid70\Xamarin.GooglePlayServices.Base.targets" Condition="Exists('..\packages\Xamarin.GooglePlayServices.Base.42.1021.1\build\MonoAndroid70\Xamarin.GooglePlayServices.Base.targets')" />
-  <Import Project="..\packages\Xamarin.GooglePlayServices.Maps.42.1021.1\build\MonoAndroid70\Xamarin.GooglePlayServices.Maps.targets" Condition="Exists('..\packages\Xamarin.GooglePlayServices.Maps.42.1021.1\build\MonoAndroid70\Xamarin.GooglePlayServices.Maps.targets')" />
+  <Import Project="..\packages\Xamarin.Build.Download.0.4.7\build\Xamarin.Build.Download.targets" Condition="Exists('..\packages\Xamarin.Build.Download.0.4.7\build\Xamarin.Build.Download.targets')" />
+  <Import Project="..\packages\Xamarin.GooglePlayServices.Basement.60.1142.0\build\MonoAndroid80\Xamarin.GooglePlayServices.Basement.targets" Condition="Exists('..\packages\Xamarin.GooglePlayServices.Basement.60.1142.0\build\MonoAndroid80\Xamarin.GooglePlayServices.Basement.targets')" />
+  <Import Project="..\packages\Xamarin.GooglePlayServices.Tasks.60.1142.0\build\MonoAndroid80\Xamarin.GooglePlayServices.Tasks.targets" Condition="Exists('..\packages\Xamarin.GooglePlayServices.Tasks.60.1142.0\build\MonoAndroid80\Xamarin.GooglePlayServices.Tasks.targets')" />
+  <Import Project="..\packages\Xamarin.GooglePlayServices.Base.60.1142.0\build\MonoAndroid80\Xamarin.GooglePlayServices.Base.targets" Condition="Exists('..\packages\Xamarin.GooglePlayServices.Base.60.1142.0\build\MonoAndroid80\Xamarin.GooglePlayServices.Base.targets')" />
+  <Import Project="..\packages\Xamarin.GooglePlayServices.Location.60.1142.0\build\MonoAndroid80\Xamarin.GooglePlayServices.Location.targets" Condition="Exists('..\packages\Xamarin.GooglePlayServices.Location.60.1142.0\build\MonoAndroid80\Xamarin.GooglePlayServices.Location.targets')" />
+  <Import Project="..\packages\Xamarin.GooglePlayServices.Maps.60.1142.0\build\MonoAndroid80\Xamarin.GooglePlayServices.Maps.targets" Condition="Exists('..\packages\Xamarin.GooglePlayServices.Maps.60.1142.0\build\MonoAndroid80\Xamarin.GooglePlayServices.Maps.targets')" />
+  <Import Project="packages\Xamarin.Forms.2.5.0.122203\build\netstandard1.0\Xamarin.Forms.targets" Condition="Exists('packages\Xamarin.Forms.2.5.0.122203\build\netstandard1.0\Xamarin.Forms.targets')" />
 </Project>

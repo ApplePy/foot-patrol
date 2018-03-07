@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.v4.widget.DrawerLayout xmlns:p1="http://schemas.android.com/apk/res/android"
-    p1:id="@+id/drawer_layout"
+    p1:id="@+id/drawer_layout1"
     p1:layout_width="match_parent"
-    p1:layout_height="match_parent">
+    p1:layout_height="match_parent"
+    p1:gravity="center_vertical|center_horizontal">
     <RelativeLayout
         p1:minWidth="25px"
         p1:minHeight="25px"
@@ -10,31 +11,32 @@
         p1:fillViewport="true"
         p1:layout_height="match_parent"
         p1:gravity="center_vertical">
-        <android.support.v7.widget.RecyclerView
-            p1:layout_width="match_parent"
-            p1:layout_height="100dp"
-            p1:id="@+id/recyclerView1"
-            p1:background="@drawable/BorderResource"
-            p1:scrollbars="horizontal"
-            p1:orientation="horizontal" />
-        <com.google.android.gms.maps.MapView
+        <fragment
             p1:minWidth="25px"
             p1:minHeight="25px"
             p1:layout_width="match_parent"
             p1:layout_height="match_parent"
-            p1:id="@+id/map" />
+            p1:id="@+id/map2"
+            class="com.google.android.gms.maps.SupportMapFragment" />
+        <android.support.v7.widget.RecyclerView
+            p1:layout_width="match_parent"
+            p1:layout_height="100dp"
+            p1:scrollbars="horizontal"
+            p1:id="@+id/recyclerView2"
+            p1:background="@drawable/BorderResource"
+            p1:orientation="horizontal" />
         <ImageView
             p1:src="@drawable/WalkNotification"
             p1:layout_width="80dp"
             p1:layout_height="80dp"
-            p1:id="@+id/notificationBase"
+            p1:id="@+id/notificationBase2"
             p1:layout_alignParentTop="true"
             p1:layout_alignParentRight="true"
             p1:layout_marginTop="20dp"
             p1:layout_marginRight="20dp" />
         <ImageView
             p1:src="@drawable/purplecircle"
-            p1:id="@+id/notificationBadge"
+            p1:id="@+id/notificationBadge2"
             p1:layout_alignParentTop="true"
             p1:layout_alignParentRight="true"
             p1:layout_width="30dp"
@@ -44,7 +46,7 @@
         <TextView
             p1:layout_width="25dp"
             p1:layout_height="25dp"
-            p1:id="@+id/badgeCounter"
+            p1:id="@+id/badgeCounter2"
             p1:layout_alignParentTop="true"
             p1:layout_alignParentRight="true"
             p1:layout_marginTop="12dp"
@@ -57,32 +59,33 @@
             p1:minHeight="25px"
             p1:layout_width="match_parent"
             p1:layout_height="80dp"
-            p1:id="@+id/innerRelative"
+            p1:id="@+id/innerRelative1"
             p1:layout_alignParentBottom="true"
             p1:background="@drawable/BorderResource">
             <Button
                 p1:layout_width="110dp"
                 p1:layout_height="40dp"
-                p1:id="@+id/completeTripBtn"
-                p1:layout_centerVertical="true"
+                p1:id="@+id/completeTripBtn1"
                 p1:text="COMPLETE TRIP"
                 p1:background="#807F83"
+                p1:layout_centerVertical="true"
+                p1:layout_centerInParent="true"
                 p1:layout_centerHorizontal="true" />
         </RelativeLayout>
         <ImageButton
             p1:src="@drawable/ic_chevron_right_black_24dp"
             p1:layout_width="30dp"
             p1:layout_height="100dp"
-            p1:id="@+id/sideTabBtn"
+            p1:id="@+id/sideTabBtn1"
             p1:background="@drawable/BorderResource"
             p1:layout_centerVertical="true"
             p1:scaleType="centerInside" />
     </RelativeLayout>
     <ListView
-        p1:id="@+id/navigationList1"
+        p1:id="@+id/listView1"
         p1:layout_width="150dp"
         p1:layout_height="200dp"
         p1:layout_gravity="left|center_vertical"
-        p1:background="@drawable/BorderResource"
+        p1:background="#ff4f2683"
         p1:divider="#807F83" />
 </android.support.v4.widget.DrawerLayout>

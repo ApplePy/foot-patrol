@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:p1="http://schemas.android.com/apk/res/android"
+    p1:minWidth="25px"
+    p1:minHeight="25px"
+    p1:layout_width="match_parent"
+    p1:layout_height="match_parent"
+    p1:background="#ff4f2683">
+    <ImageView
+        p1:src="@drawable/westernUniversity"
+        p1:layout_width="match_parent"
+        p1:layout_height="250dp"
+        p1:id="@+id/campusMapView"
+        p1:scaleType="center" />
+    <TextView
+        p1:textAppearance="?android:attr/textAppearanceMedium"
+        p1:layout_width="wrap_content"
+        p1:layout_height="wrap_content"
+        p1:id="@+id/textView1"
+        p1:text="CAMPUS MAPS"
+        p1:layout_marginTop="230dp"
+        p1:layout_marginLeft="5dp"
+        p1:textStyle="bold" />
+    <ImageButton
+        p1:src="@drawable/WesternCampusMap"
+        p1:layout_width="150dp"
+        p1:layout_height="200dp"
+        p1:id="@+id/campusMapBtn"
+        p1:layout_below="@id/campusMapView"
+        p1:scaleType="centerCrop"
+        p1:layout_marginLeft="30dp"
+        p1:background="#ffffff"
+        p1:layout_marginTop="30dp" />
+    <ImageButton
+        p1:src="@drawable/westernfootpatrolmap"
+        p1:layout_width="150dp"
+        p1:layout_height="200dp"
+        p1:id="@+id/footPatrolMapBtn"
+        p1:baselineAlignBottom="false"
+        p1:layout_below="@+id/campusMapView"
+        p1:scaleType="centerCrop"
+        p1:layout_alignParentRight="true"
+        p1:layout_marginRight="30dp"
+        p1:background="#ffffff"
+        p1:layout_marginTop="30dp" />
+    <TextView
+        p1:textAppearance="?android:attr/textAppearanceMedium"
+        p1:layout_width="wrap_content"
+        p1:layout_height="wrap_content"
+        p1:id="@+id/campusMapText"
+        p1:text="Campus Map"
+        p1:layout_below="@id/campusMapBtn"
+        p1:layout_marginLeft="50dp" />
+    <TextView
+        p1:textAppearance="?android:attr/textAppearanceMedium"
+        p1:layout_width="wrap_content"
+        p1:layout_height="wrap_content"
+        p1:id="@+id/footPatrolMapText"
+        p1:text="Foot Patrol Map"
+        p1:layout_alignParentRight="true"
+        p1:layout_below="@id/footPatrolMapBtn"
+        p1:layout_marginRight="40dp" />
+</RelativeLayout>
