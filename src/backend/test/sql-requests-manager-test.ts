@@ -260,4 +260,56 @@ class SQLRequestsManagerTest {
     return TestReplaceHelper.dateReplace(this.sqlQuery, "requests", DATA, "timestamp")
     .then(() => this.reqMgr.deleteRequest(100).should.eventually.be.rejected);
   }
+
+  @test("updateRequest works")
+  public updateRequest() {
+    // Test data
+    const DATA = {
+      id: 1,
+      name: "John",
+      from_location: "UCC",
+      to_location: "SEB",
+      additional_info: "None",
+      archived: 1,
+      timestamp: "2018-01-09T02:36:58.000Z",
+      pairing: null,
+      status: "REQUESTED"
+    };
+    const UPDATE = {
+      to_location: "CMLP",
+      additional_info: "Some stuff",
+      id: 999,
+      useless: 0,
+      status: "REJECTED"
+    };
+    const EXPECTED = {
+      id: 1,
+      name: "John",
+      from_location: "UCC",
+      to_location: "CMLP",
+      additional_info: "Some stuff",
+      archived: true,
+      timestamp: "2018-01-09T02:36:58.000Z",
+      status: "REJECTED",
+      pairing: null
+    };
+
+    // Setup FakeSQL response
+    FakeSQL.response = (q: string, v: any) => {
+      if (q.indexOf("SELECT") !== -1) {
+        return [EXPECTED];
+      }
+
+      return {affectedRows: 1};
+    };
+
+    return TestReplaceHelper.dateReplace(this.sqlQuery, "requests", DATA, "timestamp")
+    .then(() =>
+      this.reqMgr.updateRequest(new TravelRequest(UPDATE), [
+        "to_location",
+        "additional_info",
+        "status"
+      ]).should.eventually.be.fulfilled)
+    .then(() => this.reqMgr.getRequest(1).should.eventually.deep.equal(new TravelRequest(EXPECTED)));
+  }
 }
