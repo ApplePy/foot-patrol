@@ -6,6 +6,7 @@ import chaiAsPromised = require("chai-as-promised");
 import { only, skip, suite, test, timeout } from "mocha-typescript";
 import "reflect-metadata";
 import * as mock from "ts-mockito";
+import { ISQLService } from "../src/interfaces/isql-service";
 import { TravelRequest } from "../src/models/travel-request";
 import { MySQLService } from "../src/services/mysql-service";
 import { FakeSQL } from "./fake-sql";
@@ -14,7 +15,7 @@ import { TestReplaceHelper } from "./test-helper";
 // Class under test
 import { SQLRequestsManager } from "../src/services/sql-requests-manager";
 // NOTE: Change this if you want to test with a real MySQL instance
-const backend: FakeSQL | MySQLService = new FakeSQL();
+const backend: ISQLService = new FakeSQL();
 
 // Chai setup
 const should = chai.should();
