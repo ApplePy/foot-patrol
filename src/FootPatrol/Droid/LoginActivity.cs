@@ -85,10 +85,5 @@ namespace FootPatrol.Droid
 
             return views;
         }
-
-        public virtual void OnBackPressed()
-        {
-            
-        }
     }
 }

@@ -196,6 +196,8 @@
     <AndroidResource Include="Resources\drawable\WesternCampusMap.png" />
     <AndroidResource Include="Resources\drawable\WesternFootPatrolMap.png" />
     <AndroidResource Include="Resources\drawable\ic_arrow_back_black_24dp.png" />
+    <AndroidResource Include="Resources\layout\CampusMap.xml" />
+    <AndroidResource Include="Resources\layout\FootPatrolMap.xml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\drawable\" />
