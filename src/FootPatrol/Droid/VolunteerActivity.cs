@@ -10,17 +10,16 @@ using Android.Locations;
 using System.Net.Http;
 using System;
 using System.Linq;
-using System.Text;
 using Android.Gms.Common;
 using Android.Runtime;
 using Android.Widget;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using Newtonsoft.Json.Linq;
-using Newtonsoft.Json;
 using Android.Support.V7.Widget;
 using Android.Support.V4.Widget;
 using System.Threading;
+using static Android.Widget.AdapterView;
 
 namespace FootPatrol.Droid
 {
@@ -63,6 +62,9 @@ namespace FootPatrol.Droid
         private MarkerOptions volunteerMarker, userMarker; //marker options to be used for each marker on map
         private PolylineOptions polyOptions; //polyline options for the following polyline
         private static Polyline poly; //polyline to display directions on the map
+
+        public string tag;
+        public Android.Support.V4.App.Fragment fragment;
 
         /// <summary>
         /// Creates a new instance of the VolunteerActivity class
@@ -124,7 +126,7 @@ namespace FootPatrol.Droid
                 mRelativeLayout.Visibility = ViewStates.Gone; //set the visibility of the complete trip UI to gone
                 mRecyclerView.Visibility = ViewStates.Gone; //set the visibility of the directions UI to gone
 
-                mRecyclerView.SetLayoutManager(layoutManager); //set the layout manager of the recyclerview to display directions
+                mRecyclerView.SetLayoutManager(layoutManager); //set the layout manager of the recyclerview to display direction
 
                 //onClick listeners for each interactable UI element
                 mSideTab.Click += (sender, e) =>
@@ -142,6 +144,11 @@ namespace FootPatrol.Droid
                 };
 
                 mListView.SetAdapter(listAdapter); //set the listView adapter to the adapter initialized in the view
+                mListView.ItemClick += (sender, e) => //listView click listener
+                {
+                    selectItem(e.Position);
+                };
+
 
                 mView.OnCreate(savedInstanceState);
                 mView.OnStart(); //start loading the map into the mapView
@@ -169,7 +176,11 @@ namespace FootPatrol.Droid
                 mfRecyclerView.SetLayoutManager(layoutManager); //set the layout manager of the recyclerView
 
                 mfListView.SetAdapter(listAdapter); //set the listView adapter
-
+                mfListView.ItemClick += (sender, e) => //listView click listener
+                {
+                    selectItem(e.Position);
+                };
+              
                 //onClick listeners for each interactable UI element
                 mfSideTab.Click += (sender, e) =>
                 {
@@ -768,6 +779,52 @@ namespace FootPatrol.Droid
                                                   .Tilt(40)
                                                   .Build(); //setup a new camera position
             map.AnimateCamera(CameraUpdateFactory.NewCameraPosition(cp)); //animate the camera to the new camera position
+        }
+
+        private void selectItem(int position)
+        {
+            switch (position)
+            {
+                case 0:
+                    fragment = new EmergencyContactsActivity();
+                    tag = "EmergencyContactsActivity";
+                    break;
+
+                case 1:
+                    fragment = new CampusMapsActivity();
+                    tag = "CampusMapsActivity";
+                    break;
+
+                case 2:
+                    //fragment = new CampusMapsActivity();
+                    //tag = "CampusMapsActivity";
+                    break;
+
+                case 3:
+                    //fragment = new CampusMapsActivity();
+                    //tag = "CampusMapsActivity";
+                    break;
+            }
+
+            Android.Support.V4.App.FragmentTransaction fragmentTransaction = ChildFragmentManager.BeginTransaction(); //begin the fragment transaction
+            fragmentTransaction.SetCustomAnimations(Resource.Layout.EnterAnimation, Resource.Layout.ExitAnimation); //add animation to slide new fragment to the left
+
+            if (Int32.Parse(Build.VERSION.Sdk) > 23)
+            {
+                mDrawerLayout.CloseDrawer(mListView);
+                fragmentTransaction.Replace(Resource.Id.drawer_layout, fragment, tag); //replace the old fragment with the new on
+            }
+
+            else
+            {
+                mfDrawerLayout.CloseDrawer(mfListView);
+                fragmentTransaction.Replace(Resource.Id.drawer_layout1, fragment, tag);
+            }
+
+            fragmentTransaction.AddToBackStack(null); //add the transaction to the back stack
+            fragmentTransaction.Commit(); //commit the transaction
+
+       
         }
     }
 }

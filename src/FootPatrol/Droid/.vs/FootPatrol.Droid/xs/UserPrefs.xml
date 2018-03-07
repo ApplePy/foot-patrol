@@ -1,17 +1,18 @@
 ﻿<Properties StartupConfiguration="{93578BFB-ED5E-4E94-B242-156162A0E1E8}|Default">
-  <MonoDevelop.Ide.Workbench ActiveDocument="VolunteerActivity.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="EmergencyContactsActivity.cs">
     <Files>
-      <File FileName="VolunteerActivity.cs" Line="325" Column="1" />
+      <File FileName="VolunteerActivity.cs" Line="815" Column="130" />
       <File FileName="Properties/AndroidManifest.xml" Line="1" Column="1" />
-      <File FileName="MainActivity.cs" Line="30" Column="1" />
+      <File FileName="MainActivity.cs" Line="16" Column="10" />
       <File FileName="Resources/Resource.designer.cs" Line="1" Column="1" />
       <File FileName="packages.config" Line="1" Column="1" />
       <File FileName="Resources/values/Strings.xml" Line="1" Column="1" />
-      <File FileName="RequestsActivity.cs" Line="29" Column="23" />
-      <File FileName="DrawerItemClickListener.cs" Line="1" Column="1" />
-      <File FileName="LoginActivity.cs" Line="57" Column="13" />
+      <File FileName="RequestsActivity.cs" Line="34" Column="96" />
+      <File FileName="LoginActivity.cs" Line="79" Column="174" />
       <File FileName="DirectionsAdapter.cs" Line="54" Column="36" />
-      <File FileName="Requests.cs" Line="19" Column="27" />
+      <File FileName="UserRequests.cs" Line="1" Column="1" />
+      <File FileName="CampusMapsActivity.cs" Line="1" Column="1" />
+      <File FileName="EmergencyContactsActivity.cs" Line="17" Column="59" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
@@ -19,6 +20,6 @@
     <BreakpointStore />
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
   <MonoDevelop.Ide.DebuggingService.PinnedWatches />
-  <MonoDevelop.Ide.ItemProperties.FootPatrol.Droid AndroidDesignerPreferredDevice="Nexus 4" PreferredExecutionTarget="Android.current_emulator" />
+  <MonoDevelop.Ide.ItemProperties.FootPatrol.Droid AndroidDesignerPreferredDevice="Nexus 4" PreferredExecutionTarget="Android.LGD852919242ae" />
   <MultiItemStartupConfigurations />
 </Properties>

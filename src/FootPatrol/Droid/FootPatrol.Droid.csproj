@@ -156,8 +156,9 @@
     <Compile Include="DirectionsAdapter.cs" />
     <Compile Include="VolunteerActivity.cs" />
     <Compile Include="DirectionsHolder.cs" />
-    <Compile Include="DrawerItemClickListener.cs" />
     <Compile Include="UserRequests.cs" />
+    <Compile Include="CampusMapsActivity.cs" />
+    <Compile Include="EmergencyContactsActivity.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />

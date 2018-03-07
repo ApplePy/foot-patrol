@@ -32,7 +32,6 @@ namespace FootPatrol.Droid
         {
             ra = new RequestsActivity(); //create new instance
             activeRequests = new List<UserRequests.Request>();//initialize new list of requests
-
             reqCount = requests.Count; //save the count into request count variable
             saveRequests(requests);
             return ra;

@@ -27,9 +27,10 @@
         p1:id="@+id/campusMapBtn"
         p1:layout_below="@id/campusMapView"
         p1:scaleType="centerCrop"
-        p1:layout_marginLeft="30dp"
         p1:background="#ffffff"
-        p1:layout_marginTop="30dp" />
+        p1:layout_marginTop="30dp"
+        p1:layout_centerHorizontal="true"
+        p1:layout_toLeftOf="@+id/spaceMap" />
     <ImageButton
         p1:src="@drawable/westernfootpatrolmap"
         p1:layout_width="150dp"
@@ -38,10 +39,17 @@
         p1:baselineAlignBottom="false"
         p1:layout_below="@+id/campusMapView"
         p1:scaleType="centerCrop"
-        p1:layout_alignParentRight="true"
-        p1:layout_marginRight="30dp"
         p1:background="#ffffff"
-        p1:layout_marginTop="30dp" />
+        p1:layout_marginTop="30dp"
+        p1:layout_toRightOf="@+id/spaceMap"
+        p1:layout_centerHorizontal="true" />
+    <Space
+        p1:layout_width="30dp"
+        p1:layout_height="200dp"
+        p1:layout_centerHorizontal="true"
+        p1:layout_below="@id/campusMapView"
+        p1:layout_marginTop="30dp"
+        p1:id="@+id/spaceMap" />
     <TextView
         p1:textAppearance="?android:attr/textAppearanceMedium"
         p1:layout_width="wrap_content"
@@ -49,14 +57,17 @@
         p1:id="@+id/campusMapText"
         p1:text="Campus Map"
         p1:layout_below="@id/campusMapBtn"
-        p1:layout_marginLeft="50dp" />
+        p1:layout_centerHorizontal="true"
+        p1:layout_toLeftOf="@+id/spaceMap"
+        p1:layout_marginRight="20dp" />
     <TextView
         p1:textAppearance="?android:attr/textAppearanceMedium"
         p1:layout_width="wrap_content"
         p1:layout_height="wrap_content"
         p1:id="@+id/footPatrolMapText"
         p1:text="Foot Patrol Map"
-        p1:layout_alignParentRight="true"
         p1:layout_below="@id/footPatrolMapBtn"
-        p1:layout_marginRight="40dp" />
+        p1:layout_centerHorizontal="true"
+        p1:layout_toRightOf="@+id/spaceMap"
+        p1:layout_marginLeft="10dp" />
 </RelativeLayout>
