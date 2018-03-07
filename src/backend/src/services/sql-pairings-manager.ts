@@ -111,11 +111,11 @@ export class SQLVolunteerPairingManager extends SQLAbstractManager implements IV
   }
 
   /**
-   * Resolves the volunteer IDs from the SQL pairing record.
+   * Resolves the volunteer IDs from the SQL pairing record. For internal use only.
    *
    * @param obj The raw pairing record from the SQL DB.
    */
-  private reconstructVolunteerPairing(obj: {[key: string]: any}) {
+  public reconstructVolunteerPairing(obj: {[key: string]: any}) {
     // Retrieve volunteers for this pairing
     const volOnePromise = this.volmgr.getVolunteer(Number(obj.volunteer_one));
     const volTwoPromise = this.volmgr.getVolunteer(Number(obj.volunteer_two));

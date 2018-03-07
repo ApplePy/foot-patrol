@@ -24,8 +24,8 @@ export class VolunteerPairing {
   ) {
     this.volunteer_one = volOne;
     this.volunteer_two = volTwo;
-    this.active = active;
-    this.id = id;
+    this.active = Boolean(active);
+    this.id = Number(id);
   }
 
   /**
@@ -36,6 +36,7 @@ export class VolunteerPairing {
     invalid = invalid || this.volunteer_one === VolunteerPairing.NullVolunteer;
     invalid = invalid || this.volunteer_two === VolunteerPairing.NullVolunteer;
     invalid = invalid || this.checkOrdering(this.volunteer_one, this.volunteer_two);
+    invalid = invalid || Number.isNaN(this.id);
 
     return !invalid;
   }
