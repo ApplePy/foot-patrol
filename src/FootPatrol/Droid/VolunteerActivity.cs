@@ -20,7 +20,6 @@ using Android.Support.V7.Widget;
 using Android.Support.V4.Widget;
 using System.Threading;
 using static Android.Widget.AdapterView;
-using Android.Content;
 
 namespace FootPatrol.Droid
 {
