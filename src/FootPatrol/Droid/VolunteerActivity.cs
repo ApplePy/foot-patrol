@@ -243,10 +243,35 @@ namespace FootPatrol.Droid
                 client.Connect(); //if the client is not already connected, connect to the client before opening the map
         }
 
-        /// <summary>
-        /// Setup the googleAPI client to help administer map and get the current location using Location Services
-        /// </summary>
-        private void clientSetup()
+		/*public override void OnDestroyView()
+		{
+            base.OnDestroyView();
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(this.Context)
+                .SetMessage("Are you sure you would like to logout?")
+                .SetPositiveButton("Yes", (sender, e) =>
+                {
+                    if (Int32.Parse(Build.VERSION.Sdk) > 23)
+                    {
+                        switchFragment(new LoginActivity(), Resource.Id.drawer_layout, "LoginActivity");
+                    }
+
+                    else
+                        switchFragment(new LoginActivity(), Resource.Id.drawer_layout1, "LoginActivity");
+
+                }).SetNegativeButton("No", (sender, e) =>
+                {
+
+                });
+
+            Dialog dialog = builder.Create();
+            dialog.Show();
+        }*/
+		
+		/// <summary>
+		/// Setup the googleAPI client to help administer map and get the current location using Location Services
+		/// </summary>
+		private void clientSetup()
         {
             client = new GoogleApiClient.Builder(Application.Context.ApplicationContext).AddConnectionCallbacks(this)
                                         .AddOnConnectionFailedListener(this)
@@ -842,23 +867,27 @@ namespace FootPatrol.Droid
                     break;
             }
 
-            Android.Support.V4.App.FragmentTransaction fragmentTransaction = ChildFragmentManager.BeginTransaction(); //begin the fragment transaction
-            fragmentTransaction.SetCustomAnimations(Resource.Layout.EnterAnimation, Resource.Layout.ExitAnimation); //add animation to slide new fragment to the left
-
             if (Int32.Parse(Build.VERSION.Sdk) > 23)
             {
                 mDrawerLayout.CloseDrawer(mListView); //close the drawer when entering new view
-                fragmentTransaction.Replace(Resource.Id.drawer_layout, fragment, tag); //replace the old fragment with the new one
+                switchFragment(fragment, Resource.Id.drawer_layout, tag);
             }
 
             else
             {
                 mfDrawerLayout.CloseDrawer(mfListView); //close the drawer when entering new view
-                fragmentTransaction.Replace(Resource.Id.drawer_layout1, fragment, tag);
+                switchFragment(fragment, Resource.Id.drawer_layout1, tag);
             }
+        }
 
-            fragmentTransaction.AddToBackStack(null); //add the transaction to the back stack
+        private void switchFragment(Android.Support.V4.App.Fragment frag, int resource, string t)
+        {
+            Android.Support.V4.App.FragmentTransaction fragmentTransaction = this.Activity.SupportFragmentManager.BeginTransaction(); //begin the fragment transaction
+            fragmentTransaction.SetCustomAnimations(Resource.Layout.EnterAnimation, Resource.Layout.ExitAnimation); //add animation to slide new fragment to the left
+            fragmentTransaction.AddToBackStack("VolunteerActivity");
+            fragmentTransaction.Replace(resource, frag, t);
             fragmentTransaction.Commit(); //commit the transaction
         }
     }
+
 }

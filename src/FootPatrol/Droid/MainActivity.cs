@@ -15,14 +15,47 @@ namespace FootPatrol.Droid
         {
             base.OnCreate(savedInstanceState);
             SetContentView(Resource.Layout.Main); //set the content view to the main layout
+            switchFragment();
+        }
 
+		public override void OnBackPressed()
+		{
+            if (SupportFragmentManager.BackStackEntryCount == 0)
+            {
+                this.Finish();
+            }
+
+            else if(SupportFragmentManager.BackStackEntryCount == 1)
+            {
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                builder.SetMessage("Are you sure you want to logout?")
+                       .SetPositiveButton("Yes", (sender, e) =>
+                       {
+                           SupportFragmentManager.PopBackStack();
+                           switchFragment();
+                       }).SetNegativeButton("No", (sender, e) =>
+                       {
+                        //Do nothing
+                       });
+
+                Dialog dialog = builder.Create();
+                dialog.Show();
+            }
+
+            else
+            {
+                SupportFragmentManager.PopBackStack();
+            }
+		}
+
+        private void switchFragment()
+        {
             Android.Support.V4.App.Fragment newFrag = new LoginActivity(); //create a new instance of VolunteerActivity and save it
             Android.Support.V4.App.FragmentTransaction fragmentTransaction = SupportFragmentManager.BeginTransaction(); //begin the fragment transaction
             fragmentTransaction.Replace(Resource.Id.frameLayout1, newFrag, "LoginActivity"); //replace the old fragment with the new on
-            fragmentTransaction.AddToBackStack(null); //add the transaction to the back stack
             fragmentTransaction.Commit(); //commit the transaction
         }
-    }
+	}
 }
 
 

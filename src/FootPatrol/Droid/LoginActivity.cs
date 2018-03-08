@@ -75,10 +75,10 @@ namespace FootPatrol.Droid
                 {
                     spinner.Visibility = ViewStates.Visible; //make the spinner visible
                     Android.Support.V4.App.Fragment newFrag = new VolunteerActivity(); //create a new instance of VolunteerActivity and save it
-                    Android.Support.V4.App.FragmentTransaction fragmentTransaction = ChildFragmentManager.BeginTransaction(); //begin the fragment transaction
+                    Android.Support.V4.App.FragmentTransaction fragmentTransaction = this.Activity.SupportFragmentManager.BeginTransaction(); //begin the fragment transaction
                     fragmentTransaction.SetCustomAnimations(Resource.Layout.EnterAnimation, Resource.Layout.ExitAnimation); //add animation to slide new fragment to the left
                     fragmentTransaction.Replace(Resource.Id.frameLayout2, newFrag, "VolunteerActivity"); //replace the old fragment with the new on
-                    fragmentTransaction.AddToBackStack(null); //add the transaction to the back stack
+                    fragmentTransaction.AddToBackStack("LoginActivity");
                     fragmentTransaction.Commit(); //commit the transaction
                 }
             };
