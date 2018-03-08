@@ -64,7 +64,8 @@ class VolunteersAPITest {
   public before(done: MochaDone) {
     // Clear DB and FakeSQL state
     FakeSQL.response = undefined;
-    serverEnv.container.get<ISQLService>(IFACES.ISQLSERVICE).makeQuery("DELETE FROM volunteers")
+    serverEnv.container.get<ISQLService>(IFACES.ISQLSERVICE).makeQuery("DELETE FROM volunteer_pairing")
+    .then(() => serverEnv.container.get<ISQLService>(IFACES.ISQLSERVICE).makeQuery("DELETE FROM volunteers"))
     .then(() => done())
     .catch((err) => {
       if (err.name !== "FakeSQLError") {
@@ -166,6 +167,116 @@ class VolunteersAPITest {
     chai.request(serverEnv.nodeServer)
       .get(pathPrefix + "/volunteers")
       .query({disabled: true})
+      .end((err, res) => {
+        // Verify results
+        res.should.have.status(200);
+        res.body.should.have.property("volunteers");
+        res.body.should.deep.equal(EXPECTED_RESULTS);
+        done();
+      });
+    })
+    .catch(done);
+  }
+
+  @test("GET should return a list of active volunteers")
+  public activeVolunteersList(done: MochaDone) {
+    // Get SQL connector instance
+    const sqlInstance = serverEnv.container.get<ISQLService>(IFACES.ISQLSERVICE);
+    const sqlQuery = sqlInstance.makeQuery.bind(sqlInstance);
+
+    // Fake data
+    const DB_VOLUNTEERS_DATA = [
+      {
+        id: 1, uwo_id: "jdoe37", first_name: "John",
+        last_name: "Doe", disabled: false
+      },
+      {
+        id: 2, uwo_id: "jdoe38", first_name: "Jane",
+        last_name: "Doe", disabled: false
+      },
+      {
+        id: 3, uwo_id: "jdoe39", first_name: "Bobby",
+        last_name: "Doe", disabled: true
+      }
+    ];
+    const DB_PAIRING_DATA = [
+      { id: 1, active: true, volunteer_one: 1, volunteer_two: 2 },
+      { id: 2, active: true, volunteer_one: 2, volunteer_two: 3 },
+      { id: 3, active: false, volunteer_one: 1, volunteer_two: 3 }
+    ];
+
+    // Expected return
+    const EXPECTED_RESULTS = {
+      volunteers: [DB_VOLUNTEERS_DATA[0], DB_VOLUNTEERS_DATA[1]]
+    };
+
+    // Setup fake data
+    FakeSQL.response = {};
+    TestReplaceHelper.replaceParallel(sqlQuery, "volunteers", DB_VOLUNTEERS_DATA)
+    .then(() => TestReplaceHelper.replaceParallel(sqlQuery, "volunteer_pairing", DB_PAIRING_DATA))
+    .then(() => {
+      FakeSQL.response = [DB_VOLUNTEERS_DATA[0], DB_VOLUNTEERS_DATA[1]];
+    })
+    .then(() => {
+
+    // Start request
+    chai.request(serverEnv.nodeServer)
+      .get(pathPrefix + "/volunteers/active")
+      .end((err, res) => {
+        // Verify results
+        res.should.have.status(200);
+        res.body.should.have.property("volunteers");
+        res.body.should.deep.equal(EXPECTED_RESULTS);
+        done();
+      });
+    })
+    .catch(done);
+  }
+
+  @test("GET should return a list of inactive volunteers")
+  public inactiveVolunteersList(done: MochaDone) {
+    // Get SQL connector instance
+    const sqlInstance = serverEnv.container.get<ISQLService>(IFACES.ISQLSERVICE);
+    const sqlQuery = sqlInstance.makeQuery.bind(sqlInstance);
+
+    // Fake data
+    const DB_VOLUNTEERS_DATA = [
+      {
+        id: 1, uwo_id: "jdoe37", first_name: "John",
+        last_name: "Doe", disabled: false
+      },
+      {
+        id: 2, uwo_id: "jdoe38", first_name: "Jane",
+        last_name: "Doe", disabled: false
+      },
+      {
+        id: 3, uwo_id: "jdoe39", first_name: "Bobby",
+        last_name: "Doe", disabled: true
+      }
+    ];
+    const DB_PAIRING_DATA = [
+      { id: 1, active: true, volunteer_one: 1, volunteer_two: 2 },
+      { id: 2, active: true, volunteer_one: 2, volunteer_two: 3 },
+      { id: 3, active: false, volunteer_one: 1, volunteer_two: 3 }
+    ];
+
+    // Expected return
+    const EXPECTED_RESULTS = {
+      volunteers: [DB_VOLUNTEERS_DATA[2]]
+    };
+
+    // Setup fake data
+    FakeSQL.response = {};
+    TestReplaceHelper.replaceParallel(sqlQuery, "volunteers", DB_VOLUNTEERS_DATA)
+    .then(() => TestReplaceHelper.replaceParallel(sqlQuery, "volunteer_pairing", DB_PAIRING_DATA))
+    .then(() => {
+      FakeSQL.response = [DB_VOLUNTEERS_DATA[2]];
+    })
+    .then(() => {
+
+    // Start request
+    chai.request(serverEnv.nodeServer)
+      .get(pathPrefix + "/volunteers/inactive")
       .end((err, res) => {
         // Verify results
         res.should.have.status(200);
