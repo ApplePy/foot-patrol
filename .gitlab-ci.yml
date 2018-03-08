@@ -16,7 +16,7 @@ variables:
   DOMAIN: capstone.incode.ca
   DB_CONFIG: db.host=${CI_ENVIRONMENT_SLUG}-mysql.${NAMESPACE}.svc.cluster.local,db.password=$DB_PASS,mysql.mysqlPassword=$DB_PASS,mysql.mysqlRootPassword=$DB_ROOT_PASS
   DB_HOST: ${CI_ENVIRONMENT_SLUG}-mysql.${NAMESPACE}.svc.cluster.local
-  DB_SLEEP_TIME: 60   # Time to wait for DB to start up
+  DB_SLEEP_TIME: 30   # Time to wait for DB to start up
 
   # Variables in Gitlab CI:
   # $DB_PASS: password for footpatrol account
@@ -103,7 +103,7 @@ test_backend:
     NODE_ENV: 'test'  # To set Mocha to isolate data
     MYSQL_ROOT_PASSWORD: testing
     MYSQL_DATABASE: foot_patrol
-    MYSQL_HOST: localhost
+    MYSQL_HOST: 127.0.0.1
     MYSQL_PASS: testing
     MYSQL_USER: root
     MYSQL_DB: foot_patrol
@@ -117,10 +117,14 @@ test_backend:
     paths:
       - src/backend/node_modules/
   script:
+   - apt-get update && apt-get install mysql-client -y && rm -rf /var/lib/apt/lists/* # TODO: Do something better than this
    - cd src/backend
    - rm package-lock.json || true   # So that cache server works
    - npm install
-   - npm run coverage
+   - sleep $DB_SLEEP_TIME # Wait for DB to become ready
+   - echo "CREATE USER 'footpatrol'@'%' IDENTIFIED BY 'password'; CREATE DATABASE IF NOT EXISTS foot_patrol;" | mysql -h $MYSQL_HOST -u $MYSQL_USER --password=$MYSQL_PASS
+   - mysql -h $MYSQL_HOST -u $MYSQL_USER --password=$MYSQL_PASS < ./sql_statements.sql
+   - npm run coverage # Finally run tests
 
 
 # This test ensures the front end works
@@ -465,7 +469,7 @@ deploy_review:
     - helm upgrade $CI_ENVIRONMENT_SLUG $HELM_CHART --install $COMMON_INSTALL_HELM --set backend.replicas=1,webapp.replicas=1,imageTag=$TAG,ingress.hosts={"$CI_COMMIT_REF_SLUG.$DOMAIN"},$DB_CONFIG
     - cd src/backend
     - until [ $(kubectl get pods -n $NAMESPACE | grep "$CI_ENVIRONMENT_SLUG-mysql" | grep -o "1/1") ]; do echo "mysql not ready..."; sleep 15; done
-    - sleep 30  # Wait out any bugs
+    - sleep $DB_SLEEP_TIME  # Wait out any bugs
     - mysql -h $DB_HOST -u root --password=$DB_ROOT_PASS < sql_statements.sql
   environment:
     name: review/$CI_COMMIT_REF_NAME
@@ -509,7 +513,7 @@ staging:
     - helm upgrade $CI_ENVIRONMENT_SLUG $HELM_CHART --install $COMMON_INSTALL_HELM --set ingress.hosts={"staging.$DOMAIN"},imageTag=$TAG,$DB_CONFIG
     - cd src/backend
     - until [ $(kubectl get pods -n $NAMESPACE | grep "$CI_ENVIRONMENT_SLUG-mysql" | grep -o "1/1") ]; do echo "mysql not ready..."; sleep 15; done
-    - sleep 30  # Wait out any bugs
+    - sleep $DB_SLEEP_TIME  # Wait out any bugs
     - mysql -h $DB_HOST -u root --password=$DB_ROOT_PASS < sql_statements.sql
   environment:
     name: staging
@@ -549,7 +553,7 @@ production:
     - helm upgrade $CI_ENVIRONMENT_SLUG $HELM_CHART --install $COMMON_INSTALL_HELM --set ingress.hosts={"$DOMAIN"},imageTag=$TAG,$DB_CONFIG
     - cd src/backend
     - until [ $(kubectl get pods -n $NAMESPACE | grep "$CI_ENVIRONMENT_SLUG-mysql" | grep -o "1/1") ]; do echo "mysql not ready..."; sleep 15; done
-    - sleep 30  # Wait out any bugs
+    - sleep $DB_SLEEP_TIME  # Wait out any bugs
     - mysql -h $DB_HOST -u root --password=$DB_ROOT_PASS < sql_statements.sql
   environment:
     name: production

@@ -6,6 +6,7 @@ import chaiAsPromised = require("chai-as-promised");
 import { only, skip, suite, test, timeout } from "mocha-typescript";
 import "reflect-metadata";
 import * as mock from "ts-mockito";
+import { ISQLService } from "../src/interfaces/isql-service";
 import { TravelRequest } from "../src/models/travel-request";
 import { MySQLService } from "../src/services/mysql-service";
 import { FakeSQL } from "./fake-sql";
@@ -14,7 +15,7 @@ import { TestReplaceHelper } from "./test-helper";
 // Class under test
 import { SQLRequestsManager } from "../src/services/sql-requests-manager";
 // NOTE: Change this if you want to test with a real MySQL instance
-const backend: FakeSQL | MySQLService = new FakeSQL();
+const backend: ISQLService = new FakeSQL();
 
 // Chai setup
 const should = chai.should();
@@ -71,7 +72,7 @@ class SQLRequestsManagerTest {
     this.reqMgr = new SQLRequestsManager(backend);
   }
 
-  // hook for before each test; make static to be after the suite
+  // hook for before each test; make static to be before the suite
   public before(done: MochaDone) {
     // Clear DB state
     FakeSQL.response = undefined;
@@ -104,7 +105,9 @@ class SQLRequestsManagerTest {
       to_location: "SEB",
       additional_info: "None",
       archived: 0,
-      timestamp: "2018-01-09T02:36:58.000Z"
+      timestamp: "2018-01-09T02:36:58.000Z",
+      status: "REJECTED",
+      pairing: null
     };
 
     // Setup FakeSQL response
@@ -129,7 +132,9 @@ class SQLRequestsManagerTest {
       to_location: "SEB",
       additional_info: "None",
       archived: 0,
-      timestamp: "2018-01-09T02:36:58.000Z"
+      timestamp: "2018-01-09T02:36:58.000Z",
+      status: "REQUESTED",
+      pairing: null
     };
 
     // Setup FakeSQL response
@@ -157,12 +162,17 @@ class SQLRequestsManagerTest {
       to_location: "SEB",
       additional_info: "None",
       archived: 0,
-      timestamp: "2018-01-09T02:36:58.000Z"
+      timestamp: "2018-01-09T02:36:58.000Z",
+      status: "IN_PROGRESS",
+      pairing: null
     };
 
     // Setup FakeSQL response
     FakeSQL.response = (query: string, values: any[]) => {
-      return (values[0] === "John" && values[1] === 0) ? [DATA] : [];
+      return (
+        values[0] === "John" &&
+        values[1] === 0 &&
+        values[2] === "IN_PROGRESS") ? [DATA] : [];
     };
 
     return TestReplaceHelper.dateReplace(this.sqlQuery, "requests", DATA, "timestamp")
@@ -171,11 +181,13 @@ class SQLRequestsManagerTest {
       const promises = [];
       promises.push(this.reqMgr.getRequests(0, 1, new Map<string, any>([
         ["name", "John"],
-        ["archived", 0]
+        ["archived", 0],
+        ["status", "IN_PROGRESS"]
       ])).should.eventually.deep.equal([new TravelRequest(DATA)]));
       promises.push(this.reqMgr.getRequests(0, 1, new Map<string, any>([
         ["name", "Jane"],
-        ["archived", 0]
+        ["archived", 0],
+        ["status", "IN_PROGRESS"]
       ])).should.eventually.deep.equal([]));
       return Promise.all(promises);
     });
@@ -247,5 +259,57 @@ class SQLRequestsManagerTest {
     // Setup MySQL and assert
     return TestReplaceHelper.dateReplace(this.sqlQuery, "requests", DATA, "timestamp")
     .then(() => this.reqMgr.deleteRequest(100).should.eventually.be.rejected);
+  }
+
+  @test("updateRequest works")
+  public updateRequest() {
+    // Test data
+    const DATA = {
+      id: 1,
+      name: "John",
+      from_location: "UCC",
+      to_location: "SEB",
+      additional_info: "None",
+      archived: 1,
+      timestamp: "2018-01-09T02:36:58.000Z",
+      pairing: null,
+      status: "REQUESTED"
+    };
+    const UPDATE = {
+      to_location: "CMLP",
+      additional_info: "Some stuff",
+      id: 999,
+      useless: 0,
+      status: "REJECTED"
+    };
+    const EXPECTED = {
+      id: 1,
+      name: "John",
+      from_location: "UCC",
+      to_location: "CMLP",
+      additional_info: "Some stuff",
+      archived: true,
+      timestamp: "2018-01-09T02:36:58.000Z",
+      status: "REJECTED",
+      pairing: null
+    };
+
+    // Setup FakeSQL response
+    FakeSQL.response = (q: string, v: any) => {
+      if (q.indexOf("SELECT") !== -1) {
+        return [EXPECTED];
+      }
+
+      return {affectedRows: 1};
+    };
+
+    return TestReplaceHelper.dateReplace(this.sqlQuery, "requests", DATA, "timestamp")
+    .then(() =>
+      this.reqMgr.updateRequest(new TravelRequest(UPDATE), [
+        "to_location",
+        "additional_info",
+        "status"
+      ]).should.eventually.be.fulfilled)
+    .then(() => this.reqMgr.getRequest(1).should.eventually.deep.equal(new TravelRequest(EXPECTED)));
   }
 }

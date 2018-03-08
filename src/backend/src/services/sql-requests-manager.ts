@@ -3,6 +3,7 @@ import { IFACES } from "../ids";
 import { IRequestsManager } from "../interfaces/irequests-manager";
 import { ISQLService } from "../interfaces/isql-service";
 import { TravelRequest } from "../models/travel-request";
+import { SQLAbstractManager } from "./sql-abstract-manager";
 
 /**
  * Data manager for handling retrieving requested data from multiple possible persistence layers.
@@ -10,7 +11,7 @@ import { TravelRequest } from "../models/travel-request";
  * This class expects inputs to have already been sanitized and/or limited.
  */
 @injectable()
-export class SQLRequestsManager implements IRequestsManager {
+export class SQLRequestsManager extends SQLAbstractManager implements IRequestsManager {
 
   private db: ISQLService;
 
@@ -20,6 +21,8 @@ export class SQLRequestsManager implements IRequestsManager {
    * @param db The SQL database implementation to use.
    */
   constructor(@inject(IFACES.ISQLSERVICE) db: ISQLService) {
+    super();
+
     // Save db
     this.db = db;
   }
@@ -45,7 +48,7 @@ export class SQLRequestsManager implements IRequestsManager {
    *
    * @param offset Number >= 0 of results to skip before returning results.
    * @param count  Number >= 0 results to return.
-   * @param filter Dictionary to be plugged into the SQL `WHERE` parameter as "AND"
+   * @param filter Dictionary to be plugged into the SQL `WHERE` parameter as "AND". Parameters cannot equal null.
    */
   public getRequests(offset: number, count: number, filter?: Map<string, any>) {
     // Sanity check
@@ -54,7 +57,7 @@ export class SQLRequestsManager implements IRequestsManager {
     }
 
     // Get filter array
-    const filterArray = (filter !== undefined) ? filter.values() : [];
+    const filterArray = (filter !== undefined) ? Array.from(filter.values()) : [];
     const questionMarks = this.generateQuestionMarks((filter !== undefined) ? filter.keys() : [], " AND ");
 
     // Query for data
@@ -76,8 +79,8 @@ export class SQLRequestsManager implements IRequestsManager {
     }
 
     return this.db.makeQuery(
-      "INSERT INTO `requests` (name, from_location, to_location, additional_info) VALUES(?,?,?,?)",
-      [req.name, req.from_location, req.to_location, req.additional_info])
+      "INSERT INTO `requests` (name, from_location, to_location, additional_info, status, pairing) VALUES(?,?,?,?,?,?)",
+      [req.name, req.from_location, req.to_location, req.additional_info, req.status, req.pairing])
     .then((results: any) => results.insertId as number);
   }
 
@@ -106,6 +109,8 @@ export class SQLRequestsManager implements IRequestsManager {
       "from_location",
       "to_location",
       "additional_info",
+      "status",
+      "pairing",
       "archived"]
   ) {
 
@@ -128,23 +133,5 @@ export class SQLRequestsManager implements IRequestsManager {
     .then((result) => (result.affectedRows > 0) ?
                       Promise.resolve() :
                       Promise.reject(new Error("Not Found")));
-  }
-
-  /**
-   * Generate strings of "'column name'=?, ..." for SQL prepared statements
-   *
-   * @param columnNames The names of the columns to use for the prepared sections (must be pre-sanitized)
-   * @param separator   [optional] the string to separate the prepared sections
-   */
-  private generateQuestionMarks(columnNames: Iterable<string>, separator: string = ", ") {
-    let questionMarks = "";
-
-    // Create the question marks for the prepared statement
-    for (const name of columnNames) {
-      questionMarks = questionMarks.concat(name + "=?" + separator);
-    }
-    questionMarks = questionMarks.substring(0, questionMarks.length - separator.length); // Chop off the trailing sep
-
-    return questionMarks;
   }
 }

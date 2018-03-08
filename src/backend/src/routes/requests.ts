@@ -1,29 +1,33 @@
 import { NextFunction, Request, Response, Router } from "express";
 import { Container, inject, injectable } from "inversify";
 import { IFACES, TAGS } from "../ids";
+import { IVolunteerPairingManager } from "../interfaces/ipairing-manager";
 import { IRequestsManager } from "../interfaces/irequests-manager";
 import { IRoute } from "../interfaces/iroute";
 import { ISanitizer } from "../interfaces/isanitizer";
 import { StatusError } from "../models/status-error";
-import { TravelRequest } from "../models/travel-request";
+import { TravelRequest, TravelStatus } from "../models/travel-request";
+import { VolunteerPairing } from "../models/volunteer-pairing";
+import { default as errStrings } from "../strings";
+import { AbstractRoute } from "./abstract-route";
 
 @injectable()
-export class RequestsRoute implements IRoute {
+export class RequestsRoute extends AbstractRoute implements IRoute {
 
   public router: Router;
   private data: IRequestsManager;
   private sanitizer: ISanitizer;
-
-  get Router(): Router {
-    return this.router;
-  }
+  private volmgr: IVolunteerPairingManager;
 
   /**
    * Constructor
    */
   constructor(
     @inject(IFACES.IREQUESTSMANAGER) data: IRequestsManager,
+    @inject(IFACES.IVOLUNTEERPAIRINGMANAGER) volunteers: IVolunteerPairingManager,
     @inject(IFACES.ISANITIZER) sanitizer: ISanitizer) {
+    super();
+
     // Log
     console.log("[RequestsRoute::create] Creating requests route.");
 
@@ -32,6 +36,9 @@ export class RequestsRoute implements IRoute {
 
     // Get database (envvars were checked by index.js)
     this.data = data;
+
+    // Save volunteer manager
+    this.volmgr = volunteers;
 
     // Create router
     this.router = Router();
@@ -43,34 +50,10 @@ export class RequestsRoute implements IRoute {
     this.router.put("/:id", this.putRequest.bind(this));
     this.router.patch("/:id", this.patchRequest.bind(this));
     this.router.delete("/:id", this.deleteRequest.bind(this));
+    this.router.get("/:id/volunteers", this.getVolunteers.bind(this));
   }
 
-  /**
-   * Sanitizes a flat map with the mapped sanitize functions
-   *
-   * @param sanitizeMap The functions to use to sanitize different keys
-   * @param newData The flat map to sanitize
-   * @returns an array of key-value objects
-   */
-  public sanitizeMap(sanitizeMap: any, newData: any) {
-    const updateList: {[key: string]: any} = {};
-
-    for (const key in sanitizeMap) {
-      // Don't look down the prototype chain
-      if (!sanitizeMap.hasOwnProperty(key)) { continue; }
-
-      // If a property with that column is found, sanitize and add to updateList
-      if (newData[key] !== undefined) {
-        const sanFunc = sanitizeMap[key];
-        updateList[key as string] = sanFunc(newData[key]);
-        // Final structure of updateList: {column: value, ...}
-      }
-    }
-
-    // Return data
-    return updateList;
-  }
-
+  /* tslint:disable:max-line-length */
   /**
    * Get requests
    *
@@ -79,7 +62,7 @@ export class RequestsRoute implements IRoute {
    * @param next {NextFunction} Execute the next method.
    *
    * @api {get} /api/v1/requests Get walking escort requests
-   * @apiVersion 1.1.1
+   * @apiVersion 1.2.0
    * @apiName GetRequests
    * @apiGroup Requests
    *
@@ -87,7 +70,7 @@ export class RequestsRoute implements IRoute {
    * @apiParam (Query Parameter) {number} count The maximum number of elements return; capped at 100.
    * @apiParam (Query Parameter) {boolean} [archived=false] Include archived requests in the response.
    *
-   * @apiSuccess {string[]} requests Array of requests.
+   * @apiSuccess {object[]} requests Array of requests.
    * @apiSuccess {number} requests.id The record ID.
    * @apiSuccess {string} [requests.name] Name of the requester.
    * @apiSuccess {string} requests.from_location Escort start location.
@@ -95,6 +78,8 @@ export class RequestsRoute implements IRoute {
    * @apiSuccess {string} [requests.additional_info] Additional request information.
    * @apiSuccess {boolean} requests.archived Specifies if this request completed and archived.
    * @apiSuccess {string} requests.timestamp Timestamp the record was created.
+   * @apiSuccess {string} requests.status Status of the request. Can be 'ASSIGNED', 'COMPLETED', 'REQUESTED', 'REJECTED', or 'IN_PROGRESS'
+   * @apiSuccess {number} [request.pairing] ID of volunteer pair for this request.
    * @apiSuccess {object} meta The parameters used to generate the response.
    * @apiSuccess {number} meta.offset The offset from_location the start of the dataset.
    * @apiSuccess {number} meta.count The max number of elements requested.
@@ -114,33 +99,40 @@ export class RequestsRoute implements IRoute {
    *            to_location: "UCC",
    *            additional_info: null,
    *            archived: false,
-   *            timestamp: "2017-10-26T06:51:05.000Z"
+   *            timestamp: "2017-10-26T06:51:05.000Z",
+   *            pairing: 5,
+   *            status: "REQUESTED"
    *          }
    *        ],
    *        meta: {offset: 0, count: 10, archived: true}
    *     }
    *
-   * @apiError (Error 400) InvalidQueryParameters One of the URL query parameters was invalid.
+   * @apiError (Error 400) InvalidQueryParameter One of the URL query parameters was invalid.
    * @apiErrorExample Error Response:
    *     HTTP/1.1 400 BAD REQUEST
    *     {
-   *        error: "InvalidQueryParameters",
-   *        message: "Offset and/or count are not numbers >= 0."
+   *        error: "Invalid Query Parameter",
+   *        message: "A required query parameter is missing or out of range."
    *     }
    */
   public getRequests(req: Request, res: Response, next: NextFunction) {
+    /* tslint:enable:max-line-length */
     const offset = Number(req.query.offset);
     const count = Math.min(Number(req.query.count), 100);
 
     // Ensure valid parameters
     if (isNaN(offset) || isNaN(count) || offset < 0 || count < 0) {
-      next(new StatusError(400, "Invalid Query Parameter", "Offset and/or count are not numbers >= 0."));
+      next(new StatusError(400,
+                           errStrings.InvalidQueryParameter.Title,
+                           errStrings.InvalidQueryParameter.Msg));
       return;
     }
 
     // Test to ensure archived is valid
     if (this.validValues(req.query.archived, undefined, "true", "false") === false) {
-      next(new StatusError(400, "Invalid Query Parameter", "Archived must be 'true', 'false' or undefined."));
+      next(new StatusError(400,
+        errStrings.InvalidQueryParameter.Title,
+        errStrings.InvalidQueryParameter.Msg));
       return;
     }
 
@@ -154,6 +146,7 @@ export class RequestsRoute implements IRoute {
     .catch((err) => next(this.translateErrors(err))); // Send generic error
   }
 
+  /* tslint:disable:max-line-length */
   /**
    * Get specific request
    *
@@ -162,7 +155,7 @@ export class RequestsRoute implements IRoute {
    * @param next {NextFunction} Execute the next method.
    *
    * @api {get} /api/v1/requests/:id Get specific request
-   * @apiVersion 1.0.0
+   * @apiVersion 1.2.0
    * @apiName GetRequest
    * @apiGroup Requests
    *
@@ -175,6 +168,8 @@ export class RequestsRoute implements IRoute {
    * @apiSuccess {string} [additional_info] Additional request information.
    * @apiSuccess {boolean} archived Specifies if this request completed and archived.
    * @apiSuccess {string} timestamp Timestamp the record was created.
+   * @apiSuccess {string} status Status of the request. Can be 'ASSIGNED', 'COMPLETED', 'REQUESTED', 'REJECTED', or 'IN_PROGRESS'
+   * @apiSuccess {number} [pairing] ID of volunteer pair for this request.
    *
    * @apiExample Example usage:
    * curl -i http://localhost/requests/1
@@ -188,24 +183,28 @@ export class RequestsRoute implements IRoute {
    *        to_location: "UCC",
    *        additional_info: null,
    *        archived: false,
-   *        timestamp: "2017-10-26T06:51:05.000Z"
+   *        timestamp: "2017-10-26T06:51:05.000Z",
+   *        status: "REQUESTED"
    *     }
    *
-   * @apiError (Error 400) InvalidQueryParameters The requested ID was invalid format.
-   * @apiError (Error 404) RequestNotFound The request ID was not found.
+   * @apiError (Error 400) InvalidQueryParameter The requested ID was invalid format.
+   * @apiError (Error 404) NotFoundError The request ID was not found.
    * @apiErrorExample Error Response:
    *     HTTP/1.1 404 NOT FOUND
    *     {
-   *        error: "RequestNotFound",
-   *        message: "Request ID '1' was not found."
+   *        error: "Not Found Error",
+   *        message: "The requested data was not found."
    *     }
    */
   public getRequest(req: Request, res: Response, next: NextFunction) {
+    /* tslint:enable:max-line-length */
     const id = Number(req.params.id);
 
     // Ensure valid id
     if (isNaN(id) || id < 0) {
-      next(new StatusError(400, "Invalid Query Parameter", "Offset and/or count are not numbers >= 0."));
+      next(new StatusError(400,
+        errStrings.InvalidURLParameter.Title,
+        errStrings.InvalidURLParameter.Msg));
       return;
     }
 
@@ -215,6 +214,101 @@ export class RequestsRoute implements IRoute {
   }
 
   /**
+   * Get specific request's assigned volunteers.
+   *
+   * @param req {Request} The express Request object.
+   * @param res {Response} The express Response object.
+   * @param next {NextFunction} Execute the next method.
+   *
+   * @api {get} /api/v1/requests/:id/volunteers Get specific request's volunteers
+   * @apiVersion 1.2.0
+   * @apiName GetRequestVolunteers
+   * @apiGroup Requests
+   *
+   * @apiParam (URL Parameter) {number} id The id of the request to retrieve.
+   *
+   * @apiSuccess {object} volunteers The volunteers assigned to this request.
+   * @apiSuccess {number} volunteers.id The volunteer record ID.
+   * @apiSuccess {string} volunteers.first_name First name of the volunteer.
+   * @apiSuccess {string} volunteers.last_name Last name of the volunteer.
+   *
+   * @apiExample Example usage:
+   * curl -i http://localhost/requests/1/volunteers
+   *
+   * @apiSuccessExample Success Response:
+   *     HTTP/1.1 200 OK
+   *     {
+   *        volunteers: [
+   *          {
+   *            id: 3,
+   *            first_name: "John",
+   *            last_name: "Doe"
+   *          },
+   *          {
+   *            id: 8,
+   *            first_name: "Jane",
+   *            last_name: "Doe"
+   *          }
+   *        ]
+   *     }
+   *
+   * @apiError (Error 400) InvalidQueryParameter The requested ID was invalid format.
+   * @apiError (Error 404) NotFoundError The request ID was not found.
+   * @apiErrorExample Error Response:
+   *     HTTP/1.1 404 NOT FOUND
+   *     {
+   *        error: "Not Found Error",
+   *        message: "The requested data was not found."
+   *     }
+   */
+  public getVolunteers(req: Request, res: Response, next: NextFunction) {
+    const id = Number(req.params.id);
+
+    // Ensure valid id
+    if (isNaN(id) || id < 0) {
+      next(new StatusError(400,
+        errStrings.InvalidURLParameter.Title,
+        errStrings.InvalidURLParameter.Msg));
+      return;
+    }
+
+    // Get data
+    this.data.getRequest(id)
+    .then((request) => {
+      // Swap out the pair ID number for the full pairing.
+      if (typeof request.pairing === "number") {
+        return this.volmgr.getPairing(request.pairing)
+        .then((pairing) => {
+          request.pairing = pairing;
+          return request;
+        });
+      }
+
+      // Return request if the pair is empty or already filled out
+      return request;
+    })
+    .then((request) => {
+      if (request.pairing === null) {
+        // No pair assigned
+        res.send({volunteers: []});
+      } else {
+        // Pair assigned and retrieved, send array
+        const pairData = request.pairing as VolunteerPairing;
+        const output = {
+          volunteers: [
+            pairData.volunteer_one.CensorSensitiveData(),
+            pairData.volunteer_two.CensorSensitiveData()
+          ]
+        };
+
+        res.send(output);
+      }
+    })
+    .catch((err) => next(this.translateErrors(err))); // Send generic error
+  }
+
+  /* tslint:disable:max-line-length */
+  /**
    * Post new walk escort request.
    *
    * @param req {Request} The express Request object.
@@ -222,7 +316,7 @@ export class RequestsRoute implements IRoute {
    * @param next {NextFunction} Execute the next method.
    *
    * @api {post} /api/v1/requests Create a new walk escort request
-   * @apiVersion 1.1.0
+   * @apiVersion 1.2.0
    * @apiName PostRequest
    * @apiGroup Requests
    *
@@ -230,6 +324,7 @@ export class RequestsRoute implements IRoute {
    * @apiParam {string} from_location Escort start location.
    * @apiParam {string} to_location Escort destination.
    * @apiParam {string} [additional_info] Additional request information.
+   * @apiParam {number} [pairing] Pairing ID for this request.
    *
    * @apiSuccess (Created 201) {number} id The record ID.
    * @apiSuccess (Created 201) {string} [name] Name of the requester.
@@ -238,6 +333,8 @@ export class RequestsRoute implements IRoute {
    * @apiSuccess (Created 201) {string} [additional_info] Additional request information.
    * @apiSuccess (Created 201) {boolean} archived Specifies if this request completed and archived.
    * @apiSuccess (Created 201) {string} timestamp Timestamp the record was created.
+   * @apiSuccess (Created 201) {string} status Status of the request. Can be 'ASSIGNED', 'COMPLETED', 'REQUESTED', 'REJECTED', or 'IN_PROGRESS'
+   * @apiSuccess (Created 201) {number} [pairing] ID of volunteer pair for this request.
    *
    * @apiSuccessExample Success Response:
    *     HTTP/1.1 201 CREATED
@@ -247,35 +344,46 @@ export class RequestsRoute implements IRoute {
    *        from_location: "UCC",
    *        to_location: "SEB",
    *        archived: false,
-   *        timestamp: "2017-10-26T06:51:05.000Z"
+   *        timestamp: "2017-10-26T06:51:05.000Z",
+   *        status: "REQUESTED",
+   *        pairing: 2
    *     }
    *
-   * @apiError (Error 400) MissingParameters One of the post request parameters was missing or invalid.
+   * @apiError (Error 400) NonUniqueParameter One of the post request parameters was missing or invalid.
    * @apiErrorExample Error Response:
    *     HTTP/1.1 400 BAD REQUEST
    *     {
-   *        error: "MissingParameters",
-   *        message: "'from_location' and 'to' are required parameters."
+   *        error: "Non-Unique Parameter",
+   *        message: "Parameters that were required to be unique were found to be the same."
    *     }
    */
   public postRequest(req: Request, res: Response, next: NextFunction) {
+    /* tslint:enable:max-line-length */
     // Catch missing data
     if (this.checkToFromUniqueness(req.body.to_location, req.body.from_location)) {
-      next (new StatusError(
-        400,
-        "Missing Parameters",
-        "'from_location' and 'to_location' must be supplied and not equal to each other" +
-        " are required parameters."));
+      next (new StatusError(400,
+        errStrings.NonUniqueParameter.Title,
+        errStrings.NonUniqueParameter.Msg));
       return;
     }
 
     // Sanitize data
-    req.body.name = this.sanitizer.sanitize(req.body.name);
-    req.body.additional_info = this.sanitizer.sanitize(req.body.additional_info);
-    req.body.from_location = this.sanitizer.sanitize(req.body.from_location);
-    req.body.to_location = this.sanitizer.sanitize(req.body.to_location);
+    const cleanData: any = {};
+    try {
+      cleanData.pairing = (Number.isInteger(req.body.pairing)) ? Number(req.body.pairing) : undefined;
+      cleanData.name = (typeof req.body.name === "string") ? this.sanitizer.sanitize(req.body.name) : undefined;
+      cleanData.from_location = this.sanitizer.sanitize(req.body.from_location);
+      cleanData.to_location = this.sanitizer.sanitize(req.body.to_location);
+      cleanData.additional_info = (typeof req.body.additional_info === "string") ?
+      this.sanitizer.sanitize(req.body.additional_info) : undefined;
+    } catch (err) {
+      next (new StatusError(400,
+        errStrings.InvalidBodyParameter.Title,
+        errStrings.InvalidBodyParameter.Msg));
+      return;
+    }
 
-    const postData = new TravelRequest(req.body);
+    const postData = new TravelRequest(cleanData);
 
     // Insert into database and get resulting record
     this.data.createRequest(postData)
@@ -284,6 +392,7 @@ export class RequestsRoute implements IRoute {
     .catch((err) => next(this.translateErrors(err))); // Send generic error
   }
 
+  /* tslint:disable:max-line-length */
   /**
    * Replace a walk escort request.
    *
@@ -295,7 +404,7 @@ export class RequestsRoute implements IRoute {
    * @apiDescription Omitting a parameter from the new object will delete the
    *                  field if it currently exists.
    *                  Other parameters (e.g. id), if specified, will be ignored.
-   * @apiVersion 1.1.0
+   * @apiVersion 1.2.0
    * @apiName PutRequest
    * @apiGroup Requests
    *
@@ -306,6 +415,8 @@ export class RequestsRoute implements IRoute {
    * @apiParam {string} to_location Escort destination.
    * @apiParam {string} [additional_info] Additional request information.
    * @apiParam {boolean} archived Specifies if this request is completed and archived.
+   * @apiParam {string} status Status of the request. Can be 'ASSIGNED', 'COMPLETED', 'REQUESTED', 'REJECTED', or 'IN_PROGRESS'
+   * @apiParam {number} [pairing] ID of volunteer pair for this request.
    *
    * @apiSuccess {number} id The record ID.
    * @apiSuccess {string} [name] Name of the requester.
@@ -314,6 +425,8 @@ export class RequestsRoute implements IRoute {
    * @apiSuccess {string} [additional_info] Additional request information.
    * @apiSuccess {boolean} archived Specifies if this request completed and archived.
    * @apiSuccess {string} timestamp Timestamp the record was created.
+   * @apiSuccess {string} status Status of the request. Can be 'ASSIGNED', 'COMPLETED', 'REQUESTED', 'REJECTED', or 'IN_PROGRESS'
+   * @apiSuccess {number} [pairing] ID of volunteer pair for this request.
    *
    * @apiSuccessExample Success Response:
    *     HTTP/1.1 200 OK
@@ -323,42 +436,61 @@ export class RequestsRoute implements IRoute {
    *        from_location: "UCC",
    *        to_location: "SEB",
    *        archived: false,
-   *        timestamp: "2017-10-26T06:51:05.000Z"
+   *        pairing: 5,
+   *        timestamp: "2017-10-26T06:51:05.000Z",
+   *        status: "REQUESTED"
    *     }
    *
-   * @apiError (Error 400) MissingOrInvalidParameters One of the request parameters was missing or invalid.
-   * @apiError (Error 404) RequestNotFound The request ID was not found.
+   * @apiError (Error 400) InvalidBodyParameter One of the request parameters was missing or invalid.
+   * @apiError (Error 404) NotFoundError The request ID was not found.
    * @apiErrorExample Error Response:
    *     HTTP/1.1 400 BAD REQUEST
    *     {
-   *        error: "MissingParameters",
-   *        message: "'from_location' parameter is missing."
+   *        error: "Invalid Body Parameter",
+   *        message: "A required body parameter is missing or out of range."
    *     }
    */
   public putRequest(req: Request, res: Response, next: NextFunction) {
+    /* tslint:enable:max-line-length */
     const id = Number(req.params.id);
 
     // Catch invalid id
     if (isNaN(id) || id < 0) {
-      next(new StatusError(400, "Invalid URL Parameter", "Id is not a number >= 0."));
+      next(new StatusError(400,
+        errStrings.InvalidURLParameter.Title,
+        errStrings.InvalidURLParameter.Msg));
       return;
     }
 
     // Catch missing data
-    if (req.body.archived == null || this.checkToFromUniqueness(req.body.to_location, req.body.from_location)) {
-      next (new StatusError(
-        400,
-        "Missing Or Invalid Parameters",
-        "A required valid parameter is missing."));
+    if (
+      req.body.archived == null ||
+      req.body.status == null ||
+      TravelStatus[req.body.status] === undefined ||
+      this.checkToFromUniqueness(req.body.to_location, req.body.from_location)
+    ) {
+      next (new StatusError(400,
+        errStrings.InvalidBodyParameter.Title,
+        errStrings.InvalidBodyParameter.Msg));
       return;
     }
 
     // Sanitize data
-    req.body.archived = (req.body.archived === true || req.body.archived === "true") ? true : false;
-    req.body.name = this.sanitizer.sanitize(req.body.name);
-    req.body.additional_info = this.sanitizer.sanitize(req.body.additional_info);
-    req.body.from_location = this.sanitizer.sanitize(req.body.from_location);
-    req.body.to_location = this.sanitizer.sanitize(req.body.to_location);
+    try {
+      req.body.pairing = (Number.isInteger(req.body.pairing)) ? Number(req.body.pairing) : undefined;
+      req.body.status = TravelStatus[req.body.status];
+      req.body.archived = (req.body.archived === true || req.body.archived === "true") ? true : false;
+      req.body.name = (typeof req.body.name === "string") ? this.sanitizer.sanitize(req.body.name) : undefined;
+      req.body.from_location = this.sanitizer.sanitize(req.body.from_location);
+      req.body.to_location = this.sanitizer.sanitize(req.body.to_location);
+      req.body.additional_info = (typeof req.body.additional_info === "string") ?
+      this.sanitizer.sanitize(req.body.additional_info) : undefined;
+    } catch (badError) {
+      next (new StatusError(400,
+        errStrings.InvalidBodyParameter.Title,
+        errStrings.InvalidBodyParameter.Msg));
+      return;
+    }
 
     // Replace records
     const putData = new TravelRequest(req.body);
@@ -370,6 +502,7 @@ export class RequestsRoute implements IRoute {
     .catch((err) => next(this.translateErrors(err))); // Send generic error
   }
 
+  /* tslint:disable:max-line-length */
   /**
    * Update a walk escort request.
    *
@@ -381,7 +514,7 @@ export class RequestsRoute implements IRoute {
    * @apiDescription Omitting a parameter from the new object will preserve the
    *                  existing value (if it exists).
    *                  Other parameters (e.g. id), if specified, will be ignored.
-   * @apiVersion 1.1.0
+   * @apiVersion 1.2.0
    * @apiName PatchRequest
    * @apiGroup Requests
    *
@@ -392,6 +525,8 @@ export class RequestsRoute implements IRoute {
    * @apiParam {string} [to_location] Escort destination.
    * @apiParam {string} [additional_info] Additional request information.
    * @apiParam {boolean} [archived] Specifies if this request is completed and archived.
+   * @apiParam {string} [status] Status of the request. Can be 'ASSIGNED', 'COMPLETED', 'REQUESTED', 'REJECTED', or 'IN_PROGRESS'
+   * @apiParam {number} [pairing] ID of volunteer pair for this request.
    *
    * @apiSuccess {number} id The record ID.
    * @apiSuccess {string} [name] Name of the requester.
@@ -400,6 +535,8 @@ export class RequestsRoute implements IRoute {
    * @apiSuccess {string} [additional_info] Additional request information.
    * @apiSuccess {boolean} archived Specifies if this request completed and archived.
    * @apiSuccess {string} timestamp Timestamp the record was created.
+   * @apiSuccess {string} status Status of the request. Can be 'ASSIGNED', 'COMPLETED', 'REQUESTED', 'REJECTED', or 'IN_PROGRESS'
+   * @apiSuccess {number} [pairing] ID of volunteer pair for this request.
    *
    * @apiSuccessExample Success Response:
    *     HTTP/1.1 200 OK
@@ -409,22 +546,27 @@ export class RequestsRoute implements IRoute {
    *        from_location: "UCC",
    *        to_location: "SEB",
    *        archived: false,
-   *        timestamp: "2017-10-26T06:51:05.000Z"
+   *        pairing: 3,
+   *        timestamp: "2017-10-26T06:51:05.000Z",
+   *        status: "REQUESTED"
    *     }
-   * @apiError (Error 400) InvalidQueryParameters The requested ID was invalid format.
-   * @apiError (Error 400) InvalidLocation One of the location parameters equal.
-   * @apiError (Error 404) RequestNotFound The request ID was not found.
+   * @apiError (Error 400) InvalidURLParameter The requested ID was invalid format.
+   * @apiError (Error 400) NonUniqueParameter One of the location parameters equal.
+   * @apiError (Error 404) NotFoundError The request ID was not found.
    * @apiErrorExample Error Response:
    *     HTTP/1.1 404 NOT FOUND
    *     {
-   *        error: "RequestNotFound",
-   *        message: "Request ID 1 was not found."
+   *        error: "Not Found Error",
+   *        message: "The requested data was not found."
    *     }
    */
   public patchRequest(req: Request, res: Response, next: NextFunction) {
+    /* tslint:enable:max-line-length */
     // Check for invalid ID
     if (isNaN(Number(req.params.id)) || Number(req.params.id) < 0) {
-      next(new StatusError(400, "Invalid Query Parameter", "ID is required"));
+      next(new StatusError(400,
+        errStrings.InvalidURLParameter.Title,
+        errStrings.InvalidURLParameter.Msg));
       return;
     }
 
@@ -434,18 +576,30 @@ export class RequestsRoute implements IRoute {
       archived: Boolean,
       from_location: this.sanitizer.sanitize,
       name: this.sanitizer.sanitize,
-      to_location: this.sanitizer.sanitize
+      to_location: this.sanitizer.sanitize,
+      status: (obj: any) => TravelStatus[obj],
+      pairing: (obj: any) => (Number.isInteger(obj)) ? Number(obj) : undefined
     };
 
     // List of sanitized data
-    const updateDict = this.sanitizeMap(sanitizeMap, req.body);
+    let updateDict: any;
+    try {
+      updateDict = this.sanitizer.sanitizeMap(sanitizeMap, req.body);
+    } catch (err) {
+      next(new StatusError(400,
+        errStrings.InvalidBodyParameter.Title,
+        errStrings.InvalidBodyParameter.Msg));
+      return;
+    }
 
     // Locaion check
     if (updateDict.from_location !== undefined
         && updateDict.to_location !== undefined
         && updateDict.from_location === updateDict.to_location
     ) {
-      next(new StatusError(400, "Invalid Location", "Locations should not equal."));
+      next(new StatusError(400,
+        errStrings.NonUniqueParameter.Title,
+        errStrings.NonUniqueParameter.Msg));
       return;
     }
 
@@ -460,14 +614,14 @@ export class RequestsRoute implements IRoute {
   }
 
   /**
-   * Get specific request
+   * Delete specific request.
    *
    * @param req {Request} The express Request object.
    * @param res {Response} The express Response object.
    * @param next {NextFunction} Execute the next method.
    *
    * @api {delete} /api/v1/requests/:id Delete specific request
-   * @apiVersion 1.1.0
+   * @apiVersion 1.2.0
    * @apiName DeleteRequest
    * @apiGroup Requests
    *
@@ -479,13 +633,13 @@ export class RequestsRoute implements IRoute {
    * @apiSuccessExample Success Response:
    *     HTTP/1.1 204 NO CONTENT
    *
-   * @apiError (Error 400) InvalidQueryParameters The requested ID was invalid format.
-   * @apiError (Error 404) RequestNotFound The request ID was not found.
+   * @apiError (Error 400) InvalidURLParameter The requested ID was invalid format.
+   * @apiError (Error 404) NotFoundError The request ID was not found.
    * @apiErrorExample Error Response:
    *     HTTP/1.1 404 NOT FOUND
    *     {
-   *        error: "RequestNotFound",
-   *        message: "Request ID 1 was not found."
+   *        error: "Not Found Error",
+   *        message: "The requested data was not found."
    *     }
    */
   public deleteRequest(req: Request, res: Response, next: NextFunction) {
@@ -493,7 +647,9 @@ export class RequestsRoute implements IRoute {
 
     // Check for invalid id
     if (isNaN(id) || id < 0) {
-      next(new StatusError(400, "Invalid Query Parameter", "Offset and/or count are not numbers >= 0."));
+      next(new StatusError(400,
+        errStrings.InvalidURLParameter.Title,
+        errStrings.InvalidURLParameter.Msg));
       return;
     }
 
@@ -504,20 +660,6 @@ export class RequestsRoute implements IRoute {
   }
 
   /**
-   * Translate generic errors from data layer into HTTP errors.
-   *
-   * @param err
-   */
-  private translateErrors(err: Error) {
-    if (err.message === "Not Found") {
-      return new StatusError(404, "Not Found", `ID was not found.`);
-    } else {
-      console.error(err.toString());
-      return new StatusError(500, "Internal Server Error", "An error has occurred.");
-    }
-  }
-
-  /**
    * Check if to and from are the same.
    *
    * @param to
@@ -525,18 +667,5 @@ export class RequestsRoute implements IRoute {
    */
   private checkToFromUniqueness(to: string, from: string) {
     return (to == null || from == null || to === from);
-  }
-
-  private validValues(subject: any, ...valids: any[]) {
-    let valid = false;
-
-    for (const validOption of valids) {
-      if (subject === validOption) {
-        valid = true;
-        break;
-      }
-    }
-
-    return valid;
   }
 }

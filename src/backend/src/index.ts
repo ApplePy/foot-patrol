@@ -35,21 +35,27 @@ import * as http from "http";
 import * as inversify from "inversify";
 import "reflect-metadata";
 import { IFACES, TAGS } from "./ids";
+import { IVolunteerPairingManager } from "./interfaces/ipairing-manager";
 import { IRequestsManager } from "./interfaces/irequests-manager";
 import { IRoute } from "./interfaces/iroute";
 import { ISanitizer } from "./interfaces/isanitizer";
 import { ISQLService } from "./interfaces/isql-service";
+import { IVolunteersManager } from "./interfaces/ivolunteers-manager";
+import { VolunteerPairingsRoute } from "./routes/pairings";
 import { RequestsRoute } from "./routes/requests";
+import { VolunteersRoute } from "./routes/volunteers";
 import { Server } from "./server";
 import { MySQLService } from "./services/mysql-service";
 import { Sanitizer } from "./services/sanitizer";
+import { SQLVolunteerPairingManager } from "./services/sql-pairings-manager";
 import { SQLRequestsManager } from "./services/sql-requests-manager";
+import { SQLVolunteersManager } from "./services/sql-volunteers-manager";
 
 /**
  * Setup server with environment
  */
 class ServerEnvironmentSetup {
-  public expressServer: Server;
+  public expressServer: Server | undefined;
   public nodeServer: any;
   public container: inversify.Container;  // IoC Container
 
@@ -60,10 +66,37 @@ class ServerEnvironmentSetup {
     // Setup container
     this.container = new inversify.Container();
 
-    this.container.bind<IRoute>(IFACES.IROUTE).to(RequestsRoute).whenTargetNamed(TAGS.REQUESTS);
-    this.container.bind<ISanitizer>(IFACES.ISANITIZER).to(Sanitizer);
-    this.container.bind<ISQLService>(IFACES.ISQLSERVICE).to(MySQLService).inSingletonScope();
-    this.container.bind<IRequestsManager>(IFACES.IREQUESTSMANAGER).to(SQLRequestsManager).inSingletonScope();
+    this.container.bind<IRoute>(IFACES.IROUTE)
+      .to(RequestsRoute)
+      .whenTargetNamed(TAGS.REQUESTS);
+
+    this.container.bind<IRoute>(IFACES.IROUTE)
+      .to(VolunteersRoute)
+      .whenTargetNamed(TAGS.VOLUNTEERS);
+
+    this.container.bind<IRoute>(IFACES.IROUTE)
+      .to(VolunteerPairingsRoute)
+      .whenTargetNamed(TAGS.PAIRINGS);
+
+    this.container.bind<ISanitizer>(IFACES.ISANITIZER)
+      .to(Sanitizer);
+
+    this.container.bind<ISQLService>(IFACES.ISQLSERVICE)
+      .to(MySQLService)
+      .inSingletonScope();
+
+    this.container.bind<IRequestsManager>(IFACES.IREQUESTSMANAGER)
+      .to(SQLRequestsManager)
+      .inSingletonScope();
+
+    this.container.bind<IVolunteersManager>(IFACES.IVOLUNTEERSMANAGER)
+      .to(SQLVolunteersManager)
+      .inSingletonScope();
+
+    this.container.bind<IVolunteerPairingManager>(IFACES.IVOLUNTEERPAIRINGMANAGER)
+     .to(SQLVolunteerPairingManager)
+     .inSingletonScope();
+
     this.container.bind<Server>(Server).toSelf();
   }
 

@@ -26,10 +26,35 @@ const pathPrefix = "";  // For adding '/api/v1' to api calls if needed
 @suite
 class RequestsAPITest {
 
-  public static before() {
+  public static before(done: MochaDone) {
     // Update this line to switch to MySQL if desired
     serverEnv.container.rebind<ISQLService>(IFACES.ISQLSERVICE).to(FakeSQL).inSingletonScope();
     serverEnv.startServer();
+
+    // Setup DB
+    const sqlSrv = serverEnv.container.get<ISQLService>(IFACES.ISQLSERVICE);
+
+    // Clear old data
+    sqlSrv.makeQuery("DELETE FROM requests")
+    .then(() => sqlSrv.makeQuery("DELETE FROM volunteer_pairing"))
+    .then(() => sqlSrv.makeQuery("DELETE FROM volunteers"))
+
+    // Create volunteers
+    .then(() => Promise.all([
+      sqlSrv.makeQuery("REPLACE INTO volunteers VALUES(1, 'jdoe12', 'John', 'Doe', 0)"),
+      sqlSrv.makeQuery("REPLACE INTO volunteers VALUES(2, 'jdoe23', 'Jane', 'Doe', 0)"),
+    ]))
+
+    // Create pairing
+    .then(() => sqlSrv.makeQuery("REPLACE INTO volunteer_pairing VALUES(1, 1, 2, 1)"))
+    .then(() => done())
+    .catch((err) => {
+      if (err.name !== "FakeSQLError") {
+        done(err);
+      } else {
+        done();
+      }
+    });
   }
 
   public static after() {
@@ -59,42 +84,6 @@ class RequestsAPITest {
     });
   }
 
-  @test("sanitizeMap should properly sanitize data")
-  public sanitizeTest() {
-    // Data
-    const SAN_MAP = {
-      first: Number,
-      second: Boolean,
-      third: (val: any) => val,
-      fifth: Number,
-      sixth: Boolean
-    };
-
-    const DATA_MAP = {
-      first: "123",
-      second: "stuff",
-      third: {hello: "moto"},
-      fourth: "ignore me",
-      fifth: "invalid number",
-      sixth: 0
-    };
-
-    const EXPECTED_RESULTS = {
-      first: 123,
-      second: true,
-      third: {hello: "moto"},
-      fifth: NaN,
-      sixth: false
-    };
-
-    // Test
-    const requestsRoute = serverEnv.container.getNamed<RequestsRoute>(IFACES.IROUTE, TAGS.REQUESTS);
-    const results = requestsRoute.sanitizeMap(SAN_MAP, DATA_MAP);
-
-    // Assert
-    results.should.deep.equal(EXPECTED_RESULTS);
-  }
-
   @test("GET should return a list of requests")
   public requestsList(done: MochaDone) {
     // Get SQL connector instance
@@ -105,7 +94,8 @@ class RequestsAPITest {
     const DB_DATA = {
       id: 1, name: "John Doe", from_location: "SEB",
       to_location: "UCC", additional_info: null,
-      archived: 0, timestamp: "2017-10-26T06:51:05.000Z"
+      archived: 0, timestamp: "2017-10-26T06:51:05.000Z",
+      status: "ASSIGNED", pairing: 1
     };
 
     // Expected return
@@ -114,7 +104,8 @@ class RequestsAPITest {
         {
           id: 1, name: "John Doe", from_location: "SEB",
           to_location: "UCC", additional_info: null,
-          archived: false, timestamp: "2017-10-26T06:51:05.000Z"
+          archived: false, timestamp: "2017-10-26T06:51:05.000Z",
+          status: "ASSIGNED", pairing: 1
         }
       ],
       meta: { offset: 0, count: 2, archived: false }
@@ -154,7 +145,7 @@ class RequestsAPITest {
     const DB_DATA = {
       id: 1, name: "John Doe", from_location: "SEB",
       to_location: "UCC", additional_info: null,
-      archived: 0, timestamp: "2017-10-26T06:51:05.000Z"
+      archived: 0, timestamp: "2017-10-26T06:51:05.000Z", status: "REQUESTED"
     };
 
     // Expected return
@@ -163,7 +154,8 @@ class RequestsAPITest {
         {
           id: 1, name: "John Doe", from_location: "SEB",
           to_location: "UCC", additional_info: null,
-          archived: false, timestamp: "2017-10-26T06:51:05.000Z"
+          archived: false, timestamp: "2017-10-26T06:51:05.000Z",
+          status: "REQUESTED", pairing: null
         }
       ],
       meta: { offset: 0, count: 100, archived: false }
@@ -203,12 +195,12 @@ class RequestsAPITest {
     const DB_DATA = [{
       id: 1, name: "John Doe", from_location: "SEB",
       to_location: "UCC", additional_info: null,
-      archived: 1, timestamp: "2017-10-26T06:51:05.000Z"
+      archived: 1, timestamp: "2017-10-26T06:51:05.000Z", status: "REQUESTED"
     },
     {
       id: 2, name: "John Doe", from_location: "SEB",
       to_location: "UCC", additional_info: null,
-      archived: 0, timestamp: "2017-10-26T06:51:05.000Z"
+      archived: 0, timestamp: "2017-10-26T06:51:05.000Z", status: "COMPLETED"
     }];
 
     const EXPECTED_RESULTS = {
@@ -216,7 +208,8 @@ class RequestsAPITest {
         {
           id: 2, name: "John Doe", from_location: "SEB",
           to_location: "UCC", additional_info: null,
-          archived: false, timestamp: "2017-10-26T06:51:05.000Z"
+          archived: false, timestamp: "2017-10-26T06:51:05.000Z",
+          status: "COMPLETED", pairing: null
         }
       ],
       meta: { offset: 0, count: 2, archived: false }
@@ -255,12 +248,13 @@ class RequestsAPITest {
      const DB_DATA = [{
        id: 1, name: "John Doe", from_location: "SEB",
        to_location: "UCC", additional_info: null,
-       archived: 1, timestamp: "2017-10-26T06:51:05.000Z"
+       archived: 1, timestamp: "2017-10-26T06:51:05.000Z",
+       status: "COMPLETED", pairing: 1
      },
      {
-       id: 2, name: "John Doe", from_location: "SEB",
+       id: 2, name: "Jane Doe", from_location: "SEB",
        to_location: "UCC", additional_info: null,
-       archived: 0, timestamp: "2017-10-26T06:51:05.000Z"
+       archived: 0, timestamp: "2017-10-26T06:51:05.000Z", status: "REJECTED"
      }];
 
      const EXPECTED_RESULTS = {
@@ -268,12 +262,14 @@ class RequestsAPITest {
         {
           id: 1, name: "John Doe", from_location: "SEB",
           to_location: "UCC", additional_info: null,
-          archived: true, timestamp: "2017-10-26T06:51:05.000Z"
+          archived: true, timestamp: "2017-10-26T06:51:05.000Z",
+          status: "COMPLETED", pairing: 1
         },
         {
-          id: 2, name: "John Doe", from_location: "SEB",
+          id: 2, name: "Jane Doe", from_location: "SEB",
           to_location: "UCC", additional_info: null,
-          archived: false, timestamp: "2017-10-26T06:51:05.000Z"
+          archived: false, timestamp: "2017-10-26T06:51:05.000Z",
+          status: "REJECTED", pairing: null
         }
       ],
       meta: { offset: 0, count: 2, archived: true }
@@ -407,14 +403,16 @@ class RequestsAPITest {
     const DB_DATA = {
       id: 1, name: "John Doe", from_location: "SEB",
       to_location: "UCC", additional_info: null,
-      archived: 0, timestamp: "2017-10-26T06:51:05.000Z"
+      archived: 0, timestamp: "2017-10-26T06:51:05.000Z",
+      status: "REJECTED", pairing: 1
     };
 
     // Expected return
     const EXPECTED_RESULTS = {
       id: 1, name: "John Doe", from_location: "SEB",
       to_location: "UCC", additional_info: null,
-      archived: false, timestamp: "2017-10-26T06:51:05.000Z"
+      archived: false, timestamp: "2017-10-26T06:51:05.000Z",
+      status: "REJECTED", pairing: 1
     };
 
     // Setup fake data
@@ -437,7 +435,7 @@ class RequestsAPITest {
     });
   }
 
-  @test("GET should fail with 404")
+  @test("GET for non-existent ID should fail with 404")
   public getBadId(done: MochaDone) {
     // Setup fake data
     FakeSQL.response = [];
@@ -455,6 +453,187 @@ class RequestsAPITest {
       });
   }
 
+  @test("GET for invalid ID should fail with 400")
+  public getInvalidId(done: MochaDone) {
+    // Setup fake data
+    FakeSQL.response = [];
+
+    // Start request
+    chai.request(serverEnv.nodeServer)
+      .get(pathPrefix + "/requests/-1")
+      .end((err, res) => {
+        // Verify results
+        res.should.have.status(400);
+        res.body.should.have.property("error");
+        res.body.should.have.property("message");
+        res.body.should.not.have.property("stack");
+        done();
+      });
+  }
+
+  @test("GET should return one request's volunteers")
+  public getRequestVolunteers(done: MochaDone) {
+    // Get SQL connector instance
+    const sqlInstance = serverEnv.container.get<ISQLService>(IFACES.ISQLSERVICE);
+    const sqlQuery = sqlInstance.makeQuery.bind(sqlInstance);
+
+    // Fake data
+    const DB_REQUESTS_DATA = {
+      id: 1, name: "John Doe", from_location: "SEB",
+      to_location: "UCC", additional_info: null,
+      archived: 0, timestamp: "2017-10-26T06:51:05.000Z",
+      status: "REJECTED", pairing: 1
+    };
+
+    const DB_PAIRING_DATA = {
+      id: 1, active: 1, volunteer_one: 1, volunteer_two: 2
+    };
+
+    const DB_VOLUNTEERS_DATA = [
+      { id: 1, uwo_id: "jdoe37", first_name: "John", last_name: "Doe", disabled: 0 },
+      { id: 2, uwo_id: "jdoe38", first_name: "Jane", last_name: "Doe", disabled: 0 }
+    ];
+
+    // Expected return
+    const EXPECTED_RESULTS = {
+      volunteers: [
+        { id: 1, first_name: "John", last_name: "Doe" },
+        { id: 2, first_name: "Jane", last_name: "Doe" }
+      ]
+    };
+
+    // Setup fake data
+    FakeSQL.response = (query: string, values: any[]) => {
+      // Silence the REPLACE calls
+      if (query.indexOf("REPLACE") !== -1) {
+        return {};
+      } else if (query.indexOf("volunteer_pairing") !== -1) {
+        values.should.deep.equal([1]);
+        return [DB_PAIRING_DATA];
+      } else if (query.indexOf("volunteers") !== -1) {
+        values[0].should.be.within(1, 2);
+        // Return the right volunteer
+        if (values[0] === 1) {
+          return [DB_VOLUNTEERS_DATA[0]];
+        } else {
+          return [DB_VOLUNTEERS_DATA[1]];
+        }
+      } else {
+        values.should.deep.equal([1]);
+        return [DB_REQUESTS_DATA];
+      }
+    };
+
+    // Insert all the test data into the DB
+    Promise.all(DB_VOLUNTEERS_DATA.map((val) => TestReplaceHelper.replace(sqlQuery, "volunteers", val)))
+    .then(() => TestReplaceHelper.replace(sqlQuery, "volunteer_pairing", DB_PAIRING_DATA))
+    .then(() => TestReplaceHelper.dateReplace(sqlQuery, "requests", DB_REQUESTS_DATA, "timestamp"))
+    .then(() => {
+
+    // Start request
+    chai.request(serverEnv.nodeServer)
+      .get(pathPrefix + "/requests/1/volunteers")
+      .end((err, res) => {
+        // Verify results
+        res.should.have.status(200);
+        res.body.should.deep.equal(EXPECTED_RESULTS);
+        done();
+      });
+    });
+  }
+
+  @test("GET for an unassigned request should return no volunteers")
+  public getRequestVolunteersNull(done: MochaDone) {
+    // Get SQL connector instance
+    const sqlInstance = serverEnv.container.get<ISQLService>(IFACES.ISQLSERVICE);
+    const sqlQuery = sqlInstance.makeQuery.bind(sqlInstance);
+
+    // Fake data
+    const DB_REQUESTS_DATA = {
+      id: 1, name: "John Doe", from_location: "SEB",
+      to_location: "UCC", additional_info: null,
+      archived: 0, timestamp: "2017-10-26T06:51:05.000Z",
+      status: "REJECTED", pairing: null
+    };
+
+    const DB_PAIRING_DATA = {
+      id: 1, active: 1, volunteer_one: 1, volunteer_two: 2
+    };
+
+    const DB_VOLUNTEERS_DATA = [
+      { id: 1, uwo_id: "jdoe37", first_name: "John", last_name: "Doe", disabled: 0 },
+      { id: 2, uwo_id: "jdoe38", first_name: "Jane", last_name: "Doe", disabled: 0 }
+    ];
+
+    // Expected return
+    const EXPECTED_RESULTS = {
+      volunteers: []
+    };
+
+    // Setup fake data
+    FakeSQL.response = (query: string, values: any[]) => {
+      if (query.indexOf("requests") !== -1) {
+        values.should.deep.equal([1]);
+        return [DB_REQUESTS_DATA];
+      }
+
+      return {};  // Fallthrough case
+    };
+
+    // Insert all the test data into the DB
+    Promise.all(DB_VOLUNTEERS_DATA.map((val) => TestReplaceHelper.replace(sqlQuery, "volunteers", val)))
+    .then(() => TestReplaceHelper.replace(sqlQuery, "volunteer_pairing", DB_PAIRING_DATA))
+    .then(() => TestReplaceHelper.dateReplace(sqlQuery, "requests", DB_REQUESTS_DATA, "timestamp"))
+    .then(() => {
+
+    // Start request
+    chai.request(serverEnv.nodeServer)
+      .get(pathPrefix + "/requests/1/volunteers")
+      .end((err, res) => {
+        // Verify results
+        res.should.have.status(200);
+        res.body.should.deep.equal(EXPECTED_RESULTS);
+        done();
+      });
+    });
+  }
+
+  @test("GET volunteers for non-existent ID should return 404")
+  public getRequestVolunteersBadId(done: MochaDone) {
+    // Setup fake data
+    FakeSQL.response = (query: string, values: any[]) => {
+      values.should.deep.equal([0]);
+      return {};
+    };
+
+    // Start request
+    chai.request(serverEnv.nodeServer)
+      .get(pathPrefix + "/requests/0/volunteers")
+      .end((err, res) => {
+        // Verify results
+        res.should.have.status(404);
+        done();
+      });
+  }
+
+  @test("GET volunteers for badly-formed ID should return 400")
+  public getRequestVolunteersInvalidId(done: MochaDone) {
+    // Setup fake data
+    FakeSQL.response = {};
+
+    // Start request
+    chai.request(serverEnv.nodeServer)
+      .get(pathPrefix + "/requests/fake/volunteers")
+      .end((err, res) => {
+        // Verify results
+        res.should.have.status(400);
+        res.body.should.contain.property("error");
+        res.body.should.contain.property("message");
+        res.body.should.not.contain.property("stack");
+        done();
+      });
+  }
+
   @test("POST should create a new object, ignoring id and other properties")
   public postSuccess(done: MochaDone) {
     // Setup fake data
@@ -466,14 +645,18 @@ class RequestsAPITest {
       additional_info: "test",
       archived: true,
       timestamp: "lol",
-      extra: "testme"
+      extra: "testme",
+      status: "COMPLETED",
+      pairing: 1
     };
     const EXPECTED_RESULTS = {
       name: "John Doe",
       from_location: "UCC",
       to_location: "SEB",
       additional_info: "test",
-      archived: false
+      archived: false,
+      status: "REQUESTED",
+      pairing: 1
     };
     const REQUESTS_DATA = (query: string, values: any[]) => {
       const newId = 2;
@@ -502,7 +685,7 @@ class RequestsAPITest {
       });
   }
 
-  @test("POST should fail when a variable is missing")
+  @test("POST should fail when a location is missing")
   public postFail(done: MochaDone) {
     // Setup fake data
     const INPUT = {
@@ -627,6 +810,26 @@ class RequestsAPITest {
       });
   }
 
+  @test("DELETE should fail on invalid ID")
+  public deleteInvalidId(done: MochaDone) {
+    // Setup fake data
+    const INPUT = {};
+    FakeSQL.response = {};
+
+    // Start request
+    chai.request(serverEnv.nodeServer)
+      .del(pathPrefix + "/requests/fake")
+      .send(INPUT)
+      .end((err, res) => {
+        // Verify results
+        res.should.have.status(400);
+        res.body.should.contain.property("error");
+        res.body.should.contain.property("message");
+        res.body.should.not.contain.property("stack");
+        done();
+      });
+  }
+
   @test("DELETE should fail gracefully handle SQL errors")
   public deleteDBFail(done: MochaDone) {
     if (serverEnv.container.get<ISQLService>(IFACES.ISQLSERVICE) instanceof FakeSQL === false) {
@@ -671,7 +874,9 @@ class RequestsAPITest {
       to_location: "SEB",
       archived: true,
       timestamp: "2017-12-26T06:51:05.000Z",
-      extra: "testme"
+      extra: "testme",
+      status: "COMPLETED",
+      pairing: 1
     };
     const EXPECTED_RESULTS = {
       id: 1,
@@ -680,7 +885,9 @@ class RequestsAPITest {
       from_location: "UCC",
       to_location: "SEB",
       archived: true,
-      timestamp: "2017-10-26T06:51:05.000Z"
+      timestamp: "2017-10-26T06:51:05.000Z",
+      status: "COMPLETED",
+      pairing: 1
     };
 
     // Setup DB responses
@@ -696,6 +903,8 @@ class RequestsAPITest {
           "from_location",
           "to_location",
           "additional_info",
+          "status",
+          "pairing",
           "archived"
         ].forEach((val) => query.search(val).should.not.equal(-1));
         return {affectedRows: 1};
@@ -754,9 +963,12 @@ class RequestsAPITest {
 
     // Setup fake data
     const INPUT = {
-      from_location: 1,
-      to_location: 2,
-      archived: true
+      from_location: "UCC",
+      to_location: "TEB",
+      archived: true,
+      status: "REJECTED",
+      name: "John Doe",
+      additional_info: "test string"
     };
     const REQUESTS_DATA = undefined;
     FakeSQL.response = REQUESTS_DATA;
@@ -804,9 +1016,10 @@ class RequestsAPITest {
   public putBadId(done: MochaDone) {
     // Setup fake data
     const INPUT = {
-      from_location: 10,
-      to_location: 1,
-      archived: false
+      from_location: "UCC",
+      to_location: "TEB",
+      archived: false,
+      status: "REJECTED"
     };
     const REQUESTS_DATA = {affectedRows: 0};
     FakeSQL.response = REQUESTS_DATA;
@@ -825,6 +1038,26 @@ class RequestsAPITest {
       });
   }
 
+  @test("PUT should fail on invalid ID")
+  public putInvalidId(done: MochaDone) {
+    // Setup fake data
+    const INPUT = {};
+    FakeSQL.response = {};
+
+    // Start request
+    chai.request(serverEnv.nodeServer)
+      .put(pathPrefix + "/requests/fake")
+      .send(INPUT)
+      .end((err, res) => {
+        // Verify results
+        res.should.have.status(400);
+        res.body.should.contain.property("error");
+        res.body.should.contain.property("message");
+        res.body.should.not.contain.property("stack");
+        done();
+      });
+  }
+
   @test("PATCH should update object, ignoring other parameters")
   public patchSuccess(done: MochaDone) {
     // Get SQL connector instance
@@ -835,7 +1068,7 @@ class RequestsAPITest {
     const DB_DATA = {
       id: 1, name: "John Doe", from_location: "SEB",
       to_location: "UCC", additional_info: "additional info",
-      archived: 0, timestamp: "2017-10-26T06:51:05.000Z"
+      archived: 0, timestamp: "2017-10-26T06:51:05.000Z", pairing: null
     };
 
     // Setup fake data
@@ -844,7 +1077,9 @@ class RequestsAPITest {
       from_location: "UCC",
       to_location: "SEB",
       timestamp: "2017-11-26T06:51:05.000Z",
-      extra: "testme"
+      extra: "testme",
+      status: "REJECTED",
+      pairing: 1
     };
     const EXPECTED_RESULTS = {
       id: 1,
@@ -853,16 +1088,18 @@ class RequestsAPITest {
       to_location: "SEB",
       additional_info: "additional info",
       archived: false,
-      timestamp: "2017-10-26T06:51:05.000Z"
+      timestamp: "2017-10-26T06:51:05.000Z",
+      status: "REJECTED",
+      pairing: 1
     };
     FakeSQL.response = (query: string, values: any[]) => {
       if (query.search("^UPDATE") >= 0) {
         // Check query to ensure proper formation
-        query.should.equal("UPDATE `requests` SET from_location=?, to_location=? WHERE id=?");
+        query.should.equal("UPDATE `requests` SET from_location=?, to_location=?, status=?, pairing=? WHERE id=?");
 
         // Check values
         values.splice(-1);  // Remove ID
-        values.should.deep.equal(["UCC", "SEB"]);
+        values.should.deep.equal(["UCC", "SEB", "REJECTED", 1]);
 
         // Remove WHERE parameter since it has the ID
         query = query.substr(0, query.search("WHERE") - 1);
@@ -871,7 +1108,7 @@ class RequestsAPITest {
         ["id", "extra", "timestamp", "archived"].forEach((val) => query.search(val).should.equal(-1));
 
         // Ensure wanted properties are being added
-        ["from_location", "to_location"].forEach((val) => query.search(val).should.not.equal(-1));
+        ["from_location", "to_location", "status", "pairing"].forEach((val) => query.search(val).should.not.equal(-1));
 
         return {affectedRows: 1};
       } else {
@@ -927,8 +1164,8 @@ class RequestsAPITest {
   public patchDupLocations(done: MochaDone) {
     // Setup fake data
     const INPUT = {
-      from_location: 1,
-      to_location: 1
+      from_location: "HI",
+      to_location: "HI"
     };
     const REQUESTS_DATA = undefined;
     FakeSQL.response = REQUESTS_DATA;
@@ -951,8 +1188,8 @@ class RequestsAPITest {
   public patchBadId(done: MochaDone) {
     // Setup fake data
     const INPUT = {
-      from_location: 10,
-      to_location: 1,
+      from_location: "UCC",
+      to_location: "TEB",
       archived: false
     };
     const REQUESTS_DATA = {affectedRows: 0};
@@ -965,6 +1202,26 @@ class RequestsAPITest {
       .end((err, res) => {
         // Verify results
         res.should.have.status(404);
+        res.body.should.contain.property("error");
+        res.body.should.contain.property("message");
+        res.body.should.not.contain.property("stack");
+        done();
+      });
+  }
+
+  @test("PATCH should fail on invalid ID")
+  public patchInvalidId(done: MochaDone) {
+    // Setup fake data
+    const INPUT = {};
+    FakeSQL.response = {};
+
+    // Start request
+    chai.request(serverEnv.nodeServer)
+      .patch(pathPrefix + "/requests/fake")
+      .send(INPUT)
+      .end((err, res) => {
+        // Verify results
+        res.should.have.status(400);
         res.body.should.contain.property("error");
         res.body.should.contain.property("message");
         res.body.should.not.contain.property("stack");

@@ -56,7 +56,7 @@ class MySQLServiceTest {
   }
 
   public before() {
-    // hook for before each test; make static to be after the suite
+    // hook for before each test; make static to be before the suite
   }
 
     // hook for after each test; make static to be after the suite

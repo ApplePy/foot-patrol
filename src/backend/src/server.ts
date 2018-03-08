@@ -17,10 +17,12 @@ import { IRoute } from "./interfaces/iroute";
 @injectable()
 export class Server {
   public app: express.Application;
-  private cookieSecret: "myTotallySecretSecret";
+  private cookieSecret = "myTotallySecretSecret";
 
   // Routes
   private requestRoute: IRoute;
+  private volunteerRoute: IRoute;
+  private pairingRoute: IRoute;
 
   /**
    * Constructor.
@@ -28,9 +30,15 @@ export class Server {
    * @class Server
    * @constructor
    */
-  constructor(@inject (IFACES.IROUTE) @named(TAGS.REQUESTS) requestRoute: IRoute) {
+  constructor(
+    @inject (IFACES.IROUTE) @named(TAGS.REQUESTS) requestRoute: IRoute,
+    @inject (IFACES.IROUTE) @named(TAGS.VOLUNTEERS) volunteerRoute: IRoute,
+    @inject (IFACES.IROUTE) @named(TAGS.PAIRINGS) pairingRoute: IRoute
+  ) {
     // Save DI
     this.requestRoute = requestRoute;
+    this.volunteerRoute = volunteerRoute;
+    this.pairingRoute = pairingRoute;
 
     // create expressjs application
     this.app = express();
@@ -84,6 +92,8 @@ export class Server {
 
     // Start routes
     router.use("/requests", this.requestRoute.Router);
+    router.use("/volunteers", this.volunteerRoute.Router);
+    router.use("/volunteerpairs", this.pairingRoute.Router);
 
     // Greeting page
     router.get("/", (req, res, next) => res.send({greeting: "Welcome to the Foot Patrol API!"}));
