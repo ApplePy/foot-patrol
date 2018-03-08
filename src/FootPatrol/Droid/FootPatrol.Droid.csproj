@@ -158,7 +158,7 @@
     <Compile Include="DirectionsHolder.cs" />
     <Compile Include="UserRequests.cs" />
     <Compile Include="CampusMapsActivity.cs" />
-    <Compile Include="EmergencyContactsActivity.cs" />
+    <Compile Include="NonEmergencyContactsActivity.cs" />
     <Compile Include="PairFootPatrollersActivity.cs" />
     <Compile Include="CheckInActivity.cs" />
   </ItemGroup>
@@ -192,7 +192,7 @@
     <AndroidResource Include="Resources\drawable\westernUniversity.jpg" />
     <AndroidResource Include="Resources\drawable\WesternCampusPolice.jpeg" />
     <AndroidResource Include="Resources\drawable\ic_phone_black_24dp.png" />
-    <AndroidResource Include="Resources\layout\EmergencyContact.xml" />
+    <AndroidResource Include="Resources\layout\NonEmergencyContact.xml" />
     <AndroidResource Include="Resources\drawable\WesternCampusMap.png" />
     <AndroidResource Include="Resources\drawable\WesternFootPatrolMap.png" />
     <AndroidResource Include="Resources\drawable\ic_arrow_back_black_24dp.png" />

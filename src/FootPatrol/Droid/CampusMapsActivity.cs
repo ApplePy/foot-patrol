@@ -36,7 +36,6 @@ namespace FootPatrol.Droid
             AlertDialog.Builder builder = new AlertDialog.Builder(this.Context).SetView(newView);
             Dialog dialog = builder.Create();
             dialog.Show();
-
         }
     }
 }

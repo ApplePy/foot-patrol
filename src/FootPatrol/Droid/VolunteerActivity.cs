@@ -83,7 +83,7 @@ namespace FootPatrol.Droid
         {
             base.OnCreate(savedInstanceState);
 
-            menuItems = new string[] { "EMERGENCY CONTACTS", "CAMPUS MAPS", "PAIR FOOT PATROLLERS", "CHECK-IN"}; //initializes list to displayed in listView 
+            menuItems = new string[] { "NON-EMERGENCY CONTACTS", "CAMPUS MAPS", "PAIR FOOT PATROLLERS", "CHECK-IN"}; //initializes list to displayed in listView 
 
             listAdapter = new ArrayAdapter<string>(this.Context, Resource.Layout.ListElement, menuItems); //initializes ArrayAdapter to be displayed in listView
             layoutManager = new LinearLayoutManager(this.Context, LinearLayoutManager.Horizontal, false); //initializs the directions layout to be horizontal and sidescrolling
@@ -787,8 +787,8 @@ namespace FootPatrol.Droid
             switch (position)
             {
                 case 0:
-                    fragment = new EmergencyContactsActivity();
-                    tag = "EmergencyContactsActivity";
+                    fragment = new NonEmergencyContactsActivity();
+                    tag = "NonEmergencyContactsActivity";
                     break;
 
                 case 1:

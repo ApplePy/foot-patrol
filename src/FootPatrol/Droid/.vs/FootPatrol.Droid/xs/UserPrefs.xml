@@ -1,13 +1,13 @@
 ﻿<Properties StartupConfiguration="{93578BFB-ED5E-4E94-B242-156162A0E1E8}|Default">
-  <MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.Workbench ActiveDocument="NonEmergencyContactsActivity.cs">
     <Files>
-      <File FileName="VolunteerActivity.cs" Line="816" Column="78" />
+      <File FileName="VolunteerActivity.cs" Line="791" Column="31" />
       <File FileName="PairFootPatrollersActivity.cs" Line="1" Column="1" />
-      <File FileName="EmergencyContactsActivity.cs" Line="1" Column="1" />
+      <File FileName="NonEmergencyContactsActivity.cs" Line="19" Column="13" />
       <File FileName="CheckInActivity.cs" Line="21" Column="29" />
       <File FileName="MainActivity.cs" Line="24" Column="10" />
       <File FileName="LoginActivity.cs" Line="87" Column="10" />
-      <File FileName="CampusMapsActivity.cs" Line="35" Column="68" />
+      <File FileName="CampusMapsActivity.cs" Line="38" Column="27" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
