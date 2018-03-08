@@ -40,7 +40,7 @@ namespace FootPatrol.Droid
         private static ImageButton mSideTab, mfSideTab; //side tab buttons for each view
         private static MapView mView; //mapView that displays map on >= API 24
         private static ImageView notificationBase, notificationBadge; //UI for displaying requests
-        public static TextView badgeCounter; //counter that displays number of requests available to the volunteer
+        public static TextView badgeCounter, userName, toLoc, fromLoc, addInfo; //counter that displays number of requests available to the volunteer
         private static ListView mListView, mfListView; //list views for both new and older android devices
         private static RecyclerView mRecyclerView, mfRecyclerView; //recycler views that display directions for new and older android devices
         private static RecyclerView.LayoutManager layoutManager; //layout manager for recycler view
@@ -123,6 +123,10 @@ namespace FootPatrol.Droid
                 completeTripBtn = (Button)view.FindViewById(Resource.Id.completeTripBtn);
                 mRecyclerView = (RecyclerView)view.FindViewById(Resource.Id.recyclerView1);
                 mView = (MapView)view.FindViewById(Resource.Id.map);
+                userName = (TextView)view.FindViewById(Resource.Id.userName1);
+                toLoc = (TextView)view.FindViewById(Resource.Id.userToLoc);
+                fromLoc = (TextView)view.FindViewById(Resource.Id.userFromLoc);
+                addInfo = (TextView)view.FindViewById(Resource.Id.userAddInfo);
 
                 mRelativeLayout.Visibility = ViewStates.Gone; //set the visibility of the complete trip UI to gone
                 mRecyclerView.Visibility = ViewStates.Gone; //set the visibility of the directions UI to gone
@@ -169,6 +173,10 @@ namespace FootPatrol.Droid
                 completeTripBtn = (Button)view.FindViewById(Resource.Id.completeTripBtn1);
                 mf = (SupportMapFragment)this.ChildFragmentManager.FindFragmentById(Resource.Id.map2);
                 mfRecyclerView = (RecyclerView)view.FindViewById(Resource.Id.recyclerView2);
+                userName = (TextView)view.FindViewById(Resource.Id.userName2);
+                toLoc = (TextView)view.FindViewById(Resource.Id.userToLoc1);
+                fromLoc = (TextView)view.FindViewById(Resource.Id.userFromLoc1);
+                addInfo = (TextView)view.FindViewById(Resource.Id.userAddInfo1);
 
                 //set visibilities to gone of UI elements not presently used
                 mfRecyclerView.Visibility = ViewStates.Gone;
@@ -424,6 +432,12 @@ namespace FootPatrol.Droid
             from_location = request.fromLoc;
             additional_info = request.addInfo;
             id = request.id;
+
+            //Set UI elements to display pickup information
+            userName.Text = "Name: " + request.name;
+            toLoc.Text = "End Location: " + request.toLoc;
+            fromLoc.Text = "Start Location: " + request.fromLoc;
+            addInfo.Text = "Additional Information: " + request.addInfo;
 
             var address = from_location; //set the starting user destination as the address
             address = address + " Western University"; //concatenate the address with Western University to narrow the search
