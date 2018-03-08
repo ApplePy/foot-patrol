@@ -20,6 +20,7 @@ using Android.Support.V7.Widget;
 using Android.Support.V4.Widget;
 using System.Threading;
 using static Android.Widget.AdapterView;
+using System.Text.RegularExpressions;
 
 namespace FootPatrol.Droid
 {
@@ -576,12 +577,23 @@ namespace FootPatrol.Droid
                steps.Add(step.ToString());
             }
 
-            for (int i = 0; i < steps.Count;i++)
+            //use regex to remove all unnecessary html tags from directions
+            for (int i = 0; i < steps.Count; i++)
             {
-                steps[i] = steps[i].Replace("<b>", "");
-                steps[i] = steps[i].Replace("</b>", "");
-            }
+                steps[i] = Regex.Replace(steps[i], "<style>(.|\n)*?</style>", string.Empty);
+                steps[i] = Regex.Replace(steps[i], @"<xml>(.|\n)*?</xml>", string.Empty);
+                steps[i] = Regex.Replace(steps[i], @"<(.|\n)*?>", string.Empty);
 
+                //for proper formatting, separate words that are attached
+                if(steps[i].Contains("Destination")) //if the step is the last step
+                {
+                    int spaceIndex = steps[i].IndexOf("Destination", StringComparison.CurrentCulture); //find the index of destination
+                    string substring = steps[i].Substring(spaceIndex); //get the substring containing the destination
+                    steps[i] = steps[i].Remove(spaceIndex); //remove destination from the step
+                    steps.Add(substring); //make a new step containing destination information
+                    break;
+                }
+            }
             return polyPattern;
         }
 

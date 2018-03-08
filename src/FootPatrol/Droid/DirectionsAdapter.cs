@@ -24,7 +24,7 @@ namespace FootPatrol.Droid
         public override void OnBindViewHolder(RecyclerView.ViewHolder holder, int position)
         {
             DirectionsHolder dh = holder as DirectionsHolder; //create new direction holder
-            dh.directions.Text = "Step " + position+1 +": " + dataSet[position]; //set the text to the current position
+            dh.directions.Text = "Step " + (position+1).ToString() +": " + dataSet[position]; //set the text to the current position
         }
 
         /// <summary>
