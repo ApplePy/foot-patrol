@@ -15,7 +15,7 @@ export class TestReplaceHelper {
      * @param data          The data to use
      */
     public static replace(
-      queryFunction: (queryString: string, prepare: any[]) => any,
+      queryFunction: (queryString: string, prepare: any[]) => Promise<any>,
       table: string,
       data: any) {
         // Create questions array
@@ -38,7 +38,7 @@ export class TestReplaceHelper {
      * @param field         The field with a date in it that needs conversion
      */
     public static dateReplace(
-      queryFunction: (queryString: string, prepare: any[]) => any,
+      queryFunction: (queryString: string, prepare: any[]) => Promise<any>,
       table: string,
       dataInfo: object | object[],
       field: string) {
@@ -52,6 +52,7 @@ export class TestReplaceHelper {
         // Stub to make FakeSQL quiet
         const temp = FakeSQL.response;
         FakeSQL.response = {};
+        // TODO: This ^ creates a race condition if there are more than one calls to this function at once
 
         const promises = [];
         for (const data of dataArr) {
