@@ -110,7 +110,8 @@
                 p1:id="@+id/pickupInfo1"
                 p1:text="Pickup Information"
                 p1:layout_above="@+id/userName2"
-                p1:layout_centerHorizontal="true" />
+                p1:layout_centerHorizontal="true"
+                p1:layout_marginBottom="5dp" />
             <TextView
                 p1:id="@+id/line1"
                 p1:paddingTop="5dip"
@@ -118,7 +119,8 @@
                 p1:layout_below="@+id/pickupInfo1"
                 p1:layout_width="match_parent"
                 p1:layout_height="1dp"
-                p1:background="#807F83" />
+                p1:background="#807F83"
+                p1:layout_marginBottom="10dp" />
         </RelativeLayout>
         <ImageButton
             p1:src="@drawable/ic_chevron_right_black_24dp"

@@ -62,6 +62,13 @@ namespace FootPatrol.Droid
             ImageButton closeBtn = (ImageButton)view.FindViewById(Resource.Id.closeButton);
             Button acceptReq = (Button)view.FindViewById(Resource.Id.acceptRequest);
 
+            //Take care of correct fonts
+            Typeface bentonSans = Typeface.CreateFromAsset(this.Activity.Application.Assets, "BentonSansRegular.otf");
+            setFont(bentonSans, name);
+            setFont(bentonSans, toLocation);
+            setFont(bentonSans, fromLocation);
+            setFont(bentonSans, additionalInfo);
+             
             currentCount = 0; //set the initial count to zero
 
             //if there exists more than 1 request
@@ -175,6 +182,11 @@ namespace FootPatrol.Droid
 
                 activeRequests.Add(new UserRequests.Request(userName, toLoc, fromLoc, aInfo, Int32.Parse(requestId)));
             }
+        }
+
+        private void setFont(Typeface font, TextView text)
+        {
+            text.SetTypeface(font, TypefaceStyle.Normal);
         }
     }
 }

@@ -50,10 +50,10 @@ namespace FootPatrol.Droid
 
             //set the fonts of each UI element
             bentonSans = Typeface.CreateFromAsset(this.Activity.Application.Assets, "BentonSansRegular.otf");
-            signIn.SetTypeface(bentonSans, TypefaceStyle.Normal);
-            continueAsUser.SetTypeface(bentonSans, TypefaceStyle.Normal);
-            userName.SetTypeface(bentonSans, TypefaceStyle.Normal);
-            password.SetTypeface(bentonSans, TypefaceStyle.Normal);
+            setFont(bentonSans, signIn);
+            setFont(bentonSans, continueAsUser);
+            setFont(bentonSans, userName);
+            setFont(bentonSans, password);
 
             //sign In button click listener
             signIn.Click += (sender, e) =>
@@ -85,5 +85,11 @@ namespace FootPatrol.Droid
 
             return views;
         }
+
+        private void setFont(Typeface font, TextView text)
+        {
+            text.SetTypeface(font, TypefaceStyle.Normal);
+        }
+
     }
 }

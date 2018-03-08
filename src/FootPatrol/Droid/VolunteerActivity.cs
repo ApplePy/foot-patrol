@@ -29,7 +29,7 @@ namespace FootPatrol.Droid
         public static string name, to_location, from_location, additional_info; //variables to keep name, location and additional information of user
         public static int id;
 
-        private Typeface bentonSans; //font to be used in application
+        public static Typeface bentonSans; //font to be used in application
         private ArrayAdapter<System.String> listAdapter; //adapter to help display directions
         //private bool pickupComplete = false;
 
@@ -39,7 +39,7 @@ namespace FootPatrol.Droid
         private static ImageButton mSideTab, mfSideTab; //side tab buttons for each view
         private static MapView mView; //mapView that displays map on >= API 24
         private static ImageView notificationBase, notificationBadge; //UI for displaying requests
-        public static TextView badgeCounter, userName, toLoc, fromLoc, addInfo; //counter that displays number of requests available to the volunteer
+        public static TextView badgeCounter, userName, toLoc, fromLoc, addInfo, pickupInfo, directionsText; //counter that displays number of requests available to the volunteer
         private static ListView mListView, mfListView; //list views for both new and older android devices
         private static RecyclerView mRecyclerView, mfRecyclerView; //recycler views that display directions for new and older android devices
         private static RecyclerView.LayoutManager layoutManager; //layout manager for recycler view
@@ -126,6 +126,7 @@ namespace FootPatrol.Droid
                 toLoc = (TextView)view.FindViewById(Resource.Id.userToLoc);
                 fromLoc = (TextView)view.FindViewById(Resource.Id.userFromLoc);
                 addInfo = (TextView)view.FindViewById(Resource.Id.userAddInfo);
+                pickupInfo = (TextView)view.FindViewById(Resource.Id.pickupInfo);
 
                 mRelativeLayout.Visibility = ViewStates.Gone; //set the visibility of the complete trip UI to gone
                 mRecyclerView.Visibility = ViewStates.Gone; //set the visibility of the directions UI to gone
@@ -176,6 +177,7 @@ namespace FootPatrol.Droid
                 toLoc = (TextView)view.FindViewById(Resource.Id.userToLoc1);
                 fromLoc = (TextView)view.FindViewById(Resource.Id.userFromLoc1);
                 addInfo = (TextView)view.FindViewById(Resource.Id.userAddInfo1);
+                pickupInfo = (TextView)view.FindViewById(Resource.Id.pickupInfo1);
 
                 //set visibilities to gone of UI elements not presently used
                 mfRecyclerView.Visibility = ViewStates.Gone;
@@ -206,7 +208,15 @@ namespace FootPatrol.Droid
 
             //Take care of correct fonts
             bentonSans = Typeface.CreateFromAsset(this.Activity.Application.Assets, "BentonSansRegular.otf");
+
+            System.Diagnostics.Debug.WriteLine("The directions textview is: " + directionsText);
+
             setFont(bentonSans, badgeCounter);
+            setFont(bentonSans, userName);
+            setFont(bentonSans, toLoc);
+            setFont(bentonSans, fromLoc);
+            setFont(bentonSans, addInfo);
+            setFont(bentonSans, pickupInfo);
 
             //on click listeners for the request notification UI element
             notificationBase.Click += (sender, e) =>
@@ -435,7 +445,7 @@ namespace FootPatrol.Droid
             //Set UI elements to display pickup information
             userName.Text = "Name: " + request.name;
             toLoc.Text = "End Location: " + request.toLoc;
-            fromLoc.Text = "Start Location: " + request.fromLoc;
+            fromLoc.Text = "Start Locatixon: " + request.fromLoc;
             addInfo.Text = "Additional Information: " + request.addInfo;
 
             var address = from_location; //set the starting user destination as the address
