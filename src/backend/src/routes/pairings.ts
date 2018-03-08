@@ -126,6 +126,7 @@ export class VolunteerPairingsRoute extends AbstractRoute implements IRoute {
 
     // If archived records are not requested, filter by 'false'. Otherwise, don't filter to get both true and false
     this.data.getPairings(filterMap)
+    .then((pairings) => pairings.map((pairing) => this.formatPair(pairing)))
     .then((pairs) => res.send({pairs})) // Send results
     .catch((err) => next(this.translateErrors(err))); // Send generic error
   }
@@ -200,6 +201,7 @@ export class VolunteerPairingsRoute extends AbstractRoute implements IRoute {
     }
 
     this.data.getPairing(id)
+    .then((pairing) => this.formatPair(pairing))
     .then((data) => res.send(data))
     .catch((err) => next(this.translateErrors(err))); // Send generic error
   }
@@ -281,6 +283,7 @@ export class VolunteerPairingsRoute extends AbstractRoute implements IRoute {
     // Insert into database and get resulting record
     .then((postData) => this.data.createPairing(postData))
     .then((id) => this.data.getPairing(id))
+    .then((pairing) => this.formatPair(pairing))
     .then((getRes) => res.status(201).send(getRes))
     .catch((err) => next(this.translateErrors(err))); // Send generic error
   }
@@ -326,7 +329,7 @@ export class VolunteerPairingsRoute extends AbstractRoute implements IRoute {
     }
 
     // Check active status
-    if (this.validValues(req.body.active, "false", "true") === false) {
+    if (this.validValues(req.body.active, "false", "true", true, false) === false) {
       next(new StatusError(400,
         errStrings.InvalidBodyParameter.Title,
         errStrings.InvalidBodyParameter.Msg));
@@ -355,10 +358,14 @@ export class VolunteerPairingsRoute extends AbstractRoute implements IRoute {
     }
 
     // Check values
+    const dupChecker = new Set<number>();
     for (const val of req.body.volunteers) {
-      if (Number.isSafeInteger(val) === false || val <= 0) {
+      if (Number.isSafeInteger(val) === false || val <= 0 || dupChecker.has(Number(val))) {
         return false;
       }
+
+      // Add to set to check for duplicates
+      dupChecker.add(Number(val));
     }
 
     // Sort volunter IDs
@@ -367,6 +374,19 @@ export class VolunteerPairingsRoute extends AbstractRoute implements IRoute {
     return {
       active: Boolean(req.body.active),
       volunteers: ids.map((x) => this.volmgr.getVolunteer(x))
+    };
+  }
+
+  /**
+   * Converts a VolunteerPairing into the format used in the api
+   *
+   * @param pair The pair to be converted
+   */
+  private formatPair(pair: VolunteerPairing) {
+    return {
+      id: pair.id,
+      volunteers: [pair.volunteer_one, pair.volunteer_two],
+      active: pair.active
     };
   }
 }

@@ -23,7 +23,7 @@ const pathPrefix = "";  // For adding '/api/v1' to api calls if needed
 /**
  * Test the Locations API
  */
-@suite.only
+@suite
 class VolunteersAPITest {
 
   public static before(done: MochaDone) {
@@ -318,7 +318,6 @@ class VolunteersAPITest {
       last_name: "Doe", disabled: false
     };
     const REQUESTS_DATA = (query: string, values: any[]) => {
-      console.log(query, values);
       const newId = 2;
       if (query.search("^INSERT") >= 0) {
         // Ensure unwanted properties are not being added
