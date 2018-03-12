@@ -375,7 +375,9 @@ export class VolunteersRoute extends AbstractRoute implements IRoute {
       uwo_id: this.sanitizer.sanitize,
       first_name: this.sanitizer.sanitize,
       last_name: this.sanitizer.sanitize,
-      disabled: Boolean
+      disabled: Boolean,
+      latitude: this.sanitizer.sanitize,
+      longitude: this.sanitizer.sanitize
     };
 
     // List of sanitized data
@@ -508,6 +510,8 @@ export class VolunteersRoute extends AbstractRoute implements IRoute {
       const first_name = this.sanitizer.sanitize(req.body.first_name);
       const last_name = this.sanitizer.sanitize(req.body.last_name);
       const disabled = (req.body.disabled === true || req.body.disabled === "true") ? true : false;
+      const latitude = this.sanitizer.sanitize(req.body.latitude);
+      const longitude = this.sanitizer.sanitize(req.body.longitude);
       // tslint:enable:variable-name
 
       // Check that the strings aren't empty
@@ -517,7 +521,7 @@ export class VolunteersRoute extends AbstractRoute implements IRoute {
         }
       }
 
-      return {uwo_id, first_name, last_name, disabled};
+      return {uwo_id, first_name, last_name, disabled, latitude, longitude};
     } catch (err) {
       return false;
     }

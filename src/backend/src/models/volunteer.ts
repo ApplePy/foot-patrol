@@ -30,7 +30,7 @@ export class Volunteer {
       disabled: (field: any) => (field === "false") ? false : Boolean(field),
       latitude: String,
       longitude: String,
-      timestamp: Date
+      timestamp: (field: any) => new Date(field)
     };
 
     // Check if a value is valid before trying assignment
