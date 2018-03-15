@@ -9,7 +9,9 @@ import { IFACES, TAGS } from "./ids";
 import { ErrorMiddleware as ErrMid } from "./services/loggers";
 
 // Routes
+import { IHook, RunPosition } from "./interfaces/ihook";
 import { IRoute } from "./interfaces/iroute";
+import { ITask } from "./interfaces/itask";
 
 /**
  * The Express server.
@@ -23,6 +25,8 @@ export class Server {
   private requestRoute: IRoute;
   private volunteerRoute: IRoute;
   private pairingRoute: IRoute;
+  private hooks: IHook[];
+  private tasks: ITask[];
 
   /**
    * Constructor.
@@ -39,6 +43,8 @@ export class Server {
     this.requestRoute = requestRoute;
     this.volunteerRoute = volunteerRoute;
     this.pairingRoute = pairingRoute;
+    this.hooks = [];
+    this.tasks = [];
 
     // create expressjs application
     this.app = express();
@@ -48,6 +54,9 @@ export class Server {
 
     // add api
     this.api();
+
+    // Add post-api configuration
+    this.postConfig();
 
     // add error handling
     this.errorHandling();
@@ -81,6 +90,21 @@ export class Server {
       res.setHeader("Content-Type", "application/json");
       next();
     });
+
+    // Register tasks
+    for (const task of this.tasks) {
+      task.register();
+    }
+
+    // Get pre-hooks
+    const hooks = this.hooks.filter((x) => x.time === RunPosition.PRE);
+
+    // Attach all hooks
+    this.app.use((req, res, next) => {
+      for (const hook of hooks) {
+        this.callHook(hook, req, next);
+      }
+    });
   }
 
   /**
@@ -109,6 +133,39 @@ export class Server {
 
     // Use router middleware
     this.app.use("/", router);
+  }
+
+  /**
+   * Call an API hook
+   */
+  private callHook(hook: IHook, req: express.Request, next: express.NextFunction) {
+    // Create new function to automatically call next
+    const wrap = (request: express.Request, nextFunc: express.NextFunction) => {
+      hook.callback(request); nextFunc();
+    };
+
+    // Call async if requested, normal otherwise
+    if (hook.async) {
+      setTimeout(wrap.bind(hook), 0, req, next);
+    } else {
+      wrap.call(hook, req);
+      next();
+    }
+  }
+
+  /**
+   * Run configuration after the API routes
+   */
+  private postConfig() {
+    // Get post-hooks
+    const hooks = this.hooks.filter((x) => x.time === RunPosition.POST);
+
+    // Call post-API hooks
+    this.app.use((req, res, next) => {
+      for (const hook of hooks) {
+        this.callHook(hook, req, next);
+      }
+    });
   }
 
   /**
