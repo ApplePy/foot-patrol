@@ -102,8 +102,9 @@ export class Server {
     // Attach all hooks
     this.app.use((req, res, next) => {
       for (const hook of hooks) {
-        this.callHook(hook, req, next);
+        this.callHook(hook, req);
       }
+      next();
     });
   }
 
@@ -138,7 +139,7 @@ export class Server {
   /**
    * Call an API hook
    */
-  private callHook(hook: IHook, req: express.Request, next: express.NextFunction) {
+  private callHook(hook: IHook, req: express.Request) {
     // Create new function to automatically call next
     const wrap = (request: express.Request, nextFunc: express.NextFunction) => {
       hook.callback(request); nextFunc();
@@ -146,10 +147,9 @@ export class Server {
 
     // Call async if requested, normal otherwise
     if (hook.async) {
-      setTimeout(wrap.bind(hook), 0, req, next);
+      setTimeout(wrap.bind(hook), 0, req);
     } else {
       wrap.call(hook, req);
-      next();
     }
   }
 
@@ -163,8 +163,9 @@ export class Server {
     // Call post-API hooks
     this.app.use((req, res, next) => {
       for (const hook of hooks) {
-        this.callHook(hook, req, next);
+        this.callHook(hook, req);
       }
+      next();
     });
   }
 
