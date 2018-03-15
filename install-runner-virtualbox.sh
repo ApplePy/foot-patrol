@@ -56,21 +56,21 @@ install () {
   echo $PASSWORD | sudo -kS echo; brew cask install vagrant
 
   # Setup VM
-  vagrant up
+  echo $PASSWORD | sudo -kS -u root -H vagrant up
 
   # Install Xcode helpers
   echo $PASSWORD | sudo -kS gem install xcpretty
 
   # Setup gitlab-runner
   echo $PASSWORD | sudo -kS cp .vagrant/machines/default/virtualbox/private_key ~root/.gitlab-runner-private-key
-  echo $PASSWORD | sudo -kS gitlab-runner register --non-interactive -r $CI_TOKEN --tag-list mac,xamarin -u https://incode.ca/ --executor virtualbox --virtualbox-base-name high-sierra-dev --ssh-user vagrant --ssh-identity-file ~root/.gitlab-runner-private-key
+  echo $PASSWORD | sudo -kS gitlab-runner register --non-interactive -r $CI_TOKEN --tag-list mac,xamarin.ios,xamarin.android,android-26 -u https://incode.ca/ --executor virtualbox --virtualbox-base-name high-sierra-dev --ssh-user vagrant --ssh-identity-file ~root/.gitlab-runner-private-key
   echo $PASSWORD | sudo -kS gitlab-runner install -u root -d ~root
   echo $PASSWORD | sudo -S sed '/^$/N;/^\n$/i\
-<key>EnvironmentVariables</key><dict><key>HOME</key><string>/var/root</string></dict>' /Library/LaunchDaemons/gitlab-runner.plist | sudo sh -c "cat > /Library/LaunchDaemons/gitlab-runner.plist"
+<key>EnvironmentVariables</key><dict><key>HOME</key><string>/var/root</string><key>PATH</key><string>/bin:/usr/bin:/usr/local/bin</string></dict>' /Library/LaunchDaemons/gitlab-runner.plist | sudo sh -c "cat > /Library/LaunchDaemons/gitlab-runner.plist"
   echo $PASSWORD | sudo -kS gitlab-runner start
 
   # Shutdown VM
-  vagrant halt
+  echo $PASSWORD | sudo -kS -u root -H vagrant halt
 }
 
 uninstall () {
@@ -98,7 +98,7 @@ uninstall () {
   echo $PASSWORD | sudo -kS rm ~root/.gitlab-runner-private-key
 
   # Shutdown VM
-  vagrant destroy -f
+  echo $PASSWORD | sudo -kS -u root -H vagrant destroy -f
 
   # Uninstall runner
   echo $PASSWORD | sudo -kS gitlab-runner stop

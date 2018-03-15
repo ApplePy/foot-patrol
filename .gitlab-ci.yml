@@ -4,11 +4,11 @@
 
 # Ensure that the back passes its tests first since the front relies on the back
 stages:
-  - test
-  - posttest
-  - build
-  - containerize
-  - deploy
+- test
+- posttest
+- build
+- containerize
+- deploy
 
 variables:
   # NPM_CACHE: http://docker-npm-cache-sonatype-nexus.default.svc.cluster.local:8081/repository/npm-group/
@@ -29,17 +29,16 @@ variables:
   except:
   - temp
   - tags
-  artifacts:
-    expire_in: 1 hour
   image: docker:latest
   services:
   - name: docker:dind
     command: ["--registry-mirror=http://registry.internal.incode.ca:80"]
   artifacts:
-   paths:
-   - top.json
-   - backend.json
-   - frontend.json
+    expire_in: 1 hour
+    paths:
+    - top.json
+    - backend.json
+    - frontend.json
   before_script:
   - docker pull codeclimate/codeclimate
 
@@ -78,8 +77,6 @@ variables:
   except:
   - temp
   - tags
-  artifacts:
-    expire_in: 2 weeks
 
 .test_docker_common: &test_docker_common
   <<: *test_common
@@ -108,23 +105,23 @@ test_backend:
     MYSQL_USER: root
     MYSQL_DB: foot_patrol
   services:
-    - mysql:latest
+  - mysql:latest
   artifacts:
+    expire_in: 2 weeks
     paths:
-      - src/backend/coverage/
+    - src/backend/coverage/
   cache:
     key: backend
     paths:
-      - src/backend/node_modules/
+    - src/backend/node_modules/
   script:
-   - apt-get update && apt-get install mysql-client -y && rm -rf /var/lib/apt/lists/* # TODO: Do something better than this
-   - cd src/backend
-   - rm package-lock.json || true   # So that cache server works
-   - npm install
-   - sleep $DB_SLEEP_TIME # Wait for DB to become ready
-   - echo "CREATE USER 'footpatrol'@'%' IDENTIFIED BY 'password'; CREATE DATABASE IF NOT EXISTS foot_patrol;" | mysql -h $MYSQL_HOST -u $MYSQL_USER --password=$MYSQL_PASS
-   - mysql -h $MYSQL_HOST -u $MYSQL_USER --password=$MYSQL_PASS < ./sql_statements.sql
-   - npm run coverage # Finally run tests
+  - apt-get update && apt-get install mysql-client -y && rm -rf /var/lib/apt/lists/* # TODO: Do something better than this
+  - cd src/backend
+  - npm install
+  - sleep $DB_SLEEP_TIME # Wait for DB to become ready
+  - echo "CREATE USER 'footpatrol'@'%' IDENTIFIED BY 'password'; CREATE DATABASE IF NOT EXISTS foot_patrol;" | mysql -h $MYSQL_HOST -u $MYSQL_USER --password=$MYSQL_PASS
+  - mysql -h $MYSQL_HOST -u $MYSQL_USER --password=$MYSQL_PASS < ./sql_statements.sql
+  - npm run coverage # Finally run tests
 
 
 # This test ensures the front end works
@@ -132,37 +129,35 @@ test_dispatch_website:
   <<: *test_docker_common
   image: amio/node-chrome   # Contains both Node 8 and Chrome (https://incode.ca/capstone/docker-node-chrome mirrored from https://github.com/amio/docker-node-chrome)
   artifacts:
+    expire_in: 2 weeks
     paths:
-      - src/dispatch-website/coverage/
+    - src/dispatch-website/coverage/
   cache:
     key: frontend
     paths:
-      - src/dispatch-website/node_modules/
+    - src/dispatch-website/node_modules/
   script:
-   - cd src/dispatch-website
-   - rm package-lock.json || true   # So that cache server works
-   - npm install
-   - npm run coverage
-   # - npm run e2e          # TODO: Do we want e2e testing?
+  - cd src/dispatch-website
+  - npm install
+  - npm run coverage
+  # - npm run e2e          # TODO: Do we want e2e testing?
 
 
 # Handle linting and other code quality errors
 .codequality:
-  <<: *test_common
+  <<: *test_docker_common
   stage: posttest
   image: python:3
   dependencies:
   - quality_top
   - quality_frontend
   - quality_backend
-  tags:
-  - docker
-  - linux
   artifacts:
-   paths:
-   - codeclimate.json
+    expire_in: 2 weeks
+    paths:
+    - codeclimate.json
   script:
-   - python join.py top.json backend.json frontend.json codeclimate.json
+  - python join.py top.json backend.json frontend.json codeclimate.json
 
 # This test ensures the front end works
 # test_mobile:
@@ -189,6 +184,30 @@ test_dispatch_website:
   stage: build
   dependencies: []
 
+.build_mobile_common: &build_mobile_common
+  <<: *build_common
+  tags:
+  - xamarin.ios
+  - xamarin.android
+  cache:
+    key: mobile
+    paths:
+    - src/FootPatrol/packages/
+    - src/FootPatrol/Droid/packages/
+    - src/FootPatrol/iOS/packages/
+  artifacts:
+    expire_in: 2 weeks
+    paths:
+    - mobile_output/
+  before_script:
+  - mkdir mobile_output
+  - pushd .
+  - cd src/FootPatrol
+  - nuget restore FootPatrol.sln
+  - cd Droid
+  - nuget restore FootPatrol.Droid.sln
+  - popd
+
 .build_docker_common: &build_docker_common
   <<: *build_common
   image: registry.incode.ca/capstone/foot-patrol/node_type:8
@@ -197,59 +216,57 @@ test_dispatch_website:
   - linux
 
 .build_review_common: &build_review_common
-  artifacts:
-    expire_in: 1 day
   except:
-    - master
-    - develop
-    - tags
+  - master
+  - develop
+  - tags
 
 .build_deploy_common: &build_deploy_common
-  artifacts:
-    expire_in: 2 weeks
   only:
-    - master
-    - develop
+  - master
+  - develop
 
 .website: &website
   artifacts:
+    expire_in: 2 weeks
     paths:
-     - src/dispatch-website/dist/
-     - src/dispatch-website/docs/
+    - src/dispatch-website/dist/
+    - src/dispatch-website/docs/
   cache:
     policy: pull
     key: frontend
     paths:
-      - src/dispatch-website/node_modules/
+    - src/dispatch-website/node_modules/
   script:
-   - cd src/dispatch-website
-   - npm install typedoc
-   - npm install
-   - npm run docs
-   - if [ $CI_COMMIT_REF_NAME == "master" ]; then export PUBLIC_URL="$DOMAIN"; elif [ $CI_COMMIT_REF_NAME == "develop" ]; then export PUBLIC_URL="staging.$DOMAIN"; else export PUBLIC_URL="$CI_COMMIT_REF_SLUG.$DOMAIN"; fi
-   - envsubst < src/environments/environment.prod.ts > src/environments/environment.prod2.ts # Do a replacement of environment.prod.ts of ${PUBLIC_URL}
-   - mv src/environments/environment.prod2.ts src/environments/environment.prod.ts
-   - npm run build -- --prod --env=prod  # Do a replacement of environment.prod.ts of ${PUBLIC_URL}
+  - cd src/dispatch-website
+  - npm install typedoc
+  - npm install
+  - npm run docs
+  - if [ $CI_COMMIT_REF_NAME == "master" ]; then export PUBLIC_URL="$DOMAIN"; elif [ $CI_COMMIT_REF_NAME == "develop" ]; then export PUBLIC_URL="staging.$DOMAIN"; else export PUBLIC_URL="$CI_COMMIT_REF_SLUG.$DOMAIN"; fi
+  - envsubst < src/environments/environment.prod.ts > src/environments/environment.prod2.ts # Do a replacement of environment.prod.ts of ${PUBLIC_URL}
+  - mv src/environments/environment.prod2.ts src/environments/environment.prod.ts
+  - npm run build -- --prod --env=prod  # Do a replacement of environment.prod.ts of ${PUBLIC_URL}
 
 .backend: &backend
   artifacts:
+    expire_in: 2 weeks
     paths:
-     - src/backend/dist/
-     - src/backend/node_modules/
-     - src/backend/docs/
-     - src/backend/apidocs/
+    - src/backend/dist/
+    - src/backend/node_modules/
+    - src/backend/docs/
+    - src/backend/apidocs/
   cache:
     policy: pull
     key: backend
     paths:
-      - src/backend/node_modules/
+    - src/backend/node_modules/
   script:
-   - cd src/backend
-   - npm install typedoc apidoc # Can't hurt, will get caught by cache if available
-   - npm run docs
-   - npm prune --production   # Remove non-production packages that came in with the cache
-   - npm install --production # If no cache
-   - npm run build_production
+  - cd src/backend
+  - npm install typedoc apidoc # Can't hurt, will get caught by cache if available
+  - npm run docs
+  - npm prune --production   # Remove non-production packages that came in with the cache
+  - npm install --production # If no cache
+  - npm run build_production
 
 
 ### --- REVIEW --- ###
@@ -266,17 +283,19 @@ build_review_backend:
   <<: *build_docker_common
   <<: *backend
 
-# build_review_mobile:  # TODO: Figure this out
-#   <<: *build_review_common
-#   tags:
-#   - ios
-#   - android
-#   artifacts:
-#     paths:
-#      -  src/mobile-app  # TODO: Remember to filter this better after figuring out how to compile this app
-#   script:
-#    - cd src/mobile-app
-#    # TODO: Figure out how to compile this app
+build_review_mobile:
+  <<: *build_review_common
+  <<: *build_mobile_common
+  script:
+  - pushd .
+  - cd src/FootPatrol/Droid
+  - msbuild FootPatrol.Droid.sln "/p:Configuration=Debug" "/p:AndroidSdkDirectory=/usr/local/share/android-sdk" "/t:PackageForAndroid"
+  - popd
+  - find . -name \*.apk -exec cp -r {} mobile_output \;
+  - find . -type d -name \*.mSYM -exec cp -r {} mobile_output \;
+  - find . -name \*.ipa -exec cp -r {} mobile_output \;
+  - find . -type d -name \*.dSYM -exec cp -r {} mobile_output \;
+  # - msbuild FootPatrol.iOS.csproj "/p:Configuration=Debug;Platform=iPhone"
 
 
 ### --- DEPLOYMENT --- ###
@@ -295,17 +314,21 @@ build_backend:
 
 
 # This job builds the mobile app for deployment
-# build_mobile:
-#   <<: *build_deploy_common
-#   tags:
-#   - ios
-#   - android
-#   artifacts:
-#     paths:
-#      -  src/mobile-app  # TODO: Remember to filter this better after figuring out how to compile this app
-#   script:
-#    - cd src/mobile-app
-#    # TODO: Figure out how to compile this app
+build_mobile:
+  <<: *build_mobile_common
+  <<: *build_deploy_common
+  script:
+  - pushd .
+  - cd src/FootPatrol/Droid
+  - msbuild FootPatrol.Droid.sln "/p:Configuration=Release" "/p:AndroidSdkDirectory=/usr/local/share/android-sdk" "/t:PackageForAndroid"
+  - popd
+  - find . -name \*.apk -exec cp -r {} mobile_output \;
+  - find . -type d -name \*.mSYM -exec cp -r {} mobile_output \;
+  - find . -name \*.ipa -exec cp -r {} mobile_output \;
+  - find . -type d -name \*.dSYM -exec cp -r {} mobile_output \;
+  # - msbuild FootPatrol.Droid.sln /t:SignAndroidPackage /p:Configuration=Release 
+  # - cd ..
+  # - msbuild FootPatrol.sln "/p:Configuration=Debug;Platform=iPhone"
 
 
 #################################
@@ -325,30 +348,30 @@ build_backend:
 
 .containerize_review_common: &containerize_review_common
   except:
-    - master
-    - develop
-    - tags
+  - master
+  - develop
+  - tags
   variables:
     TAG: $CI_COMMIT_REF_SLUG
 
 .containerize_deploy_common: &containerize_deploy_common
   only:
-    - master
-    - develop
+  - master
+  - develop
   variables:
     TAG: $CI_COMMIT_REF_SLUG-$CI_COMMIT_SHA
   
 .web_container: &web_container
   script:
-   - cd src/dispatch-website
-   - docker build --no-cache -t $CI_REGISTRY_IMAGE/webapp:$TAG .
-   - docker push $CI_REGISTRY_IMAGE/webapp:$TAG
+  - cd src/dispatch-website
+  - docker build --no-cache -t $CI_REGISTRY_IMAGE/webapp:$TAG .
+  - docker push $CI_REGISTRY_IMAGE/webapp:$TAG
 
 .back_container: &back_container
   script:
-   - cd src/backend
-   - docker build --no-cache -t $CI_REGISTRY_IMAGE/backend:$TAG .
-   - docker push $CI_REGISTRY_IMAGE/backend:$TAG
+  - cd src/backend
+  - docker build --no-cache -t $CI_REGISTRY_IMAGE/backend:$TAG .
+  - docker push $CI_REGISTRY_IMAGE/backend:$TAG
 
 .back_docs_container: &back_docs_container
   script:
@@ -444,9 +467,9 @@ containerize_website_docs:
   stage: deploy
   dependencies: []
   tags:
-    - docker
-    - linux
-    - kubernetes
+  - docker
+  - linux
+  - kubernetes
   before_script:
   - helm init --client-only --tiller-namespace $NAMESPACE
   - helm repo add stable https://kubernetes-charts.storage.googleapis.com/
@@ -464,39 +487,39 @@ deploy_review:
     COMMON_INSTALL_HELM: --tiller-namespace $NAMESPACE --namespace ${NAMESPACE} --set appLabel=$CI_ENVIRONMENT_SLUG,dockercfg=$DOCKERCFG,imageBase=$CI_REGISTRY_IMAGE
     HELM_CHART: deploy/charts/foot-patrol
   script:
-    - helm dependency build $HELM_CHART
-    - helm delete --purge $CI_ENVIRONMENT_SLUG --tiller-namespace $NAMESPACE || true    # Remove the old deploy to ensure the containers are updated
-    - helm upgrade $CI_ENVIRONMENT_SLUG $HELM_CHART --install $COMMON_INSTALL_HELM --set backend.replicas=1,webapp.replicas=1,imageTag=$TAG,ingress.hosts={"$CI_COMMIT_REF_SLUG.$DOMAIN"},$DB_CONFIG
-    - cd src/backend
-    - until [ $(kubectl get pods -n $NAMESPACE | grep "$CI_ENVIRONMENT_SLUG-mysql" | grep -o "1/1") ]; do echo "mysql not ready..."; sleep 15; done
-    - sleep $DB_SLEEP_TIME  # Wait out any bugs
-    - mysql -h $DB_HOST -u root --password=$DB_ROOT_PASS < sql_statements.sql
+  - helm dependency build $HELM_CHART
+  - helm delete --purge $CI_ENVIRONMENT_SLUG --tiller-namespace $NAMESPACE || true    # Remove the old deploy to ensure the containers are updated
+  - helm upgrade $CI_ENVIRONMENT_SLUG $HELM_CHART --install $COMMON_INSTALL_HELM --set backend.replicas=1,webapp.replicas=1,imageTag=$TAG,ingress.hosts={"$CI_COMMIT_REF_SLUG.$DOMAIN"},$DB_CONFIG
+  - cd src/backend
+  - until [ $(kubectl get pods -n $NAMESPACE | grep "$CI_ENVIRONMENT_SLUG-mysql" | grep -o "1/1") ]; do echo "mysql not ready..."; sleep 15; done
+  - sleep $DB_SLEEP_TIME  # Wait out any bugs
+  - mysql -h $DB_HOST -u root --password=$DB_ROOT_PASS < sql_statements.sql
   environment:
     name: review/$CI_COMMIT_REF_NAME
     url: http://$CI_COMMIT_REF_SLUG.$DOMAIN/
     on_stop: shutdown_review
   except:
-    - master
-    - develop
-    - tags
+  - master
+  - develop
+  - tags
 
 
 # This job stops the deployment containers
 shutdown_review:
   <<: *deploy_common
   variables:
-      GIT_STRATEGY: None
+    GIT_STRATEGY: None
   when: manual
   script:
-    - helm delete --purge $CI_ENVIRONMENT_SLUG --tiller-namespace $NAMESPACE
+  - helm delete --purge $CI_ENVIRONMENT_SLUG --tiller-namespace $NAMESPACE
   environment:
     name: review/$CI_COMMIT_REF_NAME
     url: https://$CI_COMMIT_REF_SLUG.$DOMAIN/
     action: stop
   except:
-    - master
-    - develop
-    - tags
+  - master
+  - develop
+  - tags
 
 ### --- Staging --- ###
 
@@ -509,34 +532,34 @@ staging:
     COMMON_INSTALL_HELM: --tiller-namespace $NAMESPACE --namespace ${NAMESPACE} --set appLabel=$CI_ENVIRONMENT_SLUG,dockercfg=$DOCKERCFG,imageBase=$CI_REGISTRY_IMAGE
     HELM_CHART: deploy/charts/foot-patrol
   script:
-    - helm dependency build $HELM_CHART
-    - helm upgrade $CI_ENVIRONMENT_SLUG $HELM_CHART --install $COMMON_INSTALL_HELM --set ingress.hosts={"staging.$DOMAIN"},imageTag=$TAG,$DB_CONFIG
-    - cd src/backend
-    - until [ $(kubectl get pods -n $NAMESPACE | grep "$CI_ENVIRONMENT_SLUG-mysql" | grep -o "1/1") ]; do echo "mysql not ready..."; sleep 15; done
-    - sleep $DB_SLEEP_TIME  # Wait out any bugs
-    - mysql -h $DB_HOST -u root --password=$DB_ROOT_PASS < sql_statements.sql
+  - helm dependency build $HELM_CHART
+  - helm upgrade $CI_ENVIRONMENT_SLUG $HELM_CHART --install $COMMON_INSTALL_HELM --set ingress.hosts={"staging.$DOMAIN"},imageTag=$TAG,$DB_CONFIG
+  - cd src/backend
+  - until [ $(kubectl get pods -n $NAMESPACE | grep "$CI_ENVIRONMENT_SLUG-mysql" | grep -o "1/1") ]; do echo "mysql not ready..."; sleep 15; done
+  - sleep $DB_SLEEP_TIME  # Wait out any bugs
+  - mysql -h $DB_HOST -u root --password=$DB_ROOT_PASS < sql_statements.sql
   environment:
     name: staging
     url: http://staging.$DOMAIN/
     on_stop: shutdown_staging
   only:
-    - develop
+  - develop
 
 
 # This job stops the deployment containers
 shutdown_staging:
   <<: *deploy_common
   variables:
-      GIT_STRATEGY: None
+    GIT_STRATEGY: None
   when: manual
   script:
-    - helm delete --purge $CI_ENVIRONMENT_SLUG --tiller-namespace $NAMESPACE
+  - helm delete --purge $CI_ENVIRONMENT_SLUG --tiller-namespace $NAMESPACE
   environment:
     name: staging
     url: http://staging.$DOMAIN/
     action: stop
   only:
-    - develop
+  - develop
 
 ### --- PRODUCTION --- ###
 
@@ -549,18 +572,18 @@ production:
     COMMON_INSTALL_HELM: --tiller-namespace $NAMESPACE --namespace ${NAMESPACE} --set appLabel=$CI_ENVIRONMENT_SLUG,dockercfg=$DOCKERCFG,imageBase=$CI_REGISTRY_IMAGE
     HELM_CHART: deploy/charts/foot-patrol
   script:
-    - helm dependency build $HELM_CHART
-    - helm upgrade $CI_ENVIRONMENT_SLUG $HELM_CHART --install $COMMON_INSTALL_HELM --set ingress.hosts={"$DOMAIN"},imageTag=$TAG,$DB_CONFIG
-    - cd src/backend
-    - until [ $(kubectl get pods -n $NAMESPACE | grep "$CI_ENVIRONMENT_SLUG-mysql" | grep -o "1/1") ]; do echo "mysql not ready..."; sleep 15; done
-    - sleep $DB_SLEEP_TIME  # Wait out any bugs
-    - mysql -h $DB_HOST -u root --password=$DB_ROOT_PASS < sql_statements.sql
+  - helm dependency build $HELM_CHART
+  - helm upgrade $CI_ENVIRONMENT_SLUG $HELM_CHART --install $COMMON_INSTALL_HELM --set ingress.hosts={"$DOMAIN"},imageTag=$TAG,$DB_CONFIG
+  - cd src/backend
+  - until [ $(kubectl get pods -n $NAMESPACE | grep "$CI_ENVIRONMENT_SLUG-mysql" | grep -o "1/1") ]; do echo "mysql not ready..."; sleep 15; done
+  - sleep $DB_SLEEP_TIME  # Wait out any bugs
+  - mysql -h $DB_HOST -u root --password=$DB_ROOT_PASS < sql_statements.sql
   environment:
     name: production
     url: http://$DOMAIN/
     on_stop: shutdown
   only:
-    - master
+  - master
 
 
 # This job stops the deployment containers
@@ -570,10 +593,10 @@ shutdown:
       GIT_STRATEGY: None
   when: manual
   script:
-    - helm delete --purge $CI_ENVIRONMENT_SLUG --tiller-namespace $NAMESPACE
+  - helm delete --purge $CI_ENVIRONMENT_SLUG --tiller-namespace $NAMESPACE
   environment:
     name: production
     url: http://$DOMAIN/
     action: stop
   only:
-    - master
+  - master
