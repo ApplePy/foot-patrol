@@ -10,8 +10,8 @@ export class Volunteer {
   public first_name: string = "";
   public last_name: string = "";
   public disabled: boolean = false;
-  public latitude: String = "";
-  public longitude: String = "";
+  public latitude: string = "";
+  public longitude: string = "";
   public timestamp: Date = new Date();
 
   /* tslint:enable:variable-name */
