@@ -737,7 +737,10 @@ class VolunteersAPITest {
     // Fake data
     const DB_DATA = {
       id: 1, uwo_id: "jdoe37", first_name: "John",
-      last_name: "Doe", disabled: false
+      last_name: "Doe", disabled: false,
+      latitude: "42.9849",
+      longitude: "81.2453",
+      timestamp: "2017-10-26T06:51:05.000Z"
     };
 
     // Setup fake data
@@ -748,7 +751,10 @@ class VolunteersAPITest {
     };
     const EXPECTED_RESULTS = {
       id: 1, uwo_id: "jdoe37", first_name: "John",
-      last_name: "Doe", disabled: true
+      last_name: "Doe", disabled: true,
+      latitude: "42.9849",
+      longitude: "81.2453",
+      timestamp: "2017-10-26T06:51:05.000Z"
     };
 
     // Setup DB with data
