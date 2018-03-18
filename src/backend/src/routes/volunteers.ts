@@ -364,9 +364,9 @@ export class VolunteersRoute extends AbstractRoute implements IRoute {
    * @apiParam {string} [first_name] First name of the volunteer.
    * @apiParam {string} [last_name] Last name of the volunteer.
    * @apiParam {boolean} [disabled] Whether the volunteer should be disabled.
-   * @apiParam {string} latitude Last known volunteer latitude.
-   * @apiParam {string} longitude Last known volunteer longitude.
-   * @apiParam {string} timestamp Timestamp of last update to volunteer location.
+   * @apiParam {string} [latitude] Last known volunteer latitude.
+   * @apiParam {string} [longitude] Last known volunteer longitude.
+   * @apiParam {string} [timestamp] Timestamp of last update to volunteer location.
    *
    * @apiSuccess {number} id The record ID.
    * @apiSuccess {string} uwo_id UWO ID of the volunter.

@@ -86,15 +86,24 @@ class VolunteersAPITest {
     const DB_DATA = [
       {
         id: 1, uwo_id: "jdoe37", first_name: "John",
-        last_name: "Doe", disabled: false
+        last_name: "Doe", disabled: false,
+        latitude: "42.9849",
+        longitude: "81.2453",
+        timestamp: "2017-10-26T06:51:05.000Z"
       },
       {
         id: 2, uwo_id: "jdoe38", first_name: "Jane",
-        last_name: "Doe", disabled: false
+        last_name: "Doe", disabled: false,
+        latitude: "42.9849",
+        longitude: "81.2453",
+        timestamp: "2017-10-26T06:51:05.000Z"
       },
       {
         id: 3, uwo_id: "jdoe39", first_name: "Bobby",
-        last_name: "Doe", disabled: true
+        last_name: "Doe", disabled: true,
+        latitude: "42.9849",
+        longitude: "81.2453",
+        timestamp: "2017-10-26T06:51:05.000Z"
       }
     ];
 
@@ -138,15 +147,24 @@ class VolunteersAPITest {
     const DB_DATA = [
       {
         id: 1, uwo_id: "jdoe37", first_name: "John",
-        last_name: "Doe", disabled: false
+        last_name: "Doe", disabled: false,
+        latitude: "42.9849",
+        longitude: "81.2453",
+        timestamp: "2017-10-26T06:51:05.000Z"
       },
       {
         id: 2, uwo_id: "jdoe38", first_name: "Jane",
-        last_name: "Doe", disabled: false
+        last_name: "Doe", disabled: false,
+        latitude: "42.9849",
+        longitude: "81.2453",
+        timestamp: "2017-10-26T06:51:05.000Z"
       },
       {
         id: 3, uwo_id: "jdoe39", first_name: "Bobby",
-        last_name: "Doe", disabled: true
+        last_name: "Doe", disabled: true,
+        latitude: "42.9849",
+        longitude: "81.2453",
+        timestamp: "2017-10-26T06:51:05.000Z"
       }
     ];
 
@@ -188,15 +206,24 @@ class VolunteersAPITest {
     const DB_VOLUNTEERS_DATA = [
       {
         id: 1, uwo_id: "jdoe37", first_name: "John",
-        last_name: "Doe", disabled: false
+        last_name: "Doe", disabled: false,
+        latitude: "42.9849",
+        longitude: "81.2453",
+        timestamp: "2017-10-26T06:51:05.000Z"
       },
       {
         id: 2, uwo_id: "jdoe38", first_name: "Jane",
-        last_name: "Doe", disabled: false
+        last_name: "Doe", disabled: false,
+        latitude: "42.9849",
+        longitude: "81.2453",
+        timestamp: "2017-10-26T06:51:05.000Z"
       },
       {
         id: 3, uwo_id: "jdoe39", first_name: "Bobby",
-        last_name: "Doe", disabled: true
+        last_name: "Doe", disabled: true,
+        latitude: "42.9849",
+        longitude: "81.2453",
+        timestamp: "2017-10-26T06:51:05.000Z"
       }
     ];
     const DB_PAIRING_DATA = [
@@ -243,15 +270,24 @@ class VolunteersAPITest {
     const DB_VOLUNTEERS_DATA = [
       {
         id: 1, uwo_id: "jdoe37", first_name: "John",
-        last_name: "Doe", disabled: false
+        last_name: "Doe", disabled: false,
+        latitude: "42.9849",
+        longitude: "81.2453",
+        timestamp: "2017-10-26T06:51:05.000Z"
       },
       {
         id: 2, uwo_id: "jdoe38", first_name: "Jane",
-        last_name: "Doe", disabled: false
+        last_name: "Doe", disabled: false,
+        latitude: "42.9849",
+        longitude: "81.2453",
+        timestamp: "2017-10-26T06:51:05.000Z"
       },
       {
         id: 3, uwo_id: "jdoe39", first_name: "Bobby",
-        last_name: "Doe", disabled: true
+        last_name: "Doe", disabled: true,
+        latitude: "42.9849",
+        longitude: "81.2453",
+        timestamp: "2017-10-26T06:51:05.000Z"
       }
     ];
     const DB_PAIRING_DATA = [
@@ -340,22 +376,34 @@ class VolunteersAPITest {
     const DB_DATA = [
       {
         id: 1, uwo_id: "jdoe37", first_name: "John",
-        last_name: "Doe", disabled: false
+        last_name: "Doe", disabled: false,
+        latitude: "42.9849",
+        longitude: "81.2453",
+        timestamp: "2017-10-26T06:51:05.000Z"
       },
       {
         id: 2, uwo_id: "jdoe38", first_name: "Jane",
-        last_name: "Doe", disabled: false
+        last_name: "Doe", disabled: false,
+        latitude: "42.9849",
+        longitude: "81.2453",
+        timestamp: "2017-10-26T06:51:05.000Z"
       },
       {
         id: 3, uwo_id: "jdoe39", first_name: "Bobby",
-        last_name: "Doe", disabled: true
+        last_name: "Doe", disabled: true,
+        latitude: "42.9849",
+        longitude: "81.2453",
+        timestamp: "2017-10-26T06:51:05.000Z"
       }
     ];
 
     // Expected return
     const EXPECTED_RESULTS = {
       id: 2, uwo_id: "jdoe38", first_name: "Jane",
-      last_name: "Doe", disabled: false
+      last_name: "Doe", disabled: false,
+      latitude: "42.9849",
+      longitude: "81.2453",
+      timestamp: "2017-10-26T06:51:05.000Z"
     };
 
     // Setup fake data
@@ -485,7 +533,10 @@ class VolunteersAPITest {
 
     // Setup fake data
     const INPUT = {
-      uwo_id: "joe37", first_name: "John", last_name: "Doe", disabled: true
+      uwo_id: "joe37", first_name: "John", last_name: "Doe", disabled: true,
+      latitude: "42.9849",
+      longitude: "81.2453",
+      timestamp: "2017-10-26T06:51:05.000Z"
     };
     const REQUESTS_DATA = undefined;
     FakeSQL.response = REQUESTS_DATA;
@@ -513,17 +564,26 @@ class VolunteersAPITest {
     // Fake data
     const DB_DATA = [{
         id: 1, uwo_id: "jdoe37", first_name: "John",
-        last_name: "Doe", disabled: false
+        last_name: "Doe", disabled: false,
+        latitude: "42.9849",
+        longitude: "81.2453",
+        timestamp: "2017-10-26T06:51:05.000Z"
       }];
 
     // Setup fake data
     const INPUT = {
       id: 5, uwo_id: "jdoe39", first_name: "Johnny",
-      last_name: "Doey", disabled: true
+      last_name: "Doey", disabled: true,
+      latitude: "43.9849",
+      longitude: "82.2453",
+      timestamp: "2018-10-26T06:51:05.000Z"
     };
     const EXPECTED_RESULTS = {
       id: 1, uwo_id: "jdoe39", first_name: "Johnny",
-      last_name: "Doey", disabled: true
+      last_name: "Doey", disabled: true,
+      latitude: "43.9849",
+      longitude: "82.2453",
+      timestamp: "2018-10-26T06:51:05.000Z"
     };
 
     // Setup DB responses
@@ -541,7 +601,10 @@ class VolunteersAPITest {
             "first_name",
             "uwo_id",
             "last_name",
-            "disabled"
+            "disabled",
+            "latitude",
+            "longitude",
+            "timestamp"
           ].forEach((val) => query.search(val).should.not.equal(-1));
           return {affectedRows: 1};
         } else {
@@ -597,7 +660,10 @@ class VolunteersAPITest {
 
     // Setup fake data
     const INPUT = {
-      uwo_id: "jdoe37", first_name: "John", last_name: "Doe"
+      uwo_id: "jdoe37", first_name: "John", last_name: "Doe",
+      latitude: "42.9849",
+      longitude: "81.2453",
+      timestamp: "2017-10-26T06:51:05.000Z"
     };
     const REQUESTS_DATA = undefined;
     FakeSQL.response = REQUESTS_DATA;
@@ -620,7 +686,10 @@ class VolunteersAPITest {
   public putBadId(done: MochaDone) {
     // Setup fake data
     const INPUT = {
-      uwo_id: "jdoe37", first_name: "John", last_name: "Doe"
+      uwo_id: "jdoe37", first_name: "John", last_name: "Doe",
+      latitude: "42.9849",
+      longitude: "81.2453",
+      timestamp: "2017-10-26T06:51:05.000Z"
     };
     const REQUESTS_DATA = {affectedRows: 0};
     FakeSQL.response = REQUESTS_DATA;
