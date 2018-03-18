@@ -431,7 +431,7 @@ export class VolunteersRoute extends AbstractRoute implements IRoute {
     }
 
     // Empty string check
-    for (const prop of ["uwo_id", "first_name", "last_name"]) {
+    for (const prop of ["uwo_id", "first_name", "last_name", "latitude", "longitude", "timestamp"]) {
       if (updateDict[prop] !== undefined && updateDict[prop].length <= 0) {
         next(new StatusError(400,
           errStrings.InvalidBodyParameter.Title,
