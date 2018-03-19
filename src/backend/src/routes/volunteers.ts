@@ -198,9 +198,9 @@ export class VolunteersRoute extends AbstractRoute implements IRoute {
    * @apiParam {string} first_name First name of the new volunteer.
    * @apiParam {string} last_name Last name of the new volunteer.
    * @apiParam {boolean} [disabled] Whether the volunteer should be created disabled.
-   * @apiParam {string} volunteers.latitude Last known volunteer latitude.
-   * @apiParam {string} volunteers.longitude Last known volunteer longitude.
-   * @apiParam {string} volunteers.timestamp Timestamp of last update to volunteer location.
+   * @apiParam {string} [latitude] Last known volunteer latitude.
+   * @apiParam {string} [longitude] Last known volunteer longitude.
+   * @apiParam {string} [timestamp] Timestamp of last update to volunteer location.
    *
    * @apiSuccess (Created 201) {number} id The record ID.
    * @apiSuccess (Created 201) {string} uwo_id UWO ID of the new volunteer.
@@ -275,9 +275,9 @@ export class VolunteersRoute extends AbstractRoute implements IRoute {
    * @apiParam {string} first_name First name of the volunteer.
    * @apiParam {string} last_name Last name of the volunteer.
    * @apiParam {boolean} [disabled] Whether the volunteer should be disabled.
-   * @apiParam {string} volunteers.latitude Last known volunteer latitude.
-   * @apiParam {string} volunteers.longitude Last known volunteer longitude.
-   * @apiParam {string} volunteers.timestamp Timestamp of last update to volunteer location.
+   * @apiParam {string} [latitude] Last known volunteer latitude.
+   * @apiParam {string} [longitude] Last known volunteer longitude.
+   * @apiParam {string} [timestamp] Timestamp of last update to volunteer location.
    *
    * @apiSuccess {number} id The record ID.
    * @apiSuccess {string} uwo_id UWO ID of the volunter.
@@ -416,7 +416,8 @@ export class VolunteersRoute extends AbstractRoute implements IRoute {
       last_name: this.sanitizer.sanitize,
       disabled: Boolean,
       latitude: this.sanitizer.sanitize,
-      longitude: this.sanitizer.sanitize
+      longitude: this.sanitizer.sanitize,
+      timestamp: this.sanitizer.sanitize
     };
 
     // List of sanitized data
@@ -518,9 +519,9 @@ export class VolunteersRoute extends AbstractRoute implements IRoute {
    * @apiSuccess {string} volunteers.first_name First name of the volunteer.
    * @apiSuccess {string} volunteers.last_name First name of the volunteer.
    * @apiSuccess {boolean} volunteers.disabled Designates if the volunteer has left Foot Patrol.
-   * @apiSuccess {string} latitude Last known volunteer latitude.
-   * @apiSuccess {string} longitude Last known volunteer longitude.
-   * @apiSuccess {string} timestamp Timestamp of last update to volunteer location.
+   * @apiSuccess {string} volunteers.latitude Last known volunteer latitude.
+   * @apiSuccess {string} volunteers.longitude Last known volunteer longitude.
+   * @apiSuccess {string} volunteers.timestamp Timestamp of last update to volunteer location.
    *
    * @apiExample Example usage:
    * curl -i http://localhost/volunteers/active
@@ -569,6 +570,13 @@ export class VolunteersRoute extends AbstractRoute implements IRoute {
       // Check that the strings aren't empty
       for (const prop of [uwo_id, first_name, last_name]) {
         if (prop.length <= 0) {
+          return false;
+        }
+      }
+
+      // Check to make all location data is supplied if part is supplied
+      if (latitude.length > 0 || longitude.length > 0 || timestamp.length > 0) {
+        if (!(latitude.length > 0 && longitude.length > 0 && timestamp.length > 0)) {
           return false;
         }
       }
