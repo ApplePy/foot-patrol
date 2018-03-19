@@ -107,9 +107,7 @@ class SQLVolunteerPairingsManagerTest {
     .then(() => backend.makeQuery("DELETE FROM volunteers"));
 
     // Insert volunteers into DB
-    return clean.then(() => Promise.all(this.VOLUNTEERS.map((x) => {
-      return TestReplaceHelper.replace(this.sqlQuery, "volunteers", x);
-    })));
+    return clean.then(() => TestReplaceHelper.dateReplace(this.sqlQuery, "volunteers", this.VOLUNTEERS, "timestamp"));
   }
 
   public after() {
