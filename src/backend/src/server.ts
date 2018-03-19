@@ -9,7 +9,6 @@ import { IFACES, TAGS } from "./ids";
 import { ErrorMiddleware as ErrMid } from "./services/loggers";
 
 // Routes
-import { IHook, RunPosition } from "./interfaces/ihook";
 import { IRoute } from "./interfaces/iroute";
 import { ITask } from "./interfaces/itask";
 
@@ -25,7 +24,6 @@ export class Server {
   private requestRoute: IRoute;
   private volunteerRoute: IRoute;
   private pairingRoute: IRoute;
-  private hooks: IHook[];
   private tasks: ITask[];
 
   /**
@@ -43,7 +41,6 @@ export class Server {
     this.requestRoute = requestRoute;
     this.volunteerRoute = volunteerRoute;
     this.pairingRoute = pairingRoute;
-    this.hooks = [];
     this.tasks = [];
 
     // create expressjs application
@@ -54,9 +51,6 @@ export class Server {
 
     // add api
     this.api();
-
-    // Add post-api configuration
-    this.postConfig();
 
     // add error handling
     this.errorHandling();
@@ -95,17 +89,6 @@ export class Server {
     for (const task of this.tasks) {
       task.register();
     }
-
-    // Get pre-hooks
-    const hooks = this.hooks.filter((x) => x.time === RunPosition.PRE);
-
-    // Attach all hooks
-    this.app.use((req, res, next) => {
-      for (const hook of hooks) {
-        this.callHook(hook, req);
-      }
-      next();
-    });
   }
 
   /**
@@ -134,39 +117,6 @@ export class Server {
 
     // Use router middleware
     this.app.use("/", router);
-  }
-
-  /**
-   * Call an API hook
-   */
-  private callHook(hook: IHook, req: express.Request) {
-    // Create new function to automatically call next
-    const wrap = (request: express.Request, nextFunc: express.NextFunction) => {
-      hook.callback(request); nextFunc();
-    };
-
-    // Call async if requested, normal otherwise
-    if (hook.async) {
-      setTimeout(wrap.bind(hook), 0, req);
-    } else {
-      wrap.call(hook, req);
-    }
-  }
-
-  /**
-   * Run configuration after the API routes
-   */
-  private postConfig() {
-    // Get post-hooks
-    const hooks = this.hooks.filter((x) => x.time === RunPosition.POST);
-
-    // Call post-API hooks
-    this.app.use((req, res, next) => {
-      for (const hook of hooks) {
-        this.callHook(hook, req);
-      }
-      next();
-    });
   }
 
   /**
