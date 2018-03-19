@@ -563,6 +563,7 @@ export class VolunteersRoute extends AbstractRoute implements IRoute {
       const disabled = (req.body.disabled === true || req.body.disabled === "true") ? true : false;
       const latitude = this.sanitizer.sanitize(req.body.latitude);
       const longitude = this.sanitizer.sanitize(req.body.longitude);
+      const timestamp = this.sanitizer.sanitize(req.body.timestamp);
       // tslint:enable:variable-name
 
       // Check that the strings aren't empty
@@ -572,7 +573,7 @@ export class VolunteersRoute extends AbstractRoute implements IRoute {
         }
       }
 
-      return {uwo_id, first_name, last_name, disabled, latitude, longitude};
+      return {uwo_id, first_name, last_name, disabled, latitude, longitude, timestamp};
     } catch (err) {
       return false;
     }
