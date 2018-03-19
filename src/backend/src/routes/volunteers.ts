@@ -448,7 +448,7 @@ export class VolunteersRoute extends AbstractRoute implements IRoute {
    */
   public inactiveVolunteers(req: Request, res: Response, next: NextFunction) {
     // Make query
-    this.data.getUnpairedVolunteers()
+    this.data.getUnpairedVolunteers(new Map([["disabled", false]]))
     .then((volunteers) => res.send({volunteers}))
     .catch((err) => next(this.translateErrors(err))); // Send generic error
   }

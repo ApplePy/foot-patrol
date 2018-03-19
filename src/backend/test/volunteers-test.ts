@@ -255,14 +255,14 @@ class VolunteersAPITest {
       }
     ];
     const DB_PAIRING_DATA = [
-      { id: 1, active: true, volunteer_one: 1, volunteer_two: 2 },
+      { id: 1, active: false, volunteer_one: 1, volunteer_two: 2 },
       { id: 2, active: true, volunteer_one: 2, volunteer_two: 3 },
       { id: 3, active: false, volunteer_one: 1, volunteer_two: 3 }
     ];
 
     // Expected return
     const EXPECTED_RESULTS = {
-      volunteers: [DB_VOLUNTEERS_DATA[2]]
+      volunteers: [DB_VOLUNTEERS_DATA[0]]
     };
 
     // Setup fake data
@@ -270,7 +270,7 @@ class VolunteersAPITest {
     TestReplaceHelper.replaceParallel(sqlQuery, "volunteers", DB_VOLUNTEERS_DATA)
     .then(() => TestReplaceHelper.replaceParallel(sqlQuery, "volunteer_pairing", DB_PAIRING_DATA))
     .then(() => {
-      FakeSQL.response = [DB_VOLUNTEERS_DATA[2]];
+      FakeSQL.response = [DB_VOLUNTEERS_DATA[0]];
     })
     .then(() => {
 
