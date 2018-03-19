@@ -583,8 +583,8 @@ export class VolunteersRoute extends AbstractRoute implements IRoute {
       const disabled = (req.body.disabled === true || req.body.disabled === "true") ? true : false;
 
       // Check to make all location data is supplied if part of location data is supplied
-      if (latitude.length > 0 || longitude.length > 0 || timestamp.length > 0) {
-        if (!(latitude.length > 0 && longitude.length > 0 && timestamp.length > 0)) {
+      if (req.body.latitude.length > 0 || req.body.longitude.length > 0 || req.body.timestamp.length > 0) {
+        if (!(req.body.latitude.length > 0 && req.body.longitude.length > 0 && req.body.timestamp.length > 0)) {
           return false;
         }
       }
