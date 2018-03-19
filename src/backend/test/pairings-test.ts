@@ -113,6 +113,8 @@ class PairingsAPITest {
       new Volunteer(PairingsAPITest.VOLUNTEERS.find((vol) => vol.id === x.volunteer_one)),
       new Volunteer(PairingsAPITest.VOLUNTEERS.find((vol) => vol.id === x.volunteer_two))
       ];
+      // Foreach to fix date formatting error
+      rx.volunteers.forEach((element: any) => element.timestamp = element.timestamp.toJSON());
       return rx;
     });
 
@@ -165,6 +167,8 @@ class PairingsAPITest {
         new Volunteer(PairingsAPITest.VOLUNTEERS.find((vol) => vol.id === x.volunteer_one)),
         new Volunteer(PairingsAPITest.VOLUNTEERS.find((vol) => vol.id === x.volunteer_two))
       ];
+      // Foreach to fix date formatting error
+      rx.volunteers.forEach((element: any) => element.timestamp = element.timestamp.toJSON());
       return rx;
     });
 
@@ -217,6 +221,8 @@ class PairingsAPITest {
         new Volunteer(PairingsAPITest.VOLUNTEERS.find((vol) => vol.id === x.volunteer_one)),
         new Volunteer(PairingsAPITest.VOLUNTEERS.find((vol) => vol.id === x.volunteer_two))
       ];
+      // Foreach to fix date formatting error
+      rx.volunteers.forEach((element: any) => element.timestamp = element.timestamp.toJSON());
       return rx;
     });
 
@@ -312,6 +318,8 @@ class PairingsAPITest {
         new Volunteer(PairingsAPITest.VOLUNTEERS.find((vol) => vol.id === x.volunteer_one)),
         new Volunteer(PairingsAPITest.VOLUNTEERS.find((vol) => vol.id === x.volunteer_two))
       ];
+      // Foreach to fix date formatting error
+      rx.volunteers.forEach((element: any) => element.timestamp = element.timestamp.toJSON());
       return rx;
     });
 
@@ -406,14 +414,18 @@ class PairingsAPITest {
       .post(pathPrefix + "/volunteerpairs")
       .send(INPUT)
       .end((err, res) => {
+        // Foreach to fix date formatting error
+        const expRes = [
+          new Volunteer(PairingsAPITest.VOLUNTEERS.find((vol) => vol.id === 1)),
+          new Volunteer(PairingsAPITest.VOLUNTEERS.find((vol) => vol.id === 2))
+        ];
+        expRes.forEach((element: any) => element.timestamp = element.timestamp.toJSON());
+
         // Verify results
         res.should.have.status(201);
         res.body.should.have.property("id");
         res.body.should.have.property("active").equal(false);
-        res.body.should.have.property("volunteers").deep.equal([
-          new Volunteer(PairingsAPITest.VOLUNTEERS.find((vol) => vol.id === 1)),
-          new Volunteer(PairingsAPITest.VOLUNTEERS.find((vol) => vol.id === 2))
-        ]);
+        res.body.should.have.property("volunteers").deep.equal(expRes);
         done();
       });
   }

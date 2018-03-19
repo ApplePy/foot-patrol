@@ -23,15 +23,16 @@ class VolunteerPairingTest {
 
   @test("Converting an object with all fields should succeed")
   public normalConvert() {
+    const timestamp = new Date();
     const expected = new VolunteerPairing();
     expected.id = 1;
-    expected.volunteer_one = new Volunteer({id: 1});
-    expected.volunteer_two = new Volunteer({id: 2});
+    expected.volunteer_one = new Volunteer({id: 1, timestamp});
+    expected.volunteer_two = new Volunteer({id: 2, timestamp});
     expected.active = false;
 
     const testReq = new VolunteerPairing(
-      new Volunteer({id: 1}),
-      new Volunteer({id: 2}),
+      new Volunteer({id: 1, timestamp}),
+      new Volunteer({id: 2, timestamp}),
       false,
       1
     );
@@ -41,15 +42,16 @@ class VolunteerPairingTest {
 
   @test("Converting an object with missing fields should succeed")
   public missingConvert() {
+    const timestamp = new Date();
     const expected = new VolunteerPairing();
     expected.id = 0;
-    expected.volunteer_one = new Volunteer({id: 1});
-    expected.volunteer_two = new Volunteer({id: 2});
+    expected.volunteer_one = new Volunteer({id: 1, timestamp});
+    expected.volunteer_two = new Volunteer({id: 2, timestamp});
     expected.active = true;
 
     const testReq = new VolunteerPairing(
-      new Volunteer({id: 1}),
-      new Volunteer({id: 2})
+      new Volunteer({id: 1, timestamp}),
+      new Volunteer({id: 2, timestamp}),
     );
     testReq.should.deep.equal(expected);
     testReq.Valid().should.equal(true);
