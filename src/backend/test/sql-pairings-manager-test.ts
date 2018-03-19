@@ -72,15 +72,24 @@ class SQLVolunteerPairingsManagerTest {
   private readonly VOLUNTEERS = [
     {
       id: 1, uwo_id: "jdoe37", first_name: "John",
-      last_name: "Doe", disabled: false
+      last_name: "Doe", disabled: false,
+      latitude: "42.9849",
+      longitude: "81.2453",
+      timestamp: "2017-10-26T06:51:05.000Z"
     },
     {
       id: 2, uwo_id: "jdoe38", first_name: "Jane",
-      last_name: "Doe", disabled: false
+      last_name: "Doe", disabled: false,
+      latitude: "42.9849",
+      longitude: "81.2453",
+      timestamp: "2017-10-26T06:51:05.000Z"
     },
     {
       id: 3, uwo_id: "jdoe39", first_name: "Bobby",
-      last_name: "Doe", disabled: true
+      last_name: "Doe", disabled: true,
+      latitude: "42.9849",
+      longitude: "81.2453",
+      timestamp: "2017-10-26T06:51:05.000Z"
     }
   ];
 

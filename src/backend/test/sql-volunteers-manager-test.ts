@@ -102,12 +102,16 @@ class SQLVolunteersManagerTest {
   public getVolunteerNormal() {
     const DATA = {
       id: 1, uwo_id: "jdoe37", first_name: "John",
-      last_name: "Doe", disabled: false
+      last_name: "Doe", disabled: false,
+      latitude: "42.9849",
+      longitude: "81.2453",
+      timestamp: "2017-10-26T06:51:05.000Z"
     };
 
     // Setup FakeSQL response
     FakeSQL.response = [DATA];
     return TestReplaceHelper.replace(this.sqlQuery, "volunteers", DATA)
+    .then(() => TestReplaceHelper.dateReplace(this.sqlQuery, "volunteers", DATA, "timestamp"))
     .then(() => this.volMgr.getVolunteer(1).should.eventually.deep.equal(new Volunteer(DATA)));
   }
 
@@ -121,18 +125,24 @@ class SQLVolunteersManagerTest {
     const DATA = [
       {
         id: 1, uwo_id: "jdoe37", first_name: "John",
-        last_name: "Doe", disabled: false
+        last_name: "Doe", disabled: false,
+        latitude: "42.9849",
+        longitude: "81.2453",
+        timestamp: "2017-10-26T06:51:05.000Z"
       },
       {
         id: 2, uwo_id: "jdoe38", first_name: "Jane",
-        last_name: "Doe", disabled: true
+        last_name: "Doe", disabled: true,
+        latitude: "42.9849",
+        longitude: "81.2453",
+        timestamp: "2017-10-26T06:51:05.000Z"
       }
     ];
 
     // Setup FakeSQL response
     FakeSQL.response = DATA;
 
-    return Promise.all(DATA.map((x) => TestReplaceHelper.replace(this.sqlQuery, "volunteers", x)))
+    return TestReplaceHelper.dateReplace(this.sqlQuery, "volunteers", DATA, "timestamp")
     .then(() => {
       // Test that the values are respected
       return this.volMgr.getVolunteers().should.eventually.deep.equal(DATA.map((x) => new Volunteer(x)));
@@ -144,11 +154,17 @@ class SQLVolunteersManagerTest {
     const DATA = [
       {
         id: 1, uwo_id: "jdoe37", first_name: "John",
-        last_name: "Doe", disabled: false
+        last_name: "Doe", disabled: false,
+        latitude: "42.9849",
+        longitude: "81.2453",
+        timestamp: "2017-10-26T06:51:05.000Z"
       },
       {
         id: 2, uwo_id: "jdoe38", first_name: "Jane",
-        last_name: "Doe", disabled: true
+        last_name: "Doe", disabled: true,
+        latitude: "42.9849",
+        longitude: "81.2453",
+        timestamp: "2017-10-26T06:51:05.000Z"
       }
     ];
 
@@ -159,8 +175,7 @@ class SQLVolunteersManagerTest {
         values[1] === 1) ? [DATA[1]] : [];
     };
 
-    return Promise.all(
-      DATA.map((x) => TestReplaceHelper.replace(this.sqlQuery, "volunteers", x)))
+    return TestReplaceHelper.dateReplace(this.sqlQuery, "volunteers", DATA, "timestamp")
     .then(() => {
       // Test that the filter is respected
       const promises = [];
@@ -181,15 +196,24 @@ class SQLVolunteersManagerTest {
     const VOLUNTEERS = [
       {
         id: 1, uwo_id: "jdoe37", first_name: "John",
-        last_name: "Doe", disabled: false
+        last_name: "Doe", disabled: false,
+        latitude: "42.9849",
+        longitude: "81.2453",
+        timestamp: "2017-10-26T06:51:05.000Z"
       },
       {
         id: 2, uwo_id: "jdoe38", first_name: "Jane",
-        last_name: "Doe", disabled: false
+        last_name: "Doe", disabled: false,
+        latitude: "42.9849",
+        longitude: "81.2453",
+        timestamp: "2017-10-26T06:51:05.000Z"
       },
       {
         id: 3, uwo_id: "jdoe39", first_name: "Bobby",
-        last_name: "Doe", disabled: true
+        last_name: "Doe", disabled: true,
+        latitude: "42.9849",
+        longitude: "81.2453",
+        timestamp: "2017-10-26T06:51:05.000Z"
       }
     ];
     const PAIRINGS = [
@@ -199,11 +223,17 @@ class SQLVolunteersManagerTest {
     const EXPECTED_DATA = [
       {
         id: 1, uwo_id: "jdoe37", first_name: "John",
-        last_name: "Doe", disabled: false
+        last_name: "Doe", disabled: false,
+        latitude: "42.9849",
+        longitude: "81.2453",
+        timestamp: "2017-10-26T06:51:05.000Z"
       },
       {
         id: 2, uwo_id: "jdoe38", first_name: "Jane",
-        last_name: "Doe", disabled: false
+        last_name: "Doe", disabled: false,
+        latitude: "42.9849",
+        longitude: "81.2453",
+        timestamp: "2017-10-26T06:51:05.000Z"
       }
     ];
 
@@ -217,8 +247,7 @@ class SQLVolunteersManagerTest {
       return [];
     };
 
-    return Promise.all(
-      VOLUNTEERS.map((x) => TestReplaceHelper.replace(this.sqlQuery, "volunteers", x)))
+    return TestReplaceHelper.dateReplace(this.sqlQuery, "volunteers", VOLUNTEERS, "timestamp")
     .then(() => Promise.all(
       PAIRINGS.map((x) => TestReplaceHelper.replace(this.sqlQuery, "volunteer_pairing", x))))
     .then(() => {
@@ -244,15 +273,24 @@ class SQLVolunteersManagerTest {
     const VOLUNTEERS = [
       {
         id: 1, uwo_id: "jdoe37", first_name: "John",
-        last_name: "Doe", disabled: false
+        last_name: "Doe", disabled: false,
+        latitude: "42.9849",
+        longitude: "81.2453",
+        timestamp: "2017-10-26T06:51:05.000Z"
       },
       {
         id: 2, uwo_id: "jdoe38", first_name: "Jane",
-        last_name: "Doe", disabled: false
+        last_name: "Doe", disabled: false,
+        latitude: "42.9849",
+        longitude: "81.2453",
+        timestamp: "2017-10-26T06:51:05.000Z"
       },
       {
         id: 3, uwo_id: "jdoe39", first_name: "Bobby",
-        last_name: "Doe", disabled: true
+        last_name: "Doe", disabled: true,
+        latitude: "42.9849",
+        longitude: "81.2453",
+        timestamp: "2017-10-26T06:51:05.000Z"
       }
     ];
     const PAIRINGS = [
@@ -261,7 +299,10 @@ class SQLVolunteersManagerTest {
     ];
     const EXPECTED_DATA = {
       id: 3, uwo_id: "jdoe39", first_name: "Bobby",
-      last_name: "Doe", disabled: true
+      last_name: "Doe", disabled: true,
+      latitude: "42.9849",
+      longitude: "81.2453",
+      timestamp: "2017-10-26T06:51:05.000Z"
     };
 
     // Setup FakeSQL response
@@ -274,8 +315,7 @@ class SQLVolunteersManagerTest {
       return [];
     };
 
-    return Promise.all(
-      VOLUNTEERS.map((x) => TestReplaceHelper.replace(this.sqlQuery, "volunteers", x)))
+    return TestReplaceHelper.dateReplace(this.sqlQuery, "volunteers", VOLUNTEERS, "timestamp")
     .then(() => Promise.all(
       PAIRINGS.map((x) => TestReplaceHelper.replace(this.sqlQuery, "volunteer_pairing", x))))
     .then(() => {
@@ -301,14 +341,20 @@ class SQLVolunteersManagerTest {
     // Test data
     const DATA = {
       id: 5, uwo_id: "jdoe37", first_name: "John",
-      last_name: "Doe", disabled: false
+      last_name: "Doe", disabled: false,
+      latitude: "42.9849",
+      longitude: "81.2453",
+      timestamp: "2017-10-26T06:51:05.000Z"
     };
 
     // Setup FakeSQL response
     FakeSQL.response = {insertId: 1};
 
     // Assert
-    return this.volMgr.createVolunteer(new Volunteer(DATA)).should.eventually.be.fulfilled.and.not.equal(DATA.id);
+    return TestReplaceHelper.dateReplace(this.sqlQuery, "volunteers", DATA, "timestamp")
+    .then(() => {
+      this.volMgr.createVolunteer(new Volunteer(DATA)).should.eventually.be.fulfilled.and.not.equal(DATA.id);
+    });
   }
 
   @test("updateRequest works")
@@ -316,17 +362,26 @@ class SQLVolunteersManagerTest {
     // Test data
     const DATA = {
       id: 5, uwo_id: "jdoe37", first_name: "John",
-      last_name: "Doe", disabled: false
+      last_name: "Doe", disabled: false,
+      latitude: "42.9849",
+      longitude: "81.2453",
+      timestamp: "2017-10-26T06:51:05.000Z"
     };
     const UPDATE = {
       to_location: "CMLP",
       uwo_id: "jdoe99",
       id: 5,
-      useless: 0
+      useless: 0,
+      latitude: "42.9849",
+      longitude: "81.2453",
+      timestamp: "2017-10-26T06:51:05.000Z"
     };
     const EXPECTED = {
       id: 5, uwo_id: "jdoe99", first_name: "John",
-      last_name: "Doe", disabled: false
+      last_name: "Doe", disabled: false,
+      latitude: "42.9849",
+      longitude: "81.2453",
+      timestamp: "2017-10-26T06:51:05.000Z"
     };
 
     // Setup FakeSQL response
@@ -339,6 +394,7 @@ class SQLVolunteersManagerTest {
     };
 
     return TestReplaceHelper.replace(this.sqlQuery, "volunteers", DATA)
+    .then(() => TestReplaceHelper.dateReplace(this.sqlQuery, "volunteers", DATA, "timestamp"))
     .then(() =>
       this.volMgr.updateVolunteer(new Volunteer(UPDATE), [
         "uwo_id"
