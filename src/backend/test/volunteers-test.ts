@@ -603,7 +603,7 @@ class VolunteersAPITest {
           // Remove WHERE parameter since it has the ID
           query = query.substr(0, query.search("WHERE") - 1);
           // Ensure unwanted properties are not being added
-          [" id", "extra", "timestamp"].forEach((val) => query.search(val).should.equal(-1));
+          [" id", "extra"].forEach((val) => query.search(val).should.equal(-1));
           // Ensure wanted properties are being added
           [
             "first_name",
