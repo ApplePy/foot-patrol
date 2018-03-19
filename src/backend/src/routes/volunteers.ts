@@ -432,8 +432,27 @@ export class VolunteersRoute extends AbstractRoute implements IRoute {
     }
 
     // Empty string check
-    for (const prop of ["uwo_id", "first_name", "last_name", "latitude", "longitude", "timestamp"]) {
+    for (const prop of ["uwo_id", "first_name", "last_name"]) {
       if (updateDict[prop] !== undefined && updateDict[prop].length <= 0) {
+        next(new StatusError(400,
+          errStrings.InvalidBodyParameter.Title,
+          errStrings.InvalidBodyParameter.Msg));
+        return;
+      }
+    }
+
+    // Check to make all location data is supplied if part of location data is supplied
+    if (req.body.latitude.length > 0 || req.body.longitude.length > 0 || req.body.timestamp.length > 0) {
+      if (!(req.body.latitude.length > 0 && req.body.longitude.length > 0 && req.body.timestamp.length > 0)) {
+        next(new StatusError(400,
+          errStrings.InvalidBodyParameter.Title,
+          errStrings.InvalidBodyParameter.Msg));
+        return;
+      }
+    }
+    // Check to make all location data is supplied if part of location data is supplied
+    if (req.body.latitude !== undefined || req.body.longitude !== undefined || req.body.timestamp !== undefined) {
+      if (!(req.body.latitude !== undefined && req.body.longitude !== undefined && req.body.timestamp !== undefined)) {
         next(new StatusError(400,
           errStrings.InvalidBodyParameter.Title,
           errStrings.InvalidBodyParameter.Msg));
@@ -562,6 +581,20 @@ export class VolunteersRoute extends AbstractRoute implements IRoute {
       const first_name = this.sanitizer.sanitize(req.body.first_name);
       const last_name = this.sanitizer.sanitize(req.body.last_name);
       const disabled = (req.body.disabled === true || req.body.disabled === "true") ? true : false;
+
+      // Check to make all location data is supplied if part of location data is supplied
+      if (latitude.length > 0 || longitude.length > 0 || timestamp.length > 0) {
+        if (!(latitude.length > 0 && longitude.length > 0 && timestamp.length > 0)) {
+          return false;
+        }
+      }
+      // Check to make all location data is supplied if part of location data is supplied
+      if (req.body.latitude !== undefined || req.body.longitude !== undefined || req.body.timestamp !== undefined) {
+        if (!(req.body.latitude !== undefined && req.body.longitude !== undefined && req.body.timestamp !== undefined)) {
+          return false;
+        }
+      }
+
       const latitude = this.sanitizer.sanitize(req.body.latitude);
       const longitude = this.sanitizer.sanitize(req.body.longitude);
       const timestamp = this.sanitizer.sanitize(req.body.timestamp);
@@ -570,13 +603,6 @@ export class VolunteersRoute extends AbstractRoute implements IRoute {
       // Check that the strings aren't empty
       for (const prop of [uwo_id, first_name, last_name]) {
         if (prop.length <= 0) {
-          return false;
-        }
-      }
-
-      // Check to make all location data is supplied if part is supplied
-      if (latitude.length > 0 || longitude.length > 0 || timestamp.length > 0) {
-        if (!(latitude.length > 0 && longitude.length > 0 && timestamp.length > 0)) {
           return false;
         }
       }
