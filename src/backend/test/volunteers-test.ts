@@ -114,7 +114,7 @@ class VolunteersAPITest {
 
     // Setup fake data
     FakeSQL.response = {};
-    Promise.all(DB_DATA.map((x) => TestReplaceHelper.replace(sqlQuery, "volunteers", x)))
+    TestReplaceHelper.dateReplace(sqlQuery, "volunteers", DB_DATA, "timestamp")
     .then(() => {
       FakeSQL.response = (q: string, v: any[]) => {
         v.should.contain(false);
@@ -175,7 +175,7 @@ class VolunteersAPITest {
 
     // Setup fake data
     FakeSQL.response = {};
-    Promise.all(DB_DATA.map((x) => TestReplaceHelper.replace(sqlQuery, "volunteers", x)))
+    TestReplaceHelper.dateReplace(sqlQuery, "volunteers", DB_DATA, "timestamp")
     .then(() => {
       FakeSQL.response = DB_DATA;
     })
@@ -241,6 +241,7 @@ class VolunteersAPITest {
     FakeSQL.response = {};
     TestReplaceHelper.replaceParallel(sqlQuery, "volunteers", DB_VOLUNTEERS_DATA)
     .then(() => TestReplaceHelper.replaceParallel(sqlQuery, "volunteer_pairing", DB_PAIRING_DATA))
+    .then(() => TestReplaceHelper.dateReplace(sqlQuery, "volunteers", DB_VOLUNTEERS_DATA, "timestamp"))
     .then(() => {
       FakeSQL.response = [DB_VOLUNTEERS_DATA[0], DB_VOLUNTEERS_DATA[1]];
     })
@@ -305,6 +306,7 @@ class VolunteersAPITest {
     FakeSQL.response = {};
     TestReplaceHelper.replaceParallel(sqlQuery, "volunteers", DB_VOLUNTEERS_DATA)
     .then(() => TestReplaceHelper.replaceParallel(sqlQuery, "volunteer_pairing", DB_PAIRING_DATA))
+    .then(() => TestReplaceHelper.dateReplace(sqlQuery, "volunteers", DB_VOLUNTEERS_DATA, "timestamp"))
     .then(() => {
       FakeSQL.response = [DB_VOLUNTEERS_DATA[2]];
     })
@@ -408,7 +410,7 @@ class VolunteersAPITest {
 
     // Setup fake data
     FakeSQL.response = {};
-    Promise.all(DB_DATA.map((x) => TestReplaceHelper.replace(sqlQuery, "volunteers", x)))
+    TestReplaceHelper.dateReplace(sqlQuery, "volunteers", DB_DATA, "timestamp")
     .then(() => {
       FakeSQL.response = (query: string, values: any[]) => {
         values.should.deep.equal([2]);
@@ -470,11 +472,17 @@ class VolunteersAPITest {
     // Setup fake data
     const INPUT = {
       id: 5, uwo_id: "jdoe37", first_name: "John",
-      last_name: "Doe", extra: "test"
+      last_name: "Doe", extra: "test",
+      latitude: "42.9849",
+      longitude: "81.2453",
+      timestamp: "2017-10-26T06:51:05.000Z"
     };
     const EXPECTED_RESULTS = {
       uwo_id: "jdoe37", first_name: "John",
-      last_name: "Doe", disabled: false
+      last_name: "Doe", disabled: false,
+      latitude: "42.9849",
+      longitude: "81.2453",
+      timestamp: "2017-10-26T06:51:05.000Z"
     };
     const REQUESTS_DATA = (query: string, values: any[]) => {
       const newId = 2;
@@ -588,7 +596,7 @@ class VolunteersAPITest {
 
     // Setup DB responses
     FakeSQL.response = [];
-    Promise.all(DB_DATA.map((x) => TestReplaceHelper.replace(sqlQuery, "volunteers", x)))
+    TestReplaceHelper.dateReplace(sqlQuery, "volunteers", DB_DATA, "timestamp")
     .then(() => {
       FakeSQL.response = (query: string, values: any[]) => {
         if (query.search("^UPDATE") >= 0) {
@@ -760,6 +768,7 @@ class VolunteersAPITest {
     // Setup DB with data
     FakeSQL.response = {};
     TestReplaceHelper.replace(sqlQuery, "volunteers", DB_DATA)
+    .then(() => TestReplaceHelper.dateReplace(sqlQuery, "volunteers", DB_DATA, "timestamp"))
     .then(() => {
       FakeSQL.response = (query: string, values: any[]) => {
         if (query.search("^UPDATE") >= 0) {
