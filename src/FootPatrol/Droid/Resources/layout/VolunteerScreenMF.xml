@@ -130,6 +130,12 @@
             p1:background="@drawable/BorderResource"
             p1:layout_centerVertical="true"
             p1:scaleType="centerInside" />
+        <SearchView
+            p1:layout_width="match_parent"
+            p1:layout_height="30dp"
+            p1:id="@+id/searchView1"
+            p1:layout_alignParentTop="true"
+            p1:background="@drawable/BorderResource" />
     </RelativeLayout>
     <ListView
         p1:id="@+id/listView1"
@@ -138,4 +144,8 @@
         p1:layout_gravity="left|center_vertical"
         p1:background="#ff4f2683"
         p1:divider="#807F83" />
+    <ListView
+        p1:id="@+id/listView3"
+        p1:layout_width="150dp"
+        p1:layout_height="200dp" />
 </android.support.v4.widget.DrawerLayout>

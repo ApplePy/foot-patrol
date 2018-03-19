@@ -31,7 +31,7 @@ namespace FootPatrol.Droid
         public static int id;
 
         public static Typeface bentonSans; //font to be used in application
-        private ArrayAdapter<System.String> listAdapter; //adapter to help display directions
+        private ArrayAdapter<System.String> listAdapter,fpAdapter; //adapter to help display directions
         //private bool pickupComplete = false;
 
         private static SupportMapFragment mf; //fragment that displays map on < API 24
@@ -41,15 +41,16 @@ namespace FootPatrol.Droid
         private static MapView mView; //mapView that displays map on >= API 24
         private static ImageView notificationBase, notificationBadge; //UI for displaying requests
         public static TextView badgeCounter, userName, toLoc, fromLoc, addInfo, pickupInfo, directionsText; //counter that displays number of requests available to the volunteer
-        private static ListView mListView, mfListView; //list views for both new and older android devices
+        private static ListView mListView, mfListView, fpListView; //list views for both new and older android devices
         private static RecyclerView mRecyclerView, mfRecyclerView; //recycler views that display directions for new and older android devices
         private static RecyclerView.LayoutManager layoutManager; //layout manager for recycler view
         private static RelativeLayout mRelativeLayout, mfRelativeLayout; //relative layouts to display status of complete, cancel and pickup on trip
+        private static Android.Widget.SearchView searchView;
 
-        private static string backendURI, getURI;
+        private static string backendURI, getRequestURI, getVolunteerURI;
 
-        public static List<string> request, steps; //lists to hold information on requests and direction steps
-        public string[] menuItems; //list of menu items to be displayed in side tab
+        public static List<string> request, steps, fpNames, volunteerArray; //lists to hold information on requests and direction steps, and volunteer names
+        public static string[] menuItems; //list of menu items to be displayed in side tab
         public static RequestsActivity ra; //get a reference to each request object
 
         private static GoogleMap map; //reference to created google map
@@ -82,17 +83,23 @@ namespace FootPatrol.Droid
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
-
-            menuItems = new string[] { "NON-EMERGENCY CONTACTS", "CAMPUS MAPS", "PAIR FOOT PATROLLERS", "CHECK-IN"}; //initializes list to displayed in listView 
-
+                
+            menuItems = new string[] { "NON-EMERGENCY CONTACTS", "CAMPUS MAPS", "PAIR FOOT PATROLLERS", "CHECK-IN", "LOGOUT"}; //initializes list to displayed in listView 
+         
             listAdapter = new ArrayAdapter<string>(this.Context, Resource.Layout.ListElement, menuItems); //initializes ArrayAdapter to be displayed in listView
+
             layoutManager = new LinearLayoutManager(this.Context, LinearLayoutManager.Horizontal, false); //initializs the directions layout to be horizontal and sidescrolling
-            backendURI = "http://staging.capstone.incode.ca/api/v1/requests/";
-            getURI = "?offset=0&count=9&archived=true";
+            backendURI = "http://staging.capstone.incode.ca/api/v1";
+            getRequestURI = "/requests/?offset=0&count=9&archived=true";
+            getVolunteerURI = "/volunteers/inactive";
             request = new List<string>();
+            fpNames = new List<string>();
 
             TimerCallback time = new TimerCallback(retrieveRequests); //create a new timerCallback to be used in timer
             Timer timer = new Timer(time, 0, 0, 1000); //use the timerCallback to check for user requests every second
+
+            TimerCallback tc = new TimerCallback(retrieveVolunteers);
+            Timer t = new Timer(tc, 0, 0, 100000);
 
             try
             {
@@ -109,6 +116,8 @@ namespace FootPatrol.Droid
             createLocationRequest(); //create new location request to continuously update volunteer request
             clientSetup(); //set up the Google client 
 
+            fpAdapter = new ArrayAdapter<string>(this.Context, Resource.Layout.ListElement, fpNames);
+         
             if (Int32.Parse(Build.VERSION.Sdk) > 23) //if the user is using a build version of >= API 24 (use mapView)
             {
                 //initialize UI elements
@@ -117,7 +126,9 @@ namespace FootPatrol.Droid
                 notificationBadge = (ImageView)view.FindViewById(Resource.Id.notificationBadge);
                 badgeCounter = (TextView)view.FindViewById(Resource.Id.badgeCounter);
                 mListView = (ListView)view.FindViewById(Resource.Id.navigationList1);
+                fpListView = (ListView)view.FindViewById(Resource.Id.listView2);
                 mSideTab = (ImageButton)view.FindViewById(Resource.Id.sideTabBtn);
+                searchView = (Android.Widget.SearchView)view.FindViewById(Resource.Id.searchView);
                 mDrawerLayout = (DrawerLayout)view.FindViewById(Resource.Id.drawer_layout);
                 mRelativeLayout = (RelativeLayout)view.FindViewById(Resource.Id.innerRelative);
                 completeTripBtn = (Button)view.FindViewById(Resource.Id.completeTripBtn);
@@ -131,6 +142,8 @@ namespace FootPatrol.Droid
 
                 mRelativeLayout.Visibility = ViewStates.Gone; //set the visibility of the complete trip UI to gone
                 mRecyclerView.Visibility = ViewStates.Gone; //set the visibility of the directions UI to gone
+                fpListView.Visibility = ViewStates.Gone;
+                searchView.Visibility = ViewStates.Gone;
 
                 mRecyclerView.SetLayoutManager(layoutManager); //set the layout manager of the recyclerview to display direction
 
@@ -142,19 +155,21 @@ namespace FootPatrol.Droid
 
                 completeTripBtn.Click += (sender, e) =>
                 {
-                    //if (pickupComplete)
                     completeBtnClicked();
-
-                    //else
-                        //pickUpClicked();
                 };
 
                 mListView.SetAdapter(listAdapter); //set the listView adapter to the adapter initialized in the view
+                fpListView.SetAdapter(fpAdapter);
+
                 mListView.ItemClick += (sender, e) => //listView click listener
                 {
                     selectItem(e.Position);
                 };
 
+                fpListView.ItemClick += (sender, e) =>
+                {
+
+                };
 
                 mView.OnCreate(savedInstanceState);
                 mView.OnStart(); //start loading the map into the mapView
@@ -169,6 +184,8 @@ namespace FootPatrol.Droid
                 badgeCounter = (TextView)view.FindViewById(Resource.Id.badgeCounter2);
                 mfSideTab = (ImageButton)view.FindViewById(Resource.Id.sideTabBtn1);
                 mfListView = (ListView)view.FindViewById(Resource.Id.listView1);
+                fpListView = (ListView)view.FindViewById(Resource.Id.listView3);
+                searchView = (Android.Widget.SearchView)view.FindViewById(Resource.Id.searchView1);
                 mfDrawerLayout = (DrawerLayout)view.FindViewById(Resource.Id.drawer_layout1);
                 mfRelativeLayout = (RelativeLayout)view.FindViewById(Resource.Id.innerRelative1);
                 completeTripBtn = (Button)view.FindViewById(Resource.Id.completeTripBtn1);
@@ -183,13 +200,21 @@ namespace FootPatrol.Droid
                 //set visibilities to gone of UI elements not presently used
                 mfRecyclerView.Visibility = ViewStates.Gone;
                 mfRelativeLayout.Visibility = ViewStates.Gone;
+                searchView.Visibility = ViewStates.Gone;
+                fpListView.Visibility = ViewStates.Gone;
 
                 mfRecyclerView.SetLayoutManager(layoutManager); //set the layout manager of the recyclerView
 
                 mfListView.SetAdapter(listAdapter); //set the listView adapter
+                fpListView.SetAdapter(fpAdapter);
                 mfListView.ItemClick += (sender, e) => //listView click listener
                 {
                     selectItem(e.Position);
+                };
+
+                fpListView.ItemClick += (sender, e) =>
+                {
+
                 };
               
                 //onClick listeners for each interactable UI element
@@ -209,8 +234,6 @@ namespace FootPatrol.Droid
 
             //Take care of correct fonts
             bentonSans = Typeface.CreateFromAsset(this.Activity.Application.Assets, "BentonSansRegular.otf");
-
-            System.Diagnostics.Debug.WriteLine("The directions textview is: " + directionsText);
 
             setFont(bentonSans, badgeCounter);
             setFont(bentonSans, userName);
@@ -243,31 +266,6 @@ namespace FootPatrol.Droid
                 client.Connect(); //if the client is not already connected, connect to the client before opening the map
         }
 
-		/*public override void OnDestroyView()
-		{
-            base.OnDestroyView();
-
-            AlertDialog.Builder builder = new AlertDialog.Builder(this.Context)
-                .SetMessage("Are you sure you would like to logout?")
-                .SetPositiveButton("Yes", (sender, e) =>
-                {
-                    if (Int32.Parse(Build.VERSION.Sdk) > 23)
-                    {
-                        switchFragment(new LoginActivity(), Resource.Id.drawer_layout, "LoginActivity");
-                    }
-
-                    else
-                        switchFragment(new LoginActivity(), Resource.Id.drawer_layout1, "LoginActivity");
-
-                }).SetNegativeButton("No", (sender, e) =>
-                {
-
-                });
-
-            Dialog dialog = builder.Create();
-            dialog.Show();
-        }*/
-		
 		/// <summary>
 		/// Setup the googleAPI client to help administer map and get the current location using Location Services
 		/// </summary>
@@ -398,15 +396,13 @@ namespace FootPatrol.Droid
         private async Task<List<string>> getRequests()
         {
             HttpClient httpClient = new HttpClient(); //create a new HttpClient
-            Uri customURI = new Uri(backendURI + getURI); //get the URI to the API
+            Uri customURI = new Uri(backendURI + getRequestURI); //get the URI to the API
             var response = await httpClient.GetAsync(customURI); //get the asynchronous response
 
             try
             {
                 response.EnsureSuccessStatusCode(); //make sure the response returns with the correct status code
-
                 List<string> requestArray = new List<string>(); //initialize a new list of requests
-
                 var responseContent = await response.Content.ReadAsStringAsync(); //get the content of the response
                 var o = JObject.Parse(responseContent); //parse the response using JObject from Newtonsoft JSON library
                 var requests = o.SelectToken("requests").ToList(); //get each request from JToken List
@@ -421,6 +417,35 @@ namespace FootPatrol.Droid
             catch (Exception error)
             {
                 createAlert("The task to get user requests failed! The error is: " + error);
+                return null;
+            }
+        }
+
+        private async Task<List<string>> getVolunteers()
+        {
+            HttpClient httpClient = new HttpClient();
+            Uri customURI = new Uri(backendURI + getVolunteerURI);
+            var response = await httpClient.GetAsync(customURI); //get the asynchronous response
+
+            try 
+            {
+                response.EnsureSuccessStatusCode(); //make sure the response returns with the correct status code
+                volunteerArray = new List<string>();
+                var responseContent = await response.Content.ReadAsStringAsync();
+                var content = JObject.Parse(responseContent);
+                var volunteers = content.SelectToken("volunteers").ToList();
+
+                foreach(JToken a in volunteers)
+                {
+                    volunteerArray.Add(a.SelectToken("first_name").ToString() + " " + a.SelectToken("last_name").ToString());
+                }
+
+                return volunteerArray;
+            }
+
+            catch (Exception error)
+            {
+                //createAlert("The task to get volunteers failed! The error is: " + error);
                 return null;
             }
         }
@@ -530,7 +555,6 @@ namespace FootPatrol.Droid
             System.Diagnostics.Debug.WriteLine("The custom uri is: " + backendURI + userID);
             Uri customURI = new Uri(backendURI + userID);
             httpClient.DeleteAsync(customURI); //delete the accepted request from all requests
-                
         }
 
         /// <summary>
@@ -726,7 +750,7 @@ namespace FootPatrol.Droid
                    .SetMessage("Are you sure you want to complete the trip?")
                    .SetPositiveButton("Yes", (sender, e) =>
             {
-                postTripUI(); //on completed trip, update UI to accept more requests
+                disableUI(); //on completed trip, update UI to accept more requests
                 //completeTripBtn.Text = "PICKED UP USER";
                 //pickupComplete = false;
 
@@ -752,7 +776,7 @@ namespace FootPatrol.Droid
         /// <summary>
         /// Removes the trip UI from the view.
         /// </summary>
-        private void postTripUI()
+        private void disableUI()
         {
             if (Int32.Parse(Build.VERSION.Sdk) > 23)
             {
@@ -811,6 +835,11 @@ namespace FootPatrol.Droid
             Message msg = handler.ObtainMessage();
             msg.Arg1 = requestCount;
             handler.SendMessage(msg);
+        }
+
+        private void retrieveVolunteers(object state)
+        {
+            fpNames = Task.Run(() => getVolunteers()).Result;
         }
 
         /// <summary>
@@ -889,5 +918,4 @@ namespace FootPatrol.Droid
             fragmentTransaction.Commit(); //commit the transaction
         }
     }
-
 }

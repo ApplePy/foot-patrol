@@ -122,13 +122,19 @@
                 p1:layout_marginBottom="10dp" />
         </RelativeLayout>
         <ImageButton
-            p1:src="@drawable/ic_chevron_right_black_24dp"
+            p1:src="@drawable/ic_keyboard_arrow_right_black_24dp"
             p1:layout_width="30dp"
             p1:layout_height="100dp"
             p1:id="@+id/sideTabBtn"
             p1:background="@drawable/BorderResource"
             p1:layout_centerVertical="true"
             p1:scaleType="centerInside" />
+        <SearchView
+            p1:layout_width="match_parent"
+            p1:layout_height="30dp"
+            p1:id="@+id/searchView"
+            p1:layout_alignParentTop="true"
+            p1:background="@drawable/BorderResource" />
     </RelativeLayout>
     <ListView
         p1:id="@+id/navigationList1"
@@ -137,4 +143,8 @@
         p1:layout_gravity="left|center_vertical"
         p1:background="@drawable/BorderResource"
         p1:divider="#807F83" />
+    <ListView
+        p1:id="@+id/listView2"
+        p1:layout_width="150dp"
+        p1:layout_height="200dp" />
 </android.support.v4.widget.DrawerLayout>
