@@ -10,6 +10,9 @@ export class Volunteer {
   public first_name: string = "";
   public last_name: string = "";
   public disabled: boolean = false;
+  public latitude: string = "";
+  public longitude: string = "";
+  public timestamp: Date = new Date();
 
   /* tslint:enable:variable-name */
 
@@ -24,7 +27,10 @@ export class Volunteer {
       uwo_id: String,
       first_name: String,
       last_name: String,
-      disabled: (field: any) => (field === "false") ? false : Boolean(field)
+      disabled: (field: any) => (field === "false") ? false : Boolean(field),
+      latitude: String,
+      longitude: String,
+      timestamp: (field: any) => new Date(field)
     };
 
     // Check if a value is valid before trying assignment
@@ -42,11 +48,11 @@ export class Volunteer {
     // Make new object
     // tslint:disable-next-line:prefer-const
     let censored: any = {};
-    Object.assign(censored, this);
 
-    // Remove sensitive fields
-    censored.uwo_id = undefined;
-    censored.disabled = undefined;
+    // Only add non-sensitive fields
+    censored.id = this.id;
+    censored.first_name = this.first_name;
+    censored.last_name = this.last_name;
 
     return censored;
   }

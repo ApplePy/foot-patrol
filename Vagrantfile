@@ -114,7 +114,18 @@ Vagrant.configure("2") do |config|
     gem install xcpretty
   SHELL
   config.vm.provision "shell", privileged: false, inline: <<-SHELL
+    brew tap caskroom/versions
     brew upgrade
-    brew cask install visual-studio xamarin-ios xamarin-android
+    brew install gitlab-runner
+    brew cask install visual-studio xamarin-ios xamarin-android java8 android-sdk
+
+    # Setup Android development tools
+    mkdir -p ~/.android && touch ~/.android/repositories.cfg
+    yes | sdkmanager --licenses
+    sdkmanager "build-tools;26.0.3"
+    sdkmanager "platforms;android-26"
+    sdkmanager "patcher;v4"
+    sdkmanager "platform-tools"
+    sdkmanager --update
   SHELL
 end

@@ -49,6 +49,9 @@ CREATE TABLE IF NOT EXISTS volunteers (
   uwo_id VARCHAR(12) NOT NULL,
   first_name VARCHAR(60) NOT NULL,
   last_name VARCHAR(60) NOT NULL,
+  latitude VARCHAR(20),
+  longitude VARCHAR(20),
+  timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   disabled TINYINT(1) DEFAULT 0 NOT NULL,
   PRIMARY KEY (id)
 );
