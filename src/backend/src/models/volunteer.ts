@@ -48,11 +48,11 @@ export class Volunteer {
     // Make new object
     // tslint:disable-next-line:prefer-const
     let censored: any = {};
-    Object.assign(censored, this);
 
-    // Remove sensitive fields
-    censored.uwo_id = undefined;
-    censored.disabled = undefined;
+    // Only add non-sensitive fields
+    censored.id = this.id;
+    censored.first_name = this.first_name;
+    censored.last_name = this.last_name;
 
     return censored;
   }
