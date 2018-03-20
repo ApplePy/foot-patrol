@@ -1,6 +1,7 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import {RouterTestingModule} from '@angular/router/testing';
 import {FormsModule} from '@angular/forms';
+import {AuthService} from '../auth.service';
 
 import { LoginPageComponent } from './login-page.component';
 
@@ -12,7 +13,8 @@ describe('LoginPageComponent', () => {
     TestBed.configureTestingModule({
       imports: [RouterTestingModule,
       FormsModule],
-      declarations: [ LoginPageComponent ]
+      declarations: [ LoginPageComponent ],
+      providers: [AuthService]
     })
     .compileComponents();
   }));
@@ -31,30 +33,15 @@ describe('LoginPageComponent', () => {
     beforeEach(() => {
       fixture = TestBed.createComponent(LoginPageComponent);
       component = fixture.componentInstance;
-      spyOn(component.router, 'navigateByUrl');
-      spyOn(sessionStorage, 'setItem');
+      spyOn(component.authservice, 'login');
       fixture.detectChanges();
     });
 
-    it('should let in administrators', () => {
-      component.username = 'root';
-      component.password = 'root';
-      component.login();
-      expect(sessionStorage.setItem).toHaveBeenCalledWith('currentUser', 'Admin');
-      expect(component.router.navigateByUrl).toHaveBeenCalledWith('/request-list');
-    });
-    it('should let in dispatch users', () => {
-      component.username = component.users[0].username;
-      component.password = component.users[0].password;
-      component.login();
-      expect(sessionStorage.setItem).toHaveBeenCalledWith('currentUser', 'Dispatcher');
-      expect(component.router.navigateByUrl).toHaveBeenCalledWith('/request-list');
-    });
-    it('should block when given incorrect user information', () => {
+    it('should call the authService', () => {
       component.username = 'foo';
       component.password = 'bar';
       component.login();
-      expect(component.errorMsg).toBe('Incorrect login information');
+      expect(component.authservice.login).toHaveBeenCalledWith('foo', 'bar');
     });
   });
 });

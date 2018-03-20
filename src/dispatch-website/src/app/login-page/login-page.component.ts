@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import {Router} from '@angular/router';
 import {FormsModule} from '@angular/forms';
+import {AuthService} from '../auth.service';
 
 @Component({
   selector: 'app-login-page',
@@ -9,58 +10,23 @@ import {FormsModule} from '@angular/forms';
 })
 export class LoginPageComponent implements OnInit {
 
-  errorMsg: string;
-  users: User[];
+  constructor(public router: Router, public authservice: AuthService) { }
+
   username: string;
   password: string;
 
-  constructor(public router: Router) { }
-
   ngOnInit() {
-    this.users = [{
-      username: 'Rowan',
-      password: 'Collier'
-    }, {
-      username: 'Darryl',
-      password: 'Murray'
-    }, {
-      username: 'Kian',
-      password: 'Paliani'
-    }, {
-      username: 'Michael',
-      password: 'Romao'
-    }];
+
   }
 
   /**
    * no backend support :(
-   * run shittyHack.exe
+   * implemented a slimed down version of this tutorial
+   * https://loiane.com/2017/08/angular-hide-navbar-login-page/
    */
   login() {
-    let found = false;
-    if (this.username === 'root' && this.password === 'root') {
-      sessionStorage.setItem('currentUser', 'Admin');
-      this.router.navigateByUrl('/request-list');
-    } else {
-      for (let i = 0; i < this.users.length; i++) {
-        if (this.users[i].username === this.username && this.users[i].password === this.password) {
-          sessionStorage.setItem('currentUser', 'Dispatcher');
-          found = true;
-          break;
-        }
-      }
-      if (found) {
-        this.errorMsg = '';
-        this.router.navigateByUrl('/request-list');
-      } else {
-        this.errorMsg = 'Incorrect login information';
-      }
-    }
+    this.authservice.login(this.username, this.password);
   }
 
 }
 
-class User {
-  username: string;
-  password: string;
-}

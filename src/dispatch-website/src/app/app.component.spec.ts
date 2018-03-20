@@ -5,6 +5,8 @@ import {RequestListComponent} from './request-list/request-list.component';
 import {FormsModule} from '@angular/forms';
 import {HttpModule} from '@angular/http';
 import {RouterTestingModule} from '@angular/router/testing';
+import { HeaderComponent } from './header/header.component';
+import { AuthService } from './auth.service';
 
 describe('AppComponent', () => {
   beforeEach(async(() => {
@@ -13,12 +15,15 @@ describe('AppComponent', () => {
       imports: [
         FormsModule,
         HttpModule,
-      RouterTestingModule],
+        RouterTestingModule
+        ],
       declarations: [
         AppComponent,
         RequestListComponent,
+        HeaderComponent
       ],
-      providers: [HttpModule]
+      providers: [HttpModule,
+        AuthService]
     }).compileComponents();
   }));
   it('should create the app', async(() => {
