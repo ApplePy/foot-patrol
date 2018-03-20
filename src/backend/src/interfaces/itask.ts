@@ -5,7 +5,7 @@ export interface ITask {
   /**
    * Registration function to setup a task (can be recurrent).
    */
-  register(): NodeJS.Timer;
+  register(): void;
 
   /**
    * Registration function to stop a task (can be recurrent).
