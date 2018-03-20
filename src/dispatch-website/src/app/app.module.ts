@@ -10,6 +10,7 @@ import { AddRequestComponent } from './add-request/add-request.component';
 import {HttpClientModule} from '@angular/common/http';
 import {AgmCoreModule} from '@agm/core';
 import { MapGeneralComponent } from './map-general/map-general.component';
+import {SuiModule} from 'ng2-semantic-ui';
 
 @NgModule({
   declarations: [
