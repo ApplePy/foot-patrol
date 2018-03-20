@@ -128,7 +128,8 @@ class PairingsAPITest {
       }
       return [PairingsAPITest.VOLUNTEERS.find((x) => x.id === values[0])];
     };
-    TestReplaceHelper.replaceParallel(sqlQuery, "volunteer_pairing", DB_DATA)
+    TestReplaceHelper.dateReplace(sqlQuery, "volunteers", DB_DATA, "timestamp")
+    .then(() => TestReplaceHelper.replaceParallel(sqlQuery, "volunteer_pairing", DB_DATA))
     .then(() => {
 
     // Start request
@@ -181,7 +182,8 @@ class PairingsAPITest {
       }
       return [PairingsAPITest.VOLUNTEERS.find((x) => x.id === values[0])];
     };
-    TestReplaceHelper.replaceParallel(sqlQuery, "volunteer_pairing", DB_DATA)
+    TestReplaceHelper.dateReplace(sqlQuery, "volunteers", DB_DATA, "timestamp")
+    .then(() => TestReplaceHelper.replaceParallel(sqlQuery, "volunteer_pairing", DB_DATA))
     .then(() => {
 
     // Start request
@@ -234,7 +236,8 @@ class PairingsAPITest {
       }
       return [PairingsAPITest.VOLUNTEERS.find((x) => x.id === values[0])];
     };
-    TestReplaceHelper.replaceParallel(sqlQuery, "volunteer_pairing", DB_DATA)
+    TestReplaceHelper.dateReplace(sqlQuery, "volunteers", DB_DATA, "timestamp")
+    .then(() => TestReplaceHelper.replaceParallel(sqlQuery, "volunteer_pairing", DB_DATA))
     .then(() => {
 
     // Start request
@@ -326,7 +329,8 @@ class PairingsAPITest {
       }
       return [PairingsAPITest.VOLUNTEERS.find((x) => x.id === values[0])];
     };
-    TestReplaceHelper.replaceParallel(sqlQuery, "volunteer_pairing", DB_DATA)
+    TestReplaceHelper.dateReplace(sqlQuery, "volunteers", DB_DATA, "timestamp")
+    .then(() => TestReplaceHelper.replaceParallel(sqlQuery, "volunteer_pairing", DB_DATA))
     .then(() => {
 
     // Start request
