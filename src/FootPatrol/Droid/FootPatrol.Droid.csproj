@@ -161,6 +161,8 @@
     <Compile Include="CampusMapsActivity.cs" />
     <Compile Include="NonEmergencyContactsActivity.cs" />
     <Compile Include="CheckInActivity.cs" />
+    <Compile Include="UserActivity.cs" />
+    <Compile Include="VolunteerPairs.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
@@ -199,6 +201,8 @@
     <AndroidResource Include="Resources\layout\CampusMap.xml" />
     <AndroidResource Include="Resources\layout\FootPatrolMap.xml" />
     <AndroidResource Include="Resources\drawable\ic_keyboard_arrow_up_black_24dp.png" />
+    <AndroidResource Include="Resources\layout\UserScreen.xml" />
+    <AndroidResource Include="Resources\layout\UserScreenMF.xml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\drawable\" />

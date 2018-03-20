@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v4.widget.DrawerLayout xmlns:p1="http://schemas.android.com/apk/res/android"
+    p1:id="@+id/userdrawer"
+    p1:layout_width="match_parent"
+    p1:layout_height="match_parent">
+    <RelativeLayout
+        p1:minWidth="25px"
+        p1:minHeight="25px"
+        p1:layout_width="match_parent"
+        p1:fillViewport="true"
+        p1:layout_height="match_parent"
+        p1:gravity="center_vertical">
+        <com.google.android.gms.maps.MapView
+            p1:minWidth="25px"
+            p1:minHeight="25px"
+            p1:layout_width="match_parent"
+            p1:layout_height="match_parent"
+            p1:id="@+id/map" />
+        <ImageButton
+            p1:src="@drawable/ic_keyboard_arrow_right_black_24dp"
+            p1:layout_width="30dp"
+            p1:layout_height="100dp"
+            p1:id="@+id/userSideTab"
+            p1:background="@drawable/BorderResource"
+            p1:layout_centerVertical="true"
+            p1:scaleType="centerInside" />
+    </RelativeLayout>
+    <ListView
+        p1:id="@+id/userListView"
+        p1:layout_width="150dp"
+        p1:layout_height="200dp"
+        p1:layout_gravity="left|center_vertical"
+        p1:background="@drawable/BorderResource"
+        p1:divider="#807F83" />
+</android.support.v4.widget.DrawerLayout>

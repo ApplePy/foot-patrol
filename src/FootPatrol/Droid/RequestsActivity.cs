@@ -61,6 +61,9 @@ namespace FootPatrol.Droid
             ImageButton leftArrow = (ImageButton)view.FindViewById(Resource.Id.leftArrow);
             ImageButton closeBtn = (ImageButton)view.FindViewById(Resource.Id.closeButton);
             Button acceptReq = (Button)view.FindViewById(Resource.Id.acceptRequest);
+            Spinner loadingSpinner = (Spinner)view.FindViewById(Resource.Id.spinner1);
+
+            loadingSpinner.Visibility = ViewStates.Gone;
 
             //Take care of correct fonts
             Typeface bentonSans = Typeface.CreateFromAsset(this.Activity.Application.Assets, "BentonSansRegular.otf");
@@ -120,6 +123,7 @@ namespace FootPatrol.Droid
             //accept request button click listener
             acceptReq.Click += (sender, e) =>
             {
+                loadingSpinner.Visibility = ViewStates.Visible;
                 va = new VolunteerActivity(); //initialize the new instance of the VolunteerActivity class
                 va.onTripAcceptAsync(activeRequests[currentCount]); //pass the accepted request into the trip accept function
             };

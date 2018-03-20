@@ -10,6 +10,7 @@ using Android.Locations;
 using System.Net.Http;
 using System;
 using System.Linq;
+using System.Text;
 using Android.Gms.Common;
 using Android.Runtime;
 using Android.Widget;
@@ -28,10 +29,11 @@ namespace FootPatrol.Droid
     public class VolunteerActivity : Android.Support.V4.App.Fragment, GoogleApiClient.IOnConnectionFailedListener, GoogleApiClient.IConnectionCallbacks, Android.Gms.Location.ILocationListener, IOnMapReadyCallback
     {
         public static string name, to_location, from_location, additional_info; //variables to keep name, location and additional information of user
-        public static int id;
+        public static int id, pairID, myID = 88;
+        public bool isPaired = false, pickupPending = false;
 
         public static Typeface bentonSans; //font to be used in application
-        private ArrayAdapter<System.String> listAdapter,fpAdapter; //adapter to help display directions
+        private static ArrayAdapter<String> listAdapter,fpAdapter; //adapter to help display directions
         //private bool pickupComplete = false;
 
         private static SupportMapFragment mf; //fragment that displays map on < API 24
@@ -47,9 +49,10 @@ namespace FootPatrol.Droid
         private static RelativeLayout mRelativeLayout, mfRelativeLayout; //relative layouts to display status of complete, cancel and pickup on trip
         private static Android.Widget.SearchView searchView;
 
-        private static string backendURI, getRequestURI, getVolunteerURI;
+        private static string backendURI, getRequestURI, getVolunteerURI, postPairURI;
 
         public static List<string> request, steps, fpNames, volunteerArray; //lists to hold information on requests and direction steps, and volunteer names
+        public static List<int> volunteerID;
         public static string[] menuItems; //list of menu items to be displayed in side tab
         public static RequestsActivity ra; //get a reference to each request object
 
@@ -61,7 +64,7 @@ namespace FootPatrol.Droid
         private static Location myLocation; //the volunteer's current location
         private IFusedLocationProviderApi location; //location of the volunteer
         private LocationRequest locationRequest; //a new location request object so that location can be updated
-        private MarkerOptions volunteerMarker, userMarker; //marker options to be used for each marker on map
+        private MarkerOptions volunteerMarker, userMarker, pairMarker; //marker options to be used for each marker on map
         private PolylineOptions polyOptions; //polyline options for the following polyline
         private static Polyline poly; //polyline to display directions on the map
 
@@ -83,8 +86,8 @@ namespace FootPatrol.Droid
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
-                
-            menuItems = new string[] { "NON-EMERGENCY CONTACTS", "CAMPUS MAPS", "PAIR FOOT PATROLLERS", "CHECK-IN", "LOGOUT"}; //initializes list to displayed in listView 
+
+            menuItems = new string[] { "NON-EMERGENCY CONTACTS", "CAMPUS MAPS", "PAIR/UNPAIR FOOT PATROLLERS", "CHECK-IN", "LOGOUT" }; //initializes list to displayed in listView 
          
             listAdapter = new ArrayAdapter<string>(this.Context, Resource.Layout.ListElement, menuItems); //initializes ArrayAdapter to be displayed in listView
 
@@ -92,14 +95,15 @@ namespace FootPatrol.Droid
             backendURI = "http://staging.capstone.incode.ca/api/v1";
             getRequestURI = "/requests/?offset=0&count=9&archived=true";
             getVolunteerURI = "/volunteers/inactive";
+            postPairURI = "/volunteerPairs";
             request = new List<string>();
             fpNames = new List<string>();
 
             TimerCallback time = new TimerCallback(retrieveRequests); //create a new timerCallback to be used in timer
             Timer timer = new Timer(time, 0, 0, 1000); //use the timerCallback to check for user requests every second
 
-            TimerCallback tc = new TimerCallback(retrieveVolunteers);
-            Timer t = new Timer(tc, 0, 0, 100000);
+            fpNames = Task.Run(() => getVolunteers()).Result;
+            fpAdapter = new ArrayAdapter<string>(this.Context, Resource.Layout.ListElement, fpNames);
 
             try
             {
@@ -116,8 +120,6 @@ namespace FootPatrol.Droid
             createLocationRequest(); //create new location request to continuously update volunteer request
             clientSetup(); //set up the Google client 
 
-            fpAdapter = new ArrayAdapter<string>(this.Context, Resource.Layout.ListElement, fpNames);
-         
             if (Int32.Parse(Build.VERSION.Sdk) > 23) //if the user is using a build version of >= API 24 (use mapView)
             {
                 //initialize UI elements
@@ -158,8 +160,13 @@ namespace FootPatrol.Droid
                     completeBtnClicked();
                 };
 
-                mListView.SetAdapter(listAdapter); //set the listView adapter to the adapter initialized in the view
-                fpListView.SetAdapter(fpAdapter);
+                mListView.Adapter = listAdapter;
+                fpListView.Adapter = fpAdapter;
+
+                searchView.QueryTextChange += (sender, e) =>
+                {
+                    fpAdapter.Filter.InvokeFilter(e.NewText);
+                };
 
                 mListView.ItemClick += (sender, e) => //listView click listener
                 {
@@ -168,7 +175,7 @@ namespace FootPatrol.Droid
 
                 fpListView.ItemClick += (sender, e) =>
                 {
-
+                    confirmFootPatroller(fpAdapter.GetItem(e.Position).ToString());
                 };
 
                 mView.OnCreate(savedInstanceState);
@@ -205,8 +212,14 @@ namespace FootPatrol.Droid
 
                 mfRecyclerView.SetLayoutManager(layoutManager); //set the layout manager of the recyclerView
 
-                mfListView.SetAdapter(listAdapter); //set the listView adapter
-                fpListView.SetAdapter(fpAdapter);
+                mfListView.Adapter = listAdapter; //set the listView adapter
+                fpListView.Adapter = fpAdapter;
+
+                searchView.QueryTextChange += (sender, e) =>
+                {
+                    fpAdapter.Filter.InvokeFilter(e.NewText);
+                };
+
                 mfListView.ItemClick += (sender, e) => //listView click listener
                 {
                     selectItem(e.Position);
@@ -214,7 +227,7 @@ namespace FootPatrol.Droid
 
                 fpListView.ItemClick += (sender, e) =>
                 {
-
+                    confirmFootPatroller(fpAdapter.GetItem(e.Position).ToString());
                 };
               
                 //onClick listeners for each interactable UI element
@@ -431,6 +444,7 @@ namespace FootPatrol.Droid
             {
                 response.EnsureSuccessStatusCode(); //make sure the response returns with the correct status code
                 volunteerArray = new List<string>();
+                volunteerID = new List<int>();
                 var responseContent = await response.Content.ReadAsStringAsync();
                 var content = JObject.Parse(responseContent);
                 var volunteers = content.SelectToken("volunteers").ToList();
@@ -438,6 +452,7 @@ namespace FootPatrol.Droid
                 foreach(JToken a in volunteers)
                 {
                     volunteerArray.Add(a.SelectToken("first_name").ToString() + " " + a.SelectToken("last_name").ToString());
+                    volunteerID.Add(Int32.Parse(a.SelectToken("id").ToString()));
                 }
 
                 return volunteerArray;
@@ -486,6 +501,14 @@ namespace FootPatrol.Droid
         /// <param name="request">The accepted request</param>
         public void onTripAcceptAsync(UserRequests.Request request)
         {
+            while(!isPaired)
+            {
+                pickupInfo.Text = "Pickup Pending Pairing";
+                updateSearchUI();
+                pickupPending = true;
+            }
+
+            pickupPending = false;
             //Set variables to save user information from request
             name = request.name;
             to_location = request.toLoc;
@@ -498,6 +521,7 @@ namespace FootPatrol.Droid
             toLoc.Text = "End Location: " + request.toLoc;
             fromLoc.Text = "Start Locatixon: " + request.fromLoc;
             addInfo.Text = "Additional Information: " + request.addInfo;
+            pickupInfo.Text = "Pickup Information";
 
             var address = from_location; //set the starting user destination as the address
             address = address + " Western University"; //concatenate the address with Western University to narrow the search
@@ -790,9 +814,7 @@ namespace FootPatrol.Droid
                 mfRelativeLayout.Visibility = ViewStates.Gone;
             }
 
-            badgeCounter.Visibility = ViewStates.Visible;
-            notificationBase.Visibility = ViewStates.Visible;
-            notificationBadge.Visibility = ViewStates.Visible;
+            enableRequestUI();
 
             poly.Remove();
             userMark.Remove();
@@ -837,11 +859,6 @@ namespace FootPatrol.Droid
             handler.SendMessage(msg);
         }
 
-        private void retrieveVolunteers(object state)
-        {
-            fpNames = Task.Run(() => getVolunteers()).Result;
-        }
-
         /// <summary>
         /// If the client has failed to connect, attempt to reconnect the client, otherwise notify the user.
         /// </summary>
@@ -861,7 +878,7 @@ namespace FootPatrol.Droid
         private void setMarker(LatLng position)
         {
             volunteerMarker.SetPosition(position)
-                               .SetTitle("Volunteer")
+                               .SetTitle("You")
                                .SetIcon(BitmapDescriptorFactory.DefaultMarker(BitmapDescriptorFactory.HueRed)); //set the current position of the volunteer using a marker
             CameraPosition cp = new CameraPosition.Builder().Target(position)
                                                   .Zoom(15)
@@ -886,27 +903,65 @@ namespace FootPatrol.Droid
                     break;
 
                 case 2:
-                    //fragment = new CampusMapsActivity();
-                    //tag = "CampusMapsActivity";
+                    if (!isPaired)
+                        updateSearchUI();
+                    else
+                        unPairFootPatrollers();
                     break;
 
                 case 3:
                     //fragment = new CampusMapsActivity();
                     //tag = "CampusMapsActivity";
                     break;
+                case 4:
+                    break;
             }
 
             if (Int32.Parse(Build.VERSION.Sdk) > 23)
             {
                 mDrawerLayout.CloseDrawer(mListView); //close the drawer when entering new view
-                switchFragment(fragment, Resource.Id.drawer_layout, tag);
+                if (position != 2)
+                    switchFragment(fragment, Resource.Id.drawer_layout, tag);
             }
 
             else
             {
                 mfDrawerLayout.CloseDrawer(mfListView); //close the drawer when entering new view
-                switchFragment(fragment, Resource.Id.drawer_layout1, tag);
+                if (position != 2)
+                    switchFragment(fragment, Resource.Id.drawer_layout1, tag);
             }
+        }
+
+        private void confirmFootPatroller(string fpName)
+        {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this.Context);
+            builder.SetMessage("Are you sure you would like to pair with " + fpName + "?")
+                   .SetPositiveButton("Yes", (sender, e) =>
+                   {
+                       int position = findPosition(fpName);
+                       int vID = volunteerID[position];
+                       if (pickupPending)
+                           Task.Run(() => pairFootPatrollers(vID, true));
+                       else
+                           Task.Run(() => pairFootPatrollers(vID, false));
+                       pairMarker = new MarkerOptions();
+                       pairMarker.SetTitle(fpName)
+                                 .SetIcon(BitmapDescriptorFactory.DefaultMarker(BitmapDescriptorFactory.HueGreen))
+                                 .SetPosition(new LatLng(myLocation.Latitude - .0008, myLocation.Longitude));
+                       map.AddMarker(pairMarker);
+                       searchView.Visibility = ViewStates.Gone;
+                       fpListView.Visibility = ViewStates.Gone;
+                       if(!pickupPending)
+                          enableRequestUI();
+                       isPaired = true;
+                   })
+                   .SetNegativeButton("No", (sender, e) =>
+                   {
+                       //Do nothing
+                   });
+
+            Dialog dialog = builder.Create();
+            dialog.Show();
         }
 
         private void switchFragment(Android.Support.V4.App.Fragment frag, int resource, string t)
@@ -916,6 +971,76 @@ namespace FootPatrol.Droid
             fragmentTransaction.AddToBackStack("VolunteerActivity");
             fragmentTransaction.Replace(resource, frag, t);
             fragmentTransaction.Commit(); //commit the transaction
+        }
+
+        private void updateSearchUI()
+        {
+            if (Int32.Parse(Build.VERSION.Sdk) > 23)
+            {
+                mRecyclerView.Visibility = ViewStates.Gone;
+                mRelativeLayout.Visibility = ViewStates.Gone;
+            }
+
+            else
+            {
+                mfRecyclerView.Visibility = ViewStates.Gone;
+                mfRelativeLayout.Visibility = ViewStates.Gone;
+            }
+            removeRequestUI();
+            searchView.Visibility = ViewStates.Visible;
+            fpListView.Visibility = ViewStates.Visible;
+        }
+
+        private void unPairFootPatrollers()
+        {
+            
+        }
+
+        private async Task<int> pairFootPatrollers(int vID, bool active)
+        {
+            HttpClient httpClient = new HttpClient();
+            Uri customURI = new Uri(backendURI + postPairURI);
+
+            var content = new VolunteerPairs
+            {
+                Active = active,
+                Volunteers = new int[2] {vID, myID}
+            };
+            HttpContent httpContent = new StringContent(content.ToString(),Encoding.UTF8, "application/json");
+            HttpResponseMessage response = await httpClient.PostAsync(customURI, httpContent);
+
+            try 
+            {
+                response.EnsureSuccessStatusCode();
+                var responseString = await response.Content.ReadAsStringAsync();
+                System.Diagnostics.Debug.WriteLine(responseString);
+                return 0;
+            }
+
+            catch(Exception e)
+            {
+                
+            }
+
+            return 0;
+        }
+
+        private void enableRequestUI()
+        {
+            badgeCounter.Visibility = ViewStates.Visible;
+            notificationBase.Visibility = ViewStates.Visible;
+            notificationBadge.Visibility = ViewStates.Visible;
+        }
+
+        private int findPosition(string volunteer)
+        {
+            for (var i = 0; i < fpNames.Count; i++)
+            {
+                if (fpNames[i] == volunteer)
+                    return i;
+            }
+
+            return -1;
         }
     }
 }
