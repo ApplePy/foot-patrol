@@ -163,6 +163,7 @@
     <Compile Include="CheckInActivity.cs" />
     <Compile Include="UserActivity.cs" />
     <Compile Include="VolunteerPairs.cs" />
+    <Compile Include="RequestStatus.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
