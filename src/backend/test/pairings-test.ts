@@ -57,9 +57,18 @@ class PairingsAPITest {
   }
 
   private static readonly VOLUNTEERS = [
-    { id: 1, uwo_id: "jdoe12", first_name: "John", last_name: "Doe", disabled: false },
-    { id: 2, uwo_id: "jdoe23", first_name: "Jane", last_name: "Doe", disabled: false },
-    { id: 3, uwo_id: "jdoe34", first_name: "Bobby", last_name: "Doe", disabled: true }
+    { id: 1, uwo_id: "jdoe12", first_name: "John", last_name: "Doe", disabled: false,
+    latitude: "42.9849",
+    longitude: "81.2453",
+    timestamp: "2017-10-26T06:51:05.000Z" },
+    { id: 2, uwo_id: "jdoe23", first_name: "Jane", last_name: "Doe", disabled: false,
+    latitude: "42.9849",
+    longitude: "81.2453",
+    timestamp: "2017-10-26T06:51:05.000Z" },
+    { id: 3, uwo_id: "jdoe34", first_name: "Bobby", last_name: "Doe", disabled: true,
+    latitude: "42.9849",
+    longitude: "81.2453",
+    timestamp: "2017-10-26T06:51:05.000Z" }
   ];
 
   constructor() {
@@ -104,6 +113,8 @@ class PairingsAPITest {
       new Volunteer(PairingsAPITest.VOLUNTEERS.find((vol) => vol.id === x.volunteer_one)),
       new Volunteer(PairingsAPITest.VOLUNTEERS.find((vol) => vol.id === x.volunteer_two))
       ];
+      // Foreach to fix date formatting error
+      rx.volunteers.forEach((element: any) => element.timestamp = element.timestamp.toJSON());
       return rx;
     });
 
@@ -119,7 +130,8 @@ class PairingsAPITest {
       }
       return [PairingsAPITest.VOLUNTEERS.find((x) => x.id === values[0])];
     };
-    TestReplaceHelper.replaceParallel(sqlQuery, "volunteer_pairing", DB_DATA)
+    TestReplaceHelper.dateReplace(sqlQuery, "volunteers", DB_DATA, "timestamp")
+    .then(() => TestReplaceHelper.replaceParallel(sqlQuery, "volunteer_pairing", DB_DATA))
     .then(() => {
 
     // Start request
@@ -156,6 +168,8 @@ class PairingsAPITest {
         new Volunteer(PairingsAPITest.VOLUNTEERS.find((vol) => vol.id === x.volunteer_one)),
         new Volunteer(PairingsAPITest.VOLUNTEERS.find((vol) => vol.id === x.volunteer_two))
       ];
+      // Foreach to fix date formatting error
+      rx.volunteers.forEach((element: any) => element.timestamp = element.timestamp.toJSON());
       return rx;
     });
 
@@ -172,7 +186,8 @@ class PairingsAPITest {
       }
       return [PairingsAPITest.VOLUNTEERS.find((x) => x.id === values[0])];
     };
-    TestReplaceHelper.replaceParallel(sqlQuery, "volunteer_pairing", DB_DATA)
+    TestReplaceHelper.dateReplace(sqlQuery, "volunteers", DB_DATA, "timestamp")
+    .then(() => TestReplaceHelper.replaceParallel(sqlQuery, "volunteer_pairing", DB_DATA))
     .then(() => {
 
     // Start request
@@ -208,6 +223,8 @@ class PairingsAPITest {
         new Volunteer(PairingsAPITest.VOLUNTEERS.find((vol) => vol.id === x.volunteer_one)),
         new Volunteer(PairingsAPITest.VOLUNTEERS.find((vol) => vol.id === x.volunteer_two))
       ];
+      // Foreach to fix date formatting error
+      rx.volunteers.forEach((element: any) => element.timestamp = element.timestamp.toJSON());
       return rx;
     });
 
@@ -225,7 +242,8 @@ class PairingsAPITest {
       }
       return [PairingsAPITest.VOLUNTEERS.find((x) => x.id === values[0])];
     };
-    TestReplaceHelper.replaceParallel(sqlQuery, "volunteer_pairing", DB_DATA)
+    TestReplaceHelper.dateReplace(sqlQuery, "volunteers", DB_DATA, "timestamp")
+    .then(() => TestReplaceHelper.replaceParallel(sqlQuery, "volunteer_pairing", DB_DATA))
     .then(() => {
 
     // Start request
@@ -303,6 +321,8 @@ class PairingsAPITest {
         new Volunteer(PairingsAPITest.VOLUNTEERS.find((vol) => vol.id === x.volunteer_one)),
         new Volunteer(PairingsAPITest.VOLUNTEERS.find((vol) => vol.id === x.volunteer_two))
       ];
+      // Foreach to fix date formatting error
+      rx.volunteers.forEach((element: any) => element.timestamp = element.timestamp.toJSON());
       return rx;
     });
 
@@ -317,7 +337,8 @@ class PairingsAPITest {
       }
       return [PairingsAPITest.VOLUNTEERS.find((x) => x.id === values[0])];
     };
-    TestReplaceHelper.replaceParallel(sqlQuery, "volunteer_pairing", DB_DATA)
+    TestReplaceHelper.dateReplace(sqlQuery, "volunteers", DB_DATA, "timestamp")
+    .then(() => TestReplaceHelper.replaceParallel(sqlQuery, "volunteer_pairing", DB_DATA))
     .then(() => {
 
     // Start request
@@ -397,14 +418,18 @@ class PairingsAPITest {
       .post(pathPrefix + "/volunteerpairs")
       .send(INPUT)
       .end((err, res) => {
+        // Foreach to fix date formatting error
+        const expRes = [
+          new Volunteer(PairingsAPITest.VOLUNTEERS.find((vol) => vol.id === 1)),
+          new Volunteer(PairingsAPITest.VOLUNTEERS.find((vol) => vol.id === 2))
+        ];
+        expRes.forEach((element: any) => element.timestamp = element.timestamp.toJSON());
+
         // Verify results
         res.should.have.status(201);
         res.body.should.have.property("id");
         res.body.should.have.property("active").equal(false);
-        res.body.should.have.property("volunteers").deep.equal([
-          new Volunteer(PairingsAPITest.VOLUNTEERS.find((vol) => vol.id === 1)),
-          new Volunteer(PairingsAPITest.VOLUNTEERS.find((vol) => vol.id === 2))
-        ]);
+        res.body.should.have.property("volunteers").deep.equal(expRes);
         done();
       });
   }

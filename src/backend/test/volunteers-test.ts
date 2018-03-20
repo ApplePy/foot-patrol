@@ -86,15 +86,24 @@ class VolunteersAPITest {
     const DB_DATA = [
       {
         id: 1, uwo_id: "jdoe37", first_name: "John",
-        last_name: "Doe", disabled: false
+        last_name: "Doe", disabled: false,
+        latitude: "42.9849",
+        longitude: "81.2453",
+        timestamp: "2017-10-26T06:51:05.000Z"
       },
       {
         id: 2, uwo_id: "jdoe38", first_name: "Jane",
-        last_name: "Doe", disabled: false
+        last_name: "Doe", disabled: false,
+        latitude: "42.9849",
+        longitude: "81.2453",
+        timestamp: "2017-10-26T06:51:05.000Z"
       },
       {
         id: 3, uwo_id: "jdoe39", first_name: "Bobby",
-        last_name: "Doe", disabled: true
+        last_name: "Doe", disabled: true,
+        latitude: "42.9849",
+        longitude: "81.2453",
+        timestamp: "2017-10-26T06:51:05.000Z"
       }
     ];
 
@@ -105,7 +114,7 @@ class VolunteersAPITest {
 
     // Setup fake data
     FakeSQL.response = {};
-    Promise.all(DB_DATA.map((x) => TestReplaceHelper.replace(sqlQuery, "volunteers", x)))
+    TestReplaceHelper.dateReplace(sqlQuery, "volunteers", DB_DATA, "timestamp")
     .then(() => {
       FakeSQL.response = (q: string, v: any[]) => {
         v.should.contain(false);
@@ -138,15 +147,24 @@ class VolunteersAPITest {
     const DB_DATA = [
       {
         id: 1, uwo_id: "jdoe37", first_name: "John",
-        last_name: "Doe", disabled: false
+        last_name: "Doe", disabled: false,
+        latitude: "42.9849",
+        longitude: "81.2453",
+        timestamp: "2017-10-26T06:51:05.000Z"
       },
       {
         id: 2, uwo_id: "jdoe38", first_name: "Jane",
-        last_name: "Doe", disabled: false
+        last_name: "Doe", disabled: false,
+        latitude: "42.9849",
+        longitude: "81.2453",
+        timestamp: "2017-10-26T06:51:05.000Z"
       },
       {
         id: 3, uwo_id: "jdoe39", first_name: "Bobby",
-        last_name: "Doe", disabled: true
+        last_name: "Doe", disabled: true,
+        latitude: "42.9849",
+        longitude: "81.2453",
+        timestamp: "2017-10-26T06:51:05.000Z"
       }
     ];
 
@@ -157,7 +175,7 @@ class VolunteersAPITest {
 
     // Setup fake data
     FakeSQL.response = {};
-    Promise.all(DB_DATA.map((x) => TestReplaceHelper.replace(sqlQuery, "volunteers", x)))
+    TestReplaceHelper.dateReplace(sqlQuery, "volunteers", DB_DATA, "timestamp")
     .then(() => {
       FakeSQL.response = DB_DATA;
     })
@@ -188,15 +206,24 @@ class VolunteersAPITest {
     const DB_VOLUNTEERS_DATA = [
       {
         id: 1, uwo_id: "jdoe37", first_name: "John",
-        last_name: "Doe", disabled: false
+        last_name: "Doe", disabled: false,
+        latitude: "42.9849",
+        longitude: "81.2453",
+        timestamp: "2017-10-26T06:51:05.000Z"
       },
       {
         id: 2, uwo_id: "jdoe38", first_name: "Jane",
-        last_name: "Doe", disabled: false
+        last_name: "Doe", disabled: false,
+        latitude: "42.9849",
+        longitude: "81.2453",
+        timestamp: "2017-10-26T06:51:05.000Z"
       },
       {
         id: 3, uwo_id: "jdoe39", first_name: "Bobby",
-        last_name: "Doe", disabled: true
+        last_name: "Doe", disabled: true,
+        latitude: "42.9849",
+        longitude: "81.2453",
+        timestamp: "2017-10-26T06:51:05.000Z"
       }
     ];
     const DB_PAIRING_DATA = [
@@ -214,6 +241,7 @@ class VolunteersAPITest {
     FakeSQL.response = {};
     TestReplaceHelper.replaceParallel(sqlQuery, "volunteers", DB_VOLUNTEERS_DATA)
     .then(() => TestReplaceHelper.replaceParallel(sqlQuery, "volunteer_pairing", DB_PAIRING_DATA))
+    .then(() => TestReplaceHelper.dateReplace(sqlQuery, "volunteers", DB_VOLUNTEERS_DATA, "timestamp"))
     .then(() => {
       FakeSQL.response = [DB_VOLUNTEERS_DATA[0], DB_VOLUNTEERS_DATA[1]];
     })
@@ -243,15 +271,24 @@ class VolunteersAPITest {
     const DB_VOLUNTEERS_DATA = [
       {
         id: 1, uwo_id: "jdoe37", first_name: "John",
-        last_name: "Doe", disabled: false
+        last_name: "Doe", disabled: false,
+        latitude: "42.9849",
+        longitude: "81.2453",
+        timestamp: "2017-10-26T06:51:05.000Z"
       },
       {
         id: 2, uwo_id: "jdoe38", first_name: "Jane",
-        last_name: "Doe", disabled: false
+        last_name: "Doe", disabled: false,
+        latitude: "42.9849",
+        longitude: "81.2453",
+        timestamp: "2017-10-26T06:51:05.000Z"
       },
       {
         id: 3, uwo_id: "jdoe39", first_name: "Bobby",
-        last_name: "Doe", disabled: true
+        last_name: "Doe", disabled: true,
+        latitude: "42.9849",
+        longitude: "81.2453",
+        timestamp: "2017-10-26T06:51:05.000Z"
       }
     ];
     const DB_PAIRING_DATA = [
@@ -269,6 +306,7 @@ class VolunteersAPITest {
     FakeSQL.response = {};
     TestReplaceHelper.replaceParallel(sqlQuery, "volunteers", DB_VOLUNTEERS_DATA)
     .then(() => TestReplaceHelper.replaceParallel(sqlQuery, "volunteer_pairing", DB_PAIRING_DATA))
+    .then(() => TestReplaceHelper.dateReplace(sqlQuery, "volunteers", DB_VOLUNTEERS_DATA, "timestamp"))
     .then(() => {
       FakeSQL.response = [DB_VOLUNTEERS_DATA[0]];
     })
@@ -340,27 +378,39 @@ class VolunteersAPITest {
     const DB_DATA = [
       {
         id: 1, uwo_id: "jdoe37", first_name: "John",
-        last_name: "Doe", disabled: false
+        last_name: "Doe", disabled: false,
+        latitude: "42.9849",
+        longitude: "81.2453",
+        timestamp: "2017-10-26T06:51:05.000Z"
       },
       {
         id: 2, uwo_id: "jdoe38", first_name: "Jane",
-        last_name: "Doe", disabled: false
+        last_name: "Doe", disabled: false,
+        latitude: "42.9849",
+        longitude: "81.2453",
+        timestamp: "2017-10-26T06:51:05.000Z"
       },
       {
         id: 3, uwo_id: "jdoe39", first_name: "Bobby",
-        last_name: "Doe", disabled: true
+        last_name: "Doe", disabled: true,
+        latitude: "42.9849",
+        longitude: "81.2453",
+        timestamp: "2017-10-26T06:51:05.000Z"
       }
     ];
 
     // Expected return
     const EXPECTED_RESULTS = {
       id: 2, uwo_id: "jdoe38", first_name: "Jane",
-      last_name: "Doe", disabled: false
+      last_name: "Doe", disabled: false,
+      latitude: "42.9849",
+      longitude: "81.2453",
+      timestamp: "2017-10-26T06:51:05.000Z"
     };
 
     // Setup fake data
     FakeSQL.response = {};
-    Promise.all(DB_DATA.map((x) => TestReplaceHelper.replace(sqlQuery, "volunteers", x)))
+    TestReplaceHelper.dateReplace(sqlQuery, "volunteers", DB_DATA, "timestamp")
     .then(() => {
       FakeSQL.response = (query: string, values: any[]) => {
         values.should.deep.equal([2]);
@@ -422,11 +472,17 @@ class VolunteersAPITest {
     // Setup fake data
     const INPUT = {
       id: 5, uwo_id: "jdoe37", first_name: "John",
-      last_name: "Doe", extra: "test"
+      last_name: "Doe", extra: "test",
+      latitude: "42.9849",
+      longitude: "81.2453",
+      timestamp: "2017-10-26T06:51:05.000Z"
     };
     const EXPECTED_RESULTS = {
       uwo_id: "jdoe37", first_name: "John",
-      last_name: "Doe", disabled: false
+      last_name: "Doe", disabled: false,
+      latitude: "42.9849",
+      longitude: "81.2453",
+      timestamp: "2017-10-26T06:51:05.000Z"
     };
     const REQUESTS_DATA = (query: string, values: any[]) => {
       const newId = 2;
@@ -485,7 +541,10 @@ class VolunteersAPITest {
 
     // Setup fake data
     const INPUT = {
-      uwo_id: "joe37", first_name: "John", last_name: "Doe", disabled: true
+      uwo_id: "joe37", first_name: "John", last_name: "Doe", disabled: true,
+      latitude: "42.9849",
+      longitude: "81.2453",
+      timestamp: "2017-10-26T06:51:05.000Z"
     };
     const REQUESTS_DATA = undefined;
     FakeSQL.response = REQUESTS_DATA;
@@ -513,35 +572,47 @@ class VolunteersAPITest {
     // Fake data
     const DB_DATA = [{
         id: 1, uwo_id: "jdoe37", first_name: "John",
-        last_name: "Doe", disabled: false
+        last_name: "Doe", disabled: false,
+        latitude: "42.9849",
+        longitude: "81.2453",
+        timestamp: "2017-10-26T06:51:05.000Z"
       }];
 
     // Setup fake data
     const INPUT = {
       id: 5, uwo_id: "jdoe39", first_name: "Johnny",
-      last_name: "Doey", disabled: true
+      last_name: "Doey", disabled: true,
+      latitude: "43.9849",
+      longitude: "82.2453",
+      timestamp: "2018-10-26T06:51:05.000Z"
     };
     const EXPECTED_RESULTS = {
       id: 1, uwo_id: "jdoe39", first_name: "Johnny",
-      last_name: "Doey", disabled: true
+      last_name: "Doey", disabled: true,
+      latitude: "43.9849",
+      longitude: "82.2453",
+      timestamp: "2018-10-26T06:51:05.000Z"
     };
 
     // Setup DB responses
     FakeSQL.response = [];
-    Promise.all(DB_DATA.map((x) => TestReplaceHelper.replace(sqlQuery, "volunteers", x)))
+    TestReplaceHelper.dateReplace(sqlQuery, "volunteers", DB_DATA, "timestamp")
     .then(() => {
       FakeSQL.response = (query: string, values: any[]) => {
         if (query.search("^UPDATE") >= 0) {
           // Remove WHERE parameter since it has the ID
           query = query.substr(0, query.search("WHERE") - 1);
           // Ensure unwanted properties are not being added
-          [" id", "extra", "timestamp"].forEach((val) => query.search(val).should.equal(-1));
+          [" id", "extra"].forEach((val) => query.search(val).should.equal(-1));
           // Ensure wanted properties are being added
           [
             "first_name",
             "uwo_id",
             "last_name",
-            "disabled"
+            "disabled",
+            "latitude",
+            "longitude",
+            "timestamp"
           ].forEach((val) => query.search(val).should.not.equal(-1));
           return {affectedRows: 1};
         } else {
@@ -597,7 +668,10 @@ class VolunteersAPITest {
 
     // Setup fake data
     const INPUT = {
-      uwo_id: "jdoe37", first_name: "John", last_name: "Doe"
+      uwo_id: "jdoe37", first_name: "John", last_name: "Doe",
+      latitude: "42.9849",
+      longitude: "81.2453",
+      timestamp: "2017-10-26T06:51:05.000Z"
     };
     const REQUESTS_DATA = undefined;
     FakeSQL.response = REQUESTS_DATA;
@@ -620,7 +694,10 @@ class VolunteersAPITest {
   public putBadId(done: MochaDone) {
     // Setup fake data
     const INPUT = {
-      uwo_id: "jdoe37", first_name: "John", last_name: "Doe"
+      uwo_id: "jdoe37", first_name: "John", last_name: "Doe",
+      latitude: "42.9849",
+      longitude: "81.2453",
+      timestamp: "2017-10-26T06:51:05.000Z"
     };
     const REQUESTS_DATA = {affectedRows: 0};
     FakeSQL.response = REQUESTS_DATA;
@@ -668,7 +745,10 @@ class VolunteersAPITest {
     // Fake data
     const DB_DATA = {
       id: 1, uwo_id: "jdoe37", first_name: "John",
-      last_name: "Doe", disabled: false
+      last_name: "Doe", disabled: false,
+      latitude: "42.9849",
+      longitude: "81.2453",
+      timestamp: "2017-10-26T06:51:05.000Z"
     };
 
     // Setup fake data
@@ -679,12 +759,16 @@ class VolunteersAPITest {
     };
     const EXPECTED_RESULTS = {
       id: 1, uwo_id: "jdoe37", first_name: "John",
-      last_name: "Doe", disabled: true
+      last_name: "Doe", disabled: true,
+      latitude: "42.9849",
+      longitude: "81.2453",
+      timestamp: "2017-10-26T06:51:05.000Z"
     };
 
     // Setup DB with data
     FakeSQL.response = {};
     TestReplaceHelper.replace(sqlQuery, "volunteers", DB_DATA)
+    .then(() => TestReplaceHelper.dateReplace(sqlQuery, "volunteers", DB_DATA, "timestamp"))
     .then(() => {
       FakeSQL.response = (query: string, values: any[]) => {
         if (query.search("^UPDATE") >= 0) {

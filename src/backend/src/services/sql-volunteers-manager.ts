@@ -86,8 +86,8 @@ export class SQLVolunteersManager extends SQLAbstractManager implements IVolunte
     }
 
     return this.db.makeQuery(
-      "INSERT INTO `volunteers` (uwo_id, first_name, last_name, disabled) VALUES(?,?,?,?)",
-      [volunteer.uwo_id, volunteer.first_name, volunteer.last_name, volunteer.disabled])
+      "INSERT INTO `volunteers` (uwo_id, first_name, last_name, disabled, latitude, longitude, timestamp) VALUES(?,?,?,?,?,?,?)",
+      [volunteer.uwo_id, volunteer.first_name, volunteer.last_name, volunteer.disabled, volunteer.latitude, volunteer.longitude, volunteer.timestamp])
     .then((results: any) => results.insertId as number);
   }
 
@@ -105,7 +105,11 @@ export class SQLVolunteersManager extends SQLAbstractManager implements IVolunte
       "uwo_id",
       "first_name",
       "last_name",
-      "disabled"]
+      "disabled",
+      "latitude",
+      "longitude",
+      "timestamp"
+    ]
     ) {
 
     // Create a map containing only the keys to update
