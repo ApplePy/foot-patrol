@@ -198,9 +198,9 @@ export class VolunteersRoute extends AbstractRoute implements IRoute {
    * @apiParam {string} first_name First name of the new volunteer.
    * @apiParam {string} last_name Last name of the new volunteer.
    * @apiParam {boolean} [disabled] Whether the volunteer should be created disabled.
-   * @apiParam {string} [latitude] Last known volunteer latitude.
-   * @apiParam {string} [longitude] Last known volunteer longitude.
-   * @apiParam {string} [timestamp] Timestamp of last update to volunteer location.
+   * @apiParam {string} [latitude] Last known volunteer latitude. If supplied, must supply longitude and timestamp.
+   * @apiParam {string} [longitude] Last known volunteer longitude. If supplied, must supply latitude and timestamp.
+   * @apiParam {string} [timestamp] Timestamp of last update to volunteer location. If supplied, must give long and lat.
    *
    * @apiSuccess (Created 201) {number} id The record ID.
    * @apiSuccess (Created 201) {string} uwo_id UWO ID of the new volunteer.
@@ -275,9 +275,9 @@ export class VolunteersRoute extends AbstractRoute implements IRoute {
    * @apiParam {string} first_name First name of the volunteer.
    * @apiParam {string} last_name Last name of the volunteer.
    * @apiParam {boolean} [disabled] Whether the volunteer should be disabled.
-   * @apiParam {string} [latitude] Last known volunteer latitude.
-   * @apiParam {string} [longitude] Last known volunteer longitude.
-   * @apiParam {string} [timestamp] Timestamp of last update to volunteer location.
+   * @apiParam {string} [latitude] Last known volunteer latitude. If supplied, must supply longitude and timestamp.
+   * @apiParam {string} [longitude] Last known volunteer longitude. If supplied, must supply latitude and timestamp.
+   * @apiParam {string} [timestamp] Timestamp of last update to volunteer location. If supplied, must give long and lat.
    *
    * @apiSuccess {number} id The record ID.
    * @apiSuccess {string} uwo_id UWO ID of the volunter.
@@ -364,9 +364,9 @@ export class VolunteersRoute extends AbstractRoute implements IRoute {
    * @apiParam {string} [first_name] First name of the volunteer.
    * @apiParam {string} [last_name] Last name of the volunteer.
    * @apiParam {boolean} [disabled] Whether the volunteer should be disabled.
-   * @apiParam {string} [latitude] Last known volunteer latitude.
-   * @apiParam {string} [longitude] Last known volunteer longitude.
-   * @apiParam {string} [timestamp] Timestamp of last update to volunteer location.
+   * @apiParam {string} [latitude] Last known volunteer latitude. If supplied, must supply longitude and timestamp.
+   * @apiParam {string} [longitude] Last known volunteer longitude. If supplied, must supply latitude and timestamp.
+   * @apiParam {string} [timestamp] Timestamp of last update to volunteer location. If supplied, must give long and lat.
    *
    * @apiSuccess {number} id The record ID.
    * @apiSuccess {string} uwo_id UWO ID of the volunter.
@@ -572,40 +572,21 @@ export class VolunteersRoute extends AbstractRoute implements IRoute {
       const first_name = this.sanitizer.sanitize(req.body.first_name);
       const last_name = this.sanitizer.sanitize(req.body.last_name);
       const disabled = (req.body.disabled === true || req.body.disabled === "true") ? true : false;
-
-      // Check to make all location data is supplied if part of location data is supplied
-      if (
-        req.body.latitude.length > 0 ||
-        req.body.longitude.length > 0 ||
-        req.body.timestamp.length > 0
-      ) {
-        if (
-          !(req.body.latitude.length > 0 &&
-          req.body.longitude.length > 0 &&
-          req.body.timestamp.length > 0)
-        ) {
-          return false;
-        }
-      }
-      // Check to make all location data is supplied if part of location data is supplied
-      if (
-        req.body.latitude !== undefined ||
-        req.body.longitude !== undefined ||
-        req.body.timestamp !== undefined
-      ) {
-        if (
-          !(req.body.latitude !== undefined &&
-          req.body.longitude !== undefined &&
-          req.body.timestamp !== undefined)
-        ) {
-          return false;
-        }
-      }
-
-      const latitude = this.sanitizer.sanitize(req.body.latitude);
-      const longitude = this.sanitizer.sanitize(req.body.longitude);
-      const timestamp = this.sanitizer.sanitize(req.body.timestamp);
+      let latitude: any;
+      let longitude: any;
+      let timestamp: any;
       // tslint:enable:variable-name
+
+      // Check to make all location data is supplied if part of location data is supplied
+      if (req.body.latitude || req.body.longitude || req.body.timestamp) {
+        if (!(req.body.latitude && req.body.longitude && req.body.timestamp)) {
+          return false;
+        } else {
+          latitude = String(req.body.latitude);
+          longitude = String(req.body.longitude);
+          timestamp = String(req.body.timestamp);
+        }
+      }
 
       // Check that the strings aren't empty
       for (const prop of [uwo_id, first_name, last_name]) {

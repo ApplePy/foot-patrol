@@ -510,6 +510,68 @@ class VolunteersAPITest {
       });
   }
 
+  @test("POST should create a new object even if latitude/longitude/timestamp are not available")
+  public postPositionSuccess(done: MochaDone) {
+    // Setup fake data
+    const INPUT = {
+      id: 5, uwo_id: "jdoe37", first_name: "John",
+      last_name: "Doe", extra: "test",
+    };
+    const EXPECTED_RESULTS = {
+      uwo_id: "jdoe37", first_name: "John",
+      last_name: "Doe", disabled: false,
+      latitude: "",
+      longitude: "",
+      timestamp: "2017-10-26T06:51:05.000Z"
+    };
+    const REQUESTS_DATA = (query: string, values: any[]) => {
+      const newId = 2;
+      if (query.search("^INSERT") >= 0) {
+        // Ensure unwanted properties are not being added
+        ["extra"].forEach((val) => query.search(val).should.equal(-1));
+        return {insertId: newId};
+      } else {
+        values.should.contain(newId); // Ensure correct ID was requested
+        return [{...EXPECTED_RESULTS, id: newId}];
+      }
+    };
+    FakeSQL.response = REQUESTS_DATA;
+
+    // Start request
+    chai.request(serverEnv.nodeServer)
+      .post(pathPrefix + "/volunteers")
+      .send(INPUT)
+      .end((err, res) => {
+        // Verify results
+        res.should.have.status(201);
+        res.body.should.contain(EXPECTED_RESULTS);
+        res.body.should.have.property("id");
+        done();
+      });
+  }
+
+  @test("POST should fail when a longitude is missing")
+  public postLongitudeFail(done: MochaDone) {
+    // Setup fake data
+    const INPUT = { first_name: "John", last_name: "Doe", disabled: true, latitude: "55"};
+    const REQUESTS_DATA = undefined;
+
+    FakeSQL.response = REQUESTS_DATA;
+
+    // Start request
+    chai.request(serverEnv.nodeServer)
+      .post(pathPrefix + "/volunteers")
+      .send(INPUT)
+      .end((err, res) => {
+        // Verify results
+        res.should.have.status(400);
+        res.body.should.contain.property("error");
+        res.body.should.contain.property("message");
+        res.body.should.not.contain.property("stack");
+        done();
+      });
+  }
+
   @test("POST should fail when a uwo_id is missing")
   public postFail(done: MochaDone) {
     // Setup fake data
