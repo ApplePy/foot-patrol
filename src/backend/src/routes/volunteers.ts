@@ -442,17 +442,8 @@ export class VolunteersRoute extends AbstractRoute implements IRoute {
     }
 
     // Check to make all location data is supplied if part of location data is supplied
-    if (req.body.latitude.length > 0 || req.body.longitude.length > 0 || req.body.timestamp.length > 0) {
-      if (!(req.body.latitude.length > 0 && req.body.longitude.length > 0 && req.body.timestamp.length > 0)) {
-        next(new StatusError(400,
-          errStrings.InvalidBodyParameter.Title,
-          errStrings.InvalidBodyParameter.Msg));
-        return;
-      }
-    }
-    // Check to make all location data is supplied if part of location data is supplied
-    if (req.body.latitude !== undefined || req.body.longitude !== undefined || req.body.timestamp !== undefined) {
-      if (!(req.body.latitude !== undefined && req.body.longitude !== undefined && req.body.timestamp !== undefined)) {
+    if (updateDict.latitude || updateDict.longitude || updateDict.timestamp) {
+      if (!(updateDict.latitude && updateDict.longitude && updateDict.timestamp)) {
         next(new StatusError(400,
           errStrings.InvalidBodyParameter.Title,
           errStrings.InvalidBodyParameter.Msg));
@@ -583,14 +574,30 @@ export class VolunteersRoute extends AbstractRoute implements IRoute {
       const disabled = (req.body.disabled === true || req.body.disabled === "true") ? true : false;
 
       // Check to make all location data is supplied if part of location data is supplied
-      if (req.body.latitude.length > 0 || req.body.longitude.length > 0 || req.body.timestamp.length > 0) {
-        if (!(req.body.latitude.length > 0 && req.body.longitude.length > 0 && req.body.timestamp.length > 0)) {
+      if (
+        req.body.latitude.length > 0 ||
+        req.body.longitude.length > 0 ||
+        req.body.timestamp.length > 0
+      ) {
+        if (
+          !(req.body.latitude.length > 0 &&
+          req.body.longitude.length > 0 &&
+          req.body.timestamp.length > 0)
+        ) {
           return false;
         }
       }
       // Check to make all location data is supplied if part of location data is supplied
-      if (req.body.latitude !== undefined || req.body.longitude !== undefined || req.body.timestamp !== undefined) {
-        if (!(req.body.latitude !== undefined && req.body.longitude !== undefined && req.body.timestamp !== undefined)) {
+      if (
+        req.body.latitude !== undefined ||
+        req.body.longitude !== undefined ||
+        req.body.timestamp !== undefined
+      ) {
+        if (
+          !(req.body.latitude !== undefined &&
+          req.body.longitude !== undefined &&
+          req.body.timestamp !== undefined)
+        ) {
           return false;
         }
       }
