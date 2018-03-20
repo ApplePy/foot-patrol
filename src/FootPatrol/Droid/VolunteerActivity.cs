@@ -355,7 +355,7 @@ namespace FootPatrol.Droid
 
             if(isPaired)
             {
-                LatLng pairPosition = new LatLng(location.Latitude - 0.0008, location.Longitude);
+                LatLng pairPosition = new LatLng(location.Latitude, location.Longitude + 0.0005);
                 pairMarker.SetPosition(pairPosition);
             }
         }
@@ -401,11 +401,17 @@ namespace FootPatrol.Droid
 
             if (client.IsConnected) //if the client is still connected
             {
+                LatLng position = new LatLng(myLocation.Latitude, myLocation.Longitude);
                 volunteerMarker = new MarkerOptions();
                 volunteerMarker.SetTitle("You")
                                .SetIcon(BitmapDescriptorFactory.DefaultMarker(BitmapDescriptorFactory.HueRed)) //set the current position of the volunteer using a marker
-                               .SetPosition(new LatLng(myLocation.Latitude, myLocation.Longitude));
+                               .SetPosition(position);
+                CameraPosition cameraPosition = new CameraPosition.Builder().Target(position)
+                                                                            .Zoom(15)
+                                                                            .Tilt(45)
+                                                                            .Build();
                 map.AddMarker(volunteerMarker); //add the marker on the map
+                map.AnimateCamera(CameraUpdateFactory.NewCameraPosition(cameraPosition));
             }
 
             else
@@ -884,7 +890,7 @@ namespace FootPatrol.Droid
                        pairMarker = new MarkerOptions();
                        pairMarker.SetTitle(fpName)
                                  .SetIcon(BitmapDescriptorFactory.DefaultMarker(BitmapDescriptorFactory.HueGreen))
-                                 .SetPosition(new LatLng(myLocation.Latitude - 0.0008, myLocation.Longitude));
+                                 .SetPosition(new LatLng(myLocation.Latitude, myLocation.Longitude + 0.0005));
                        map.AddMarker(pairMarker);
                        searchView.Visibility = ViewStates.Gone;
                        fpListView.Visibility = ViewStates.Gone;
@@ -931,6 +937,8 @@ namespace FootPatrol.Droid
         {
             HttpClient httpClient = new HttpClient();
             Uri customURI = new Uri(backendURI + postPairURI);
+            System.Diagnostics.Debug.WriteLine("The custom URI for footPatrollers is: " + customURI);
+            System.Diagnostics.Debug.WriteLine("My id is: " + myID + " ,partner ID is: " + vID);
 
             var content = new VolunteerPairs
             {
@@ -944,9 +952,11 @@ namespace FootPatrol.Droid
 
             try 
             {
+                System.Diagnostics.Debug.WriteLine("The status code is: " + response.StatusCode.ToString());
                 response.EnsureSuccessStatusCode();
                 var responseString = await response.Content.ReadAsStringAsync();
-                System.Diagnostics.Debug.WriteLine("The response string is: "+ responseString);
+                var jObj = JObject.Parse(responseString);
+                System.Diagnostics.Debug.WriteLine("The response string is: "+ jObj);
                 return 0;
             }
 
@@ -1036,15 +1046,15 @@ namespace FootPatrol.Droid
 
             HttpClient httpClient = new HttpClient(); //create a new HTTP client
             string userID = id.ToString();
-            System.Diagnostics.Debug.WriteLine("The custom uri is: " + backendURI + userID);
             Uri customURI = new Uri(backendURI + userID);
             httpClient.DeleteAsync(customURI); //delete the accepted request from all requests
         }
 
-        private async Task<string> updateRequestStatus(string status, Boolean archived)
+        private async Task<string> updateRequestStatus(string status, bool archived)
         {
             HttpClient httpClient = new HttpClient();
             Uri customURI = new Uri(backendURI + "/requests/"+ acceptedRequest.id);
+            System.Diagnostics.Debug.WriteLine("The custom URI for UpdateRequest is: " + customURI);
 
             var content = new RequestStatus
             {
@@ -1058,9 +1068,11 @@ namespace FootPatrol.Droid
 
             try
             {
+                System.Diagnostics.Debug.WriteLine("The status code is: " + response.StatusCode.ToString());
                 response.EnsureSuccessStatusCode();
-                var responseString = response.Content.ReadAsStringAsync();
-                System.Diagnostics.Debug.WriteLine("The status string is: " + responseString);
+                var responseString = await response.Content.ReadAsStringAsync();
+                var jObj = JObject.Parse(responseString);
+                System.Diagnostics.Debug.WriteLine("The status string is: " + jObj);
                 return "";
             }
 
@@ -1069,7 +1081,7 @@ namespace FootPatrol.Droid
                 createAlert("There was an exception! The error was: " + e);
             }
 
-            return "";
+            return "";  
         }
     }
 }
