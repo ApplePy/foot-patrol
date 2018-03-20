@@ -10,13 +10,15 @@ import { AddRequestComponent } from './add-request/add-request.component';
 import {HttpClientModule} from '@angular/common/http';
 import {AgmCoreModule} from '@agm/core';
 import { MapGeneralComponent } from './map-general/map-general.component';
+import { LoginPageComponent } from './login-page/login-page.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     RequestListComponent,
     AddRequestComponent,
-    MapGeneralComponent
+    MapGeneralComponent,
+    LoginPageComponent
   ],
   imports: [
     BrowserModule,
