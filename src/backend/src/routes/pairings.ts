@@ -364,7 +364,7 @@ export class VolunteerPairingsRoute extends AbstractRoute implements IRoute {
     }
 
     // Toggle state in DB
-    this.data.toggleActive(id, Boolean(req.body.active))
+    this.data.toggleActive(id, (req.body.active === "true") ? true : false)
     .then(() => res.sendStatus(204))
     .catch((err) => next(this.translateErrors(err))); // Send generic error
   }
