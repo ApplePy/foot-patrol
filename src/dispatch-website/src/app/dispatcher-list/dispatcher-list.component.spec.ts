@@ -1,6 +1,8 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { DispatcherListComponent } from './dispatcher-list.component';
+import { FormsModule } from '@angular/forms';
+import { RouterTestingModule } from '@angular/router/testing';
 
 describe('DispatcherListComponent', () => {
   let component: DispatcherListComponent;
@@ -8,6 +10,8 @@ describe('DispatcherListComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
+      imports: [FormsModule,
+      RouterTestingModule],
       declarations: [ DispatcherListComponent ]
     })
     .compileComponents();

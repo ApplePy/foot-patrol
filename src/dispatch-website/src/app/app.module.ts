@@ -16,6 +16,8 @@ import { AuthService } from './auth.service';
 import { AuthGuard } from './auth.guard';
 import { DispatcherListComponent } from './dispatcher-list/dispatcher-list.component';
 import { DemoDispatchService } from './demo-dispatch.service';
+import { EditDispatcherComponent } from './edit-dispatcher/edit-dispatcher.component';
+import { AddDispatcherComponent } from './add-dispatcher/add-dispatcher.component';
 
 @NgModule({
   declarations: [
@@ -25,7 +27,9 @@ import { DemoDispatchService } from './demo-dispatch.service';
     MapGeneralComponent,
     LoginPageComponent,
     HeaderComponent,
-    DispatcherListComponent
+    DispatcherListComponent,
+    EditDispatcherComponent,
+    AddDispatcherComponent
   ],
   imports: [
     BrowserModule,
