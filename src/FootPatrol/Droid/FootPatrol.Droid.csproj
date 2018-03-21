@@ -169,6 +169,7 @@
     <Compile Include="AboutUsActivity.cs" />
     <Compile Include="WWDActivity.cs" />
     <Compile Include="VolunteeringActivity.cs" />
+    <Compile Include="WalkRequest.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
@@ -218,6 +219,7 @@
     <AndroidResource Include="Resources\drawable\whatwedo.jpg" />
     <AndroidResource Include="Resources\drawable\wfp.jpg" />
     <AndroidResource Include="Resources\drawable\FootPatrolLocation.png" />
+    <AndroidResource Include="Resources\drawable\FormEntry.xml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\drawable\" />

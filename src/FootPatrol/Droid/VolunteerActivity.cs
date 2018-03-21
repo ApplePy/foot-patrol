@@ -30,7 +30,7 @@ namespace FootPatrol.Droid
     public class VolunteerActivity : Android.Support.V4.App.Fragment, GoogleApiClient.IOnConnectionFailedListener, GoogleApiClient.IConnectionCallbacks, Android.Gms.Location.ILocationListener, IOnMapReadyCallback
     {
         public static string name, to_location, from_location, additional_info; //variables to keep name, location and additional information of user
-        public static int id, pairID, myID = 2;
+        public static int id, pairID, myID = 1;
         public static bool isPaired = false, pickupPending = false;
 
         public static Typeface bentonSans; //font to be used in application

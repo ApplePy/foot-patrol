@@ -17,6 +17,87 @@
             p1:layout_height="match_parent"
             p1:id="@+id/userMapMF"
             class="com.google.android.gms.maps.SupportMapFragment" />
+        <RelativeLayout
+            p1:minWidth="25px"
+            p1:minHeight="25px"
+            p1:layout_width="match_parent"
+            p1:layout_height="175dp"
+            p1:id="@+id/userInnerRelativeMF"
+            p1:layout_alignParentBottom="true"
+            p1:background="@drawable/BorderResource">
+            <Button
+                p1:layout_width="wrap_content"
+                p1:layout_height="35dp"
+                p1:id="@+id/requestPickupBtn1"
+                p1:layout_centerVertical="true"
+                p1:text="REQUEST PICKUP"
+                p1:background="#807F83"
+                p1:layout_centerHorizontal="true"
+                p1:layout_alignParentBottom="true"
+                p1:layout_marginBottom="10dp" />
+            <EditText
+                p1:layout_width="350dp"
+                p1:layout_height="25dp"
+                p1:id="@+id/userName6"
+                p1:layout_above="@+id/userToLocation1"
+                p1:layout_marginRight="10dp"
+                p1:background="@drawable/FormEntry"
+                p1:layout_marginTop="5dp"
+                p1:layout_centerHorizontal="true"
+                p1:textColor="#ff4f2683"
+                p1:paddingLeft="5dp"
+                p1:textColorHint="#ff4f2683"
+                p1:hint="Name (Optional)"
+                p1:singleLine="true" />
+            <EditText
+                p1:layout_width="350dp"
+                p1:layout_height="25dp"
+                p1:id="@+id/userToLocation1"
+                p1:layout_above="@+id/userAdditionalInfo1"
+                p1:background="@drawable/FormEntry"
+                p1:layout_marginRight="10dp"
+                p1:layout_centerHorizontal="true"
+                p1:layout_centerVertical="false"
+                p1:textColor="#ff4f2683"
+                p1:paddingLeft="5dp"
+                p1:layout_marginTop="5dp"
+                p1:textColorHint="#ff4f2683"
+                p1:hint="Destination"
+                p1:singleLine="true" />
+            <EditText
+                p1:layout_width="350dp"
+                p1:layout_height="25dp"
+                p1:id="@+id/userAdditionalInfo1"
+                p1:layout_above="@+id/requestPickupBtn1"
+                p1:layout_centerHorizontal="true"
+                p1:background="@drawable/FormEntry"
+                p1:layout_marginRight="10dp"
+                p1:textColor="#ff4f2683"
+                p1:paddingLeft="5dp"
+                p1:layout_marginTop="5dp"
+                p1:layout_marginBottom="5dp"
+                p1:textColorHint="#ff4f2683"
+                p1:hint="Additional Information"
+                p1:singleLine="true" />
+            <TextView
+                p1:textAppearance="?android:attr/textAppearanceLarge"
+                p1:layout_width="wrap_content"
+                p1:layout_height="wrap_content"
+                p1:id="@+id/pickupInfo"
+                p1:text="Pickup Information"
+                p1:layout_above="@+id/userName5"
+                p1:layout_centerHorizontal="true"
+                p1:layout_marginBottom="5dp" />
+            <TextView
+                p1:id="@+id/line"
+                p1:paddingTop="5dip"
+                p1:gravity="center_horizontal"
+                p1:layout_below="@+id/pickupInfo"
+                p1:layout_width="match_parent"
+                p1:layout_height="1dp"
+                p1:background="#807F83"
+                p1:layout_marginBottom="10dp" />
+        </RelativeLayout>
         <ImageButton
             p1:src="@drawable/ic_keyboard_arrow_right_black_24dp"
             p1:layout_width="30dp"

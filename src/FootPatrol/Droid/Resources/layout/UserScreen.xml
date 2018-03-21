@@ -10,6 +10,87 @@
         p1:fillViewport="true"
         p1:layout_height="match_parent"
         p1:gravity="center_vertical">
+        <RelativeLayout
+            p1:minWidth="25px"
+            p1:minHeight="25px"
+            p1:layout_width="match_parent"
+            p1:layout_height="175dp"
+            p1:id="@+id/userInnerRelative"
+            p1:layout_alignParentBottom="true"
+            p1:background="@drawable/BorderResource">
+            <Button
+                p1:layout_width="wrap_content"
+                p1:layout_height="35dp"
+                p1:id="@+id/requestPickupBtn"
+                p1:layout_centerVertical="true"
+                p1:text="REQUEST PICKUP"
+                p1:background="#807F83"
+                p1:layout_centerHorizontal="true"
+                p1:layout_alignParentBottom="true"
+                p1:layout_marginBottom="10dp" />
+            <EditText
+                p1:layout_width="350dp"
+                p1:layout_height="25dp"
+                p1:id="@+id/userName5"
+                p1:layout_above="@+id/userToLocation"
+                p1:layout_marginRight="10dp"
+                p1:background="@drawable/FormEntry"
+                p1:layout_marginTop="5dp"
+                p1:layout_centerHorizontal="true"
+                p1:paddingLeft="5dp"
+                p1:hint="Name (Optional)"
+                p1:textColor="#ff4f2683"
+                p1:textColorHint="#ff4f2683"
+                p1:singleLine="true" />
+            <EditText
+                p1:layout_width="350dp"
+                p1:layout_height="25dp"
+                p1:id="@+id/userToLocation"
+                p1:layout_above="@+id/userAdditionalInfo"
+                p1:background="@drawable/FormEntry"
+                p1:layout_marginRight="10dp"
+                p1:layout_centerHorizontal="true"
+                p1:layout_centerVertical="false"
+                p1:textColor="#ff4f2683"
+                p1:paddingLeft="5dp"
+                p1:layout_marginTop="5dp"
+                p1:hint="Destination"
+                p1:textColorHint="#ff4f2683"
+                p1:singleLine="true" />
+            <EditText
+                p1:layout_width="350dp"
+                p1:layout_height="25dp"
+                p1:id="@+id/userAdditionalInfo"
+                p1:layout_above="@+id/requestPickupBtn"
+                p1:layout_centerHorizontal="true"
+                p1:background="@drawable/FormEntry"
+                p1:layout_marginRight="10dp"
+                p1:textColor="#ff4f2683"
+                p1:paddingLeft="5dp"
+                p1:layout_marginTop="5dp"
+                p1:layout_marginBottom="5dp"
+                p1:hint="Additional Information"
+                p1:textColorHint="#ff4f2683"
+                p1:singleLine="true" />
+            <TextView
+                p1:textAppearance="?android:attr/textAppearanceLarge"
+                p1:layout_width="wrap_content"
+                p1:layout_height="wrap_content"
+                p1:id="@+id/pickupInfo"
+                p1:text="Pickup Information"
+                p1:layout_above="@+id/userName5"
+                p1:layout_centerHorizontal="true"
+                p1:layout_marginBottom="5dp" />
+            <TextView
+                p1:id="@+id/line"
+                p1:paddingTop="5dip"
+                p1:gravity="center_horizontal"
+                p1:layout_below="@+id/pickupInfo"
+                p1:layout_width="match_parent"
+                p1:layout_height="1dp"
+                p1:background="#807F83"
+                p1:layout_marginBottom="10dp" />
+        </RelativeLayout>
         <com.google.android.gms.maps.MapView
             p1:minWidth="25px"
             p1:minHeight="25px"
