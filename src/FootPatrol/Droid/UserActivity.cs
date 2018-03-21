@@ -46,6 +46,9 @@ namespace FootPatrol.Droid
         static Android.Widget.SearchView searchView;
         private static string[] menuItems, locationNames;
 
+        public string tag;
+        public Android.Support.V4.App.Fragment fragment;
+
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
@@ -107,6 +110,11 @@ namespace FootPatrol.Droid
                     }
                 };
 
+                mListView.ItemClick += (sender, e) =>
+                {
+                    selectItem(e.Position);
+                };
+
                 mView.OnCreate(savedInstanceState);
                 mView.OnStart(); //start loading the map into the mapView
             }
@@ -145,6 +153,11 @@ namespace FootPatrol.Droid
                         searchListView.Visibility = ViewStates.Visible;
                         locationAdapter.Filter.InvokeFilter(e.NewText);
                     }
+                };
+
+                mfListView.ItemClick += (sender, e) =>
+                {
+                    selectItem(e.Position);
                 };
 
 
@@ -298,6 +311,52 @@ namespace FootPatrol.Droid
             {
                 drawer.OpenDrawer(list); //if the drawer isn't open, open it
             }
+        }
+
+        private void selectItem(int position)
+        {
+            switch(position)
+            {
+                case 0:
+                    fragment = new CampusMapsActivity();
+                    tag = "CampusMapsActivity";
+                    break;
+                case 1:
+                    fragment = new NonEmergencyContactsActivity();
+                    tag = "NonEmergencyContactsActivity";
+                    break;
+                case 2:
+                    fragment = new ContactUsActivity();
+                    tag = "ContactUsActivity";
+                    break;
+                case 3:
+                    fragment = new AboutUsActivity();
+                    tag = "AboutUsActivity";
+                    break;
+                case 4:
+                    fragment = new WWDActivity();
+                    tag = "WhatWeDoActivity";
+                    break;
+                case 5:
+                    fragment = new VolunteeringActivity();
+                    tag = "VolunteeringActivity";
+                    break;
+            }
+
+            if (Int32.Parse(Build.VERSION.Sdk) > 23)
+                switchFragment(fragment, Resource.Id.userdrawer, tag);
+            else
+                switchFragment(fragment, Resource.Id.userdrawerMF, tag);
+
+        }
+
+        private void switchFragment(Android.Support.V4.App.Fragment frag, int resource, string tag)
+        {
+            Android.Support.V4.App.FragmentTransaction fragmentTransaction = this.Activity.SupportFragmentManager.BeginTransaction(); //begin the fragment transaction
+            fragmentTransaction.SetCustomAnimations(Resource.Layout.EnterAnimation, Resource.Layout.ExitAnimation); //add animation to slide new fragment to the left
+            fragmentTransaction.AddToBackStack("UserActivity");
+            fragmentTransaction.Replace(resource, frag, tag);
+            fragmentTransaction.Commit(); //commit the transaction
         }
     }
 }

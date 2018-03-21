@@ -165,6 +165,10 @@
     <Compile Include="VolunteerPairs.cs" />
     <Compile Include="RequestStatus.cs" />
     <Compile Include="PairActive.cs" />
+    <Compile Include="ContactUsActivity.cs" />
+    <Compile Include="AboutUsActivity.cs" />
+    <Compile Include="WWDActivity.cs" />
+    <Compile Include="VolunteeringActivity.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
