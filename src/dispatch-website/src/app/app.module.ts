@@ -14,6 +14,8 @@ import { LoginPageComponent } from './login-page/login-page.component';
 import { HeaderComponent } from './header/header.component';
 import { AuthService } from './auth.service';
 import { AuthGuard } from './auth.guard';
+import { DispatcherListComponent } from './dispatcher-list/dispatcher-list.component';
+import { DemoDispatchService } from './demo-dispatch.service';
 
 @NgModule({
   declarations: [
@@ -22,7 +24,8 @@ import { AuthGuard } from './auth.guard';
     AddRequestComponent,
     MapGeneralComponent,
     LoginPageComponent,
-    HeaderComponent
+    HeaderComponent,
+    DispatcherListComponent
   ],
   imports: [
     BrowserModule,
@@ -35,7 +38,9 @@ import { AuthGuard } from './auth.guard';
     })
   ],
   providers: [AuthService,
-  AuthGuard],
+  AuthGuard,
+  FtpRequestService,
+  DemoDispatchService],
   bootstrap: [AppComponent],
 })
 export class AppModule { }
