@@ -26,7 +26,8 @@
         p1:id="@+id/usernameField"
         p1:layout_below="@id/WesternLogo"
         p1:layout_centerHorizontal="true"
-        p1:hint="Username"
+        p1:singleLine="true"
+        p1:hint="USERNAME"
         p1:typeface="normal" />
     <EditText
         p1:layout_width="300dp"
@@ -34,8 +35,10 @@
         p1:id="@+id/passwordField"
         p1:layout_below="@id/usernameField"
         p1:layout_centerHorizontal="true"
-        p1:hint="Password"
-        p1:typeface="normal" />
+        p1:hint="PASSWORD"
+        p1:singleLine="true"
+        p1:typeface="normal"
+        p1:password="true" />
     <TextView
         p1:layout_width="wrap_content"
         p1:layout_height="wrap_content"

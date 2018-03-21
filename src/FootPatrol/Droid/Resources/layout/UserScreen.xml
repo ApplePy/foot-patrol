@@ -15,7 +15,7 @@
             p1:minHeight="25px"
             p1:layout_width="match_parent"
             p1:layout_height="match_parent"
-            p1:id="@+id/map" />
+            p1:id="@+id/userMap" />
         <ImageButton
             p1:src="@drawable/ic_keyboard_arrow_right_black_24dp"
             p1:layout_width="30dp"
@@ -24,6 +24,29 @@
             p1:background="@drawable/BorderResource"
             p1:layout_centerVertical="true"
             p1:scaleType="centerInside" />
+        <SearchView
+            p1:layout_width="match_parent"
+            p1:layout_height="40dp"
+            p1:id="@+id/userSearchView"
+            p1:layout_alignParentTop="true"
+            p1:layout_marginTop="20dp"
+            p1:background="@drawable/BorderResource" />
+        <ListView
+            p1:id="@+id/userSearchListView"
+            p1:layout_width="match_parent"
+            p1:layout_height="150dp"
+            p1:layout_marginTop="60dp"
+            p1:background="@drawable/BorderResource"
+            p1:divider="#807F83" />
+        <TextView
+            p1:layout_width="match_parent"
+            p1:layout_height="20dp"
+            p1:id="@+id/userSVDescription"
+            p1:text="SEARCH FOR LOCATION"
+            p1:textAllCaps="true"
+            p1:textStyle="bold"
+            p1:background="@drawable/BorderResource"
+            p1:gravity="center_horizontal" />
     </RelativeLayout>
     <ListView
         p1:id="@+id/userListView"

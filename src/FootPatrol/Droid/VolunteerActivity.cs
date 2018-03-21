@@ -30,7 +30,7 @@ namespace FootPatrol.Droid
     public class VolunteerActivity : Android.Support.V4.App.Fragment, GoogleApiClient.IOnConnectionFailedListener, GoogleApiClient.IConnectionCallbacks, Android.Gms.Location.ILocationListener, IOnMapReadyCallback
     {
         public static string name, to_location, from_location, additional_info; //variables to keep name, location and additional information of user
-        public static int id, pairID, myID = 88;
+        public static int id, pairID, myID = 2;
         public static bool isPaired = false, pickupPending = false;
 
         public static Typeface bentonSans; //font to be used in application
@@ -42,14 +42,14 @@ namespace FootPatrol.Droid
         private static ImageButton mSideTab, mfSideTab; //side tab buttons for each view
         private static MapView mView; //mapView that displays map on >= API 24
         private static ImageView notificationBase, notificationBadge; //UI for displaying requests
-        public static TextView badgeCounter, userName, toLoc, fromLoc, addInfo, pickupInfo, directionsText; //counter that displays number of requests available to the volunteer
+        public static TextView badgeCounter, userName, toLoc, fromLoc, addInfo, pickupInfo, directionsText, searchViewDescription; //counter that displays number of requests available to the volunteer
         private static ListView mListView, mfListView, fpListView; //list views for both new and older android devices
         private static RecyclerView mRecyclerView, mfRecyclerView; //recycler views that display directions for new and older android devices
         private static RecyclerView.LayoutManager layoutManager; //layout manager for recycler view
         private static RelativeLayout mRelativeLayout, mfRelativeLayout; //relative layouts to display status of complete, cancel and pickup on trip
         private static Android.Widget.SearchView searchView;
 
-        private static string backendURI, getRequestURI, getVolunteerURI, postPairURI;
+        private static string backendURI, getRequestURI, getVolunteerURI, postPairURI, postInactivePairURI, setPairActiveURI;
 
         public static List<string> request, steps, fpNames, volunteerArray; //lists to hold information on requests and direction steps, and volunteer names
         public static List<int> volunteerID;
@@ -96,7 +96,8 @@ namespace FootPatrol.Droid
             backendURI = "http://staging.capstone.incode.ca/api/v1";
             getRequestURI = "/requests/?offset=0&count=9&archived=false";
             getVolunteerURI = "/volunteers/inactive";
-            postPairURI = "/volunteerPairs";
+            postPairURI = "/volunteerpairs/";
+            postInactivePairURI = "/volunteerpairs?inactive=true";
             request = new List<string>();
             fpNames = new List<string>();
 
@@ -115,8 +116,6 @@ namespace FootPatrol.Droid
             {
                 createAlert("Unable to initialize the map, the error is: " + e);
             }
-
-            volunteerMarker = new MarkerOptions(); //initialize the volunteer MarkerOptions
 
             createLocationRequest(); //create new location request to continuously update volunteer request
             clientSetup(); //set up the Google client 
@@ -142,11 +141,11 @@ namespace FootPatrol.Droid
                 fromLoc = (TextView)view.FindViewById(Resource.Id.userFromLoc);
                 addInfo = (TextView)view.FindViewById(Resource.Id.userAddInfo);
                 pickupInfo = (TextView)view.FindViewById(Resource.Id.pickupInfo);
+                searchViewDescription = (TextView)view.FindViewById(Resource.Id.volunteerSVDescription);
 
                 mRelativeLayout.Visibility = ViewStates.Gone; //set the visibility of the complete trip UI to gone
                 mRecyclerView.Visibility = ViewStates.Gone; //set the visibility of the directions UI to gone
-                fpListView.Visibility = ViewStates.Gone;
-                searchView.Visibility = ViewStates.Gone;
+                removeSearchUI();
 
                 mRecyclerView.SetLayoutManager(layoutManager); //set the layout manager of the recyclerview to display direction
 
@@ -164,9 +163,18 @@ namespace FootPatrol.Droid
                 mListView.Adapter = listAdapter;
                 fpListView.Adapter = fpAdapter;
 
+                searchView.SetQueryHint("Search for volunteer");
+
                 searchView.QueryTextChange += (sender, e) =>
                 {
-                    fpAdapter.Filter.InvokeFilter(e.NewText);
+                    if (searchView.Query == "")
+                        fpListView.Visibility = ViewStates.Gone;
+
+                    else
+                    {
+                        fpListView.Visibility = ViewStates.Visible;
+                        fpAdapter.Filter.InvokeFilter(e.NewText);
+                    }
                 };
 
                 mListView.ItemClick += (sender, e) => //listView click listener
@@ -204,21 +212,30 @@ namespace FootPatrol.Droid
                 fromLoc = (TextView)view.FindViewById(Resource.Id.userFromLoc1);
                 addInfo = (TextView)view.FindViewById(Resource.Id.userAddInfo1);
                 pickupInfo = (TextView)view.FindViewById(Resource.Id.pickupInfo1);
+                searchViewDescription = (TextView)view.FindViewById(Resource.Id.volunteerSVDescriptionMF);
 
                 //set visibilities to gone of UI elements not presently used
                 mfRecyclerView.Visibility = ViewStates.Gone;
                 mfRelativeLayout.Visibility = ViewStates.Gone;
-                searchView.Visibility = ViewStates.Gone;
-                fpListView.Visibility = ViewStates.Gone;
+                removeSearchUI();
 
                 mfRecyclerView.SetLayoutManager(layoutManager); //set the layout manager of the recyclerView
 
                 mfListView.Adapter = listAdapter; //set the listView adapter
                 fpListView.Adapter = fpAdapter;
 
+                searchView.SetQueryHint("Search for volunteer");
+
                 searchView.QueryTextChange += (sender, e) =>
                 {
-                    fpAdapter.Filter.InvokeFilter(e.NewText);
+                    if (searchView.Query == "")
+                        fpListView.Visibility = ViewStates.Gone;
+
+                    else
+                    {
+                        fpListView.Visibility = ViewStates.Visible;
+                        fpAdapter.Filter.InvokeFilter(e.NewText);
+                    }
                 };
 
                 mfListView.ItemClick += (sender, e) => //listView click listener
@@ -467,6 +484,7 @@ namespace FootPatrol.Droid
 
                 foreach(JToken a in volunteers)
                 {
+                    System.Diagnostics.Debug.WriteLine("The current volunteer is: " + a.ToString());
                     volunteerArray.Add(a.SelectToken("first_name").ToString() + " " + a.SelectToken("last_name").ToString());
                     volunteerID.Add(Int32.Parse(a.SelectToken("id").ToString()));
                 }
@@ -476,9 +494,10 @@ namespace FootPatrol.Droid
 
             catch (Exception error)
             {
-                //createAlert("The task to get volunteers failed! The error is: " + error);
-                return null;
+                createAlert("The task to get volunteers failed! The error is: " + error);
             }
+
+            return null;
         }
 
         /// <summary>
@@ -525,13 +544,15 @@ namespace FootPatrol.Droid
             if (!(isPaired))
             {
                 updateSearchUI();
-                pickupInfo.Text = "Pickup Pending Pairing";
+                searchViewDescription.Text = "PICKUP PENDING PAIRING";
                 pickupPending = true;
             }
 
             else
+            {
+                searchViewDescription.Text = "SEARCH FOR VOLUNTEER";
                 startTrip(acceptedRequest);
-
+            }
         }
 
         /// <summary>
@@ -711,12 +732,6 @@ namespace FootPatrol.Droid
             }
         }
 
-        private void pickUpClicked()
-        {
-            //completeTripBtn.Text = "COMPLETE TRIP";
-            //pickupComplete = true;
-        }
-
         /// <summary>
         /// Button listener for the complete trip button.
         /// </summary>
@@ -877,14 +892,15 @@ namespace FootPatrol.Droid
                    {
                        int position = findPosition(fpName);
                        int vID = volunteerID[position];
+                       pairID = Task.Run(() => pairFootPatrollers(vID)).Result;
+                       Task.Run(() => setPairActive(true));
+                       
                        if (pickupPending)
                        {
-                           Task.Run(() => pairFootPatrollers(vID, true));
                            startTrip(acceptedRequest);
                        }
                        else
                        {
-                           Task.Run(() => pairFootPatrollers(vID, false));
                            enableRequestUI();
                        }
                        pairMarker = new MarkerOptions();
@@ -892,9 +908,8 @@ namespace FootPatrol.Droid
                                  .SetIcon(BitmapDescriptorFactory.DefaultMarker(BitmapDescriptorFactory.HueGreen))
                                  .SetPosition(new LatLng(myLocation.Latitude, myLocation.Longitude + 0.0005));
                        map.AddMarker(pairMarker);
-                       searchView.Visibility = ViewStates.Gone;
-                       fpListView.Visibility = ViewStates.Gone;
-                       
+                       removeSearchUI();
+                      
                        isPaired = true;
                    })
                    .SetNegativeButton("No", (sender, e) =>
@@ -928,36 +943,62 @@ namespace FootPatrol.Droid
                 mfRecyclerView.Visibility = ViewStates.Gone;
                 mfRelativeLayout.Visibility = ViewStates.Gone;
             }
+
             removeRequestUI();
             searchView.Visibility = ViewStates.Visible;
-            fpListView.Visibility = ViewStates.Visible;
+            searchViewDescription.Visibility = ViewStates.Visible;
         }
 
-        private async Task<int> pairFootPatrollers(int vID, bool active)
+        private async Task<int> pairFootPatrollers(int vID)
         {
+            //First check whether the pair already exists
             HttpClient httpClient = new HttpClient();
-            Uri customURI = new Uri(backendURI + postPairURI);
-            System.Diagnostics.Debug.WriteLine("The custom URI for footPatrollers is: " + customURI);
-            System.Diagnostics.Debug.WriteLine("My id is: " + myID + " ,partner ID is: " + vID);
+            Uri customURI = new Uri(backendURI + postInactivePairURI);
+            HttpResponseMessage response = await httpClient.GetAsync(customURI);
+
+            try
+            {
+                response.EnsureSuccessStatusCode();
+                var responseString = await response.Content.ReadAsStringAsync();
+                var parsedString = JObject.Parse(responseString);
+                var pairs = parsedString.SelectTokens("pairs[*]");
+                foreach(JToken pair in pairs)
+                {
+                    var firstID = pair.SelectToken("volunteers[0].id");
+                    var secondID = pair.SelectToken("volunteers[1].id");
+                    var pairingID = pair.SelectToken("id");
+
+                    //We've found a match
+                    if (Int32.Parse(firstID.ToString()) == myID && vID == Int32.Parse(secondID.ToString()))
+                    {
+                        return Int32.Parse(pairingID.ToString());
+                    }
+                }
+            }
+
+            catch(Exception e)
+            {
+                createAlert("There was an exception " + e);
+            }
+            //Otherwise create the new pairing and get the pairID
 
             var content = new VolunteerPairs
             {
-                Active = active,
-                Volunteers = new int[2] {vID, myID}
+                volunteers = new int[2] {myID, vID}
             };
 
             var stringContent = JsonConvert.SerializeObject(content);
             HttpContent httpContent = new StringContent(stringContent,Encoding.UTF8, "application/json");
-            HttpResponseMessage response = await httpClient.PostAsync(customURI, httpContent);
+            response = await httpClient.PostAsync(customURI, httpContent);
 
             try 
             {
-                System.Diagnostics.Debug.WriteLine("The status code is: " + response.StatusCode.ToString());
                 response.EnsureSuccessStatusCode();
                 var responseString = await response.Content.ReadAsStringAsync();
                 var jObj = JObject.Parse(responseString);
-                System.Diagnostics.Debug.WriteLine("The response string is: "+ jObj);
-                return 0;
+                var pairingID = jObj.SelectToken("id");
+
+                return Int32.Parse(pairingID.ToString());
             }
 
             catch(Exception e)
@@ -1053,13 +1094,12 @@ namespace FootPatrol.Droid
         private async Task<string> updateRequestStatus(string status, bool archived)
         {
             HttpClient httpClient = new HttpClient();
-            Uri customURI = new Uri(backendURI + "/requests/"+ acceptedRequest.id);
-            System.Diagnostics.Debug.WriteLine("The custom URI for UpdateRequest is: " + customURI);
+            Uri customURI = new Uri(backendURI + "/requests/" + acceptedRequest.id.ToString());
 
             var content = new RequestStatus
             {
-                Archived = archived,
-                Status = status
+                archived = archived,
+                status = status
             };
 
             var stringContent = JsonConvert.SerializeObject(content);
@@ -1068,7 +1108,6 @@ namespace FootPatrol.Droid
 
             try
             {
-                System.Diagnostics.Debug.WriteLine("The status code is: " + response.StatusCode.ToString());
                 response.EnsureSuccessStatusCode();
                 var responseString = await response.Content.ReadAsStringAsync();
                 var jObj = JObject.Parse(responseString);
@@ -1082,6 +1121,45 @@ namespace FootPatrol.Droid
             }
 
             return "";  
+        }
+
+        private void removeSearchUI()
+        {
+            searchView.Visibility = ViewStates.Gone;
+            fpListView.Visibility = ViewStates.Gone;
+            searchViewDescription.Visibility = ViewStates.Gone;
+        }
+
+        private async Task<string> setPairActive(bool isActive)
+        {
+            HttpClient httpClient = new HttpClient();
+            Uri customURI = new Uri(backendURI + postPairURI + pairID.ToString() + "/active");
+            System.Diagnostics.Debug.WriteLine("The custom URI is: " + customURI);
+
+            var content = new VolunteerPairs
+            {
+                active = isActive
+            };
+
+            var stringContent = JsonConvert.SerializeObject(content);
+            HttpContent httpContent = new StringContent(stringContent, Encoding.UTF8, "application/json");
+            HttpResponseMessage response = await httpClient.PostAsync(customURI, httpContent);
+
+            try 
+            {
+                System.Diagnostics.Debug.WriteLine("The status code is: " + response.StatusCode.ToString());
+                response.EnsureSuccessStatusCode();
+                var responseString = await response.Content.ReadAsStringAsync();
+                JObject obj = JObject.Parse(responseString);
+                System.Diagnostics.Debug.WriteLine("The response is: " + obj);
+            }
+
+            catch(Exception e)
+            {
+                createAlert("The exception is: " + e);
+            }
+
+            return "";
         }
     }
 }

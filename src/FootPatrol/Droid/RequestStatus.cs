@@ -13,13 +13,12 @@ using Android.Widget;
 
 namespace FootPatrol.Droid
 {
-    [Activity(Label = "RequestStatus")]
     public class RequestStatus
     {
-        [JsonProperty("archived")]
-        public bool Archived { get; set; }
+        [JsonProperty(PropertyName = "archived")]
+        public bool archived { get; set; }
 
-        [JsonProperty("status")]
-        public string Status { get; set; }
+        [JsonProperty(PropertyName = "status")]
+        public string status { get; set; }
     }
 }

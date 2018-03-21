@@ -37,10 +37,29 @@ namespace FootPatrol.Droid
         private static MapView mView; //mapView that displays map on >= API 24
         private static SupportMapFragment mf; //fragment that displays map on < API 24
         private static ImageButton mSideTab, mfSideTab; //side tab buttons for each view
+        private static ListView mListView, mfListView, searchListView;
+        private static MarkerOptions userMarker;
+        private static DrawerLayout mDrawerLayout, mfDrawerLayout;
+        private static View view; //the current view
+        private static TextView svDescription;
+        private static ArrayAdapter<String> listAdapter, locationAdapter;
+        static Android.Widget.SearchView searchView;
+        private static string[] menuItems, locationNames;
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
-            View view;
+            base.OnCreate(savedInstanceState);
+
+            menuItems = new string[] { "CAMPUS MAPS", "NON-EMERGENCY CONTACTS", "CONTACT US", "ABOUT US", "WHAT WE DO", "VOLUNTEER" };
+            locationNames = new string[] {"3M CTR - 3M CENTRE" , "AH - ALUMNI HALL" , "BGS - BIOLOGY & GEOLOGY SCIENCES", " CHB - CHEMISTRY BUILDING" ,
+            "EC - ELBORN COLLEGE", "HSB - HEALTH SCIENCES BUILDING", "KB - KRESGE BUILDING", "LH - LAWSON HALL", "MC - MIDDLESEX COLLEGE", "NCB - NORTH CAMPUS BUILDING", "NSC - NATURAL SCIENCES CENTRE",
+            "SEB - SPENCER ENGINEERING BUILDING", "SH - SOMERVILLE HOUSE", "SSC - SOCIAL SCIENCES CENTRE", "STVH - STEVENSON HALL", "TC - TALBOT COLLEGE", "TH - THAMES HALL", "UC - UNIVERSITY COLLEGE", "UCC - UNIVERSITY COMMUNITY CENTRE",
+            "VAC - VISUAL ARTS CENTRE", "WL - WELDON LIBRARY", "WSC - WESTERN SCIENCE CENTRE", "BRE - BRESCIA CAMPUS", "HU - HURON CAMPUS", "IV - IVEY BUSINESS SCHOOL",
+                "BH - BROUGHDALE HALL (KING'S UNIVERSITY COLLEGE)", "FB - FACULTY BUILDING (KING'S UNIVERSITY COLLEGE)", "WH - WEMPLE HALL (KING'S UNIVERSITY COLLEGE)", "LH - LABATT HALL (KING'S UNIVERSITY COLLEGE)",
+                "DL - DANTE LENARDON HALL (KING'S UNIVERSITY COLLEGE"};
+
+            listAdapter = new ArrayAdapter<string>(this.Context, Resource.Layout.ListElement, menuItems);
+            locationAdapter = new ArrayAdapter<string>(this.Context, Resource.Layout.ListElement, locationNames);
 
             try
             {
@@ -55,41 +74,136 @@ namespace FootPatrol.Droid
             if (Int32.Parse(Build.VERSION.Sdk) > 23)
             {
                 view = inflater.Inflate(Resource.Layout.UserScreen, container, false);
-                mView = (MapView)view.FindViewById(Resource.Id.map);
+                mView = (MapView)view.FindViewById(Resource.Id.userMap);
+                mSideTab = (ImageButton)view.FindViewById(Resource.Id.userSideTab);
+                mDrawerLayout = (DrawerLayout)view.FindViewById(Resource.Id.userdrawer);
+                mListView = (ListView)view.FindViewById(Resource.Id.userListView);
+                searchView = (Android.Widget.SearchView)view.FindViewById(Resource.Id.userSearchView);
+                searchListView = (ListView)view.FindViewById(Resource.Id.userSearchListView);
+                svDescription = (TextView)view.FindViewById(Resource.Id.userSVDescription);
+
+                searchListView.Visibility = ViewStates.Gone;
+                mListView.Adapter = listAdapter;
+                searchListView.Adapter = locationAdapter;
+
+                mSideTab.Click += (sender, e) =>
+                {
+                    sideTabClicked(mSideTab, mDrawerLayout, mListView);
+                };
+
+                searchView.SetQueryHint("Search for destination");
+
+                searchView.QueryTextChange += (sender, e) =>
+                {
+                    if (searchView.Query == "")
+                    {
+                        searchListView.Visibility = ViewStates.Gone;
+                    }
+
+                    else
+                    {
+                        searchListView.Visibility = ViewStates.Visible;
+                        locationAdapter.Filter.InvokeFilter(e.NewText);
+                    }
+                };
+
+                mView.OnCreate(savedInstanceState);
+                mView.OnStart(); //start loading the map into the mapView
             }
 
             else
             {
                 view = inflater.Inflate(Resource.Layout.UserScreenMF, container, false);
-                mf = (SupportMapFragment)this.ChildFragmentManager.FindFragmentById(Resource.Id.map2);
+                mf = (SupportMapFragment)this.ChildFragmentManager.FindFragmentById(Resource.Id.userMapMF);
+                mfSideTab = (ImageButton)view.FindViewById(Resource.Id.userSideTabMF);
+                mfDrawerLayout = (DrawerLayout)view.FindViewById(Resource.Id.userdrawerMF);
+                mfListView = (ListView)view.FindViewById(Resource.Id.userListViewMF);
+                searchView = (Android.Widget.SearchView)view.FindViewById(Resource.Id.userSearchViewMF);
+                searchListView = (ListView)view.FindViewById(Resource.Id.userSearchListViewMF);
+                svDescription = (TextView)view.FindViewById(Resource.Id.userSVDescription);
+
+                searchListView.Visibility = ViewStates.Gone;
+                mfListView.Adapter = listAdapter;
+                searchListView.Adapter = locationAdapter;
+
+                mfSideTab.Click += (sender, e) =>
+                {
+                    sideTabClicked(mfSideTab, mfDrawerLayout, mfListView);
+                };
+
+                searchView.SetQueryHint("Search for destination");
+
+                searchView.QueryTextChange += (sender, e) =>
+                {
+                    if (searchView.Query == "")
+                    {
+                        searchListView.Visibility = ViewStates.Gone;
+                    }
+
+                    else
+                    {
+                        searchListView.Visibility = ViewStates.Visible;
+                        locationAdapter.Filter.InvokeFilter(e.NewText);
+                    }
+                };
+
+
+                mf.OnCreate(savedInstanceState);
+                mf.OnStart(); //start loading the map into the mapView
             }
+
+            createLocationRequest(); //create new location request to continuously update volunteer request
+            clientSetup(); //set up the Google client 
 
             return view;
         }
 
         public void OnConnected(Bundle connectionHint)
         {
-            throw new NotImplementedException();
+            myLocation = location.GetLastLocation(client); //once the client is connected, get the last known location of the device
+            mapSetup(); //now that client is connected, attempt to setup map
+            location.RequestLocationUpdates(client, locationRequest, this); //request location updates using the created client and locationRequest objects
         }
 
         public void OnConnectionFailed(ConnectionResult result)
         {
-            throw new NotImplementedException();
+            onConnectionInterrupted();
         }
 
         public void OnConnectionSuspended(int cause)
         {
-            throw new NotImplementedException();
+            onConnectionInterrupted();
         }
 
         public void OnLocationChanged(Location location)
         {
-            throw new NotImplementedException();
+            LatLng userPosition = new LatLng(location.Latitude, location.Longitude);
+            userMarker.SetPosition(userPosition);
         }
 
         public void OnMapReady(GoogleMap googleMap)
         {
-            throw new NotImplementedException();
+            map = googleMap; //set the created googleMap to the map variables
+            map.UiSettings.CompassEnabled = false; //disable compass
+            map.UiSettings.MapToolbarEnabled = false; //disable map toolbar
+
+            if (client.IsConnected) //if the client is still connected
+            {
+                LatLng position = new LatLng(myLocation.Latitude, myLocation.Longitude);
+                userMarker = new MarkerOptions();
+                userMarker.SetTitle("You")
+                               .SetIcon(BitmapDescriptorFactory.DefaultMarker(BitmapDescriptorFactory.HueRed)) //set the current position of the volunteer using a marker
+                               .SetPosition(position);
+                CameraPosition cameraPosition = new CameraPosition.Builder().Target(position)
+                                                                            .Zoom(15)
+                                                                            .Tilt(45)
+                                                                            .Build();
+                map.AddMarker(userMarker); //add the marker on the map
+                map.AnimateCamera(CameraUpdateFactory.NewCameraPosition(cameraPosition));
+            }
+
+            else
+                client.Reconnect(); //attempt to reconnect the client
         }
 
         /// <summary>
@@ -117,6 +231,73 @@ namespace FootPatrol.Droid
             dialog.Show();
         }
 
+        /// <summary>
+        /// Start the map display and connect client if it isn't already connected from clientSetup() call
+        /// </summary>
+        public override void OnStart()
+        {
+            base.OnStart();
+            if (!client.IsConnected)
+                client.Connect(); //if the client is not already connected, connect to the client before opening the map
+        }
 
+        /// <summary>
+        /// Creates the location request.
+        /// </summary>
+        private void createLocationRequest()
+        {
+            locationRequest = LocationRequest.Create(); //create a new location request
+            locationRequest.SetPriority(LocationRequest.PriorityHighAccuracy) //set the location request priority to high
+                           .SetInterval(10000) //set the interval for location updates to every minute
+                           .SetFastestInterval(1000); //set the fastest interval for location updates to every second
+        }
+
+        /// <summary>
+        /// Setup the map based on the build version used.
+        /// </summary>
+        private void mapSetup()
+        {
+            if (Int32.Parse(Build.VERSION.Sdk) <= 23) //if the android version is older
+                mf.GetMapAsync(this); //set the mapFragment
+
+            else
+                mView.GetMapAsync(this); //set the mapView
+        }
+
+        /// <summary>
+        /// If the client has failed to connect, attempt to reconnect the client, otherwise notify the user.
+        /// </summary>
+        private void onConnectionInterrupted()
+        {
+            try
+            {
+                client.Reconnect(); //attempt to reconnect the client
+            }
+
+            catch
+            {
+                createAlert("Could not connect to google API client, please try again later."); //if the client cannot be connected, display alert
+            }
+        }
+
+        /// <summary>
+        /// Click listener for the side tab.
+        /// </summary>
+        /// <param name="btn">Button</param>
+        /// <param name="drawer">Drawer</param>
+        /// <param name="list">List</param>
+        private void sideTabClicked(ImageButton btn, DrawerLayout drawer, ListView list)
+        {
+            if (drawer.IsDrawerOpen(list))
+            {
+                btn.SetX(0); //set the button to its initial position
+                drawer.CloseDrawer(list); //close the drawer
+            }
+
+            else
+            {
+                drawer.OpenDrawer(list); //if the drawer isn't open, open it
+            }
+        }
     }
 }

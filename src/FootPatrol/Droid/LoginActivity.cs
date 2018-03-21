@@ -74,13 +74,14 @@ namespace FootPatrol.Droid
                 else
                 {
                     spinner.Visibility = ViewStates.Visible; //make the spinner visible
-                    Android.Support.V4.App.Fragment newFrag = new VolunteerActivity(); //create a new instance of VolunteerActivity and save it
-                    Android.Support.V4.App.FragmentTransaction fragmentTransaction = this.Activity.SupportFragmentManager.BeginTransaction(); //begin the fragment transaction
-                    fragmentTransaction.SetCustomAnimations(Resource.Layout.EnterAnimation, Resource.Layout.ExitAnimation); //add animation to slide new fragment to the left
-                    fragmentTransaction.Replace(Resource.Id.frameLayout2, newFrag, "VolunteerActivity"); //replace the old fragment with the new on
-                    fragmentTransaction.AddToBackStack("LoginActivity");
-                    fragmentTransaction.Commit(); //commit the transaction
+                    switchFragment(new VolunteerActivity(), "VolunteerActivity");
                 }
+            };
+
+            continueAsUser.Click += (sender, e) =>
+            {
+                spinner.Visibility = ViewStates.Visible; //make the spinner visible
+                switchFragment(new UserActivity(), "UserActivity");
             };
 
             return views;
@@ -89,6 +90,16 @@ namespace FootPatrol.Droid
         private void setFont(Typeface font, TextView text)
         {
             text.SetTypeface(font, TypefaceStyle.Normal);
+        }
+
+        private void switchFragment(Android.Support.V4.App.Fragment frag, string tag)
+        {
+            Android.Support.V4.App.Fragment newFrag = frag; //create a new instance of VolunteerActivity and save it
+            Android.Support.V4.App.FragmentTransaction fragmentTransaction = this.Activity.SupportFragmentManager.BeginTransaction(); //begin the fragment transaction
+            fragmentTransaction.SetCustomAnimations(Resource.Layout.EnterAnimation, Resource.Layout.ExitAnimation); //add animation to slide new fragment to the left
+            fragmentTransaction.Replace(Resource.Id.frameLayout2, newFrag, tag); //replace the old fragment with the new on
+            fragmentTransaction.AddToBackStack("LoginActivity");
+            fragmentTransaction.Commit(); //commit the transaction
         }
 
     }

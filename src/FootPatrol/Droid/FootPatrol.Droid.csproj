@@ -164,6 +164,7 @@
     <Compile Include="UserActivity.cs" />
     <Compile Include="VolunteerPairs.cs" />
     <Compile Include="RequestStatus.cs" />
+    <Compile Include="PairActive.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
@@ -204,6 +205,15 @@
     <AndroidResource Include="Resources\drawable\ic_keyboard_arrow_up_black_24dp.png" />
     <AndroidResource Include="Resources\layout\UserScreen.xml" />
     <AndroidResource Include="Resources\layout\UserScreenMF.xml" />
+    <AndroidResource Include="Resources\layout\ContactUs.xml" />
+    <AndroidResource Include="Resources\layout\AboutUs.xml" />
+    <AndroidResource Include="Resources\layout\WhatWeDo.xml" />
+    <AndroidResource Include="Resources\layout\Volunteer.xml" />
+    <AndroidResource Include="Resources\drawable\westernFootPatrolVolunteers.jpg" />
+    <AndroidResource Include="Resources\drawable\volunteers.jpg" />
+    <AndroidResource Include="Resources\drawable\whatwedo.jpg" />
+    <AndroidResource Include="Resources\drawable\wfp.jpg" />
+    <AndroidResource Include="Resources\drawable\FootPatrolLocation.png" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\drawable\" />

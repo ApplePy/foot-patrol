@@ -135,14 +135,24 @@
             p1:layout_height="40dp"
             p1:id="@+id/searchView1"
             p1:layout_alignParentTop="true"
+            p1:layout_marginTop="20dp"
             p1:background="@drawable/BorderResource" />
         <ListView
             p1:id="@+id/listView3"
             p1:layout_width="match_parent"
             p1:layout_height="150dp"
-            p1:layout_marginTop="40dp"
+            p1:layout_marginTop="60dp"
             p1:background="@drawable/BorderResource"
             p1:divider="#807F83" />
+        <TextView
+            p1:layout_width="match_parent"
+            p1:layout_height="20dp"
+            p1:id="@+id/volunteerSVDescriptionMF"
+            p1:background="@drawable/BorderResource"
+            p1:text="SEARCH FOR VOLUNTEER"
+            p1:textAllCaps="true"
+            p1:textStyle="bold"
+            p1:gravity="center_horizontal" />
     </RelativeLayout>
     <ListView
         p1:id="@+id/listView1"
