@@ -2,4 +2,6 @@
 <nav *ngIf="isLoggedIn | async" >
   <button routerLink='/request-list'>Request List</button>
   <button routerLink='/map'>Map</button>
+  <button *ngIf='isAdmin | async' routerLink='/dispatcher-list'>Dispatcher List</button>
+  <button (click)='onLogout()'>Logout</button>
 </nav>
