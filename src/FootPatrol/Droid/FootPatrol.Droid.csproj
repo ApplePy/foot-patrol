@@ -220,6 +220,8 @@
     <AndroidResource Include="Resources\drawable\wfp.jpg" />
     <AndroidResource Include="Resources\drawable\FootPatrolLocation.png" />
     <AndroidResource Include="Resources\drawable\FormEntry.xml" />
+    <AndroidResource Include="Resources\drawable\mike.png" />
+    <AndroidResource Include="Resources\drawable\darryl.png" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\drawable\" />

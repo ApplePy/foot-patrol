@@ -8,6 +8,7 @@ using Android.Gms.Location;
 using Android.Graphics;
 using Android.Locations;
 using System;
+using Xamarin.Forms;
 using System.Text;
 using Android.Gms.Common;
 using Android.Widget;
@@ -18,6 +19,7 @@ using System.Threading.Tasks;
 using System.Net.Http;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System.Threading;
 
 namespace FootPatrol.Droid
 {
@@ -32,28 +34,32 @@ namespace FootPatrol.Droid
         private static MapView mView; //mapView that displays map on >= API 24
         private static SupportMapFragment mf; //fragment that displays map on < API 24
         private static ImageButton mSideTab, mfSideTab; //side tab buttons for each view
-        private static Button pickUpBtn;
+        private static Android.Widget.Button pickUpBtn;
         private static EditText userName, destination, additionalInfo;
-        private static ListView mListView, mfListView, searchListView;
+        private static Android.Widget.ListView mListView, mfListView, searchListView;
         private static MarkerOptions userMarker;
         private static CircleOptions circle;
         private static DrawerLayout mDrawerLayout, mfDrawerLayout;
-        private static RelativeLayout relativeLayout;
-        private static View view; //the current view
+        private static Android.Widget.RelativeLayout relativeLayout, acceptedRequestLayout;
+        private static Android.Views.View view; //the current view
         private static TextView svDescription;
         private static ArrayAdapter<String> listAdapter, locationAdapter;
-        static Android.Widget.SearchView searchView;
+        private static Android.Widget.SearchView searchView;
         private static string[] menuItems, locationNames;
         private string backendURI, postRequestURI;
         private static int requestID;
+        private static Android.Widget.ProgressBar spinner;
+        private static TimerCallback tc;
+        public static Timer timer;
 
         public string tag;
         public Android.Support.V4.App.Fragment fragment;
 
-        public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+        public override Android.Views.View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
 
+            Forms.Init(this.Activity,savedInstanceState);
             menuItems = new string[] { "CAMPUS MAPS", "NON-EMERGENCY CONTACTS", "CONTACT US", "ABOUT US", "WHAT WE DO", "VOLUNTEER" };
             locationNames = new string[] {"3M CTR - 3M CENTRE" , "AH - ALUMNI HALL" , "BGS - BIOLOGY & GEOLOGY SCIENCES", " CHB - CHEMISTRY BUILDING" ,
             "EC - ELBORN COLLEGE", "HSB - HEALTH SCIENCES BUILDING", "KB - KRESGE BUILDING", "LH - LAWSON HALL", "MC - MIDDLESEX COLLEGE", "NCB - NORTH CAMPUS BUILDING", "NSC - NATURAL SCIENCES CENTRE",
@@ -84,18 +90,22 @@ namespace FootPatrol.Droid
                 mView = (MapView)view.FindViewById(Resource.Id.userMap);
                 mSideTab = (ImageButton)view.FindViewById(Resource.Id.userSideTab);
                 mDrawerLayout = (DrawerLayout)view.FindViewById(Resource.Id.userdrawer);
-                mListView = (ListView)view.FindViewById(Resource.Id.userListView);
+                mListView = (Android.Widget.ListView)view.FindViewById(Resource.Id.userListView);
                 searchView = (Android.Widget.SearchView)view.FindViewById(Resource.Id.userSearchView);
-                searchListView = (ListView)view.FindViewById(Resource.Id.userSearchListView);
+                searchListView = (Android.Widget.ListView)view.FindViewById(Resource.Id.userSearchListView);
                 svDescription = (TextView)view.FindViewById(Resource.Id.userSVDescription);
-                pickUpBtn = (Button)view.FindViewById(Resource.Id.requestPickupBtn);
+                pickUpBtn = (Android.Widget.Button)view.FindViewById(Resource.Id.requestPickupBtn);
                 userName = (EditText)view.FindViewById(Resource.Id.userName5);
                 destination = (EditText)view.FindViewById(Resource.Id.userToLocation);
                 additionalInfo = (EditText)view.FindViewById(Resource.Id.userAdditionalInfo);
-                relativeLayout = (RelativeLayout)view.FindViewById(Resource.Id.userInnerRelative);
+                relativeLayout = (Android.Widget.RelativeLayout)view.FindViewById(Resource.Id.userInnerRelative);
+                spinner = (Android.Widget.ProgressBar)view.FindViewById(Resource.Id.spinner2);
+                acceptedRequestLayout = (Android.Widget.RelativeLayout)view.FindViewById(Resource.Id.acceptedRequestLayout);
 
                 searchListView.Visibility = ViewStates.Gone;
                 relativeLayout.Visibility = ViewStates.Gone;
+                spinner.Visibility = ViewStates.Gone;
+                acceptedRequestLayout.Visibility = ViewStates.Gone;
 
                 mListView.Adapter = listAdapter;
                 searchListView.Adapter = locationAdapter;
@@ -146,18 +156,22 @@ namespace FootPatrol.Droid
                 mf = (SupportMapFragment)this.ChildFragmentManager.FindFragmentById(Resource.Id.userMapMF);
                 mfSideTab = (ImageButton)view.FindViewById(Resource.Id.userSideTabMF);
                 mfDrawerLayout = (DrawerLayout)view.FindViewById(Resource.Id.userdrawerMF);
-                mfListView = (ListView)view.FindViewById(Resource.Id.userListViewMF);
+                mfListView = (Android.Widget.ListView)view.FindViewById(Resource.Id.userListViewMF);
                 searchView = (Android.Widget.SearchView)view.FindViewById(Resource.Id.userSearchViewMF);
-                searchListView = (ListView)view.FindViewById(Resource.Id.userSearchListViewMF);
+                searchListView = (Android.Widget.ListView)view.FindViewById(Resource.Id.userSearchListViewMF);
                 svDescription = (TextView)view.FindViewById(Resource.Id.userSVDescriptionMF);
-                pickUpBtn = (Button)view.FindViewById(Resource.Id.requestPickupBtn1);
-                userName = (EditText)view.FindViewById(Resource.Id.userName6);
+                pickUpBtn = (Android.Widget.Button)view.FindViewById(Resource.Id.requestPickupBtn1);
+                userName = (Android.Widget.EditText)view.FindViewById(Resource.Id.userName6);
                 destination = (EditText)view.FindViewById(Resource.Id.userToLocation1);
                 additionalInfo = (EditText)view.FindViewById(Resource.Id.userAdditionalInfo1);
-                relativeLayout = (RelativeLayout)view.FindViewById(Resource.Id.userInnerRelativeMF);
+                relativeLayout = (Android.Widget.RelativeLayout)view.FindViewById(Resource.Id.userInnerRelativeMF);
+                spinner = (Android.Widget.ProgressBar)view.FindViewById(Resource.Id.spinner3);
+                acceptedRequestLayout = (Android.Widget.RelativeLayout)view.FindViewById(Resource.Id.acceptedRequestLayout2);
 
                 searchListView.Visibility = ViewStates.Gone;
                 relativeLayout.Visibility = ViewStates.Gone;
+                spinner.Visibility = ViewStates.Gone;
+                acceptedRequestLayout.Visibility = ViewStates.Gone;
 
                 mfListView.Adapter = listAdapter;
                 searchListView.Adapter = locationAdapter;
@@ -261,7 +275,7 @@ namespace FootPatrol.Droid
         /// </summary>
         private void clientSetup()
         {
-            client = new GoogleApiClient.Builder(Application.Context.ApplicationContext).AddConnectionCallbacks(this)
+            client = new GoogleApiClient.Builder(Android.App.Application.Context.ApplicationContext).AddConnectionCallbacks(this)
                                         .AddOnConnectionFailedListener(this)
                                         .AddApi(LocationServices.API).Build(); //create new client and add needed callbacks
             location = LocationServices.FusedLocationApi; //initialize
@@ -336,7 +350,7 @@ namespace FootPatrol.Droid
         /// <param name="btn">Button</param>
         /// <param name="drawer">Drawer</param>
         /// <param name="list">List</param>
-        private void sideTabClicked(ImageButton btn, DrawerLayout drawer, ListView list)
+        private void sideTabClicked(ImageButton btn, DrawerLayout drawer, Android.Widget.ListView list)
         {
             if (drawer.IsDrawerOpen(list))
             {
@@ -398,10 +412,11 @@ namespace FootPatrol.Droid
 
         private void pickUpBtnClicked()
         {
+            spinner.Visibility = ViewStates.Visible;
             clearInitialUI();
             circle = new CircleOptions();
             LatLng center = new LatLng(myLocation.Latitude, myLocation.Longitude);
-            circle.InvokeCenter(center).InvokeFillColor(Color.Purple).InvokeRadius(500).InvokeStrokeWidth(5);
+            circle.InvokeCenter(center).InvokeFillColor(Android.Graphics.Color.Purple).InvokeRadius(500).InvokeStrokeWidth(5);
             map.AddCircle(circle);
             svDescription.Visibility = ViewStates.Visible;
             svDescription.Text = "SEARCHING FOR VOLUNTEERS";
@@ -409,7 +424,11 @@ namespace FootPatrol.Droid
             //Submit the request so that it can be picked up and return the id
             requestID = Task.Run(() => submitRequest()).Result;
 
-            //Use this new ID to continuously check the status of the request
+            spinner.Visibility = ViewStates.Gone;
+
+            tc = new TimerCallback(retrieveRequestUpdate); //create a new timerCallback to be used in timer
+            timer = new Timer(tc, 0, 0, 1000); //use the timerCallback to check for user requests every second
+
         }
 
         private void clearInitialUI()
@@ -504,5 +523,43 @@ namespace FootPatrol.Droid
             return 0;
         }
 
+        private async Task<string> getRequestStatus()
+        {
+            HttpClient httpClient = new HttpClient();
+            Uri customURI = new Uri(backendURI + postRequestURI + "/" + requestID.ToString());
+            HttpResponseMessage response = await httpClient.GetAsync(customURI);
+
+            try
+            {
+                response.EnsureSuccessStatusCode();
+                var res = await response.Content.ReadAsStringAsync();
+                JObject obj = JObject.Parse(res);
+                var statusLine = obj.SelectToken("status");
+                return statusLine.ToString();
+            }
+
+            catch(Exception e)
+            {
+                createAlert("The request response failed with exception " + e);
+            }
+
+            return "";
+        }
+
+        private void retrieveRequestUpdate(object state)
+        {
+            string status = Task.Run(() => getRequestStatus()).Result;
+            System.Diagnostics.Debug.WriteLine("The status is: " + status);
+            if (status == "IN_PROGRESS")
+            {
+                timer.Change(Timeout.Infinite, Timeout.Infinite);
+                Device.BeginInvokeOnMainThread(displayVolunteers);
+            }
+        }
+
+        private void displayVolunteers()
+        {
+            acceptedRequestLayout.Visibility = ViewStates.Visible;
+        }
     }
 }

@@ -71,10 +71,10 @@
         p1:layout_alignParentRight="true"
         p1:scaleType="fitCenter"
         p1:background="#807F83" />
-    <Spinner
+    <ProgressBar
         style="?android:attr/progressBarStyleLarge"
-        p1:layout_width="wrap_content"
-        p1:layout_height="wrap_content"
+        p1:layout_width="40dp"
+        p1:layout_height="40dp"
         p1:id="@+id/spinner1"
         p1:spinnerMode="dialog"
         p1:layout_centerHorizontal="true"
