@@ -10,6 +10,12 @@ import { AddRequestComponent } from './add-request/add-request.component';
 import {HttpClientModule} from '@angular/common/http';
 import {AgmCoreModule} from '@agm/core';
 import { MapGeneralComponent } from './map-general/map-general.component';
+import { EditRequestComponent } from './edit-request/edit-request.component';
+import { VolunteerListComponent } from './volunteer-list/volunteer-list.component';
+import { EditVolunteerpairComponent } from './edit-volunteerpair/edit-volunteerpair.component';
+import { AddPairComponent } from './add-pair/add-pair.component';
+import { AddVolunteerComponent } from './add-volunteer/add-volunteer.component';
+import { EditVolunteerComponent } from './edit-volunteer/edit-volunteer.component';
 import {SuiModule} from 'ng2-semantic-ui';
 import { LoginPageComponent } from './login-page/login-page.component';
 import { HeaderComponent } from './header/header.component';
@@ -26,6 +32,12 @@ import { AddDispatcherComponent } from './add-dispatcher/add-dispatcher.componen
     RequestListComponent,
     AddRequestComponent,
     MapGeneralComponent,
+    EditRequestComponent,
+    VolunteerListComponent,
+    EditVolunteerpairComponent,
+    AddPairComponent,
+    AddVolunteerComponent,
+    EditVolunteerComponent,
     LoginPageComponent,
     HeaderComponent,
     DispatcherListComponent,
@@ -43,6 +55,7 @@ import { AddDispatcherComponent } from './add-dispatcher/add-dispatcher.componen
       apiKey: 'AIzaSyBCuq_f6oftSWJxY9D8SnQ3wcqtdCZj_u8'
     })
   ],
+
   providers: [AuthService,
   AuthGuard,
   FtpRequestService,

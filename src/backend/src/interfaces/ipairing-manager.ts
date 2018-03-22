@@ -37,4 +37,9 @@ export interface IVolunteerPairingManager {
    * @param active The new active state of the pairing.
    */
   toggleActive(id: number, active: boolean): Promise<void>;
+
+  /**
+   * Get a list of volunteer pairs from the backend that are not currently busy.
+   */
+  getUnassignedPairs(): Promise<VolunteerPairing[]>;
 }

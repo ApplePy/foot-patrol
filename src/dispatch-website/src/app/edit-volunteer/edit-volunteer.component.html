@@ -1,0 +1,22 @@
+<h2>Edit Volunteer</h2>
+<div>
+  First Name: <input type='text' [(ngModel)]=volunteer.first_name><br>
+  Last Name: <input type='text' [(ngModel)]=volunteer.last_name><br>
+  UWO id: <input type='text' [(ngModel)]=volunteer.uwo_id><br>
+  State (optional): <select id=volunteerTWO [(ngModel)]="m_disabled">
+    <option *ngFor="let state of states" [ngValue]="m_disabled">{{state}}</option>
+  </select><br>
+</div>
+
+<div>
+  <br>
+  <button (click)="updateVolunteer()" type="button">Edit Volunteer</button>
+  <button routerLink='/volunteer-list' type="button">Cancel</button>
+</div>
+
+<div>
+  <br>
+  <p>
+    {{errorMsg}}
+  </p>
+</div>

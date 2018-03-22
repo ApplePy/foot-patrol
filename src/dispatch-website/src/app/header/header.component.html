@@ -1,6 +1,7 @@
 <!-- <a href="https://docs.google.com/forms/d/e/1FAIpQLSdeB7-BxZh4oWTGqrMGMUL4wu0ufQRKmEyNvwKGfzXt8OdZYQ/viewform?usp=sf_link">Give Feedback</a>
 <nav *ngIf="isLoggedIn | async" >
   <button routerLink='/request-list'>Request List</button>
+  <button routerLink='/volunteer-list'>Volunteer List</button>
   <button routerLink='/map'>Map</button>
   <button *ngIf='isAdmin | async' routerLink='/dispatcher-list'>Dispatcher List</button>
   <button (click)='onLogout()'>Logout</button>

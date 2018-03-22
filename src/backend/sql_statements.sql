@@ -100,3 +100,10 @@ CREATE OR REPLACE SQL SECURITY INVOKER VIEW inactive_volunteers AS
   SELECT * FROM volunteers WHERE id NOT IN
     (SELECT volunteer_one as id FROM volunteer_pairing WHERE active=1
      UNION SELECT volunteer_two FROM volunteer_pairing WHERE active=1);
+
+CREATE OR REPLACE SQL SECURITY INVOKER VIEW idle_pairs AS
+  SELECT * FROM volunteer_pairing WHERE
+    active=1 AND
+    id NOT IN (
+      SELECT pairing FROM requests WHERE
+        status IN ('ASSIGNED', 'IN_PROGRESS'));

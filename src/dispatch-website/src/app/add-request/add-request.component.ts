@@ -66,7 +66,7 @@ export class AddRequestComponent implements OnInit {
     charCheck = charCheck || regVal.test(strAdditionalInfo);
 
     if (charCheck === true) {
-      this.errorMsg = 'Error: Invalid characters detected. Please remove any special characters such as !?*|":<>`\';()@&$#% from the input fields';
+      this.errorMsg = 'Error: Invalid characters detected. Remove any special characters other than "." and "," from the input fields';
       check = false;
     }
 

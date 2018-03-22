@@ -9,6 +9,8 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { HttpTestingController } from '@angular/common/http/testing';
 import { errorHandler } from '@angular/platform-browser/src/browser';
 
+const testURL = environment.apiUrl;
+
 describe('FtpRequestService', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -35,6 +37,7 @@ describe('FtpRequestService', () => {
           from_location: 'SEB',
           to_location: 'TEB',
           additional_info: 'quick',
+          pairing: null,
           timestamp: '10/12/2017'
         },
         {
@@ -43,20 +46,37 @@ describe('FtpRequestService', () => {
           from_location: 'TEB',
           to_location: 'SEB',
           additional_info: null,
+          pairing: null,
           timestamp: '11/1/2017'
         }]
       };
       service.getRequests().subscribe();
-      const req = mockBackend.expectOne(environment.apiUrl + '/requests?offset=0&count=10');
+      const req = mockBackend.expectOne(testURL + '/requests?offset=0&count=10');
       expect(req.request.method).toEqual('GET');
       req.flush(mockResponse1);
       mockBackend.verify();
     })));
   });
   describe('archiveRequest(request)', () => {
-    it('should be defined',
-    inject([FtpRequestService], (service: FtpRequestService) => {
+    it('should send a patch request to the server',
+    inject([FtpRequestService, HttpTestingController], (service: FtpRequestService, mockBackend: HttpTestingController) => {
       expect(service.archiveRequest).toBeDefined();
+      const mockRequest3 = {
+        id: 1,
+        name: 'name1',
+        from_location: 'SEB',
+        to_location: 'TEB',
+        additional_info: 'quick',
+        timestamp: '2017-10-26T06:51:05.000Z',
+        archived: false,
+        pairing: null,
+        status: 'assigned'
+      };
+      service.archiveRequest(mockRequest3).subscribe();
+      const req = mockBackend.expectOne(testURL + '/requests' + '/' + mockRequest3.id);
+      expect(req.request.method).toEqual('PATCH');
+      req.flush(mockRequest3);
+      mockBackend.verify();
     }));
   });
 
@@ -70,6 +90,7 @@ describe('FtpRequestService', () => {
           from_location: 'TEB',
           to_location: 'SEB',
           additional_info: 'quickly',
+          pairing: null,
           timestamp: '10/12/2017ZE100:234'
         }
       };
@@ -80,7 +101,7 @@ describe('FtpRequestService', () => {
         'additional_info': 'quickly',
       };
       service.addRequest(mockRequest1).subscribe();
-      const req = mockBackend.expectOne(environment.apiUrl + '/requests');
+      const req = mockBackend.expectOne(testURL + '/requests');
       expect(req.request.method).toEqual('POST');
       req.flush(mockRequest1);
       mockBackend.verify();

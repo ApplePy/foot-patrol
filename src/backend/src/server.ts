@@ -10,6 +10,7 @@ import { ErrorMiddleware as ErrMid } from "./services/loggers";
 
 // Routes
 import { IRoute } from "./interfaces/iroute";
+import { ITask } from "./interfaces/itask";
 
 /**
  * The Express server.
@@ -23,6 +24,7 @@ export class Server {
   private requestRoute: IRoute;
   private volunteerRoute: IRoute;
   private pairingRoute: IRoute;
+  private tasks: ITask[];
 
   /**
    * Constructor.
@@ -33,12 +35,14 @@ export class Server {
   constructor(
     @inject (IFACES.IROUTE) @named(TAGS.REQUESTS) requestRoute: IRoute,
     @inject (IFACES.IROUTE) @named(TAGS.VOLUNTEERS) volunteerRoute: IRoute,
-    @inject (IFACES.IROUTE) @named(TAGS.PAIRINGS) pairingRoute: IRoute
+    @inject (IFACES.IROUTE) @named(TAGS.PAIRINGS) pairingRoute: IRoute,
+    @inject (IFACES.ITASK) @named(TAGS.SCHEDULER) schedulerTask: ITask
   ) {
     // Save DI
     this.requestRoute = requestRoute;
     this.volunteerRoute = volunteerRoute;
     this.pairingRoute = pairingRoute;
+    this.tasks = [schedulerTask];
 
     // create expressjs application
     this.app = express();
@@ -81,6 +85,11 @@ export class Server {
       res.setHeader("Content-Type", "application/json");
       next();
     });
+
+    // Register tasks
+    for (const task of this.tasks) {
+      task.register();
+    }
   }
 
   /**

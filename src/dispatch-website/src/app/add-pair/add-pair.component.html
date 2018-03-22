@@ -1,0 +1,26 @@
+<h2>Add Volunteer Pair</h2>
+<div>
+  State: <select id=pairState [(ngModel)]="pairState">
+    <option value='Active'>Active</option>
+    <option value='Inactive'>Inactive</option>
+  </select><br>
+  Volunteer 1: <select id=volunteerONE [(ngModel)]="volunteerONE">
+    <option *ngFor="let volunteer of volunteers" [ngValue]="volunteer">{{volunteer.first_name}} {{volunteer.last_name}}</option>
+  </select><br>
+  Volunteer 2: <select id=volunteerTWO [(ngModel)]="volunteerTWO">
+    <option *ngFor="let volunteer of volunteers" [ngValue]="volunteer">{{volunteer.first_name}} {{volunteer.last_name}}</option>
+  </select><br>
+</div>
+
+<div>
+  <br>
+  <button (click)="createPair()" type="button">Add Pair</button>
+  <button routerLink='/volunteer-list' type="button">Cancel</button>
+</div>
+
+<div>
+  <br>
+  <p>
+    {{errorMsg}}
+  </p>
+</div>
