@@ -139,18 +139,6 @@ test_dispatch_website:
   script:
   - cd src/dispatch-website
   - npm install
-  - ls
-  - cd node_modules
-  - ls
-  - cd jquery
-  - ls 
-  - cd dist
-  - ls
-  - cd ../../semantic-ui
-  - ls
-  - cd dist
-  - ls
-  - cd ../../..
   - npm run coverage
   # - npm run e2e          # TODO: Do we want e2e testing?
 
