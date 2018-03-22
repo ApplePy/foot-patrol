@@ -90,7 +90,7 @@ variables:
   # - npm config set registry $NPM_CACHE # Setup proxy to stop killing bandwidth
 
 # This test ensures the back end works
-.test_backend:
+test_backend:
   <<: *test_docker_common
   tags:
   - docker
@@ -125,7 +125,7 @@ variables:
 
 
 # This test ensures the front end works
-.test_dispatch_website:
+test_dispatch_website:
   <<: *test_docker_common
   image: amio/node-chrome   # Contains both Node 8 and Chrome (https://incode.ca/capstone/docker-node-chrome mirrored from https://github.com/amio/docker-node-chrome)
   artifacts:
@@ -283,7 +283,7 @@ build_review_backend:
   <<: *build_docker_common
   <<: *backend
 
-.build_review_mobile:
+build_review_mobile:
   <<: *build_review_common
   <<: *build_mobile_common
   script:
@@ -314,7 +314,7 @@ build_backend:
 
 
 # This job builds the mobile app for deployment
-.build_mobile:
+build_mobile:
   <<: *build_mobile_common
   <<: *build_deploy_common
   script:
