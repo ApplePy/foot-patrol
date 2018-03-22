@@ -1,18 +1,19 @@
-<button routerLink='/add-request'>Add new request</button>
 <h2>Requests</h2>
-<table>
-  <tr>
-    <th>Request ID</th>
-    <th>Name</th>
-    <th>From</th>
-    <th>To</th>
-    <th>Additional Info</th>
-    <th>Time</th>
-    <th>Archive</th>
-    <th>Edit</th>
-    <th>Status</th>
-  </tr>
-
+<table class="ui celled table">
+  <thead>
+    <tr>
+        <th>Request ID</th>
+        <th>Name</th>
+        <th>From</th>
+        <th>To</th>
+        <th>Additional Info</th>
+        <th>Time</th>
+        <th>Archive</th>
+        <th>Edit</th>
+        <th>Status</th>
+    </tr>
+  </thead>
+  <tbody>
   <tr *ngFor="let request of displayRequests">
     <td>{{request.id}}</td>
     <td>{{request.name}}</td>
@@ -24,4 +25,6 @@
     <td><button (click)="editRequest(request.id)">Change assigned volunteers</button></td>
     <td>{{request.status}}</td>
   </tr>
+</tbody>
 </table>
+<button routerLink='/add-request' class="ui green button">Add new request</button>

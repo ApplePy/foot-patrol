@@ -16,6 +16,7 @@ import { EditVolunteerpairComponent } from './edit-volunteerpair/edit-volunteerp
 import { AddPairComponent } from './add-pair/add-pair.component';
 import { AddVolunteerComponent } from './add-volunteer/add-volunteer.component';
 import { EditVolunteerComponent } from './edit-volunteer/edit-volunteer.component';
+import {SuiModule} from 'ng2-semantic-ui';
 import { LoginPageComponent } from './login-page/login-page.component';
 import { HeaderComponent } from './header/header.component';
 import { AuthService } from './auth.service';
@@ -47,6 +48,7 @@ import { AddDispatcherComponent } from './add-dispatcher/add-dispatcher.componen
     BrowserModule,
     HttpClientModule,
     HttpModule,
+    SuiModule,
     FormsModule,
     AppRoutingModule,
     AgmCoreModule.forRoot({
