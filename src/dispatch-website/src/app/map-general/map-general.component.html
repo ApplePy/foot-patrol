@@ -2,6 +2,9 @@
 <!-- the component as the initial center of the map: -->
 <agm-map [latitude]="lat" [longitude]="lng" [zoom]="zoom">
   <agm-marker *ngFor="let vol of TestList" [latitude]="vol.late" [longitude]="vol.long">
-    <agm-info-window>{{vol.name}}</agm-info-window>
+    <agm-info-window>
+      Name: {{vol.name}}<br>
+      Last Checkin: {{vol.timestamp}}
+    </agm-info-window>
   </agm-marker>
 </agm-map>
