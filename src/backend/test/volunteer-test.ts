@@ -28,7 +28,10 @@ class VolunteerTest {
       first_name: "John",
       last_name: "Doe",
       uwo_id: "jdoe37",
-      disabled: "false"
+      disabled: "false",
+      latitude: "42.9849",
+      longitude: "81.2453",
+      timestamp: "2017-10-26T06:51:05.000Z"
     };
     const expected = new Volunteer();
     expected.id = 1;
@@ -36,6 +39,10 @@ class VolunteerTest {
     expected.last_name = "Doe";
     expected.uwo_id = "jdoe37";
     expected.disabled = false;
+    expected.latitude = "42.9849";
+    expected.longitude = "81.2453";
+    expected.timestamp = new Date("2017-10-26T06:51:05.000Z");
+
 
     const testReq = new Volunteer(testData);
     testReq.should.deep.equal(expected);
@@ -49,6 +56,9 @@ class VolunteerTest {
       first_name: "John",
       last_name: "Doe",
       uwo_id: "jdoe37",
+      latitude: "42.9849",
+      longitude: "81.2453",
+      timestamp: "2017-10-26T06:51:05.000Z"
     };
     const expected = new Volunteer();
     expected.id = 0;
@@ -56,6 +66,9 @@ class VolunteerTest {
     expected.last_name = "Doe";
     expected.uwo_id = "jdoe37";
     expected.disabled = false;
+    expected.latitude = "42.9849";
+    expected.longitude = "81.2453";
+    expected.timestamp = new Date("2017-10-26T06:51:05.000Z");
 
     const testReq = new Volunteer(testData);
     testReq.should.deep.equal(expected);
@@ -68,13 +81,19 @@ class VolunteerTest {
     const testData = {
       first_name: "John",
       last_name: "Doe",
-      disabled: "false"
+      disabled: "false",
+      latitude: "42.9849",
+      longitude: "81.2453",
+      timestamp: "2017-10-26T06:51:05.000Z"
     };
     const expected = new Volunteer();
     expected.id = 0;
     expected.first_name = "John";
     expected.last_name = "Doe";
     expected.disabled = false;
+    expected.latitude = "42.9849";
+    expected.longitude = "81.2453";
+    expected.timestamp = new Date("2017-10-26T06:51:05.000Z");
 
     const testReq = new Volunteer(testData);
     testReq.should.deep.equal(expected);

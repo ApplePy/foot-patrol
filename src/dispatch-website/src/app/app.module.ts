@@ -11,13 +11,26 @@ import {HttpClientModule} from '@angular/common/http';
 import {AgmCoreModule} from '@agm/core';
 import { MapGeneralComponent } from './map-general/map-general.component';
 import {SuiModule} from 'ng2-semantic-ui';
+import { LoginPageComponent } from './login-page/login-page.component';
+import { HeaderComponent } from './header/header.component';
+import { AuthService } from './auth.service';
+import { AuthGuard } from './auth.guard';
+import { DispatcherListComponent } from './dispatcher-list/dispatcher-list.component';
+import { DemoDispatchService } from './demo-dispatch.service';
+import { EditDispatcherComponent } from './edit-dispatcher/edit-dispatcher.component';
+import { AddDispatcherComponent } from './add-dispatcher/add-dispatcher.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     RequestListComponent,
     AddRequestComponent,
-    MapGeneralComponent
+    MapGeneralComponent,
+    LoginPageComponent,
+    HeaderComponent,
+    DispatcherListComponent,
+    EditDispatcherComponent,
+    AddDispatcherComponent
   ],
   imports: [
     BrowserModule,
@@ -30,7 +43,10 @@ import {SuiModule} from 'ng2-semantic-ui';
       apiKey: 'AIzaSyBCuq_f6oftSWJxY9D8SnQ3wcqtdCZj_u8'
     })
   ],
-  providers: [],
+  providers: [AuthService,
+  AuthGuard,
+  FtpRequestService,
+  DemoDispatchService],
   bootstrap: [AppComponent],
 })
 export class AppModule { }

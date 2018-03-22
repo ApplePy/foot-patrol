@@ -67,6 +67,9 @@ export class VolunteersRoute extends AbstractRoute implements IRoute {
    * @apiSuccess {string} volunteers.first_name First name of the volunteer.
    * @apiSuccess {string} volunteers.last_name First name of the volunteer.
    * @apiSuccess {boolean} volunteers.disabled Designates if the volunteer has left Foot Patrol.
+   * @apiSuccess {string} volunteers.latitude Last known volunteer latitude.
+   * @apiSuccess {string} volunteers.longitude Last known volunteer longitude.
+   * @apiSuccess {string} volunteers.timestamp Timestamp of last update to volunteer location.
    *
    * @apiExample Example usage:
    * curl -i http://localhost/volunteers?disabled=true
@@ -80,7 +83,10 @@ export class VolunteersRoute extends AbstractRoute implements IRoute {
    *            uwo_id: "jdoe37",
    *            first_name: "John",
    *            last_name: "Doe",
-   *            disabled: false
+   *            disabled: false,
+   *            latitude: "42.9849",
+   *            longitude: "81.2453",
+   *            timestamp: "2017-10-26T06:51:05.000Z"
    *          }
    *        ]
    *     }
@@ -131,6 +137,9 @@ export class VolunteersRoute extends AbstractRoute implements IRoute {
    * @apiSuccess {string} first_name First name of the volunteer.
    * @apiSuccess {string} last_name First name of the volunteer.
    * @apiSuccess {boolean} disabled Designates if the volunteer has left Foot Patrol.
+   * @apiSuccess {string} latitude Last known volunteer latitude.
+   * @apiSuccess {string} longitude Last known volunteer longitude.
+   * @apiSuccess {string} timestamp Timestamp of last update to volunteer location.
    *
    * @apiExample Example usage:
    * curl -i http://localhost/volunteers/1
@@ -142,7 +151,10 @@ export class VolunteersRoute extends AbstractRoute implements IRoute {
    *        uwo_id: "jdoe37",
    *        first_name: "John",
    *        last_name: "Doe",
-   *        disabled: false
+   *        disabled: false,
+   *        latitude: "42.9849",
+   *        longitude: "81.2453",
+   *        timestamp: "2017-10-26T06:51:05.000Z"
    *     }
    *
    * @apiError (Error 400) InvalidURLParameter The requested ID was invalid format.
@@ -186,12 +198,18 @@ export class VolunteersRoute extends AbstractRoute implements IRoute {
    * @apiParam {string} first_name First name of the new volunteer.
    * @apiParam {string} last_name Last name of the new volunteer.
    * @apiParam {boolean} [disabled] Whether the volunteer should be created disabled.
+   * @apiParam {string} [latitude] Last known volunteer latitude. If supplied, must supply longitude and timestamp.
+   * @apiParam {string} [longitude] Last known volunteer longitude. If supplied, must supply latitude and timestamp.
+   * @apiParam {string} [timestamp] Timestamp of last update to volunteer location. If supplied, must give long and lat.
    *
    * @apiSuccess (Created 201) {number} id The record ID.
    * @apiSuccess (Created 201) {string} uwo_id UWO ID of the new volunteer.
    * @apiSuccess (Created 201) {string} first_name First name of the new volunteer.
    * @apiSuccess (Created 201) {string} last_name Last name of the new volunteer.
    * @apiSuccess (Created 201) {boolean} disabled Whether the volunteer is disabled.
+   * @apiSuccess (Created 201) {string} latitude Last known volunteer latitude.
+   * @apiSuccess (Created 201) {string} longitude Last known volunteer longitude.
+   * @apiSuccess (Created 201) {string} timestamp Timestamp of last update to volunteer location.
    *
    * @apiSuccessExample Success Response:
    *     HTTP/1.1 201 CREATED
@@ -200,7 +218,10 @@ export class VolunteersRoute extends AbstractRoute implements IRoute {
    *        uwo_id: "jdoe37",
    *        first_name: "John",
    *        last_name: "Doe",
-   *        disabled: false
+   *        disabled: false,
+   *        latitude: "42.9849",
+   *        longitude: "81.2453",
+   *        timestamp: "2017-10-26T06:51:05.000Z"
    *     }
    *
    * @apiError (Error 400) InvalidBodyParameter One of the post request parameters was missing or invalid.
@@ -254,12 +275,18 @@ export class VolunteersRoute extends AbstractRoute implements IRoute {
    * @apiParam {string} first_name First name of the volunteer.
    * @apiParam {string} last_name Last name of the volunteer.
    * @apiParam {boolean} [disabled] Whether the volunteer should be disabled.
+   * @apiParam {string} [latitude] Last known volunteer latitude. If supplied, must supply longitude and timestamp.
+   * @apiParam {string} [longitude] Last known volunteer longitude. If supplied, must supply latitude and timestamp.
+   * @apiParam {string} [timestamp] Timestamp of last update to volunteer location. If supplied, must give long and lat.
    *
    * @apiSuccess {number} id The record ID.
    * @apiSuccess {string} uwo_id UWO ID of the volunter.
    * @apiSuccess {string} first_name First name of the volunteer.
    * @apiSuccess {string} last_name First name of the volunteer.
    * @apiSuccess {boolean} disabled Designates if the volunteer has left Foot Patrol.
+   * @apiSuccess {string} latitude Last known volunteer latitude.
+   * @apiSuccess {string} longitude Last known volunteer longitude.
+   * @apiSuccess {string} timestamp Timestamp of last update to volunteer location.
    *
    * @apiSuccessExample Success Response:
    *     HTTP/1.1 200 OK
@@ -268,7 +295,10 @@ export class VolunteersRoute extends AbstractRoute implements IRoute {
    *        uwo_id: "jdoe37",
    *        first_name: "John",
    *        last_name: "Doe",
-   *        disabled: false
+   *        disabled: false,
+   *        latitude: "42.9849",
+   *        longitude: "81.2453",
+   *        timestamp: "2017-10-26T06:51:05.000Z"
    *     }
    *
    * @apiError (Error 400) InvalidURLParameter The ID was invalid.
@@ -334,12 +364,18 @@ export class VolunteersRoute extends AbstractRoute implements IRoute {
    * @apiParam {string} [first_name] First name of the volunteer.
    * @apiParam {string} [last_name] Last name of the volunteer.
    * @apiParam {boolean} [disabled] Whether the volunteer should be disabled.
+   * @apiParam {string} [latitude] Last known volunteer latitude. If supplied, must supply longitude and timestamp.
+   * @apiParam {string} [longitude] Last known volunteer longitude. If supplied, must supply latitude and timestamp.
+   * @apiParam {string} [timestamp] Timestamp of last update to volunteer location. If supplied, must give long and lat.
    *
    * @apiSuccess {number} id The record ID.
    * @apiSuccess {string} uwo_id UWO ID of the volunter.
    * @apiSuccess {string} first_name First name of the volunteer.
    * @apiSuccess {string} last_name First name of the volunteer.
    * @apiSuccess {boolean} disabled Designates if the volunteer has left Foot Patrol.
+   * @apiSuccess {string} latitude Last known volunteer latitude.
+   * @apiSuccess {string} longitude Last known volunteer longitude.
+   * @apiSuccess {string} timestamp Timestamp of last update to volunteer location.
    *
    * @apiSuccessExample Success Response:
    *     HTTP/1.1 200 OK
@@ -348,7 +384,10 @@ export class VolunteersRoute extends AbstractRoute implements IRoute {
    *        uwo_id: "jdoe37",
    *        first_name: "John",
    *        last_name: "Doe",
-   *        disabled: false
+   *        disabled: false,
+   *        latitude: "42.9849",
+   *        longitude: "81.2453",
+   *        timestamp: "2017-10-26T06:51:05.000Z"
    *     }
    *
    * @apiError (Error 400) InvalidURLParameter The ID was invalid.
@@ -375,7 +414,10 @@ export class VolunteersRoute extends AbstractRoute implements IRoute {
       uwo_id: this.sanitizer.sanitize,
       first_name: this.sanitizer.sanitize,
       last_name: this.sanitizer.sanitize,
-      disabled: Boolean
+      disabled: Boolean,
+      latitude: this.sanitizer.sanitize,
+      longitude: this.sanitizer.sanitize,
+      timestamp: this.sanitizer.sanitize
     };
 
     // List of sanitized data
@@ -392,6 +434,16 @@ export class VolunteersRoute extends AbstractRoute implements IRoute {
     // Empty string check
     for (const prop of ["uwo_id", "first_name", "last_name"]) {
       if (updateDict[prop] !== undefined && updateDict[prop].length <= 0) {
+        next(new StatusError(400,
+          errStrings.InvalidBodyParameter.Title,
+          errStrings.InvalidBodyParameter.Msg));
+        return;
+      }
+    }
+
+    // Check to make all location data is supplied if part of location data is supplied
+    if (updateDict.latitude || updateDict.longitude || updateDict.timestamp) {
+      if (!(updateDict.latitude && updateDict.longitude && updateDict.timestamp)) {
         next(new StatusError(400,
           errStrings.InvalidBodyParameter.Title,
           errStrings.InvalidBodyParameter.Msg));
@@ -428,6 +480,9 @@ export class VolunteersRoute extends AbstractRoute implements IRoute {
    * @apiSuccess {string} volunteers.first_name First name of the volunteer.
    * @apiSuccess {string} volunteers.last_name First name of the volunteer.
    * @apiSuccess {boolean} volunteers.disabled Designates if the volunteer has left Foot Patrol.
+   * @apiSuccess {string} volunteers.latitude Last known volunteer latitude.
+   * @apiSuccess {string} volunteers.longitude Last known volunteer longitude.
+   * @apiSuccess {string} volunteers.timestamp Timestamp of last update to volunteer location.
    *
    * @apiExample Example usage:
    * curl -i http://localhost/volunteers/inactive
@@ -441,7 +496,10 @@ export class VolunteersRoute extends AbstractRoute implements IRoute {
    *            uwo_id: "jdoe37",
    *            first_name: "John",
    *            last_name: "Doe",
-   *            disabled: false
+   *            disabled: false,
+   *            latitude: "42.9849",
+   *            longitude: "81.2453",
+   *            timestamp: "2017-10-26T06:51:05.000Z"
    *          }
    *        ]
    *     }
@@ -471,6 +529,9 @@ export class VolunteersRoute extends AbstractRoute implements IRoute {
    * @apiSuccess {string} volunteers.first_name First name of the volunteer.
    * @apiSuccess {string} volunteers.last_name First name of the volunteer.
    * @apiSuccess {boolean} volunteers.disabled Designates if the volunteer has left Foot Patrol.
+   * @apiSuccess {string} volunteers.latitude Last known volunteer latitude.
+   * @apiSuccess {string} volunteers.longitude Last known volunteer longitude.
+   * @apiSuccess {string} volunteers.timestamp Timestamp of last update to volunteer location.
    *
    * @apiExample Example usage:
    * curl -i http://localhost/volunteers/active
@@ -484,7 +545,10 @@ export class VolunteersRoute extends AbstractRoute implements IRoute {
    *            uwo_id: "jdoe37",
    *            first_name: "John",
    *            last_name: "Doe",
-   *            disabled: false
+   *            disabled: false,
+   *            latitude: "42.9849",
+   *            longitude: "81.2453",
+   *            timestamp: "2017-10-26T06:51:05.000Z"
    *          }
    *        ]
    *     }
@@ -508,7 +572,21 @@ export class VolunteersRoute extends AbstractRoute implements IRoute {
       const first_name = this.sanitizer.sanitize(req.body.first_name);
       const last_name = this.sanitizer.sanitize(req.body.last_name);
       const disabled = (req.body.disabled === true || req.body.disabled === "true") ? true : false;
+      let latitude: any;
+      let longitude: any;
+      let timestamp: any;
       // tslint:enable:variable-name
+
+      // Check to make all location data is supplied if part of location data is supplied
+      if (req.body.latitude || req.body.longitude || req.body.timestamp) {
+        if (!(req.body.latitude && req.body.longitude && req.body.timestamp)) {
+          return false;
+        } else {
+          latitude = String(req.body.latitude);
+          longitude = String(req.body.longitude);
+          timestamp = String(req.body.timestamp);
+        }
+      }
 
       // Check that the strings aren't empty
       for (const prop of [uwo_id, first_name, last_name]) {
@@ -517,7 +595,7 @@ export class VolunteersRoute extends AbstractRoute implements IRoute {
         }
       }
 
-      return {uwo_id, first_name, last_name, disabled};
+      return {uwo_id, first_name, last_name, disabled, latitude, longitude, timestamp};
     } catch (err) {
       return false;
     }

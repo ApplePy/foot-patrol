@@ -72,6 +72,9 @@ export class VolunteerPairingsRoute extends AbstractRoute implements IRoute {
    * @apiSuccess {string} pairs.volunteers.first_name First name of the volunteer.
    * @apiSuccess {string} pairs.volunteers.last_name First name of the volunteer.
    * @apiSuccess {boolean} pairs.volunteers.disabled Designates if the volunteer has left Foot Patrol.
+   * @apiSuccess {string} pairs.volunteers.latitude Last known volunteer latitude.
+   * @apiSuccess {string} pairs.volunteers.longitude Last known volunteer longitude.
+   * @apiSuccess {string} pairs.volunteers.timestamp Timestamp of last update to volunteer location.
    *
    * @apiExample Example usage:
    * curl -i http://localhost/volunteerpairs?inactive=true
@@ -89,14 +92,20 @@ export class VolunteerPairingsRoute extends AbstractRoute implements IRoute {
    *                uwo_id: "jdoe37",
    *                first_name: "John",
    *                last_name: "Doe",
-   *                disabled: false
+   *                disabled: false,
+   *                latitude: "42.9849",
+   *                longitude: "81.2453",
+   *                timestamp: "2017-10-26T06:51:05.000Z"
    *              },
    *              {
    *                id: 2,
    *                uwo_id: "jdoe38",
    *                first_name: "Jane",
    *                last_name: "Doe",
-   *                disabled: false
+   *                disabled: false,
+   *                latitude: "42.9849",
+   *                longitude: "81.2453",
+   *                timestamp: "2017-10-26T06:51:05.000Z"
    *              }
    *            ]
    *          }
@@ -153,6 +162,9 @@ export class VolunteerPairingsRoute extends AbstractRoute implements IRoute {
    * @apiSuccess {string} volunteers.first_name First name of the volunteer.
    * @apiSuccess {string} volunteers.last_name First name of the volunteer.
    * @apiSuccess {boolean} volunteers.disabled Designates if the volunteer has left Foot Patrol.
+   * @apiSuccess {string} volunteers.latitude Last known volunteer latitude.
+   * @apiSuccess {string} volunteers.longitude Last known volunteer longitude.
+   * @apiSuccess {string} volunteers.timestamp Timestamp of last update to volunteer location.
    *
    * @apiExample Example usage:
    * curl -i http://localhost/volunteerpairs/1
@@ -168,14 +180,20 @@ export class VolunteerPairingsRoute extends AbstractRoute implements IRoute {
    *            uwo_id: "jdoe37",
    *            first_name: "John",
    *            last_name: "Doe",
-   *            disabled: false
+   *            disabled: false,
+   *            latitude: "42.9849",
+   *            longitude: "81.2453",
+   *            timestamp: "2017-10-26T06:51:05.000Z"
    *          },
    *          {
    *            id: 2,
    *            uwo_id: "jdoe38",
    *            first_name: "Jane",
    *            last_name: "Doe",
-   *            disabled: false
+   *            disabled: false,
+   *            latitude: "42.9849",
+   *            longitude: "81.2453",
+   *            timestamp: "2017-10-26T06:51:05.000Z"
    *          }
    *        ]
    *     }
@@ -229,6 +247,9 @@ export class VolunteerPairingsRoute extends AbstractRoute implements IRoute {
    * @apiSuccess (Created 201) {string} volunteers.first_name First name of the volunteer.
    * @apiSuccess (Created 201) {string} volunteers.last_name First name of the volunteer.
    * @apiSuccess (Created 201) {boolean} volunteers.disabled Designates if the volunteer has left Foot Patrol.
+   * @apiSuccess (Created 201) {string} volunteers.latitude Last known volunteer latitude.
+   * @apiSuccess (Created 201) {string} volunteers.longitude Last known volunteer longitude.
+   * @apiSuccess (Created 201) {string} volunteers.timestamp Timestamp of last update to volunteer location.
    *
    * @apiSuccessExample Success Response:
    *     HTTP/1.1 201 CREATED
@@ -241,14 +262,20 @@ export class VolunteerPairingsRoute extends AbstractRoute implements IRoute {
    *            uwo_id: "jdoe37",
    *            first_name: "John",
    *            last_name: "Doe",
-   *            disabled: false
+   *            disabled: false,
+   *            latitude: "42.9849",
+   *            longitude: "81.2453",
+   *            timestamp: "2017-10-26T06:51:05.000Z"
    *          },
    *          {
    *            id: 2,
    *            uwo_id: "jdoe38",
    *            first_name: "Jane",
    *            last_name: "Doe",
-   *            disabled: false
+   *            disabled: false,
+   *            latitude: "42.9849",
+   *            longitude: "81.2453",
+   *            timestamp: "2017-10-26T06:51:05.000Z"
    *          }
    *        ]
    *     }
@@ -337,7 +364,7 @@ export class VolunteerPairingsRoute extends AbstractRoute implements IRoute {
     }
 
     // Toggle state in DB
-    this.data.toggleActive(id, Boolean(req.body.active))
+    this.data.toggleActive(id, (req.body.active === "true") ? true : false)
     .then(() => res.sendStatus(204))
     .catch((err) => next(this.translateErrors(err))); // Send generic error
   }

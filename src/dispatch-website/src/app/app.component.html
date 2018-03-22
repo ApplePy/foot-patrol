@@ -1,19 +1,8 @@
 <!--The content below is only a placeholder and can be replaced.-->
-<div class="ui segment" style="background-color:#4d0099;">
-  <div style="text-align:center">
-    <h1 style="color:white; font-size: 50px;">
-      {{title}}
-    </h1>
-  </div>
+<div style="text-align:center">
+  <h1>
+    {{title}}
+  </h1>
 </div>
-
-  <div class="ui vertical menu" style="width:25%; float: left;">
-    <a routerLink='/request-list' class="item">Request List</a>
-    <a routerLink='/map' class="item">Map</a>
-    <a href="https://docs.google.com/forms/d/e/1FAIpQLSdeB7-BxZh4oWTGqrMGMUL4wu0ufQRKmEyNvwKGfzXt8OdZYQ/viewform?usp=sf_link" class="item">Give Feedback</a>
-  </div>
-
-
-<div class="ui segment" style="width:75%; float: right;">
-  <router-outlet style="float: right;"></router-outlet>
-</div>
+<app-header></app-header>
+<router-outlet></router-outlet>
