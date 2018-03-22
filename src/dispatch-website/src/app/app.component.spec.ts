@@ -31,10 +31,10 @@ describe('AppComponent', () => {
     const app = fixture.debugElement.componentInstance;
     expect(app).toBeTruthy();
   }));
-  it(`should have as title 'Foot-Patrol Dispatcher Website'`, async(() => {
+  it(`should have as title 'Foot-Patrol Portal'`, async(() => {
     const fixture = TestBed.createComponent(AppComponent);
     const app = fixture.debugElement.componentInstance;
-    expect(app.title).toEqual('Foot-Patrol Dispatcher Website');
+    expect(app.title).toEqual('Foot-Patrol Portal');
   }));
 });
 
