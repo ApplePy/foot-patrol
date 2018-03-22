@@ -81,7 +81,8 @@ describe('AddRequestComponent', () => {
       expect(component.checkValidSubmitReq('John Johnson', 'T{B', 'seb', 'quickly please')).toBe(false);
       expect(component.checkValidSubmitReq('John Johnson', 'TEB', 's&b', 'quickly please')).toBe(false);
       expect(component.checkValidSubmitReq('John Johnson', 'TEB', 'seb', 'quickl* please')).toBe(false);
-      expect(component.errorMsg).toBe('Error: Invalid characters detected. Please remove any special characters such as !?*|":<>`\';()@&$#% from the input fields');
+      expect(component.errorMsg)
+      .toBe('Error: Invalid characters detected. Remove any special characters other than "." and "," from the input fields');
     });
 
     it('should reject inputs with matching to and from locations', () => {

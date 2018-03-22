@@ -8,7 +8,9 @@
     <th>To</th>
     <th>Additional Info</th>
     <th>Time</th>
-    <th>Complete</th>
+    <th>Archive</th>
+    <th>Edit</th>
+    <th>Status</th>
   </tr>
 
   <tr *ngFor="let request of displayRequests">
@@ -19,5 +21,7 @@
     <td>{{request.additional_info}}</td>
     <td>{{request.timestamp}}</td>
     <td><button (click)="archive(request)">Archive</button></td>
+    <td><button (click)="editRequest(request.id)">Change assigned volunteers</button></td>
+    <td>{{request.status}}</td>
   </tr>
 </table>

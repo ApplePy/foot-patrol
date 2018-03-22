@@ -59,14 +59,15 @@ class VolunteerPairingTest {
 
   @test("Converting an object with missing required fields should succeed but be marked invalid")
   public missingRequiredConvert() {
+    const timestamp = new Date();
     const expected = new VolunteerPairing();
     expected.id = 0;
-    expected.volunteer_one = new Volunteer({id: 1});
+    expected.volunteer_one = new Volunteer({id: 1, timestamp});
     expected.volunteer_two = VolunteerPairing.NullVolunteer;
     expected.active = true;
 
     const testReq = new VolunteerPairing(
-      new Volunteer({id: 1})
+      new Volunteer({id: 1, timestamp})
     );
     testReq.should.deep.equal(expected);
     testReq.Valid().should.equal(false);
@@ -74,15 +75,16 @@ class VolunteerPairingTest {
 
   @test("Converting an object with bad Volunteer order should be invalid")
   public badOrderingConvert() {
+    const timestamp = new Date();
     const expected = new VolunteerPairing();
     expected.id = 0;
-    expected.volunteer_one = new Volunteer({id: 2});
-    expected.volunteer_two = new Volunteer({id: 1});
+    expected.volunteer_one = new Volunteer({id: 2, timestamp});
+    expected.volunteer_two = new Volunteer({id: 1, timestamp});
     expected.active = true;
 
     const testReq = new VolunteerPairing(
-      new Volunteer({id: 2}),
-      new Volunteer({id: 1})
+      new Volunteer({id: 2, timestamp}),
+      new Volunteer({id: 1, timestamp})
     );
     testReq.should.deep.equal(expected);
     testReq.Valid().should.equal(false);

@@ -1,0 +1,28 @@
+
+<h2>Edit Request {{request.id}}</h2>
+<div>
+  Name: {{request.name}}<br>
+  Walk from: {{request.from_location}}<br>
+  Walk to: {{request.to_location}}<br>
+  Volunteer Pair: {{volunteerPair?.volunteers[0]?.first_name}} {{volunteerPair?.volunteers[0]?.last_name}} and {{volunteerPair?.volunteers[1]?.first_name}} {{volunteerPair?.volunteers[1]?.last_name}} <select id=volunteerPairing [(ngModel)]="volunteerPair">
+    <option *ngFor="let pair of volunteerPairs" [ngValue]=pair>{{pair.volunteers[0].first_name}} {{pair.volunteers[0].last_name}} and {{pair.volunteers[1].first_name}} {{pair.volunteers[1].last_name}}</option>
+  </select><br>
+  Status: {{request.status}} <select id='stateReq' [(ngModel)]="request.status">
+    <option *ngFor="let state of states" [ngValue]="state">{{state}}</option>
+  </select><br>
+  Additional information:<br>
+  {{request.additional_info}}<br>
+</div>
+
+<div>
+  <br>
+  <button (click)="updateRequest()" type="button">Update</button>
+  <button routerLink='/request-list' type="button">Cancel</button>
+</div>
+
+<div>
+  <br>
+  <p>
+    {{errorMsg}}
+  </p>
+</div>
