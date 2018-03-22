@@ -87,9 +87,9 @@ export class Server {
     });
 
     // Register tasks
-    for (const task of this.tasks) {
-      task.register();
-    }
+    // for (const task of this.tasks) {
+    //   task.register();
+    // }
   }
 
   /**
