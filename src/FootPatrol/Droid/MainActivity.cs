@@ -33,6 +33,8 @@ namespace FootPatrol.Droid
                        {
                            SupportFragmentManager.PopBackStack();
                            switchFragment();
+                           if (VolunteerActivity.isPaired)
+                               VolunteerActivity.isPaired = false;
                        }).SetNegativeButton("No", (sender, e) =>
                        {
                         //Do nothing

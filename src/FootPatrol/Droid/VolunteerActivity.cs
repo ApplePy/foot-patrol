@@ -19,10 +19,13 @@ using System.Collections.Generic;
 using Newtonsoft.Json.Linq;
 using Android.Support.V7.Widget;
 using Android.Support.V4.Widget;
+using Android.Content;
 using System.Threading;
 using static Android.Widget.AdapterView;
 using System.Text.RegularExpressions;
 using Newtonsoft.Json;
+using Android.Views.InputMethods;
+using Org.Apache.Http.Protocol;
 
 namespace FootPatrol.Droid
 {
@@ -49,7 +52,7 @@ namespace FootPatrol.Droid
         private static RelativeLayout mRelativeLayout, mfRelativeLayout; //relative layouts to display status of complete, cancel and pickup on trip
         private static Android.Widget.SearchView searchView;
 
-        private static string backendURI, getRequestURI, getVolunteerURI, postPairURI, postInactivePairURI, setPairActiveURI;
+        private static string backendURI, getRequestURI, getVolunteerURI, postPairURI, postInactivePairURI, setPairActiveURI, updateVolunteerURI;
 
         public static List<string> request, steps, fpNames, volunteerArray; //lists to hold information on requests and direction steps, and volunteer names
         public static List<int> volunteerID;
@@ -58,14 +61,14 @@ namespace FootPatrol.Droid
         public static UserRequests.Request acceptedRequest;
 
         private static GoogleMap map; //reference to created google map
-        private static Marker userMark; //user marker to be displayed on map
+        private static Marker userMark, volunteerMark, pairMark; //user marker to be displayed on map
         private static View view; //the current view
         private static VolunteerActivity va; //reference to new instance of VolunteerActivity
         private static GoogleApiClient client; //the Google API client used to connect to Google Play Store
         private static Location myLocation; //the volunteer's current location
         private IFusedLocationProviderApi location; //location of the volunteer
         private LocationRequest locationRequest; //a new location request object so that location can be updated
-        private MarkerOptions volunteerMarker, userMarker, pairMarker; //marker options to be used for each marker on map
+        private static MarkerOptions volunteerMarker, userMarker, pairMarker; //marker options to be used for each marker on map
         private PolylineOptions polyOptions; //polyline options for the following polyline
         private static Polyline poly; //polyline to display directions on the map
 
@@ -88,7 +91,7 @@ namespace FootPatrol.Droid
         {
             base.OnCreate(savedInstanceState);
 
-            menuItems = new string[] { "NON-EMERGENCY CONTACTS", "CAMPUS MAPS", "PAIR/UNPAIR FOOT PATROLLERS", "CHECK-IN", "LOGOUT" }; //initializes list to displayed in listView 
+            menuItems = new string[] { "NON-EMERGENCY CONTACTS", "CAMPUS MAPS", "PAIR/UNPAIR FOOT PATROLLERS"}; //initializes list to displayed in listView 
          
             listAdapter = new ArrayAdapter<string>(this.Context, Resource.Layout.ListElement, menuItems); //initializes ArrayAdapter to be displayed in listView
 
@@ -98,6 +101,7 @@ namespace FootPatrol.Droid
             getVolunteerURI = "/volunteers/inactive";
             postPairURI = "/volunteerpairs/";
             postInactivePairURI = "/volunteerpairs?inactive=true";
+            updateVolunteerURI = "/volunteers/";
             request = new List<string>();
             fpNames = new List<string>();
 
@@ -369,11 +373,13 @@ namespace FootPatrol.Droid
         {
             LatLng userPosition = new LatLng(location.Latitude, location.Longitude);
             volunteerMarker.SetPosition(userPosition);
+            Task.Run(() => updateLatLng(myID, userPosition.Latitude.ToString(), userPosition.Longitude.ToString()));
 
             if(isPaired)
             {
                 LatLng pairPosition = new LatLng(location.Latitude, location.Longitude + 0.0005);
                 pairMarker.SetPosition(pairPosition);
+                Task.Run(() => updateLatLng(pairID, pairPosition.Latitude.ToString(), pairPosition.Longitude.ToString()));
             }
         }
 
@@ -427,7 +433,7 @@ namespace FootPatrol.Droid
                                                                             .Zoom(15)
                                                                             .Tilt(45)
                                                                             .Build();
-                map.AddMarker(volunteerMarker); //add the marker on the map
+                volunteerMark = map.AddMarker(volunteerMarker); //add the marker on the map
                 map.AnimateCamera(CameraUpdateFactory.NewCameraPosition(cameraPosition));
             }
 
@@ -737,21 +743,37 @@ namespace FootPatrol.Droid
         /// </summary>
         private void completeBtnClicked()
         {
-            AlertDialog.Builder builder = new AlertDialog.Builder(this.Context);
-            builder.SetTitle("Complete Trip")
-                   .SetMessage("Are you sure you want to complete the trip?")
-                   .SetPositiveButton("Yes", (sender, e) =>
+            if (completeTripBtn.Text == "COMPLETE TRIP")
             {
-                disableUI();
-                Task.Run(() => updateRequestStatus("COMPLETED", true));
+                AlertDialog.Builder builder = new AlertDialog.Builder(this.Context);
+                builder.SetTitle("Complete Trip")
+                       .SetMessage("Are you sure you want to complete the trip?")
+                       .SetPositiveButton("Yes", (sender, e) =>
+                {
+                    disableUI();
+                    Task.Run(() => updateRequestStatus("COMPLETED", true));
+                    if (Int32.Parse(Build.VERSION.Sdk) > 23)
+                        mListView.GetChildAt(2).Enabled = true;
 
-            }).SetNegativeButton("No", (sender, e) =>
+                    else
+                        mfListView.GetChildAt(2).Enabled = true;
+
+                }).SetNegativeButton("No", (sender, e) =>
+                {
+                    //Do nothing
+                });
+
+                Dialog dialog = builder.Create();
+                dialog.Show(); //show the dialog
+            }
+
+            else
             {
-                //Do nothing
-            });
-                                                                                                                          
-            Dialog dialog = builder.Create();
-            dialog.Show(); //show the dialog
+                completeTripBtn.Text = "COMPLETE TRIP";
+                poly.Remove();
+                userMark.Remove();
+                userPickedUp();
+            }
         }
 
         /// <summary>
@@ -859,13 +881,13 @@ namespace FootPatrol.Droid
                 case 2:
                     if (!isPaired)
                         updateSearchUI();
-                    break;
-
-                case 3:
-                    //fragment = new CampusMapsActivity();
-                    //tag = "CampusMapsActivity";
-                    break;
-                case 4:
+                    else
+                    {
+                        Task.Run(() => setPairActive(false));
+                        isPaired = false;
+                        pairID = 0;
+                        pairMark.Remove();
+                    }
                     break;
             }
 
@@ -894,7 +916,8 @@ namespace FootPatrol.Droid
                        int vID = volunteerID[position];
                        pairID = Task.Run(() => pairFootPatrollers(vID)).Result;
                        Task.Run(() => setPairActive(true));
-                       
+                       clearSearchView();
+
                        if (pickupPending)
                        {
                            startTrip(acceptedRequest);
@@ -907,7 +930,7 @@ namespace FootPatrol.Droid
                        pairMarker.SetTitle(fpName)
                                  .SetIcon(BitmapDescriptorFactory.DefaultMarker(BitmapDescriptorFactory.HueGreen))
                                  .SetPosition(new LatLng(myLocation.Latitude, myLocation.Longitude + 0.0005));
-                       map.AddMarker(pairMarker);
+                       pairMark = map.AddMarker(pairMarker);
                        removeSearchUI();
                       
                        isPaired = true;
@@ -1029,16 +1052,108 @@ namespace FootPatrol.Droid
 
         private void startTrip(UserRequests.Request requestedTrip)
         {
-            Task.Run(() => updateRequestStatus("IN_PROGRESS", false));
+            completeTripBtn.Text = "PICKED UP USER";
 
             //Set UI elements to display pickup information
             userName.Text = "Name: " + requestedTrip.name;
             toLoc.Text = "End Location: " + requestedTrip.toLoc;
-            fromLoc.Text = "Start Locatixon: " + requestedTrip.fromLoc;
+            fromLoc.Text = "Start Location: " + requestedTrip.fromLoc;
             addInfo.Text = "Additional Information: " + requestedTrip.addInfo;
             pickupInfo.Text = "Pickup Information";
 
-            var address = from_location; //set the starting user destination as the address
+            Task.Run(() => updateRequestStatus("IN_PROGRESS", false));
+
+            if (Int32.Parse(Build.VERSION.Sdk) > 23)
+                mListView.GetChildAt(2).Enabled = false;
+
+            else
+                mfListView.GetChildAt(2).Enabled = false;
+            
+            string userLocation = requestedTrip.fromLoc;
+            string[] latLng = userLocation.Split(' ');
+
+            double latitude = Double.Parse(latLng[0]);
+            double longitude = Double.Parse(latLng[1]);
+
+            userMarker = new MarkerOptions();
+
+            userMarker.SetPosition(new LatLng(latitude, longitude))
+                      .SetTitle(name)
+                      .SetIcon(BitmapDescriptorFactory.DefaultMarker(BitmapDescriptorFactory.HueBlue)); //add the user starting location as a marker on the screen
+            userMark = map.AddMarker(userMarker); //add the map marker to the screen and return a reference so that it can be removed
+
+            string currentLocation = myLocation.Latitude.ToString() + "," + myLocation.Longitude.ToString();
+            string destinationLocation = latitude.ToString() + "," + longitude.ToString();
+
+            var polyPattern = Task.Run(() => getPolyPat(currentLocation, destinationLocation)).Result; //get the poly pattern character string
+
+            List<LatLng> polyline = DecodePolyline(polyPattern); //decode the character string into a polyline that can be displayed on the map
+            polyOptions = new PolylineOptions().InvokeColor(Color.Blue).InvokeWidth(10); //create the new polyline as a blue line of 10 thickness
+
+            foreach (LatLng point in polyline)
+            {
+                polyOptions.Add(point); //for each point in the LatLng list, add the separate polyline to the polyline options
+            }
+
+            poly = map.AddPolyline(polyOptions); //display the polyline on the map
+
+            if (Int32.Parse(Build.VERSION.Sdk) > 23)
+            {
+                mRecyclerView.Visibility = ViewStates.Visible;
+                mRecyclerView.SetAdapter(new DirectionsAdapter(steps));
+                mRelativeLayout.Visibility = ViewStates.Visible;
+            }
+
+            else
+            {
+                mfRecyclerView.Visibility = ViewStates.Visible;
+                mfRecyclerView.SetAdapter(new DirectionsAdapter(steps));
+                mfRelativeLayout.Visibility = ViewStates.Visible;
+            }
+        }
+
+        private async Task<string> updateRequestStatus(string status, bool archived)
+        {
+            HttpClient httpClient = new HttpClient();
+            Uri customURI = new Uri(backendURI + "/requests/" + acceptedRequest.id.ToString());
+
+            var content = new RequestStatus
+            {
+                archived = archived,
+                status = status
+            };
+
+            var stringContent = JsonConvert.SerializeObject(content);
+            HttpContent httpContent = new StringContent(stringContent, Encoding.UTF8, "application/json");
+            HttpResponseMessage response = await httpClient.PatchAsync(customURI, httpContent);
+
+            try
+            {
+                response.EnsureSuccessStatusCode();
+                var responseString = await response.Content.ReadAsStringAsync();
+                var jObj = JObject.Parse(responseString);
+                System.Diagnostics.Debug.WriteLine("The status string is: " + jObj);
+                return "";
+            }
+
+            catch (Exception e)
+            {
+                createAlert("There was an exception! The error was: " + e);
+            }
+
+            return "";  
+        }
+
+        private void userPickedUp()
+        {
+            //Set UI elements to display pickup information
+            userName.Text = "Name: " + acceptedRequest.name;
+            toLoc.Text = "End Location: " + acceptedRequest.toLoc;
+            fromLoc.Text = "Start Location: " + acceptedRequest.fromLoc;
+            addInfo.Text = "Additional Information: " + acceptedRequest.addInfo;
+            pickupInfo.Text = "Pickup Information";
+
+            var address = to_location; //set the starting user destination as the address
             address = address + " Western University"; //concatenate the address with Western University to narrow the search
             var approximateLocation = Task.Run(() => getPositionForAddress(address)).Result; //get GPS coordinates of the approximate location
 
@@ -1046,7 +1161,6 @@ namespace FootPatrol.Droid
             double latitude = System.Double.Parse(approximateLocation[0]);
             double longitude = System.Double.Parse(approximateLocation[1]);
 
-            userMarker = new MarkerOptions(); //initialize a new set of marker options to be used for the user
             LatLng userCoordinates = new LatLng(latitude, longitude); //initialize new LatLng object to define user coordinates
 
             userMarker.SetPosition(userCoordinates)
@@ -1084,43 +1198,6 @@ namespace FootPatrol.Droid
                 mfRecyclerView.SetAdapter(new DirectionsAdapter(steps));
                 mfRelativeLayout.Visibility = ViewStates.Visible;
             }
-
-            HttpClient httpClient = new HttpClient(); //create a new HTTP client
-            string userID = id.ToString();
-            Uri customURI = new Uri(backendURI + userID);
-            httpClient.DeleteAsync(customURI); //delete the accepted request from all requests
-        }
-
-        private async Task<string> updateRequestStatus(string status, bool archived)
-        {
-            HttpClient httpClient = new HttpClient();
-            Uri customURI = new Uri(backendURI + "/requests/" + acceptedRequest.id.ToString());
-
-            var content = new RequestStatus
-            {
-                archived = archived,
-                status = status
-            };
-
-            var stringContent = JsonConvert.SerializeObject(content);
-            HttpContent httpContent = new StringContent(stringContent, Encoding.UTF8, "application/json");
-            HttpResponseMessage response = await httpClient.PostAsync(customURI, httpContent);
-
-            try
-            {
-                response.EnsureSuccessStatusCode();
-                var responseString = await response.Content.ReadAsStringAsync();
-                var jObj = JObject.Parse(responseString);
-                System.Diagnostics.Debug.WriteLine("The status string is: " + jObj);
-                return "";
-            }
-
-            catch (Exception e)
-            {
-                createAlert("There was an exception! The error was: " + e);
-            }
-
-            return "";  
         }
 
         private void removeSearchUI()
@@ -1128,13 +1205,13 @@ namespace FootPatrol.Droid
             searchView.Visibility = ViewStates.Gone;
             fpListView.Visibility = ViewStates.Gone;
             searchViewDescription.Visibility = ViewStates.Gone;
+            clearSearchView();
         }
 
         private async Task<string> setPairActive(bool isActive)
         {
             HttpClient httpClient = new HttpClient();
             Uri customURI = new Uri(backendURI + postPairURI + pairID.ToString() + "/active");
-            System.Diagnostics.Debug.WriteLine("The custom URI is: " + customURI);
 
             var content = new VolunteerPairs
             {
@@ -1147,16 +1224,49 @@ namespace FootPatrol.Droid
 
             try 
             {
-                System.Diagnostics.Debug.WriteLine("The status code is: " + response.StatusCode.ToString());
                 response.EnsureSuccessStatusCode();
-                var responseString = await response.Content.ReadAsStringAsync();
-                JObject obj = JObject.Parse(responseString);
-                System.Diagnostics.Debug.WriteLine("The response is: " + obj);
             }
 
             catch(Exception e)
             {
                 createAlert("The exception is: " + e);
+            }
+
+            return "";
+        }
+
+        private void clearSearchView()
+        {
+            searchView.SetQuery("", true);
+            InputMethodManager manager = (InputMethodManager)this.Activity.GetSystemService(Context.InputMethodService);
+            manager.HideSoftInputFromWindow(searchView.WindowToken, 0);
+        }
+
+        private async Task<string> updateLatLng(int ID, string lat, string lng)
+        {
+            HttpClient httpClient = new HttpClient();
+            Uri customURI = new Uri(backendURI + updateVolunteerURI + ID.ToString());
+            var Timestamp = new DateTimeOffset(DateTime.UtcNow).ToUnixTimeSeconds().ToString();
+
+            var content = new UpdateVolunteer
+            {
+                latitude = lat,
+                longitude = lng,
+                timestamp = Timestamp
+            };
+
+            var serializedContent = JsonConvert.SerializeObject(content);
+            HttpContent httpContent = new StringContent(serializedContent, Encoding.UTF8, "application/json");
+            HttpResponseMessage response = await httpClient.PatchAsync(customURI, httpContent);
+
+            try
+            {
+                response.EnsureSuccessStatusCode();
+            }
+
+            catch(Exception e)
+            {
+                createAlert("The task failed to complete due to exception " + e);
             }
 
             return "";

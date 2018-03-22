@@ -61,7 +61,7 @@ namespace FootPatrol.Droid
             ImageButton leftArrow = (ImageButton)view.FindViewById(Resource.Id.leftArrow);
             ImageButton closeBtn = (ImageButton)view.FindViewById(Resource.Id.closeButton);
             Button acceptReq = (Button)view.FindViewById(Resource.Id.acceptRequest);
-            Spinner loadingSpinner = (Spinner)view.FindViewById(Resource.Id.spinner1);
+            ProgressBar loadingSpinner = (ProgressBar)view.FindViewById(Resource.Id.spinner1);
 
             loadingSpinner.Visibility = ViewStates.Gone;
 

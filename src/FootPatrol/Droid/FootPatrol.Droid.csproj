@@ -170,6 +170,8 @@
     <Compile Include="WWDActivity.cs" />
     <Compile Include="VolunteeringActivity.cs" />
     <Compile Include="WalkRequest.cs" />
+    <Compile Include="UpdateVolunteer.cs" />
+    <Compile Include="HttpClientExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
