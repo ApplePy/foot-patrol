@@ -35,13 +35,14 @@ export class Server {
   constructor(
     @inject (IFACES.IROUTE) @named(TAGS.REQUESTS) requestRoute: IRoute,
     @inject (IFACES.IROUTE) @named(TAGS.VOLUNTEERS) volunteerRoute: IRoute,
-    @inject (IFACES.IROUTE) @named(TAGS.PAIRINGS) pairingRoute: IRoute
+    @inject (IFACES.IROUTE) @named(TAGS.PAIRINGS) pairingRoute: IRoute,
+    @inject (IFACES.ITASK) @named(TAGS.SCHEDULER) schedulerTask: ITask
   ) {
     // Save DI
     this.requestRoute = requestRoute;
     this.volunteerRoute = volunteerRoute;
     this.pairingRoute = pairingRoute;
-    this.tasks = [];
+    this.tasks = [schedulerTask];
 
     // create expressjs application
     this.app = express();

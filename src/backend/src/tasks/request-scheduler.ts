@@ -10,7 +10,7 @@ import { VolunteerPairing } from "../models/volunteer-pairing";
 
 @injectable()
 export class SchedulerTask implements ITask {
-  private interval = 10;  // 10 seconds
+  private interval = 5;  // 10 seconds
   private pairMgr: IVolunteerPairingManager;
   private reqMgr: IRequestsManager;
   private timer: number | undefined;
@@ -28,6 +28,7 @@ export class SchedulerTask implements ITask {
    * Registration function to setup a task (can be recurrent).
    */
   public register() {
+    console.log("[RequestScheduler::register] Registering task");
     this.timer = setInterval(this.scheduleRequests.bind(this), this.interval * 1000);
   }
 
