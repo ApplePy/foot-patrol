@@ -23,6 +23,7 @@ import {SuiModule} from 'ng2-semantic-ui';
     BrowserModule,
     HttpClientModule,
     HttpModule,
+    SuiModule,
     FormsModule,
     AppRoutingModule,
     AgmCoreModule.forRoot({

@@ -1,16 +1,17 @@
-<button routerLink='/add-request'>Add new request</button>
 <h2>Requests</h2>
-<table>
-  <tr>
-    <th>Request ID</th>
-    <th>Name</th>
-    <th>From</th>
-    <th>To</th>
-    <th>Additional Info</th>
-    <th>Time</th>
-    <th>Complete</th>
-  </tr>
-
+<table class="ui celled table">
+  <thead>
+    <tr>
+      <th>Request ID</th>
+      <th>Name</th>
+      <th>From</th>
+      <th>To</th>
+      <th>Additional Info</th>
+      <th>Time</th>
+      <th>Complete</th>
+    </tr>
+  </thead>
+  <tbody>
   <tr *ngFor="let request of displayRequests">
     <td>{{request.id}}</td>
     <td>{{request.name}}</td>
@@ -20,4 +21,6 @@
     <td>{{request.timestamp}}</td>
     <td><button (click)="archive(request)">Archive</button></td>
   </tr>
+</tbody>
 </table>
+<button routerLink='/add-request' class="ui green button">Add new request</button>
