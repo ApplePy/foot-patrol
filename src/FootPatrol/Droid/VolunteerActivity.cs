@@ -33,7 +33,7 @@ namespace FootPatrol.Droid
     public class VolunteerActivity : Android.Support.V4.App.Fragment, GoogleApiClient.IOnConnectionFailedListener, GoogleApiClient.IConnectionCallbacks, Android.Gms.Location.ILocationListener, IOnMapReadyCallback
     {
         public static string name, to_location, from_location, additional_info; //variables to keep name, location and additional information of user
-        public static int id, pairID, myID = 1;
+        public static int id, pairID, myID = 1, vlnteerID;
         public static bool isPaired = false, pickupPending = false;
 
         public static Typeface bentonSans; //font to be used in application
@@ -379,7 +379,7 @@ namespace FootPatrol.Droid
             {
                 LatLng pairPosition = new LatLng(location.Latitude, location.Longitude + 0.0005);
                 pairMarker.SetPosition(pairPosition);
-                Task.Run(() => updateLatLng(pairID, pairPosition.Latitude.ToString(), pairPosition.Longitude.ToString()));
+                Task.Run(() => updateLatLng(vlnteerID, pairPosition.Latitude.ToString(), pairPosition.Longitude.ToString()));
             }
         }
 
@@ -914,6 +914,7 @@ namespace FootPatrol.Droid
                    {
                        int position = findPosition(fpName);
                        int vID = volunteerID[position];
+                       vlnteerID = vID;
                        pairID = Task.Run(() => pairFootPatrollers(vID)).Result;
                        Task.Run(() => setPairActive(true));
                        clearSearchView();
