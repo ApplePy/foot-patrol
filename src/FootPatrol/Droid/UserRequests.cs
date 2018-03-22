@@ -19,7 +19,5 @@ namespace FootPatrol.Droid
                 this.id = Id;
             }
         };
-
-
     }
 }

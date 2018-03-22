@@ -50,10 +50,10 @@ namespace FootPatrol.Droid
 
             //set the fonts of each UI element
             bentonSans = Typeface.CreateFromAsset(this.Activity.Application.Assets, "BentonSansRegular.otf");
-            signIn.SetTypeface(bentonSans, TypefaceStyle.Normal);
-            continueAsUser.SetTypeface(bentonSans, TypefaceStyle.Normal);
-            userName.SetTypeface(bentonSans, TypefaceStyle.Normal);
-            password.SetTypeface(bentonSans, TypefaceStyle.Normal);
+            setFont(bentonSans, signIn);
+            setFont(bentonSans, continueAsUser);
+            setFont(bentonSans, userName);
+            setFont(bentonSans, password);
 
             //sign In button click listener
             signIn.Click += (sender, e) =>
@@ -74,16 +74,33 @@ namespace FootPatrol.Droid
                 else
                 {
                     spinner.Visibility = ViewStates.Visible; //make the spinner visible
-                    Android.Support.V4.App.Fragment newFrag = new VolunteerActivity(); //create a new instance of VolunteerActivity and save it
-                    Android.Support.V4.App.FragmentTransaction fragmentTransaction = ChildFragmentManager.BeginTransaction(); //begin the fragment transaction
-                    fragmentTransaction.SetCustomAnimations(Resource.Layout.EnterAnimation, Resource.Layout.ExitAnimation); //add animation to slide new fragment to the left
-                    fragmentTransaction.Replace(Resource.Id.frameLayout2, newFrag, "VolunteerActivity"); //replace the old fragment with the new one
-                    fragmentTransaction.AddToBackStack(null); //add the transaction to the back stack
-                    fragmentTransaction.Commit(); //commit the transaction
+                    switchFragment(new VolunteerActivity(), "VolunteerActivity");
                 }
+            };
+
+            continueAsUser.Click += (sender, e) =>
+            {
+                spinner.Visibility = ViewStates.Visible; //make the spinner visible
+                switchFragment(new UserActivity(), "UserActivity");
             };
 
             return views;
         }
+
+        private void setFont(Typeface font, TextView text)
+        {
+            text.SetTypeface(font, TypefaceStyle.Normal);
+        }
+
+        private void switchFragment(Android.Support.V4.App.Fragment frag, string tag)
+        {
+            Android.Support.V4.App.Fragment newFrag = frag; //create a new instance of VolunteerActivity and save it
+            Android.Support.V4.App.FragmentTransaction fragmentTransaction = this.Activity.SupportFragmentManager.BeginTransaction(); //begin the fragment transaction
+            fragmentTransaction.SetCustomAnimations(Resource.Layout.EnterAnimation, Resource.Layout.ExitAnimation); //add animation to slide new fragment to the left
+            fragmentTransaction.Replace(Resource.Id.frameLayout2, newFrag, tag); //replace the old fragment with the new on
+            fragmentTransaction.AddToBackStack("LoginActivity");
+            fragmentTransaction.Commit(); //commit the transaction
+        }
+
     }
 }

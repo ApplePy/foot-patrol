@@ -32,7 +32,6 @@ namespace FootPatrol.Droid
         {
             ra = new RequestsActivity(); //create new instance
             activeRequests = new List<UserRequests.Request>();//initialize new list of requests
-
             reqCount = requests.Count; //save the count into request count variable
             saveRequests(requests);
             return ra;
@@ -62,7 +61,17 @@ namespace FootPatrol.Droid
             ImageButton leftArrow = (ImageButton)view.FindViewById(Resource.Id.leftArrow);
             ImageButton closeBtn = (ImageButton)view.FindViewById(Resource.Id.closeButton);
             Button acceptReq = (Button)view.FindViewById(Resource.Id.acceptRequest);
+            ProgressBar loadingSpinner = (ProgressBar)view.FindViewById(Resource.Id.spinner1);
 
+            loadingSpinner.Visibility = ViewStates.Gone;
+
+            //Take care of correct fonts
+            Typeface bentonSans = Typeface.CreateFromAsset(this.Activity.Application.Assets, "BentonSansRegular.otf");
+            setFont(bentonSans, name);
+            setFont(bentonSans, toLocation);
+            setFont(bentonSans, fromLocation);
+            setFont(bentonSans, additionalInfo);
+             
             currentCount = 0; //set the initial count to zero
 
             //if there exists more than 1 request
@@ -114,6 +123,7 @@ namespace FootPatrol.Droid
             //accept request button click listener
             acceptReq.Click += (sender, e) =>
             {
+                loadingSpinner.Visibility = ViewStates.Visible;
                 va = new VolunteerActivity(); //initialize the new instance of the VolunteerActivity class
                 va.onTripAcceptAsync(activeRequests[currentCount]); //pass the accepted request into the trip accept function
             };
@@ -176,6 +186,11 @@ namespace FootPatrol.Droid
 
                 activeRequests.Add(new UserRequests.Request(userName, toLoc, fromLoc, aInfo, Int32.Parse(requestId)));
             }
+        }
+
+        private void setFont(Typeface font, TextView text)
+        {
+            text.SetTypeface(font, TypefaceStyle.Normal);
         }
     }
 }

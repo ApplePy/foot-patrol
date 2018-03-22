@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:p1="http://schemas.android.com/apk/res/android"
+    p1:layout_width="match_parent"
+    p1:layout_height="match_parent"
+    p1:background="#ff4f2683">
+    <ImageView
+        p1:src="@drawable/volunteers"
+        p1:layout_width="match_parent"
+        p1:layout_height="250dp"
+        p1:id="@+id/campusMapView"
+        p1:scaleType="centerCrop" />
+    <TextView
+        p1:textAppearance="?android:attr/textAppearanceMedium"
+        p1:layout_width="wrap_content"
+        p1:layout_height="wrap_content"
+        p1:id="@+id/volunteerText"
+        p1:text="VOLUNTEER"
+        p1:layout_marginTop="230dp"
+        p1:layout_marginLeft="5dp"
+        p1:textStyle="bold"
+        p1:textColor="#ffffffff" />
+    <ScrollView
+        p1:minWidth="25px"
+        p1:minHeight="25px"
+        p1:layout_width="match_parent"
+        p1:layout_height="300dp"
+        p1:id="@+id/scrollView1"
+        p1:layout_marginTop="250dp">
+        <RelativeLayout
+            p1:layout_width="match_parent"
+            p1:layout_height="match_parent">
+            <TextView
+                p1:textAppearance="?android:attr/textAppearanceLarge"
+                p1:layout_width="wrap_content"
+                p1:layout_height="wrap_content"
+                p1:id="@+id/volunteerText"
+                p1:text="Volunteer" />
+            <TextView
+                p1:text="Volunteering with Western Foot Patrol is a very rewarding experience. There are various positions within Foot Patrol, including Patroller, SUV driver, Operations Assistant and Operations Manager. All volunteers begin as Patrollers, and if they meet requirements, can apply to additional positions."
+                p1:textAppearance="?android:attr/textAppearanceSmall"
+                p1:layout_width="wrap_content"
+                p1:layout_height="wrap_content"
+                p1:id="@+id/volunteer"
+                p1:layout_below="@+id/volunteerText" />
+            <TextView
+                p1:textAppearance="?android:attr/textAppearanceLarge"
+                p1:layout_width="wrap_content"
+                p1:layout_height="wrap_content"
+                p1:id="@+id/whyVolunteerText"
+                p1:text="Why Volunteer?"
+                p1:layout_below="@+id/volunteer"
+                p1:layout_marginTop="5dp" />
+            <TextView
+                p1:text="Volunteering with Foot Patrol provides students with an opportunity to meet people, get to know campus, gain valuable work experience and fulfill volunteer admission requirements to programs while contributing to the Western community. In addition, Western students often just want to contribute to the community they are a part of, and want to keep campus safe."
+                p1:textAppearance="?android:attr/textAppearanceSmall"
+                p1:layout_width="wrap_content"
+                p1:layout_height="wrap_content"
+                p1:id="@+id/whyVolunteer"
+                p1:layout_below="@+id/whyVolunteerText" />
+        </RelativeLayout>
+    </ScrollView>
+</RelativeLayout>

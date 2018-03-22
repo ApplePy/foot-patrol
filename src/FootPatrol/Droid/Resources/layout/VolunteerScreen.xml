@@ -12,7 +12,7 @@
         p1:gravity="center_vertical">
         <android.support.v7.widget.RecyclerView
             p1:layout_width="match_parent"
-            p1:layout_height="100dp"
+            p1:layout_height="50dp"
             p1:id="@+id/recyclerView1"
             p1:background="@drawable/BorderResource"
             p1:scrollbars="horizontal"
@@ -56,27 +56,102 @@
             p1:minWidth="25px"
             p1:minHeight="25px"
             p1:layout_width="match_parent"
-            p1:layout_height="80dp"
+            p1:layout_height="175dp"
             p1:id="@+id/innerRelative"
             p1:layout_alignParentBottom="true"
             p1:background="@drawable/BorderResource">
             <Button
-                p1:layout_width="110dp"
+                p1:layout_width="wrap_content"
                 p1:layout_height="40dp"
                 p1:id="@+id/completeTripBtn"
                 p1:layout_centerVertical="true"
                 p1:text="COMPLETE TRIP"
                 p1:background="#807F83"
-                p1:layout_centerHorizontal="true" />
+                p1:layout_centerHorizontal="true"
+                p1:layout_alignParentBottom="true"
+                p1:layout_marginBottom="10dp" />
+            <TextView
+                p1:text="Name:"
+                p1:layout_width="wrap_content"
+                p1:layout_height="wrap_content"
+                p1:id="@+id/userName1"
+                p1:layout_above="@+id/userFromLoc"
+                p1:layout_centerHorizontal="true"
+                p1:layout_marginBottom="5dp" />
+            <TextView
+                p1:text="Start Location:"
+                p1:layout_width="wrap_content"
+                p1:layout_height="wrap_content"
+                p1:id="@+id/userFromLoc"
+                p1:layout_above="@+id/userToLoc"
+                p1:layout_centerHorizontal="true"
+                p1:layout_marginBottom="5dp" />
+            <TextView
+                p1:text="End Location:"
+                p1:layout_width="wrap_content"
+                p1:layout_height="wrap_content"
+                p1:id="@+id/userToLoc"
+                p1:layout_above="@+id/userAddInfo"
+                p1:layout_centerHorizontal="true"
+                p1:layout_marginBottom="5dp" />
+            <TextView
+                p1:text="Additional Information:"
+                p1:layout_width="wrap_content"
+                p1:layout_height="wrap_content"
+                p1:id="@+id/userAddInfo"
+                p1:layout_above="@+id/completeTripBtn"
+                p1:layout_centerHorizontal="true"
+                p1:layout_marginBottom="5dp" />
+            <TextView
+                p1:textAppearance="?android:attr/textAppearanceLarge"
+                p1:layout_width="wrap_content"
+                p1:layout_height="wrap_content"
+                p1:id="@+id/pickupInfo"
+                p1:text="Pickup Information"
+                p1:layout_above="@+id/userName1"
+                p1:layout_centerHorizontal="true"
+                p1:layout_marginBottom="5dp" />
+            <TextView
+                p1:id="@+id/line"
+                p1:paddingTop="5dip"
+                p1:gravity="center_horizontal"
+                p1:layout_below="@+id/pickupInfo"
+                p1:layout_width="match_parent"
+                p1:layout_height="1dp"
+                p1:background="#807F83"
+                p1:layout_marginBottom="10dp" />
         </RelativeLayout>
         <ImageButton
-            p1:src="@drawable/ic_chevron_right_black_24dp"
+            p1:src="@drawable/ic_keyboard_arrow_right_black_24dp"
             p1:layout_width="30dp"
             p1:layout_height="100dp"
             p1:id="@+id/sideTabBtn"
             p1:background="@drawable/BorderResource"
             p1:layout_centerVertical="true"
             p1:scaleType="centerInside" />
+        <SearchView
+            p1:layout_width="match_parent"
+            p1:layout_height="40dp"
+            p1:id="@+id/searchView"
+            p1:layout_alignParentTop="true"
+            p1:background="@drawable/BorderResource"
+            p1:layout_marginTop="20dp" />
+        <ListView
+            p1:id="@+id/listView2"
+            p1:layout_width="match_parent"
+            p1:layout_height="150dp"
+            p1:layout_marginTop="60dp"
+            p1:background="@drawable/BorderResource"
+            p1:divider="#807F83" />
+        <TextView
+            p1:layout_width="match_parent"
+            p1:layout_height="20dp"
+            p1:id="@+id/volunteerSVDescription"
+            p1:text="SEARCH FOR VOLUNTEER"
+            p1:background="@drawable/BorderResource"
+            p1:textAllCaps="true"
+            p1:textStyle="bold"
+            p1:gravity="center_horizontal" />
     </RelativeLayout>
     <ListView
         p1:id="@+id/navigationList1"

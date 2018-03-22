@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:p1="http://schemas.android.com/apk/res/android"
+    p1:layout_width="match_parent"
+    p1:layout_height="match_parent"
+    p1:background="#ff4f2683">
+    <ImageView
+        p1:src="@drawable/WesternCampusPolice"
+        p1:layout_width="match_parent"
+        p1:layout_height="250dp"
+        p1:id="@+id/emergencyImage"
+        p1:scaleType="centerCrop" />
+    <TextView
+        p1:textAppearance="?android:attr/textAppearanceMedium"
+        p1:layout_width="wrap_content"
+        p1:layout_height="wrap_content"
+        p1:id="@+id/textView1"
+        p1:layout_marginTop="230dp"
+        p1:layout_marginLeft="5dp"
+        p1:textStyle="bold"
+        p1:text="NON-EMERGENCY CONTACTS"
+        p1:textColor="#ffffffff" />
+    <Button
+        p1:layout_width="wrap_content"
+        p1:layout_height="wrap_content"
+        p1:id="@+id/footPatrolHQBtn"
+        p1:text="FOOT PATROL HQ"
+        p1:drawableLeft="@drawable/ic_phone_black_24dp"
+        p1:layout_below="@+id/campusPoliceBtn"
+        p1:layout_centerHorizontal="true"
+        p1:layout_marginTop="20dp"
+        p1:background="#807F83"
+        p1:paddingRight="10dp" />
+    <Button
+        p1:layout_width="wrap_content"
+        p1:layout_height="wrap_content"
+        p1:id="@+id/campusPoliceBtn"
+        p1:layout_below="@+id/emergencyImage"
+        p1:layout_marginTop="40dp"
+        p1:text="CAMPUS POLICE"
+        p1:drawableLeft="@drawable/ic_phone_black_24dp"
+        p1:layout_centerHorizontal="true"
+        p1:background="#807F83"
+        p1:paddingRight="10dp" />
+</RelativeLayout>

@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v4.widget.DrawerLayout xmlns:p1="http://schemas.android.com/apk/res/android"
+    p1:id="@+id/userdrawer"
+    p1:layout_width="match_parent"
+    p1:layout_height="match_parent">
+    <RelativeLayout
+        p1:minWidth="25px"
+        p1:minHeight="25px"
+        p1:layout_width="match_parent"
+        p1:fillViewport="true"
+        p1:layout_height="match_parent"
+        p1:gravity="center_vertical">
+        <RelativeLayout
+            p1:layout_width="match_parent"
+            p1:layout_alignParentBottom="true"
+            p1:layout_height="220dp"
+            p1:id="@+id/acceptedRequestLayout"
+            p1:background="@drawable/BorderResource"
+            p1:minWidth="25px"
+            p1:minHeight="25px">
+            <TextView
+                p1:textAppearance="?android:attr/textAppearanceLarge"
+                p1:layout_width="wrap_content"
+                p1:layout_height="wrap_content"
+                p1:id="@+id/volunteersText"
+                p1:layout_centerHorizontal="true"
+                p1:text="Volunteers" />
+            <ImageButton
+                p1:src="@drawable/mike"
+                p1:layout_width="150dp"
+                p1:layout_height="120dp"
+                p1:id="@+id/patrollerPicture1"
+                p1:layout_below="@+id/volunteersText"
+                p1:layout_marginTop="5dp"
+                p1:layout_marginLeft="20dp"
+                p1:scaleType="fitCenter"
+                p1:background="#ff4f2683" />
+            <ImageButton
+                p1:src="@drawable/darryl"
+                p1:layout_width="150dp"
+                p1:layout_height="120dp"
+                p1:id="@+id/patrollerPicture2"
+                p1:layout_below="@+id/volunteersText"
+                p1:layout_alignParentRight="true"
+                p1:layout_marginTop="5dp"
+                p1:layout_marginRight="20dp"
+                p1:scaleType="fitCenter"
+                p1:background="#ff4f2683" />
+            <TextView
+                p1:textAppearance="?android:attr/textAppearanceMedium"
+                p1:layout_width="wrap_content"
+                p1:layout_height="wrap_content"
+                p1:id="@+id/patrollerName1"
+                p1:layout_below="@+id/patrollerPicture1"
+                p1:layout_marginLeft="35dp"
+                p1:textColor="#ffffffff"
+                p1:text="Michael Romao" />
+            <TextView
+                p1:textAppearance="?android:attr/textAppearanceMedium"
+                p1:layout_width="wrap_content"
+                p1:layout_height="wrap_content"
+                p1:id="@+id/patrollerName2"
+                p1:layout_below="@+id/patrollerPicture2"
+                p1:layout_alignParentRight="true"
+                p1:layout_marginRight="40dp"
+                p1:textColor="#ffffffff"
+                p1:text="Darryl Murray" />
+            <TextView
+                p1:id="@+id/line2"
+                p1:paddingTop="5dip"
+                p1:gravity="center_horizontal"
+                p1:layout_below="@+id/volunteersText"
+                p1:layout_width="match_parent"
+                p1:layout_height="1dp"
+                p1:background="#807F83"
+                p1:layout_marginBottom="10dp" />
+            <TextView
+                p1:id="@+id/line3"
+                p1:paddingTop="5dip"
+                p1:gravity="center_horizontal"
+                p1:layout_below="@+id/patrollerName1"
+                p1:layout_width="match_parent"
+                p1:layout_height="1dp"
+                p1:background="#807F83"
+                p1:layout_marginBottom="10dp"
+                p1:layout_marginTop="5dp" />
+        </RelativeLayout>
+        <RelativeLayout
+            p1:minWidth="25px"
+            p1:minHeight="25px"
+            p1:layout_width="match_parent"
+            p1:layout_height="175dp"
+            p1:id="@+id/userInnerRelative"
+            p1:layout_alignParentBottom="true"
+            p1:background="@drawable/BorderResource">
+            <Button
+                p1:layout_width="wrap_content"
+                p1:layout_height="35dp"
+                p1:id="@+id/requestPickupBtn"
+                p1:layout_centerVertical="true"
+                p1:text="REQUEST PICKUP"
+                p1:background="#807F83"
+                p1:layout_centerHorizontal="true"
+                p1:layout_alignParentBottom="true"
+                p1:layout_marginBottom="10dp" />
+            <EditText
+                p1:layout_width="350dp"
+                p1:layout_height="25dp"
+                p1:id="@+id/userName5"
+                p1:layout_above="@+id/userToLocation"
+                p1:layout_marginRight="10dp"
+                p1:background="@drawable/FormEntry"
+                p1:layout_marginTop="5dp"
+                p1:layout_centerHorizontal="true"
+                p1:paddingLeft="5dp"
+                p1:hint="Name (Optional)"
+                p1:textColor="#ff4f2683"
+                p1:textColorHint="#ff4f2683"
+                p1:singleLine="true" />
+            <EditText
+                p1:layout_width="350dp"
+                p1:layout_height="25dp"
+                p1:id="@+id/userToLocation"
+                p1:layout_above="@+id/userAdditionalInfo"
+                p1:background="@drawable/FormEntry"
+                p1:layout_marginRight="10dp"
+                p1:layout_centerHorizontal="true"
+                p1:layout_centerVertical="false"
+                p1:textColor="#ff4f2683"
+                p1:paddingLeft="5dp"
+                p1:layout_marginTop="5dp"
+                p1:hint="Destination"
+                p1:textColorHint="#ff4f2683"
+                p1:singleLine="true" />
+            <EditText
+                p1:layout_width="350dp"
+                p1:layout_height="25dp"
+                p1:id="@+id/userAdditionalInfo"
+                p1:layout_above="@+id/requestPickupBtn"
+                p1:layout_centerHorizontal="true"
+                p1:background="@drawable/FormEntry"
+                p1:layout_marginRight="10dp"
+                p1:textColor="#ff4f2683"
+                p1:paddingLeft="5dp"
+                p1:layout_marginTop="5dp"
+                p1:layout_marginBottom="5dp"
+                p1:hint="Additional Information"
+                p1:textColorHint="#ff4f2683"
+                p1:singleLine="true" />
+            <TextView
+                p1:textAppearance="?android:attr/textAppearanceLarge"
+                p1:layout_width="wrap_content"
+                p1:layout_height="wrap_content"
+                p1:id="@+id/pickupInfo"
+                p1:text="Pickup Information"
+                p1:layout_above="@+id/userName5"
+                p1:layout_centerHorizontal="true"
+                p1:layout_marginBottom="5dp" />
+            <TextView
+                p1:id="@+id/line"
+                p1:paddingTop="5dip"
+                p1:gravity="center_horizontal"
+                p1:layout_below="@+id/pickupInfo"
+                p1:layout_width="match_parent"
+                p1:layout_height="1dp"
+                p1:background="#807F83"
+                p1:layout_marginBottom="10dp" />
+        </RelativeLayout>
+        <com.google.android.gms.maps.MapView
+            p1:minWidth="25px"
+            p1:minHeight="25px"
+            p1:layout_width="match_parent"
+            p1:layout_height="match_parent"
+            p1:id="@+id/userMap" />
+        <ImageButton
+            p1:src="@drawable/ic_keyboard_arrow_right_black_24dp"
+            p1:layout_width="30dp"
+            p1:layout_height="100dp"
+            p1:id="@+id/userSideTab"
+            p1:background="@drawable/BorderResource"
+            p1:layout_centerVertical="true"
+            p1:scaleType="centerInside" />
+        <SearchView
+            p1:layout_width="match_parent"
+            p1:layout_height="40dp"
+            p1:id="@+id/userSearchView"
+            p1:layout_alignParentTop="true"
+            p1:layout_marginTop="20dp"
+            p1:background="@drawable/BorderResource" />
+        <ListView
+            p1:id="@+id/userSearchListView"
+            p1:layout_width="match_parent"
+            p1:layout_height="150dp"
+            p1:layout_marginTop="60dp"
+            p1:background="@drawable/BorderResource"
+            p1:divider="#807F83" />
+        <TextView
+            p1:layout_width="match_parent"
+            p1:layout_height="20dp"
+            p1:id="@+id/userSVDescription"
+            p1:text="SEARCH FOR LOCATION"
+            p1:textAllCaps="true"
+            p1:textStyle="bold"
+            p1:background="@drawable/BorderResource"
+            p1:gravity="center_horizontal" />
+        <ProgressBar
+            p1:layout_width="wrap_content"
+            p1:layout_height="wrap_content"
+            p1:id="@+id/spinner2"
+            p1:spinnerMode="dialog"
+            style="?android:attr/progressBarStyleLarge"
+            p1:layout_centerHorizontal="true"
+            p1:layout_centerVertical="true" />
+    </RelativeLayout>
+    <ListView
+        p1:id="@+id/userListView"
+        p1:layout_width="150dp"
+        p1:layout_height="200dp"
+        p1:layout_gravity="left|center_vertical"
+        p1:background="@drawable/BorderResource"
+        p1:divider="#807F83" />
+</android.support.v4.widget.DrawerLayout>
