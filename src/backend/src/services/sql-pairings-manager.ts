@@ -74,6 +74,22 @@ export class SQLVolunteerPairingManager extends SQLAbstractManager implements IV
   }
 
   /**
+   * Get a list of volunteer pairs from the backend that are not currently busy.
+   */
+  public getUnassignedPairs() {
+    // Query for data
+    return this.db.makeQuery(
+      `SELECT * FROM \`idle_pairs\``)
+    .then((requests) => {
+      // Resolve all the volunteer objects
+      const resolves = requests.map((x: any) => this.reconstructVolunteerPairing(x)) as [Promise<VolunteerPairing>];
+
+      // Return when all objects are resolved
+      return Promise.all(resolves);
+    });
+  }
+
+  /**
    * Create a new volunteer pairing. Returns new ID.
    *
    * @param pairing The new pairing to store.

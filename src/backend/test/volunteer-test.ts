@@ -43,7 +43,6 @@ class VolunteerTest {
     expected.longitude = "81.2453";
     expected.timestamp = new Date("2017-10-26T06:51:05.000Z");
 
-
     const testReq = new Volunteer(testData);
     testReq.should.deep.equal(expected);
     testReq.Valid().should.equal(true);

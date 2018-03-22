@@ -27,6 +27,8 @@ const pathPrefix = "";  // For adding '/api/v1' to api calls if needed
 class RequestsAPITest {
 
   public static before(done: MochaDone) {
+    FakeSQL.response = undefined;
+
     // Update this line to switch to MySQL if desired
     serverEnv.container.rebind<ISQLService>(IFACES.ISQLSERVICE).to(FakeSQL).inSingletonScope();
     serverEnv.startServer();

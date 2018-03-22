@@ -40,6 +40,7 @@ import { IRequestsManager } from "./interfaces/irequests-manager";
 import { IRoute } from "./interfaces/iroute";
 import { ISanitizer } from "./interfaces/isanitizer";
 import { ISQLService } from "./interfaces/isql-service";
+import { ITask } from "./interfaces/itask";
 import { IVolunteersManager } from "./interfaces/ivolunteers-manager";
 import { VolunteerPairingsRoute } from "./routes/pairings";
 import { RequestsRoute } from "./routes/requests";
@@ -50,6 +51,7 @@ import { Sanitizer } from "./services/sanitizer";
 import { SQLVolunteerPairingManager } from "./services/sql-pairings-manager";
 import { SQLRequestsManager } from "./services/sql-requests-manager";
 import { SQLVolunteersManager } from "./services/sql-volunteers-manager";
+import { SchedulerTask } from "./tasks/request-scheduler";
 
 /**
  * Setup server with environment
@@ -96,6 +98,9 @@ class ServerEnvironmentSetup {
     this.container.bind<IVolunteerPairingManager>(IFACES.IVOLUNTEERPAIRINGMANAGER)
      .to(SQLVolunteerPairingManager)
      .inSingletonScope();
+    this.container.bind<ITask>(IFACES.ITASK)
+      .to(SchedulerTask)
+      .inSingletonScope();
 
     this.container.bind<Server>(Server).toSelf();
   }
