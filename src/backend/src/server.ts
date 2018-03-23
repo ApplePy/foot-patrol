@@ -75,7 +75,7 @@ export class Server {
     // Control response headers
     this.app.use((request: express.Request, response: express.Response, next: express.NextFunction) => {
       // Leave the dual server system in place for everything except production
-      response.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+      //response.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
       response.header("Access-Control-Allow-Methods", "POST, PATCH, GET, PUT, DELETE, OPTIONS");
       next();
     });
