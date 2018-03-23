@@ -243,6 +243,7 @@ test_dispatch_website:
   - npm install
   - npm run docs
   - if [ $CI_COMMIT_REF_NAME == "master" ]; then export PUBLIC_URL="$DOMAIN"; elif [ $CI_COMMIT_REF_NAME == "develop" ]; then export PUBLIC_URL="staging.$DOMAIN"; else export PUBLIC_URL="$CI_COMMIT_REF_SLUG.$DOMAIN"; fi
+  - if [ $CI_COMMIT_REF_NAME == "master" ]; then export PROTO="https"; elif [ $CI_COMMIT_REF_NAME == "develop" ]; then export PROTO="https"; else export PROTO="http"; fi
   - envsubst < src/environments/environment.prod.ts > src/environments/environment.prod2.ts # Do a replacement of environment.prod.ts of ${PUBLIC_URL}
   - mv src/environments/environment.prod2.ts src/environments/environment.prod.ts
   - npm run build -- --prod --env=prod  # Do a replacement of environment.prod.ts of ${PUBLIC_URL}
