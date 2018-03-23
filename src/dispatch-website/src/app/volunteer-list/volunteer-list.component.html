@@ -1,47 +1,52 @@
 <h2>Volunteers</h2>
 <h4>Volunteer Pairs</h4>
-<button routerLink='/add-pair'>Create new volunteer pairing</button>
 <form #p="ngForm">
-  <input type="radio" name="PairView" (change)="changePairView('active')"> View Active Pairs
-  <input type="radio" name="PairView" (change)="changePairView('all')"> View All Pairs
+  <input type="radio" name="PairView" (change)="changePairView('active')" class="radio"> View Active Pairs
+  <input type="radio" name="PairView" (change)="changePairView('all')" class="radio"> View All Pairs
 </form>
-<table #pt>
-  <tr>
-    <th>Pair ID</th>
-    <th>Volunteers</th>
-    <th>Edit</th>
-    <th></th>
-  </tr>
-
-  <tr *ngFor="let pair of volunteerPairs">
-    <td>{{pair?.id}}</td>
-    <td>{{pair?.volunteers[0].first_name}} {{pair?.volunteers[0].last_name}} and {{pair?.volunteers[1].first_name}} {{pair?.volunteers[1].last_name}}</td>
-    <td><button (click)="editVolunteerPair(pair.id)">Edit</button> </td>
-    <td ng-if="volunteer.active">ACTIVE</td>
-  </tr>
+<table #pt class="ui celled table">
+  <thead>
+    <tr>
+      <th>Pair ID</th>
+      <th>Volunteers</th>
+      <th>Edit</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let pair of volunteerPairs">
+      <td>{{pair?.id}}</td>
+      <td>{{pair?.volunteers[0].first_name}} {{pair?.volunteers[0].last_name}} and {{pair?.volunteers[1].first_name}} {{pair?.volunteers[1].last_name}}</td>
+      <td><button (click)="editVolunteerPair(pair.id)">Edit</button> </td>
+      <td ng-if="volunteer.active">ACTIVE</td>
+    </tr>
+  </tbody>
 </table>
+<button routerLink='/add-pair' class="ui green button">Create new volunteer pairing</button>
 
 <h4>Volunteers</h4>
-<button routerLink='/add-volunteer'>Add new volunteer</button>
 <form #v="ngForm">
-  <input type="radio" name="VolunteerView" (change)="changeVolunteerView('all')"> View All Volunteers
-  <input type="radio" name="VolunteerView" (change)="changeVolunteerView('active')"> View Active Volunteers
-  <input type="radio" name="VolunteerView" (change)="changeVolunteerView('inactive')"> View Inactive Volunteers
+  <input type="radio" name="VolunteerView" (change)="changeVolunteerView('all')" class="radio"> View All Volunteers
+  <input type="radio" name="VolunteerView" (change)="changeVolunteerView('active')" class="radio"> View Active Volunteers
+  <input type="radio" name="VolunteerView" (change)="changeVolunteerView('inactive')" class="radio"> View Inactive Volunteers
 </form>
-<table #vt>
-  <tr>
-    <th>Volunteer ID</th>
-    <th>Name</th>
-    <th>UWO id</th>
-    <th>Last checkin time</th>
-    <th>Edit</th>
-  </tr>
-
-  <tr *ngFor="let volunteer of displayVolunteers">
-    <td>{{volunteer?.id}}</td>
-    <td>{{volunteer?.first_name}} {{volunteer?.last_name}}</td>
-    <td>{{volunteer?.uwo_id}}</td>
-    <td>{{volunteer?.timestamp}}</td>
-    <td><button (click)="editVolunteer(volunteer.id)">Edit</button></td>
-  </tr>
+<table #vt class="ui celled table">
+  <thead>
+    <tr>
+      <th>Volunteer ID</th>
+      <th>Name</th>
+      <th>UWO id</th>
+      <th>Last checkin time</th>
+      <th>Edit</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let volunteer of displayVolunteers">
+      <td>{{volunteer?.id}}</td>
+      <td>{{volunteer?.first_name}} {{volunteer?.last_name}}</td>
+      <td>{{volunteer?.uwo_id}}</td>
+      <td>{{volunteer?.timestamp}}</td>
+      <td><button (click)="editVolunteer(volunteer.id)">Edit</button></td>
+    </tr>
+  </tbody>
 </table>
+<button routerLink='/add-volunteer' class="ui green button">Add new volunteer</button>
