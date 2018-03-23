@@ -1006,8 +1006,10 @@ namespace FootPatrol.Droid
             }
             //Otherwise create the new pairing and get the pairID
 
+            customURI = new Uri(backendURI + postPairURI);
             var content = new VolunteerPairs
             {
+                active = true,
                 volunteers = new int[2] {myID, vID}
             };
 
@@ -1121,6 +1123,7 @@ namespace FootPatrol.Droid
             var content = new RequestStatus
             {
                 archived = archived,
+                pairing = pairID,
                 status = status
             };
 
@@ -1213,9 +1216,10 @@ namespace FootPatrol.Droid
         {
             HttpClient httpClient = new HttpClient();
             Uri customURI = new Uri(backendURI + postPairURI + pairID.ToString() + "/active");
+            System.Diagnostics.Debug.WriteLine("The uri is: " + customURI);
+            System.Diagnostics.Debug.WriteLine("The value of isActive is: " + isActive);
 
-            var content = new VolunteerPairs
-            {
+            var content = new VPairStatus {
                 active = isActive
             };
 

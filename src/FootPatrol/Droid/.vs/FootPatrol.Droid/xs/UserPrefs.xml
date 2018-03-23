@@ -1,5 +1,5 @@
 ﻿<Properties StartupConfiguration="{93578BFB-ED5E-4E94-B242-156162A0E1E8}|Default">
-  <MonoDevelop.Ide.Workbench ActiveDocument="VolunteerActivity.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="UserActivity.cs">
     <Files>
       <File FileName="VolunteerActivity.cs" Line="1" Column="1" />
       <File FileName="NonEmergencyContactsActivity.cs" Line="1" Column="1" />

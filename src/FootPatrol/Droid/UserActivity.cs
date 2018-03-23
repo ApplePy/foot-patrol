@@ -20,6 +20,7 @@ using System.Net.Http;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Threading;
+using System.Collections.Generic;
 
 namespace FootPatrol.Droid
 {
@@ -37,7 +38,7 @@ namespace FootPatrol.Droid
         private static Android.Widget.Button pickUpBtn;
         private static EditText userName, destination, additionalInfo;
         private static Android.Widget.ListView mListView, mfListView, searchListView;
-        private static MarkerOptions userMarker;
+        private static MarkerOptions userMarker, pairOneMarker, pairTwoMarker;
         private static CircleOptions circle;
         private static DrawerLayout mDrawerLayout, mfDrawerLayout;
         private static Android.Widget.RelativeLayout relativeLayout, acceptedRequestLayout;
@@ -46,11 +47,15 @@ namespace FootPatrol.Droid
         private static ArrayAdapter<String> listAdapter, locationAdapter;
         private static Android.Widget.SearchView searchView;
         private static string[] menuItems, locationNames;
-        private string backendURI, postRequestURI;
-        private static int requestID;
+        private string backendURI, postRequestURI, findPairsURI;
+        private static int requestID, pairingID;
         private static Android.Widget.ProgressBar spinner;
         private static TimerCallback tc;
         public static Timer timer;
+        private static Circle mapCircle;
+        private static LatLng volunteerOneLatLng, volunteerTwoLatLng;
+        private static PolylineOptions polyOptions;
+        private static Polyline poly;
 
         public string tag;
         public Android.Support.V4.App.Fragment fragment;
@@ -70,6 +75,7 @@ namespace FootPatrol.Droid
 
             backendURI = "http://staging.capstone.incode.ca/api/v1";
             postRequestURI = "/requests";
+            findPairsURI = "/volunteerPairs/";
 
             listAdapter = new ArrayAdapter<string>(this.Context, Resource.Layout.ListElement, menuItems);
             locationAdapter = new ArrayAdapter<string>(this.Context, Resource.Layout.ListElement, locationNames);
@@ -410,19 +416,20 @@ namespace FootPatrol.Droid
             fragmentTransaction.Commit(); //commit the transaction
         }
 
-        private void pickUpBtnClicked()
+        private async void pickUpBtnClicked()
         {
             spinner.Visibility = ViewStates.Visible;
             clearInitialUI();
             circle = new CircleOptions();
             LatLng center = new LatLng(myLocation.Latitude, myLocation.Longitude);
             circle.InvokeCenter(center).InvokeFillColor(Android.Graphics.Color.Purple).InvokeRadius(500).InvokeStrokeWidth(5);
-            map.AddCircle(circle);
+            mapCircle = map.AddCircle(circle);
             svDescription.Visibility = ViewStates.Visible;
             svDescription.Text = "SEARCHING FOR VOLUNTEERS";
 
             //Submit the request so that it can be picked up and return the id
             requestID = Task.Run(() => submitRequest()).Result;
+            System.Diagnostics.Debug.WriteLine("The request ID is: " + requestID);
 
             spinner.Visibility = ViewStates.Gone;
 
@@ -529,27 +536,73 @@ namespace FootPatrol.Droid
             Uri customURI = new Uri(backendURI + postRequestURI + "/" + requestID.ToString());
             HttpResponseMessage response = await httpClient.GetAsync(customURI);
 
+            Newtonsoft.Json.Linq.JToken statusLine = null;
             try
             {
                 response.EnsureSuccessStatusCode();
                 var res = await response.Content.ReadAsStringAsync();
                 JObject obj = JObject.Parse(res);
-                var statusLine = obj.SelectToken("status");
-                return statusLine.ToString();
+                statusLine = obj.SelectToken("status");
+                var pairing = obj.SelectToken("pairing");
+                if(pairing.ToString() != "")
+                {
+                    System.Diagnostics.Debug.WriteLine("We're in here");
+                    pairingID = Int32.Parse(pairing.ToString());
+                }
+
             }
 
             catch(Exception e)
             {
-                createAlert("The request response failed with exception " + e);
+                
             }
 
-            return "";
+            return statusLine.ToString();
+
+        }
+
+        private async Task<List<string>> getVolunteerNames()
+        {
+            HttpClient httpClient = new HttpClient();
+            Uri customURI = new Uri(backendURI + findPairsURI + pairingID.ToString());
+            HttpResponseMessage httpResponse = await httpClient.GetAsync(customURI);
+
+            List<string> names = new List<string>();
+            try
+            {
+                httpResponse.EnsureSuccessStatusCode();
+                var responseString = await httpResponse.Content.ReadAsStringAsync();
+                JObject jObj = JObject.Parse(responseString);
+                var volunteerOneFN = jObj.SelectToken("volunteers[0].first_name");
+                var volunteerOneLN = jObj.SelectToken("volunteers[0].last_name");
+                var volunteerTwoFN = jObj.SelectToken("volunteers[1].first_name");
+                var volunteerTwoLN = jObj.SelectToken("volunteers[1].last_name");
+                var volunteerOneLat = jObj.SelectToken("volunteers[0].latitude");
+                var volunteerTwoLat = jObj.SelectToken("volunteers[1].latitude");
+                var volunteerOneLong = jObj.SelectToken("volunteers[0].longitude");
+                var volunteerTwoLong = jObj.SelectToken("volunteers[0].longitude");
+
+                names.Add(volunteerOneFN + " " + volunteerOneLN);
+                names.Add(volunteerTwoFN + " " + volunteerTwoLN);
+
+                volunteerOneLatLng = new LatLng(Double.Parse(volunteerOneLat.ToString()), Double.Parse(volunteerOneLong.ToString()));
+                volunteerTwoLatLng = new LatLng(Double.Parse(volunteerTwoLat.ToString()), Double.Parse(volunteerTwoLong.ToString()));
+
+            }
+
+            catch (Exception e)
+            {
+                
+            }
+
+            return names;
         }
 
         private void retrieveRequestUpdate(object state)
         {
             string status = Task.Run(() => getRequestStatus()).Result;
             System.Diagnostics.Debug.WriteLine("The status is: " + status);
+
             if (status == "IN_PROGRESS")
             {
                 timer.Change(Timeout.Infinite, Timeout.Infinite);
@@ -560,6 +613,129 @@ namespace FootPatrol.Droid
         private void displayVolunteers()
         {
             acceptedRequestLayout.Visibility = ViewStates.Visible;
+            svDescription.Visibility = ViewStates.Gone;
+            mapCircle.Remove();
+            System.Diagnostics.Debug.WriteLine("The pairing ID is: " + pairingID);
+            pairOneMarker = new MarkerOptions();
+            pairTwoMarker = new MarkerOptions();
+
+            List<string> returnedNames = new List<string>();
+            returnedNames = Task.Run(() => getVolunteerNames()).Result;
+
+            pairOneMarker.SetIcon(BitmapDescriptorFactory.DefaultMarker(BitmapDescriptorFactory.HueRed))
+                         .SetPosition(volunteerOneLatLng);
+            pairTwoMarker.SetIcon(BitmapDescriptorFactory.DefaultMarker(BitmapDescriptorFactory.HueGreen))
+                         .SetPosition(volunteerTwoLatLng);
+
+            map.AddMarker(pairOneMarker);
+            map.AddMarker(pairTwoMarker);
+
+            string currentLocation = myLocation.Latitude.ToString() + "," + myLocation.Longitude.ToString();
+            string destinationLocation = volunteerOneLatLng.Latitude.ToString() + "," + volunteerOneLatLng.Longitude.ToString();
+
+            var polyPattern = Task.Run(() => getPolyPat(currentLocation, destinationLocation)).Result; //get the poly pattern character string
+
+            List<LatLng> polyline = DecodePolyline(polyPattern); //decode the character string into a polyline that can be displayed on the map
+            polyOptions = new PolylineOptions().InvokeColor(Android.Graphics.Color.Blue).InvokeWidth(10); //create the new polyline as a blue line of 10 thickness
+
+            foreach (LatLng point in polyline)
+            {
+                polyOptions.Add(point); //for each point in the LatLng list, add the separate polyline to the polyline options
+            }
+
+            poly = map.AddPolyline(polyOptions); //display the polyline on the map
+        }
+
+        private async Task<string> getPolyPat(string start, string dest)
+        {
+            HttpClient httpClient = new HttpClient();
+            Uri customURI = new Uri("https://maps.googleapis.com/maps/api/directions/json?origin=" + start + "&destination=" + dest + "&mode=walking&key=AIzaSyDQMcKBqfQwfRC88Lt02V8FP5yGPUqIq04");
+            HttpResponseMessage response = await httpClient.GetAsync(customURI);
+
+            try
+            {
+                response.EnsureSuccessStatusCode();
+            }
+
+            catch (Exception error)
+            {
+                System.Diagnostics.Debug.WriteLine("The exception is: " + error);
+            }
+
+            var content = await response.Content.ReadAsStringAsync();
+            JObject dir = JObject.Parse(content);
+            string polyPattern = (string)dir.SelectToken("routes[0].overview_polyline.points");
+            var stepDirections = dir.SelectTokens("routes[0].legs[0].steps[*].html_instructions");
+
+            return polyPattern;
+        }
+
+        /// <summary>
+        /// Decodes the polyline from a mix of random characters to a list of latitude and longitude points.
+        /// </summary>
+        /// <returns>The decoded polyline.</returns>
+        /// <param name="encodedPoints">Encoded points</param>
+        private List<LatLng> DecodePolyline(string encodedPoints)
+        {
+            //if no directions are passed, return nothing
+            if (string.IsNullOrWhiteSpace(encodedPoints))
+            {
+                return null;
+            }
+
+            int index = 0; //start with the first character
+            var polylineChars = encodedPoints.ToCharArray(); //change the string to a character array to analyze each character
+            var polyline = new List<LatLng>(); //initialize the new list of LatLng points
+
+            //initialize each variable
+            int currentLat = 0;
+            int currentLng = 0;
+            int next5Bits;
+
+            while (index < polylineChars.Length)
+            {
+                // calculate next latitude
+                int sum = 0;
+                int shifter = 0;
+
+                do
+                {
+                    next5Bits = polylineChars[index++] - 63; //subtract 63 from each value
+                    sum |= (next5Bits & 31) << shifter; //bitwise or each set of 5 bits with the address of the last value and left shift by an increment of 5 bits
+                    shifter += 5; //increment shift by 5 to look at the next 5 bits
+                }
+                while (next5Bits >= 32 && index < polylineChars.Length); //do this while there are still 5-bit chunks
+
+                if (index >= polylineChars.Length) //break out of the while loop if the character array is empty or the index is larger than the size of the char array
+                {
+                    break;
+                }
+
+                currentLat += (sum & 1) == 1 ? ~(sum >> 1) : (sum >> 1); //convert the binary value to decimal
+
+                // calculate longitude using same steps as above
+                sum = 0;
+                shifter = 0;
+
+                do
+                {
+                    next5Bits = polylineChars[index++] - 63;
+                    sum |= (next5Bits & 31) << shifter;
+                    shifter += 5;
+                }
+                while (next5Bits >= 32 && index < polylineChars.Length);
+
+                if (index >= polylineChars.Length && next5Bits >= 32)
+                {
+                    break;
+                }
+
+                currentLng += (sum & 1) == 1 ? ~(sum >> 1) : (sum >> 1);
+
+                var mLatLng = new LatLng(Convert.ToDouble(currentLat) / 100000.0, Convert.ToDouble(currentLng) / 100000.0); //divide each result by 1e5 to get the decimal value
+                polyline.Add(mLatLng); //add the polyline to the set of LatLng points
+            }
+            return polyline;
         }
     }
 }

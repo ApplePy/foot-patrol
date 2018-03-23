@@ -13,9 +13,10 @@ using Android.Widget;
 
 namespace FootPatrol.Droid
 {
-    public class PairActive
+    [Activity(Label = "VPairStatus")]
+    public class VPairStatus
     {
         [JsonProperty(PropertyName = "active")]
-        public bool active { get; set; }
+        public bool active { set; get; }
     }
 }
