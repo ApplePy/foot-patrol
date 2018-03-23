@@ -1,29 +1,28 @@
 ﻿<Properties StartupConfiguration="{93578BFB-ED5E-4E94-B242-156162A0E1E8}|Default">
   <MonoDevelop.Ide.Workbench ActiveDocument="VolunteerActivity.cs">
     <Files>
-      <File FileName="VolunteerActivity.cs" Line="1244" Column="9" />
-      <File FileName="NonEmergencyContactsActivity.cs" Line="19" Column="13" />
+      <File FileName="VolunteerActivity.cs" Line="1" Column="1" />
+      <File FileName="NonEmergencyContactsActivity.cs" Line="1" Column="1" />
       <File FileName="CheckInActivity.cs" Line="1" Column="1" />
-      <File FileName="MainActivity.cs" Line="37" Column="67" />
-      <File FileName="LoginActivity.cs" Line="37" Column="43" />
-      <File FileName="CampusMapsActivity.cs" Line="9" Column="39" />
-      <File FileName="UserRequests.cs" Line="21" Column="11" />
-      <File FileName="RequestsActivity.cs" Line="64" Column="55" />
-      <File FileName="Resources/values/Strings.xml" Line="7" Column="1" />
+      <File FileName="MainActivity.cs" Line="1" Column="1" />
+      <File FileName="LoginActivity.cs" Line="1" Column="1" />
+      <File FileName="CampusMapsActivity.cs" Line="1" Column="1" />
+      <File FileName="UserRequests.cs" Line="1" Column="1" />
+      <File FileName="RequestsActivity.cs" Line="1" Column="1" />
+      <File FileName="Resources/values/Strings.xml" Line="1" Column="1" />
       <File FileName="Resources/drawable/BorderResource.xml" Line="3" Column="21" />
-      <File FileName="DirectionsAdapter.cs" Line="27" Column="67" />
+      <File FileName="DirectionsAdapter.cs" Line="1" Column="1" />
       <File FileName="DirectionsHolder.cs" Line="1" Column="1" />
-      <File FileName="UserActivity.cs" Line="68" Column="70" />
-      <File FileName="VolunteerPairs.cs" Line="23" Column="23" />
-      <File FileName="RequestStatus.cs" Line="15" Column="2" />
-      <File FileName="PairActive.cs" Line="15" Column="2" />
-      <File FileName="ContactUsActivity.cs" Line="15" Column="2" />
-      <File FileName="AboutUsActivity.cs" Line="15" Column="2" />
-      <File FileName="WWDActivity.cs" Line="16" Column="32" />
-      <File FileName="VolunteeringActivity.cs" Line="22" Column="62" />
-      <File FileName="Resources/drawable/FormEntry.xml" Line="5" Column="9" />
+      <File FileName="UserActivity.cs" Line="1" Column="1" />
+      <File FileName="VolunteerPairs.cs" Line="1" Column="1" />
+      <File FileName="RequestStatus.cs" Line="1" Column="1" />
+      <File FileName="ContactUsActivity.cs" Line="1" Column="1" />
+      <File FileName="AboutUsActivity.cs" Line="1" Column="1" />
+      <File FileName="WWDActivity.cs" Line="1" Column="1" />
+      <File FileName="VolunteeringActivity.cs" Line="1" Column="1" />
+      <File FileName="Resources/drawable/FormEntry.xml" Line="1" Column="1" />
       <File FileName="WalkRequest.cs" Line="1" Column="1" />
-      <File FileName="UpdateVolunteer.cs" Line="23" Column="45" />
+      <File FileName="UpdateVolunteer.cs" Line="1" Column="1" />
       <File FileName="HttpClientExtensions.cs" Line="1" Column="1" />
     </Files>
   </MonoDevelop.Ide.Workbench>
@@ -32,6 +31,6 @@
     <BreakpointStore />
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
   <MonoDevelop.Ide.DebuggingService.PinnedWatches />
-  <MonoDevelop.Ide.ItemProperties.FootPatrol.Droid AndroidDesignerPreferredDevice="Nexus 4" PreferredExecutionTarget="Android.021e38f7" />
+  <MonoDevelop.Ide.ItemProperties.FootPatrol.Droid PreferredExecutionTarget="Android.nexus_7" />
   <MultiItemStartupConfigurations />
 </Properties>
