@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:p1="http://schemas.android.com/apk/res/android"
+    p1:layout_width="match_parent"
+    p1:layout_height="match_parent"
+    p1:background="#ff4f2683">
+    <ImageView
+        p1:src="@drawable/wfp"
+        p1:layout_width="match_parent"
+        p1:layout_height="250dp"
+        p1:id="@+id/campusMapView"
+        p1:scaleType="centerCrop"
+        p1:paddingLeft="220dp" />
+    <TextView
+        p1:textAppearance="?android:attr/textAppearanceMedium"
+        p1:layout_width="wrap_content"
+        p1:layout_height="wrap_content"
+        p1:id="@+id/aboutUsText"
+        p1:text="ABOUT US"
+        p1:layout_marginTop="230dp"
+        p1:layout_marginLeft="5dp"
+        p1:textStyle="bold"
+        p1:textColor="#ffffffff" />
+    <ScrollView
+        p1:minWidth="25px"
+        p1:minHeight="25px"
+        p1:layout_width="match_parent"
+        p1:layout_height="300dp"
+        p1:id="@+id/scrollView1"
+        p1:layout_marginTop="250dp">
+        <RelativeLayout
+            p1:layout_width="match_parent"
+            p1:layout_height="match_parent">
+            <TextView
+                p1:textAppearance="?android:attr/textAppearanceLarge"
+                p1:layout_width="wrap_content"
+                p1:layout_height="wrap_content"
+                p1:id="@+id/ourMissionText"
+                p1:layout_below="@+id/introductionText"
+                p1:text="Our Mission" />
+            <TextView
+                p1:text="Western Foot Patrol is a free service at Western University that assists in keeping campus a safe place to study, work and live. We are volunteer-driven service, with between 250-300 volunteers each school year.  We are committed to providing a safe and secure environment for students, faculty and staff. Our mission is to raise awareness of personal safety issues, deter crime through visible patrols and to provide safe escorts to community members. This proactive approach to safety focuses on &quot;students helping students&quot;, engaging student volunteers in the direct provision of services, creating a sense of ownership and responsibility."
+                p1:textAppearance="?android:attr/textAppearanceSmall"
+                p1:layout_width="wrap_content"
+                p1:layout_height="wrap_content"
+                p1:id="@+id/introductionText"
+                p1:layout_below="@+id/aboutUsText" />
+            <TextView
+                p1:text="Western Foot Patrol is dedicated to contributing to a safe campus community by conducting safe escorts; campus patrols; lighting audits and safety campaigns.  We do this with a team of incredible volunteers who carry out these services with a sense of warmth, caring and pride."
+                p1:textAppearance="?android:attr/textAppearanceSmall"
+                p1:layout_width="wrap_content"
+                p1:layout_height="wrap_content"
+                p1:id="@+id/missionText"
+                p1:layout_below="@+id/ourMissionText" />
+            <TextView
+                p1:textAppearance="?android:attr/textAppearanceLarge"
+                p1:layout_width="wrap_content"
+                p1:layout_height="wrap_content"
+                p1:id="@+id/toOurVolunteers"
+                p1:layout_below="@+id/missionText"
+                p1:text="To Our Volunteers" />
+            <TextView
+                p1:text="We are committed to providing our volunteers with a positive, rewarding volunteer experience with an opportunity for growth and advancement, while cultivating an environment where the contributions of every volunteer are valued and respected. Volunteers will be provided the same concern, respect, and caring attitude within the organization that they are expected to share externally."
+                p1:textAppearance="?android:attr/textAppearanceSmall"
+                p1:layout_width="wrap_content"
+                p1:layout_height="wrap_content"
+                p1:id="@+id/toOurVolunteersText"
+                p1:layout_below="@+id/toOurVolunteers" />
+        </RelativeLayout>
+    </ScrollView>
+</RelativeLayout>

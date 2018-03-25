@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:p1="http://schemas.android.com/apk/res/android"
+    p1:layout_width="match_parent"
+    p1:layout_height="match_parent"
+    p1:background="#ff4f2683">
+    <ImageView
+        p1:src="@drawable/westernfootpatrolvolunteers"
+        p1:layout_width="match_parent"
+        p1:layout_height="250dp"
+        p1:id="@+id/campusMapView"
+        p1:scaleType="centerCrop" />
+    <TextView
+        p1:textAppearance="?android:attr/textAppearanceMedium"
+        p1:layout_width="wrap_content"
+        p1:layout_height="wrap_content"
+        p1:id="@+id/whatWeDoText"
+        p1:text="WHAT WE DO"
+        p1:layout_marginTop="230dp"
+        p1:layout_marginLeft="5dp"
+        p1:textStyle="bold"
+        p1:textColor="#ffffffff" />
+    <ScrollView
+        p1:minWidth="25px"
+        p1:minHeight="25px"
+        p1:layout_width="match_parent"
+        p1:layout_height="300dp"
+        p1:id="@+id/scrollView1"
+        p1:layout_marginTop="250dp">
+        <RelativeLayout
+            p1:layout_width="match_parent"
+            p1:layout_height="match_parent">
+            <TextView
+                p1:textAppearance="?android:attr/textAppearanceLarge"
+                p1:layout_width="wrap_content"
+                p1:layout_height="wrap_content"
+                p1:id="@+id/escortsText"
+                p1:text="Escorts" />
+            <TextView
+                p1:text="Volunteer teams provide safe escorts on the main and affiliate college campuses, including some off campus locations. Our co-ed teams will wait with you at bus stops, ensure you reach your car safely in campus parking lots, and escort you to your residence or any other building on campus. The Western Foot Patrol vehicle compliments our walking teams, and is used for long escorts and on high-volume evenings."
+                p1:textAppearance="?android:attr/textAppearanceSmall"
+                p1:layout_width="wrap_content"
+                p1:layout_height="wrap_content"
+                p1:id="@+id/escort"
+                p1:layout_below="@+id/escortsText" />
+            <TextView
+                p1:textAppearance="?android:attr/textAppearanceLarge"
+                p1:layout_width="wrap_content"
+                p1:layout_height="wrap_content"
+                p1:id="@+id/lostAndFoundText"
+                p1:layout_below="@+id/escort"
+                p1:layout_marginTop="5dp"
+                p1:text="Lost &amp; Found" />
+            <TextView
+                p1:text="Western Foot Patrol operates the university’s main Lost and Found.
+
+The Foot Patrol Office is located in the University Community Centre room 57 and is open Monday-Friday 12-5pm (Hours are subject to change during holidays. Please refer to our home page for any change in hours).
+"
+                p1:textAppearance="?android:attr/textAppearanceSmall"
+                p1:layout_width="wrap_content"
+                p1:layout_height="wrap_content"
+                p1:id="@+id/lostAndFound"
+                p1:layout_below="@+id/lostAndFoundText" />
+            <TextView
+                p1:textAppearance="?android:attr/textAppearanceLarge"
+                p1:layout_width="wrap_content"
+                p1:layout_height="wrap_content"
+                p1:id="@+id/otherServicesText"
+                p1:layout_below="@+id/lostAndFound"
+                p1:layout_marginTop="5dp"
+                p1:text="Other Services" />
+            <TextView
+                p1:text="Patrols: co-ed volunteer teams patrol campus and affiliated colleges, deterring crime through visible patrols, and reporting suspicious or criminal activities. Each team carries a two-way radio that connects with the Foot Patrol Operations Manager and Campus Community Police Services, which allows them to report any observed safety hazards."
+                p1:textAppearance="?android:attr/textAppearanceSmall"
+                p1:layout_width="wrap_content"
+                p1:layout_height="wrap_content"
+                p1:id="@+id/patrolsText"
+                p1:layout_below="@+id/otherServicesText" />
+            <TextView
+                p1:text="Lighting &amp; Phone Audits: Teams conduct weekly audits of the Code Blue Emergency Phones, to ensure they are operating correctly. These phones are positioned strategically throughout campus and provide a direct link to Police Communications Operators, should an emergency arise. Teams also conduct monthly audits of all main campus lighting – the finished reports are sent to Physical Plant."
+                p1:textAppearance="?android:attr/textAppearanceSmall"
+                p1:layout_width="wrap_content"
+                p1:layout_height="wrap_content"
+                p1:id="@+id/lightingText"
+                p1:layout_below="@+id/patrolsText"
+                p1:layout_marginTop="5dp" />
+            <TextView
+                p1:text="Awareness: Western Foot Patrol conducts awareness campaigns and safety presentations on a variety of topics, including travel safety and date rape, among others. "
+                p1:textAppearance="?android:attr/textAppearanceSmall"
+                p1:layout_width="wrap_content"
+                p1:layout_height="wrap_content"
+                p1:id="@+id/awarenessText"
+                p1:layout_below="@+id/lightingText"
+                p1:layout_marginTop="5dp" />
+            <TextView
+                p1:textAppearance="?android:attr/textAppearanceLarge"
+                p1:layout_width="wrap_content"
+                p1:layout_height="wrap_content"
+                p1:id="@+id/workSafeText"
+                p1:layout_below="@+id/awarenessText"
+                p1:layout_marginTop="5dp"
+                p1:text="WorkSafe" />
+            <TextView
+                p1:text="Western Foot Patrol in partnership with Campus Police offer the Work Safe program, a “check in” service available for students and staff working alone and late at night on campus. Please see the Work Safe page in the navigation bar for more information."
+                p1:textAppearance="?android:attr/textAppearanceSmall"
+                p1:layout_width="wrap_content"
+                p1:layout_height="wrap_content"
+                p1:id="@+id/workSafe"
+                p1:layout_below="@+id/workSafeText" />
+        </RelativeLayout>
+    </ScrollView>
+</RelativeLayout>

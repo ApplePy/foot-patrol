@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:p1="http://schemas.android.com/apk/res/android"
+    p1:layout_width="match_parent"
+    p1:layout_height="match_parent"
+    p1:background="#ff4f2683">
+    <ImageView
+        p1:src="@drawable/whatwedo"
+        p1:layout_width="match_parent"
+        p1:layout_height="250dp"
+        p1:id="@+id/campusMapView"
+        p1:scaleType="center" />
+    <TextView
+        p1:textAppearance="?android:attr/textAppearanceMedium"
+        p1:layout_width="wrap_content"
+        p1:layout_height="wrap_content"
+        p1:id="@+id/contactUsText"
+        p1:text="CONTACT US"
+        p1:layout_marginTop="230dp"
+        p1:layout_marginLeft="5dp"
+        p1:textStyle="bold"
+        p1:textColor="#ffffffff" />
+    <ScrollView
+        p1:minWidth="25px"
+        p1:minHeight="25px"
+        p1:layout_width="match_parent"
+        p1:layout_height="300dp"
+        p1:id="@+id/scrollView1"
+        p1:layout_marginTop="250dp">
+        <RelativeLayout
+            p1:layout_width="match_parent"
+            p1:layout_height="match_parent">
+            <TextView
+                p1:textAppearance="?android:attr/textAppearanceLarge"
+                p1:layout_width="wrap_content"
+                p1:layout_height="wrap_content"
+                p1:id="@+id/hours"
+                p1:text="Hours" />
+            <TextView
+                p1:textAppearance="?android:attr/textAppearanceMedium"
+                p1:layout_width="wrap_content"
+                p1:layout_height="wrap_content"
+                p1:id="@+id/dayTimeHoursText"
+                p1:layout_below="@+id/hours"
+                p1:text="Daytime Office Hours"
+                p1:textStyle="bold"
+                p1:layout_marginTop="5dp"
+                p1:textColor="#ffffffff" />
+            <TextView
+                p1:textAppearance="?android:attr/textAppearanceMedium"
+                p1:layout_width="wrap_content"
+                p1:layout_height="wrap_content"
+                p1:id="@+id/eveningHoursText"
+                p1:layout_below="@+id/daytimeHours"
+                p1:text="Evening Hours of Operation"
+                p1:layout_marginTop="5dp"
+                p1:textStyle="bold"
+                p1:textColor="#ffffffff" />
+            <TextView
+                p1:textAppearance="?android:attr/textAppearanceSmall"
+                p1:layout_width="wrap_content"
+                p1:layout_height="wrap_content"
+                p1:id="@+id/daytimeHours"
+                p1:layout_below="@+id/dayTimeHoursText"
+                p1:text="Regular Office Hours : Monday - Friday 12-5 PM                              Reading Week, April Office Hours : Monday - Friday 1-4 PM" />
+            <TextView
+                p1:textAppearance="?android:attr/textAppearanceSmall"
+                p1:layout_width="wrap_content"
+                p1:layout_height="wrap_content"
+                p1:id="@+id/septemberHours"
+                p1:layout_below="@+id/eveningHoursText"
+                p1:text="September Hours : Sunday - Thursday 9PM-1AM;                         Friday &amp; Saturday 9PM-12AM" />
+            <TextView
+                p1:textAppearance="?android:attr/textAppearanceSmall"
+                p1:layout_width="wrap_content"
+                p1:layout_height="wrap_content"
+                p1:id="@+id/regularOperations"
+                p1:layout_below="@+id/septemberHours"
+                p1:layout_marginTop="5dp"
+                p1:text="Regular Event Operations (beginning October 1)                           Sunday - Thursday 6PM-1AM; Friday &amp; Saturday 6PM-12AM                      " />
+            <TextView
+                p1:textAppearance="?android:attr/textAppearanceSmall"
+                p1:layout_width="wrap_content"
+                p1:layout_height="wrap_content"
+                p1:id="@+id/holidayWeekends"
+                p1:layout_below="@+id/regularOperations"
+                p1:layout_marginTop="5dp"
+                p1:text="Long Holiday Weekends : Sunday - Thursday 9PM-1AM               Friday &amp; Saturday 9PM-12AM    " />
+            <TextView
+                p1:textAppearance="?android:attr/textAppearanceLarge"
+                p1:layout_width="wrap_content"
+                p1:layout_height="wrap_content"
+                p1:id="@+id/workSafeText"
+                p1:layout_below="@+id/holidayWeekends"
+                p1:layout_marginTop="5dp"
+                p1:text="Work Safe" />
+            <TextView
+                p1:text="The Work Safe program is operated in partnership with Campus Police from 6pm-6am daily. Western Foot Patrol operates the service during the evening hours of operation listed above; Campus Police operates the service at all other times."
+                p1:textAppearance="?android:attr/textAppearanceSmall"
+                p1:layout_width="wrap_content"
+                p1:layout_height="wrap_content"
+                p1:id="@+id/workSafe"
+                p1:layout_below="@+id/workSafeText" />
+            <TextView
+                p1:textAppearance="?android:attr/textAppearanceLarge"
+                p1:layout_width="wrap_content"
+                p1:layout_height="wrap_content"
+                p1:id="@+id/locationText"
+                p1:layout_below="@+id/workSafe"
+                p1:layout_marginTop="5dp"
+                p1:text="Location" />
+            <TextView
+                p1:text="The Western Foot Patrol office is located in the lower level of the University Community Centre (UCC), room 57.                         "
+                p1:textAppearance="?android:attr/textAppearanceSmall"
+                p1:layout_width="wrap_content"
+                p1:layout_height="wrap_content"
+                p1:id="@+id/locationTextView"
+                p1:layout_below="@+id/locationText" />
+            <TextView
+                p1:textAppearance="?android:attr/textAppearanceMedium"
+                p1:layout_width="wrap_content"
+                p1:layout_height="wrap_content"
+                p1:id="@+id/phoneText"
+                p1:layout_below="@+id/locationTextView"
+                p1:layout_marginTop="5dp"
+                p1:textColor="#ffffffff"
+                p1:text="Phone: (519) 661-3650" />
+            <TextView
+                p1:textAppearance="?android:attr/textAppearanceMedium"
+                p1:layout_width="wrap_content"
+                p1:layout_height="wrap_content"
+                p1:id="@+id/emailText"
+                p1:layout_below="@+id/phoneText"
+                p1:layout_marginTop="5dp"
+                p1:textColor="#ffffffff"
+                p1:text="Email: wfp@uwo.ca" />
+            <ImageButton
+                p1:src="@drawable/footpatrollocation"
+                p1:layout_width="wrap_content"
+                p1:layout_height="wrap_content"
+                p1:id="@+id/footPatrolLocation"
+                p1:layout_below="@+id/emailText"
+                p1:layout_marginTop="5dp"
+                p1:layout_centerVertical="true"
+                p1:layout_centerHorizontal="true"
+                p1:scaleType="fitCenter"
+                p1:background="#ffffffff" />
+        </RelativeLayout>
+    </ScrollView>
+</RelativeLayout>

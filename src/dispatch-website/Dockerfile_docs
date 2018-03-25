@@ -1,0 +1,10 @@
+FROM nginx:1-alpine
+
+# Create doc directories
+RUN mkdir -p /usr/share/nginx/html/
+
+# Get all the code needed to run the app
+COPY docs/  /usr/share/nginx/html/
+
+# Expose the port the app runs in
+EXPOSE 80
