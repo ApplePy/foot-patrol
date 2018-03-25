@@ -77,6 +77,7 @@ export class Server {
       // Leave the dual server system in place for everything except production
       response.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
       response.header("Access-Control-Allow-Methods", "POST, PATCH, GET, PUT, DELETE, OPTIONS");
+      response.header("Access-Control-Allow-Origin", "*");
       next();
     });
 
