@@ -423,7 +423,7 @@ namespace FootPatrol.Droid
             fragmentTransaction.Commit(); //commit the transaction
         }
 
-        private async void pickUpBtnClicked()
+        private void pickUpBtnClicked()
         {
             spinner.Visibility = ViewStates.Visible;
             clearInitialUI();
@@ -536,8 +536,6 @@ namespace FootPatrol.Droid
             JObject jObj = JObject.Parse(res);
             var id = jObj.SelectToken("id");
             return Int32.Parse(id.ToString());
-
-            return 0;
         }
 
         private async Task<string> getRequestStatus()
@@ -546,25 +544,18 @@ namespace FootPatrol.Droid
             Uri customURI = new Uri(backendURI + postRequestURI + "/" + requestID.ToString());
             HttpResponseMessage response = await httpClient.GetAsync(customURI);
 
-            Newtonsoft.Json.Linq.JToken statusLine = null;
+            JToken statusLine = null;
             try
             {
                 response.EnsureSuccessStatusCode();
                 var res = await response.Content.ReadAsStringAsync();
                 JObject obj = JObject.Parse(res);
                 statusLine = obj.SelectToken("status");
-                var pairing = obj.SelectToken("pairing");
-                if(pairing.ToString() != "")
-                {
-                    //Not getting the proper pairing ID here
-                    pairingID = Int32.Parse(pairing.ToString());
-                }
-
             }
 
             catch(Exception e)
             {
-                
+                createAlert("The request response failed with exception: " + e);
             }
 
             return statusLine.ToString();
@@ -575,6 +566,7 @@ namespace FootPatrol.Droid
         {
             HttpClient httpClient = new HttpClient();
             Uri customURI = new Uri(backendURI + findPairsURI + pairingID.ToString());
+            System.Diagnostics.Debug.WriteLine("The custom URI is: " + customURI);
             HttpResponseMessage httpResponse = await httpClient.GetAsync(customURI);
 
             List<string> names = new List<string>();
@@ -590,6 +582,7 @@ namespace FootPatrol.Droid
 
             var responseString = await httpResponse.Content.ReadAsStringAsync();
             JObject jObj = JObject.Parse(responseString);
+            System.Diagnostics.Debug.WriteLine("The request string is: " + jObj);
             var volunteerOneFN = jObj.SelectToken("volunteers[0].first_name");
             var volunteerOneLN = jObj.SelectToken("volunteers[0].last_name");
             var volunteerTwoFN = jObj.SelectToken("volunteers[1].first_name");
@@ -604,6 +597,11 @@ namespace FootPatrol.Droid
 
             volunteerOneLatLng = new LatLng(Double.Parse(volunteerOneLat.ToString()), Double.Parse(volunteerOneLong.ToString()));
             volunteerTwoLatLng = new LatLng(Double.Parse(volunteerTwoLat.ToString()), Double.Parse(volunteerTwoLong.ToString()));
+
+            foreach (string name in names)
+            {
+                System.Diagnostics.Debug.WriteLine("The names are: " + names);
+            }
 
             return names;
         }
