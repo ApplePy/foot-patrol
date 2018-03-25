@@ -5,7 +5,6 @@ using Android.Gms.Common.Apis;
 using Android.Gms.Maps;
 using Android.Gms.Maps.Model;
 using Android.Gms.Location;
-using Android.Graphics;
 using Android.Locations;
 using System;
 using Xamarin.Forms;
@@ -53,7 +52,7 @@ namespace FootPatrol.Droid
         private static TimerCallback tc;
         public static Timer timer;
         private static Circle mapCircle;
-        private static LatLng volunteerOneLatLng, volunteerTwoLatLng;
+        public static LatLng volunteerOneLatLng, volunteerTwoLatLng;
         private static PolylineOptions polyOptions;
         private static Polyline poly;
 
@@ -231,6 +230,7 @@ namespace FootPatrol.Droid
         public void OnConnected(Bundle connectionHint)
         {
             myLocation = location.GetLastLocation(client); //once the client is connected, get the last known location of the device
+            System.Diagnostics.Debug.WriteLine("My location is: " + myLocation.Latitude + " " + myLocation.Longitude);
             mapSetup(); //now that client is connected, attempt to setup map
             location.RequestLocationUpdates(client, locationRequest, this); //request location updates using the created client and locationRequest objects
         }
@@ -372,6 +372,7 @@ namespace FootPatrol.Droid
 
         private void selectItem(int position)
         {
+            
             switch(position)
             {
                 case 0:
@@ -401,9 +402,15 @@ namespace FootPatrol.Droid
             }
 
             if (Int32.Parse(Build.VERSION.Sdk) > 23)
+            {
+                mDrawerLayout.CloseDrawer(mListView);
                 switchFragment(fragment, Resource.Id.userdrawer, tag);
+            }
             else
+            {
+                mfDrawerLayout.CloseDrawer(mfListView);
                 switchFragment(fragment, Resource.Id.userdrawerMF, tag);
+            }
 
         }
 
@@ -499,6 +506,7 @@ namespace FootPatrol.Droid
         {
             HttpClient httpClient = new HttpClient();
             Uri customURI = new Uri(backendURI + postRequestURI);
+            System.Diagnostics.Debug.WriteLine("The URI is : " + customURI);
             string stringLocation = myLocation.Latitude.ToString() + " " + myLocation.Longitude.ToString();
             var content = new WalkRequest
             {
@@ -511,21 +519,23 @@ namespace FootPatrol.Droid
             var stringContent = JsonConvert.SerializeObject(content);
 
             HttpContent httpContent = new StringContent(stringContent, Encoding.UTF8, "application/json");
-            HttpResponseMessage response = await httpClient.PostAsync(customURI, httpContent);
+            HttpResponseMessage response = await httpClient.PostAsync(customURI, httpContent); //getting the error here
 
             try
             {
                 response.EnsureSuccessStatusCode();
-                var res = await response.Content.ReadAsStringAsync();
-                JObject jObj = JObject.Parse(res);
-                var id = jObj.SelectToken("id");
-                return Int32.Parse(id.ToString());
             }
 
             catch(Exception e)
             {
+                System.Diagnostics.Debug.WriteLine("Caught an exception : " + e);
                 createAlert("The request response failed with exception: " + e);
             }
+
+            var res = await response.Content.ReadAsStringAsync();
+            JObject jObj = JObject.Parse(res);
+            var id = jObj.SelectToken("id");
+            return Int32.Parse(id.ToString());
 
             return 0;
         }
@@ -546,7 +556,7 @@ namespace FootPatrol.Droid
                 var pairing = obj.SelectToken("pairing");
                 if(pairing.ToString() != "")
                 {
-                    System.Diagnostics.Debug.WriteLine("We're in here");
+                    //Not getting the proper pairing ID here
                     pairingID = Int32.Parse(pairing.ToString());
                 }
 
@@ -571,31 +581,55 @@ namespace FootPatrol.Droid
             try
             {
                 httpResponse.EnsureSuccessStatusCode();
-                var responseString = await httpResponse.Content.ReadAsStringAsync();
-                JObject jObj = JObject.Parse(responseString);
-                var volunteerOneFN = jObj.SelectToken("volunteers[0].first_name");
-                var volunteerOneLN = jObj.SelectToken("volunteers[0].last_name");
-                var volunteerTwoFN = jObj.SelectToken("volunteers[1].first_name");
-                var volunteerTwoLN = jObj.SelectToken("volunteers[1].last_name");
-                var volunteerOneLat = jObj.SelectToken("volunteers[0].latitude");
-                var volunteerTwoLat = jObj.SelectToken("volunteers[1].latitude");
-                var volunteerOneLong = jObj.SelectToken("volunteers[0].longitude");
-                var volunteerTwoLong = jObj.SelectToken("volunteers[0].longitude");
-
-                names.Add(volunteerOneFN + " " + volunteerOneLN);
-                names.Add(volunteerTwoFN + " " + volunteerTwoLN);
-
-                volunteerOneLatLng = new LatLng(Double.Parse(volunteerOneLat.ToString()), Double.Parse(volunteerOneLong.ToString()));
-                volunteerTwoLatLng = new LatLng(Double.Parse(volunteerTwoLat.ToString()), Double.Parse(volunteerTwoLong.ToString()));
-
             }
 
             catch (Exception e)
             {
-                
+                createAlert("The exception thrown is: " + e);
             }
 
+            var responseString = await httpResponse.Content.ReadAsStringAsync();
+            JObject jObj = JObject.Parse(responseString);
+            var volunteerOneFN = jObj.SelectToken("volunteers[0].first_name");
+            var volunteerOneLN = jObj.SelectToken("volunteers[0].last_name");
+            var volunteerTwoFN = jObj.SelectToken("volunteers[1].first_name");
+            var volunteerTwoLN = jObj.SelectToken("volunteers[1].last_name");
+            var volunteerOneLat = jObj.SelectToken("volunteers[0].latitude");
+            var volunteerTwoLat = jObj.SelectToken("volunteers[1].latitude");
+            var volunteerOneLong = jObj.SelectToken("volunteers[0].longitude");
+            var volunteerTwoLong = jObj.SelectToken("volunteers[0].longitude");
+
+            names.Add(volunteerOneFN + " " + volunteerOneLN);
+            names.Add(volunteerTwoFN + " " + volunteerTwoLN);
+
+            volunteerOneLatLng = new LatLng(Double.Parse(volunteerOneLat.ToString()), Double.Parse(volunteerOneLong.ToString()));
+            volunteerTwoLatLng = new LatLng(Double.Parse(volunteerTwoLat.ToString()), Double.Parse(volunteerTwoLong.ToString()));
+
             return names;
+        }
+
+        private async Task<int> getPairingID()
+        {
+            HttpClient httpClient = new HttpClient();
+            Uri customURI = new Uri(backendURI + postRequestURI + "/" + requestID.ToString());
+            HttpResponseMessage response = await httpClient.GetAsync(customURI);
+
+            try
+            {
+                response.EnsureSuccessStatusCode();
+            }
+
+            catch (Exception e)
+            {
+                createAlert("The request failed in the task. The exception is: " + e);
+            }
+
+            var res = await response.Content.ReadAsStringAsync();
+            JObject obj = JObject.Parse(res);
+            System.Diagnostics.Debug.WriteLine("The response is: " + obj);
+            var pairing = obj.SelectToken("pairing");
+
+            return Int32.Parse(pairing.ToString());
         }
 
         private void retrieveRequestUpdate(object state)
@@ -603,8 +637,9 @@ namespace FootPatrol.Droid
             string status = Task.Run(() => getRequestStatus()).Result;
             System.Diagnostics.Debug.WriteLine("The status is: " + status);
 
-            if (status == "IN_PROGRESS")
+            if (status == "IN_PROGRESS") //We know that the request has been accepted, we need to find the correct pairing ID
             {
+                pairingID = Task.Run(() => getPairingID()).Result;
                 timer.Change(Timeout.Infinite, Timeout.Infinite);
                 Device.BeginInvokeOnMainThread(displayVolunteers);
             }
@@ -622,7 +657,10 @@ namespace FootPatrol.Droid
             List<string> returnedNames = new List<string>();
             returnedNames = Task.Run(() => getVolunteerNames()).Result;
 
-            pairOneMarker.SetIcon(BitmapDescriptorFactory.DefaultMarker(BitmapDescriptorFactory.HueRed))
+            System.Diagnostics.Debug.WriteLine("Volunteer one's position is: " + volunteerOneLatLng);
+            System.Diagnostics.Debug.WriteLine("Volunteer one's position is: " + volunteerTwoLatLng);
+
+            pairOneMarker.SetIcon(BitmapDescriptorFactory.DefaultMarker(BitmapDescriptorFactory.HueRed)) //this is where the error occurred 
                          .SetPosition(volunteerOneLatLng);
             pairTwoMarker.SetIcon(BitmapDescriptorFactory.DefaultMarker(BitmapDescriptorFactory.HueGreen))
                          .SetPosition(volunteerTwoLatLng);
