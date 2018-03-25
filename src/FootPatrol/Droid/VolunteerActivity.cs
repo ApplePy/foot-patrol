@@ -25,7 +25,6 @@ using static Android.Widget.AdapterView;
 using System.Text.RegularExpressions;
 using Newtonsoft.Json;
 using Android.Views.InputMethods;
-using Org.Apache.Http.Protocol;
 
 namespace FootPatrol.Droid
 {
@@ -96,7 +95,7 @@ namespace FootPatrol.Droid
             listAdapter = new ArrayAdapter<string>(this.Context, Resource.Layout.ListElement, menuItems); //initializes ArrayAdapter to be displayed in listView
 
             layoutManager = new LinearLayoutManager(this.Context, LinearLayoutManager.Horizontal, false); //initializs the directions layout to be horizontal and sidescrolling
-            backendURI = "http://staging.capstone.incode.ca/api/v1";
+            backendURI = "https://staging.capstone.incode.ca/api/v1";
             getRequestURI = "/requests/?offset=0&count=9&archived=false";
             getVolunteerURI = "/volunteers/inactive";
             postPairURI = "/volunteerpairs/";
@@ -490,7 +489,6 @@ namespace FootPatrol.Droid
 
                 foreach(JToken a in volunteers)
                 {
-                    System.Diagnostics.Debug.WriteLine("The current volunteer is: " + a.ToString());
                     volunteerArray.Add(a.SelectToken("first_name").ToString() + " " + a.SelectToken("last_name").ToString());
                     volunteerID.Add(Int32.Parse(a.SelectToken("id").ToString()));
                 }
@@ -616,7 +614,7 @@ namespace FootPatrol.Droid
 
             catch (Exception error)
             {
-                System.Diagnostics.Debug.WriteLine("The exception is: " + error);
+                createAlert("The task failed with exception: " + error);
             }
 
             var content = await response.Content.ReadAsStringAsync();
@@ -1136,7 +1134,7 @@ namespace FootPatrol.Droid
                 response.EnsureSuccessStatusCode();
                 var responseString = await response.Content.ReadAsStringAsync();
                 var jObj = JObject.Parse(responseString);
-                System.Diagnostics.Debug.WriteLine("The status string is: " + jObj);
+
                 return "";
             }
 
@@ -1216,8 +1214,6 @@ namespace FootPatrol.Droid
         {
             HttpClient httpClient = new HttpClient();
             Uri customURI = new Uri(backendURI + postPairURI + pairID.ToString() + "/active");
-            System.Diagnostics.Debug.WriteLine("The uri is: " + customURI);
-            System.Diagnostics.Debug.WriteLine("The value of isActive is: " + isActive);
 
             var content = new VPairStatus {
                 active = isActive
