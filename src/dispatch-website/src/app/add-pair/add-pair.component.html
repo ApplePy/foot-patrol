@@ -1,21 +1,21 @@
 <h2>Add Volunteer Pair</h2>
 <div>
-  State: <select id=pairState [(ngModel)]="pairState">
+  <div>State: <select id=pairState [(ngModel)]="pairState" class="ui dropdown">
     <option value='Active'>Active</option>
     <option value='Inactive'>Inactive</option>
-  </select><br>
-  Volunteer 1: <select id=volunteerONE [(ngModel)]="volunteerONE">
+  </select></div><br>
+  <div>Volunteer 1: <select id=volunteerONE [(ngModel)]="volunteerONE" class="ui dropdown">
     <option *ngFor="let volunteer of volunteers" [ngValue]="volunteer">{{volunteer.first_name}} {{volunteer.last_name}}</option>
-  </select><br>
-  Volunteer 2: <select id=volunteerTWO [(ngModel)]="volunteerTWO">
+  </select></div><br>
+  <div>Volunteer 2: <select id=volunteerTWO [(ngModel)]="volunteerTWO" class="ui dropdown">
     <option *ngFor="let volunteer of volunteers" [ngValue]="volunteer">{{volunteer.first_name}} {{volunteer.last_name}}</option>
-  </select><br>
+  </select></div><br>
 </div>
 
 <div>
   <br>
-  <button (click)="createPair()" type="button">Add Pair</button>
-  <button routerLink='/volunteer-list' type="button">Cancel</button>
+  <button (click)="createPair()" type="button" class="ui green button">Add Pair</button>
+  <button routerLink='/volunteer-list' type="button" class="ui red button">Cancel</button>
 </div>
 
 <div>

@@ -1,8 +1,12 @@
 h1{
-    color: #369;
-    font-family: Arial, Helvetica, sans-serif;
-    font-size: 250%;
+  font-family: Arial, Helvetica, sans-serif;
+  vertical-align: middle;
+  color:white;
+  font-size: 50px;
+  display:inline-block;
+  margin-left: 30px;
 }
+
 a{
     font-family: Arial, Helvetica, sans-serif;
 }

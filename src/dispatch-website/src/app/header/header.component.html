@@ -1,17 +1,9 @@
-<!-- <a href="https://docs.google.com/forms/d/e/1FAIpQLSdeB7-BxZh4oWTGqrMGMUL4wu0ufQRKmEyNvwKGfzXt8OdZYQ/viewform?usp=sf_link">Give Feedback</a>
-<nav *ngIf="isLoggedIn | async" >
-  <button routerLink='/request-list'>Request List</button>
-
-  <button routerLink='/map'>Map</button>
-  <button *ngIf='isAdmin | async' routerLink='/dispatcher-list'>Dispatcher List</button>
-  <button (click)='onLogout()'>Logout</button>
-</nav> -->
-
-<div class="ui vertical menu" *ngIf="isLoggedIn | async">
+<div class="ui six item menu" *ngIf="isLoggedIn | async">
   <a routerLink='/request-list' class="item">Request List</a>
   <a routerLink='/volunteer-list' class="item">Volunteer List</a>
   <a routerLink='/map' class="item">Map</a>
-  <a *ngIf='isAdmin | async' routerLink='/dispatcher-list' class="item">Dispatcher List</a>
+  <a *ngIf='isAdmin | async; else noDispatcher' routerLink='/dispatcher-list' class="item">Dispatcher List</a>
+  <ng-template #noDispatcher><a class="item">Dispatcher List</a></ng-template>
   <a href="https://docs.google.com/forms/d/e/1FAIpQLSdeB7-BxZh4oWTGqrMGMUL4wu0ufQRKmEyNvwKGfzXt8OdZYQ/viewform?usp=sf_link" class="item">Give Feedback</a>
   <a class="item" (click)='onLogout()'>Logout</a>
 </div>
