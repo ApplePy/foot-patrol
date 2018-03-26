@@ -290,7 +290,7 @@ build_review_mobile:
   script:
   - pushd .
   - cd src/FootPatrol/Droid
-  - msbuild FootPatrol.Droid.sln "/p:Configuration=Debug" "/p:AndroidSdkDirectory=/usr/local/share/android-sdk" "/t:PackageForAndroid"
+  - msbuild FootPatrol.Droid.sln "/p:Configuration=Release" "/p:AndroidSdkDirectory=/usr/local/share/android-sdk" "/t:SignForAndroid"
   - popd
   - find . -name \*.apk -exec cp -r {} mobile_output \;
   - find . -type d -name \*.mSYM -exec cp -r {} mobile_output \;
@@ -321,7 +321,7 @@ build_mobile:
   script:
   - pushd .
   - cd src/FootPatrol/Droid
-  - msbuild FootPatrol.Droid.sln "/p:Configuration=Release" "/p:AndroidSdkDirectory=/usr/local/share/android-sdk" "/t:PackageForAndroid"
+  - msbuild FootPatrol.Droid.sln "/p:Configuration=Release" "/p:AndroidSdkDirectory=/usr/local/share/android-sdk" "/t:SignForAndroid"
   - popd
   - find . -name \*.apk -exec cp -r {} mobile_output \;
   - find . -type d -name \*.mSYM -exec cp -r {} mobile_output \;
