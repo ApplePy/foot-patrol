@@ -68,7 +68,7 @@ namespace FootPatrol.Droid
                 "BROUGHDALE HALL (KING'S UNIVERSITY COLLEGE)", "FACULTY BUILDING (KING'S UNIVERSITY COLLEGE)", "WEMPLE HALL (KING'S UNIVERSITY COLLEGE)", "LABATT HALL (KING'S UNIVERSITY COLLEGE)",
                 "DANTE LENARDON HALL (KING'S UNIVERSITY COLLEGE"};
 
-            backendURI = "http://staging.capstone.incode.ca/api/v1";
+            backendURI = Resources.GetString(Resource.String.api_url);
             postRequestURI = "/requests";
 
             listAdapter = new ArrayAdapter<string>(this.Context, Resource.Layout.ListElement, menuItems);

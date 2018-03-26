@@ -28,6 +28,8 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AndroidLinkMode>None</AndroidLinkMode>
+    <AndroidHttpClientHandlerType>Xamarin.Android.Net.AndroidClientHandler</AndroidHttpClientHandlerType>
+    <AndroidTlsProvider>btls</AndroidTlsProvider>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -181,7 +183,7 @@
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\layout\Main.axml" />
-    <AndroidResource Include="Resources\values\Strings.xml" />
+    <AndroidResource Include="Resources\values\API.xml" />
     <AndroidResource Include="Resources\layout\LoginScreen.xml" />
     <AndroidResource Include="Resources\drawable\WesternFootPatrolNoBack.png" />
     <AndroidResource Include="Resources\drawable\westernfootpatrol.png" />
@@ -224,6 +226,7 @@
     <AndroidResource Include="Resources\drawable\FormEntry.xml" />
     <AndroidResource Include="Resources\drawable\mike.png" />
     <AndroidResource Include="Resources\drawable\darryl.png" />
+    <AndroidResource Include="Resources\values\Strings.xml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\drawable\" />
