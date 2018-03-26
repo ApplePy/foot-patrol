@@ -90,7 +90,7 @@ variables:
   # - npm config set registry $NPM_CACHE # Setup proxy to stop killing bandwidth
 
 # This test ensures the back end works
-.test_backend:
+test_backend:
   <<: *test_docker_common
   tags:
   - docker
@@ -125,7 +125,7 @@ variables:
 
 
 # This test ensures the front end works
-.test_dispatch_website:
+test_dispatch_website:
   <<: *test_docker_common
   image: amio/node-chrome   # Contains both Node 8 and Chrome (https://incode.ca/capstone/docker-node-chrome mirrored from https://github.com/amio/docker-node-chrome)
   artifacts:
