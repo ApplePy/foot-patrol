@@ -127,6 +127,7 @@ Vagrant.configure("2") do |config|
     sdkmanager "platforms;android-26"
     sdkmanager "patcher;v4"
     sdkmanager "platform-tools"
+    sdkmanager "platforms;android-23"
     sdkmanager --update
   SHELL
 end
