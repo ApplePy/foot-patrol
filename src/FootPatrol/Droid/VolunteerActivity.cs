@@ -449,10 +449,10 @@ namespace FootPatrol.Droid
         {
             HttpClient httpClient = new HttpClient(); //create a new HttpClient
             Uri customURI = new Uri(backendURI + getRequestURI); //get the URI to the API
-            var response = await httpClient.GetAsync(customURI); //get the asynchronous response
 
             try
             {
+                var response = await httpClient.GetAsync(customURI); //get the asynchronous response
                 response.EnsureSuccessStatusCode(); //make sure the response returns with the correct status code
                 List<string> requestArray = new List<string>(); //initialize a new list of requests
                 var responseContent = await response.Content.ReadAsStringAsync(); //get the content of the response
@@ -477,10 +477,10 @@ namespace FootPatrol.Droid
         {
             HttpClient httpClient = new HttpClient();
             Uri customURI = new Uri(backendURI + getVolunteerURI);
-            var response = await httpClient.GetAsync(customURI); //get the asynchronous response
 
             try 
             {
+                var response = await httpClient.GetAsync(customURI); //get the asynchronous response
                 response.EnsureSuccessStatusCode(); //make sure the response returns with the correct status code
                 volunteerArray = new List<string>();
                 volunteerID = new List<int>();
