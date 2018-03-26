@@ -58,6 +58,10 @@ class RequestSchedulerTest {
     {
       id: 2, from_location: "32 39", to_location: "SEB", timestamp: "2017-10-26T06:51:05.000Z",
       archived: false, status: "REQUESTED", additional_info: "", pairing: null
+    },
+    {
+      id: 3, from_location: "32 39", to_location: "SEB", timestamp: "2017-10-26T06:51:05.000Z",
+      archived: true, status: "REQUESTED", additional_info: "", pairing: null
     }
   ];
 
@@ -114,7 +118,8 @@ class RequestSchedulerTest {
         return [VOLUNTEERS.find((x) => x.id === values[0])];
       } else if (query.search(new RegExp("^SELECT \\* FROM `requests`")) !== -1) {
         // For finding unfulfilled requests
-        return REQUESTS.filter((x) => x.status === values[0]).slice(values[1], values[1] + values[2]);
+        return REQUESTS.filter((x) => x.status === values[0] && x.archived === values[1])
+          .slice(values[2], values[2] + values[3]);
       }
 
       // Default fallback
@@ -159,7 +164,8 @@ class RequestSchedulerTest {
         return [VOLUNTEERS.find((x) => x.id === values[0])];
       } else if (query.search(new RegExp("^SELECT \\* FROM `requests`")) !== -1) {
         // For finding unfulfilled requests
-        return REQUESTS.filter((x) => x.status === values[0]).slice(values[1], values[1] + values[2]);
+        return REQUESTS.filter((x) => x.status === values[0] && x.archived === values[1])
+          .slice(values[2], values[2] + values[3]);
       }
 
       // Default fallback
@@ -204,7 +210,8 @@ class RequestSchedulerTest {
         return [VOLUNTEERS.find((x) => x.id === values[0])];
       } else if (query.search(new RegExp("^SELECT \\* FROM `requests`")) !== -1) {
         // For finding unfulfilled requests
-        return REQUESTS.filter((x) => x.status === values[0]).slice(values[1], values[1] + values[2]);
+        return REQUESTS.filter((x) => x.status === values[0] && x.archived === values[1])
+          .slice(values[2], values[2] + values[3]);
       }
 
       // Default fallback
@@ -244,7 +251,8 @@ class RequestSchedulerTest {
         return [VOLUNTEERS.find((x) => x.id === values[0])];
       } else if (query.search(new RegExp("^SELECT \\* FROM `requests`")) !== -1) {
         // For finding unfulfilled requests
-        return REQUESTS.filter((x) => x.status === values[0]).slice(values[1], values[1] + values[2]);
+        return REQUESTS.filter((x) => x.status === values[0] && x.archived === values[1])
+          .slice(values[2], values[2] + values[3]);
       }
 
       // Default fallback
@@ -284,7 +292,8 @@ class RequestSchedulerTest {
         return [VOLUNTEERS.find((x) => x.id === values[0])];
       } else if (query.search(new RegExp("^SELECT \\* FROM `requests`")) !== -1) {
         // For finding unfulfilled requests
-        return REQUESTS.filter((x) => x.status === values[0]).slice(values[1], values[1] + values[2]);
+        return REQUESTS.filter((x) => x.status === values[0] && x.archived === values[1])
+          .slice(values[2], values[2] + values[3]);
       }
 
       // Default fallback
@@ -329,7 +338,8 @@ class RequestSchedulerTest {
         return [VOLUNTEERS.find((x) => x.id === values[0])];
       } else if (query.search(new RegExp("^SELECT \\* FROM `requests`")) !== -1) {
         // For finding unfulfilled requests
-        return REQUESTS.filter((x) => x.status === values[0]).slice(values[1], values[1] + values[2]);
+        return REQUESTS.filter((x) => x.status === values[0] && x.archived === values[1])
+          .slice(values[2], values[2] + values[3]);
       }
 
       // Default fallback
