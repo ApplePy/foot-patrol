@@ -96,7 +96,7 @@ namespace FootPatrol.Droid
             listAdapter = new ArrayAdapter<string>(this.Context, Resource.Layout.ListElement, menuItems); //initializes ArrayAdapter to be displayed in listView
 
             layoutManager = new LinearLayoutManager(this.Context, LinearLayoutManager.Horizontal, false); //initializs the directions layout to be horizontal and sidescrolling
-            backendURI = "http://staging.capstone.incode.ca/api/v1";
+            backendURI = Resources.GetString(Resource.String.api_url);
             getRequestURI = "/requests/?offset=0&count=9&archived=false";
             getVolunteerURI = "/volunteers/inactive";
             postPairURI = "/volunteerpairs/";
