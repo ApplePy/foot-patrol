@@ -116,7 +116,8 @@ Vagrant.configure("2") do |config|
   config.vm.provision "shell", privileged: false, inline: <<-SHELL
     brew tap caskroom/versions
     brew upgrade
-    brew install gitlab-runner
+    brew install gitlab-runner gettext
+    brew link --force gettext
     brew cask install visual-studio xamarin-ios xamarin-android java8 android-sdk
 
     # Setup Android development tools
