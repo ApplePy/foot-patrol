@@ -1,12 +1,18 @@
 import * as bodyParser from "body-parser";
 import * as cookieParser from "cookie-parser";
 import * as express from "express";
+import * as session from "express-session";
 import { Container, inject, injectable, named } from "inversify";
 import * as logger from "morgan";
+import * as passport from "passport";
+import { AuthenticateOptions } from "passport";
 import * as path from "path";
 import { stringify } from "querystring";
 import { IFACES, TAGS } from "./ids";
 import { ErrorMiddleware as ErrMid } from "./services/loggers";
+
+// tslint:disable-next-line:no-var-requires
+const oidc: any = require("passport-openid-connect");
 
 // Routes
 import { IRoute } from "./interfaces/iroute";
@@ -59,12 +65,16 @@ export class Server {
     this.app.use(bodyParser.json());
     this.app.use(bodyParser.urlencoded({ extended: false }));
     this.app.use(cookieParser(this.cookieSecret));
+    // this.app.use(session({ secret: this.cookieSecret })); // TODO: Configure
+
+    // Setup passportJS
+    this.authenticationSetup();
 
     // Control response headers
     this.app.use((request: express.Request, response: express.Response, next: express.NextFunction) => {
       // Leave the dual server system in place for everything except production
       response.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-      response.header("Access-Control-Allow-Methods', 'POST, PATCH, GET, PUT, DELETE, OPTIONS");
+      response.header("Access-Control-Allow-Methods", "POST, PATCH, GET, PUT, DELETE, OPTIONS");
       next();
     });
 
@@ -113,5 +123,33 @@ export class Server {
 
     // Default logger
     this.app.use(ErrMid.fallback);
+  }
+
+  /**
+   * Setup PassportJS with the desired authentication strategy
+   */
+  private authenticationSetup() {
+    // Setup OpenID Connect strategy
+    const OICStrategy = oidc.Strategy;
+    const User = oidc.User;
+    const oic = new OICStrategy({ // TODO: Replace with real data
+      issuerHost: "https://adfs.murrayweb.ca/adfs",
+      client_id: "73a42bce-4468-4c41-8d80-be7d11311a0e",
+      client_secret: "cWMMu29Lpw_FVlkkPiC4wFvFBDnIszuhrN6txAqc",
+      redirect_uri: "http://localhost:8080/callback",
+      scope: "openid profile userinfo"
+      // scope: "userinfo profile openid allatclaims aza email logon_cert user_impersonation"
+    });
+
+    // Setup passport
+    passport.use(oic);
+    passport.serializeUser(OICStrategy.serializeUser);
+    passport.deserializeUser(OICStrategy.deserializeUser);
+
+    // Hook up passport to the API
+    this.app.use(passport.initialize());
+    this.app.use(passport.session());
+    this.app.use("/callback",
+     passport.authenticate("passport-openid-connect", {callback: true} as AuthenticateOptions));
   }
 }

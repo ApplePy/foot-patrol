@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response, Router } from "express";
 import { Container, inject, injectable } from "inversify";
+import * as passport from "passport";
 import { IFACES, TAGS } from "../ids";
 import { IRequestsManager } from "../interfaces/irequests-manager";
 import { IRoute } from "../interfaces/iroute";
@@ -39,7 +40,9 @@ export class RequestsRoute implements IRoute {
     // Add to router
     this.router.get("/", this.getRequests.bind(this));
     this.router.post("/", this.postRequest.bind(this));
-    this.router.get("/:id", this.getRequest.bind(this));
+    this.router.get("/:id",
+     passport.authenticate("passport-openid-connect"), this.getRequest.bind(this));
+     // Try using the panva/node-openid-client directly with passport, and use line 145 in library to shut down Userinfo calls.
     this.router.put("/:id", this.putRequest.bind(this));
     this.router.patch("/:id", this.patchRequest.bind(this));
     this.router.delete("/:id", this.deleteRequest.bind(this));
