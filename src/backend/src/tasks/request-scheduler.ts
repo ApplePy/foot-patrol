@@ -75,7 +75,7 @@ export class SchedulerTask implements ITask {
       return this.reqMgr.getRequests(
         0,
         Object.keys(pairLocations).length,
-        new Map([["status", TravelStatus.REQUESTED]]))
+        new Map<string, any>([["status", TravelStatus.REQUESTED], ["archived", false]]))
       .then((requests) => ({pairLocations, requests}));
     })
     .then((data) => this.pairingAlgorithm(data.pairLocations, data.requests));
