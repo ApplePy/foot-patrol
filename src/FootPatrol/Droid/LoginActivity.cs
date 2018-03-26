@@ -4,6 +4,7 @@ using Android.Views;
 using Android.Graphics;
 using Android.Widget;
 using System.Windows;
+using Java.Lang;
 
 namespace FootPatrol.Droid
 {
@@ -14,18 +15,10 @@ namespace FootPatrol.Droid
         Button signIn;
         EditText userName, password;
         ProgressBar spinner;
+        public LoginActivity la;
+        public static Android.Support.V4.App.FragmentManager fragmentManager;
 
         private Typeface bentonSans; //font to be used
-
-        /// <summary>
-        /// Creates a new instance of LoginActivity
-        /// </summary>
-        /// <returns>The instance.</returns>
-        public static LoginActivity newInstance()
-        {
-            LoginActivity la = new LoginActivity();
-            return la;
-        }
 
         /// <summary>
         /// Creates the LoginActivity view.
@@ -45,6 +38,9 @@ namespace FootPatrol.Droid
             userName = (EditText)views.FindViewById(Resource.Id.usernameField);
             password = (EditText)views.FindViewById(Resource.Id.passwordField);
             spinner = (ProgressBar)views.FindViewById(Resource.Id.progressBar1);
+
+            la = new LoginActivity();
+            fragmentManager = this.Activity.SupportFragmentManager;
 
             spinner.Visibility = ViewStates.Gone; //set the loading spinner to gone
 
@@ -73,15 +69,13 @@ namespace FootPatrol.Droid
 
                 else
                 {
-                    spinner.Visibility = ViewStates.Visible; //make the spinner visible
-                    switchFragment(new VolunteerActivity(), "VolunteerActivity");
+                    new loginSpinnerTask(spinner, la, new VolunteerActivity(), "VolunteerActivity").Execute();
                 }
             };
 
             continueAsUser.Click += (sender, e) =>
             {
-                spinner.Visibility = ViewStates.Visible; //make the spinner visible
-                switchFragment(new UserActivity(), "UserActivity");
+                new loginSpinnerTask(spinner, la, new UserActivity(), "UserActivity").Execute();
             };
 
             return views;
@@ -92,15 +86,49 @@ namespace FootPatrol.Droid
             text.SetTypeface(font, TypefaceStyle.Normal);
         }
 
-        private void switchFragment(Android.Support.V4.App.Fragment frag, string tag)
+        public void switchFragment(Android.Support.V4.App.Fragment frag, string tag)
         {
             Android.Support.V4.App.Fragment newFrag = frag; //create a new instance of VolunteerActivity and save it
-            Android.Support.V4.App.FragmentTransaction fragmentTransaction = this.Activity.SupportFragmentManager.BeginTransaction(); //begin the fragment transaction
+            Android.Support.V4.App.FragmentTransaction fragmentTransaction = fragmentManager.BeginTransaction(); //begin the fragment transaction
             fragmentTransaction.SetCustomAnimations(Resource.Layout.EnterAnimation, Resource.Layout.ExitAnimation); //add animation to slide new fragment to the left
             fragmentTransaction.Replace(Resource.Id.frameLayout2, newFrag, tag); //replace the old fragment with the new on
             fragmentTransaction.AddToBackStack("LoginActivity");
             fragmentTransaction.Commit(); //commit the transaction
         }
 
+    }
+
+    public class loginSpinnerTask : AsyncTask
+    {
+        ProgressBar progressBar;
+        LoginActivity _la;
+        Android.Support.V4.App.Fragment frag;
+        string fragTag;
+
+        public loginSpinnerTask(ProgressBar pb, LoginActivity la, Android.Support.V4.App.Fragment fragment, string tag)
+        {
+            progressBar = pb;
+            _la = la;
+            frag = fragment;
+            fragTag = tag;
+        }
+
+		protected override void OnPostExecute(Object result)
+		{
+			base.OnPostExecute(result);
+            progressBar.Visibility = ViewStates.Gone;
+		}
+
+		protected override Object DoInBackground(params Object[] @params)
+        {
+            _la.switchFragment(frag, fragTag);
+            return "";
+        }
+
+        protected override void OnPreExecute()
+        {
+            base.OnPreExecute();
+            progressBar.Visibility = ViewStates.Visible;
+        }
     }
 }

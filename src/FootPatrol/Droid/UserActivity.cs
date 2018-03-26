@@ -20,6 +20,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Threading;
 using System.Collections.Generic;
+using Java.Lang;
 
 namespace FootPatrol.Droid
 {
@@ -43,11 +44,11 @@ namespace FootPatrol.Droid
         private static Android.Widget.RelativeLayout relativeLayout, acceptedRequestLayout;
         private static Android.Views.View view; //the current view
         private static TextView svDescription;
-        private static ArrayAdapter<String> listAdapter, locationAdapter;
+        private static ArrayAdapter<System.String> listAdapter, locationAdapter;
         private static Android.Widget.SearchView searchView;
         private static string[] menuItems, locationNames;
         private string backendURI, postRequestURI, findPairsURI;
-        private static int requestID, pairingID;
+        public int requestID, pairingID;
         private static Android.Widget.ProgressBar spinner;
         private static TimerCallback tc;
         public static Timer timer;
@@ -55,6 +56,7 @@ namespace FootPatrol.Droid
         public static LatLng volunteerOneLatLng, volunteerTwoLatLng;
         private static PolylineOptions polyOptions;
         private static Polyline poly;
+        private UserActivity ua;
 
         public string tag;
         public Android.Support.V4.App.Fragment fragment;
@@ -62,6 +64,8 @@ namespace FootPatrol.Droid
         public override Android.Views.View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
+
+            ua = new UserActivity();
 
             Forms.Init(this.Activity,savedInstanceState);
             menuItems = new string[] { "CAMPUS MAPS", "NON-EMERGENCY CONTACTS", "CONTACT US", "ABOUT US", "WHAT WE DO", "VOLUNTEER" };
@@ -84,7 +88,7 @@ namespace FootPatrol.Droid
                 MapsInitializer.Initialize(this.Context); //initialize the Google Maps Android API
             }
 
-            catch (Exception e)
+            catch (System.Exception e)
             {
                 createAlert("Unable to initialize the map, the error is: " + e);
             }
@@ -138,7 +142,7 @@ namespace FootPatrol.Droid
 
                 pickUpBtn.Click += (sender, e) =>
                 {
-                    pickUpBtnClicked();
+                    new spinnerTask(spinner, ua).Execute();
                 };
 
                 mListView.ItemClick += (sender, e) =>
@@ -423,9 +427,8 @@ namespace FootPatrol.Droid
             fragmentTransaction.Commit(); //commit the transaction
         }
 
-        private void pickUpBtnClicked()
+        public void pickUpBtnClicked()
         {
-            spinner.Visibility = ViewStates.Visible;
             clearInitialUI();
             circle = new CircleOptions();
             LatLng center = new LatLng(myLocation.Latitude, myLocation.Longitude);
@@ -526,7 +529,7 @@ namespace FootPatrol.Droid
                 response.EnsureSuccessStatusCode();
             }
 
-            catch(Exception e)
+            catch(System.Exception e)
             {
                 System.Diagnostics.Debug.WriteLine("Caught an exception : " + e);
                 createAlert("The request response failed with exception: " + e);
@@ -553,13 +556,12 @@ namespace FootPatrol.Droid
                 statusLine = obj.SelectToken("status");
             }
 
-            catch(Exception e)
+            catch(System.Exception e)
             {
                 createAlert("The request response failed with exception: " + e);
             }
 
             return statusLine.ToString();
-
         }
 
         private async Task<List<string>> getVolunteerNames()
@@ -575,7 +577,7 @@ namespace FootPatrol.Droid
                 httpResponse.EnsureSuccessStatusCode();
             }
 
-            catch (Exception e)
+            catch (System.Exception e)
             {
                 createAlert("The exception thrown is: " + e);
             }
@@ -595,8 +597,8 @@ namespace FootPatrol.Droid
             names.Add(volunteerOneFN + " " + volunteerOneLN);
             names.Add(volunteerTwoFN + " " + volunteerTwoLN);
 
-            volunteerOneLatLng = new LatLng(Double.Parse(volunteerOneLat.ToString()), Double.Parse(volunteerOneLong.ToString()));
-            volunteerTwoLatLng = new LatLng(Double.Parse(volunteerTwoLat.ToString()), Double.Parse(volunteerTwoLong.ToString()));
+            volunteerOneLatLng = new LatLng(System.Double.Parse(volunteerOneLat.ToString()), System.Double.Parse(volunteerOneLong.ToString()));
+            volunteerTwoLatLng = new LatLng(System.Double.Parse(volunteerTwoLat.ToString()), System.Double.Parse(volunteerTwoLong.ToString()));
 
             foreach (string name in names)
             {
@@ -606,7 +608,7 @@ namespace FootPatrol.Droid
             return names;
         }
 
-        private async Task<int> getPairingID()
+        public async Task<int> getPairingID()
         {
             HttpClient httpClient = new HttpClient();
             Uri customURI = new Uri(backendURI + postRequestURI + "/" + requestID.ToString());
@@ -617,7 +619,7 @@ namespace FootPatrol.Droid
                 response.EnsureSuccessStatusCode();
             }
 
-            catch (Exception e)
+            catch (System.Exception e)
             {
                 createAlert("The request failed in the task. The exception is: " + e);
             }
@@ -637,13 +639,12 @@ namespace FootPatrol.Droid
 
             if (status == "IN_PROGRESS") //We know that the request has been accepted, we need to find the correct pairing ID
             {
-                pairingID = Task.Run(() => getPairingID()).Result;
+                new updateUITask(ua).Execute();
                 timer.Change(Timeout.Infinite, Timeout.Infinite);
-                Device.BeginInvokeOnMainThread(displayVolunteers);
             }
         }
 
-        private void displayVolunteers()
+        public void displayVolunteers()
         {
             acceptedRequestLayout.Visibility = ViewStates.Visible;
             svDescription.Visibility = ViewStates.Gone;
@@ -693,7 +694,7 @@ namespace FootPatrol.Droid
                 response.EnsureSuccessStatusCode();
             }
 
-            catch (Exception error)
+            catch (System.Exception error)
             {
                 System.Diagnostics.Debug.WriteLine("The exception is: " + error);
             }
@@ -774,4 +775,58 @@ namespace FootPatrol.Droid
             return polyline;
         }
     }
+
+    public class spinnerTask : AsyncTask
+    {
+        Android.Widget.ProgressBar _pb;
+        UserActivity _ua;
+
+        public spinnerTask(Android.Widget.ProgressBar pb, UserActivity ua)
+        {
+            _pb = pb;
+            _ua = ua;
+        }
+
+        protected override Java.Lang.Object DoInBackground(params Java.Lang.Object[] @params)
+        {
+            _ua.pickUpBtnClicked();
+            return "";
+        }
+
+        protected override void OnPreExecute()
+        {
+            base.OnPreExecute();
+            System.Diagnostics.Debug.WriteLine("We're in here!");
+            _pb.Visibility = ViewStates.Visible;
+        }
+
+    }
+
+    public class updateUITask : AsyncTask
+    {
+        UserActivity _ua;
+
+        public updateUITask(UserActivity ua)
+        {
+            _ua = ua;
+        }
+
+        protected override Java.Lang.Object DoInBackground(params Java.Lang.Object[] @params)
+        {
+            return "";
+        }
+
+		protected override void OnPreExecute()
+		{
+			base.OnPreExecute();
+            _ua.pairingID = Task.Run(() => _ua.getPairingID()).Result;
+		}
+
+		protected override void OnPostExecute(Java.Lang.Object result)
+		{
+			base.OnPostExecute(result);
+            _ua.displayVolunteers();
+		}
+	}
+
 }

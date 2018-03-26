@@ -25,6 +25,7 @@ using static Android.Widget.AdapterView;
 using System.Text.RegularExpressions;
 using Newtonsoft.Json;
 using Android.Views.InputMethods;
+using Java.Lang;
 
 namespace FootPatrol.Droid
 {
@@ -36,7 +37,7 @@ namespace FootPatrol.Droid
         public static bool isPaired = false, pickupPending = false;
 
         public static Typeface bentonSans; //font to be used in application
-        private static ArrayAdapter<String> listAdapter,fpAdapter; //adapter to help display direction
+        private static ArrayAdapter<System.String> listAdapter,fpAdapter; //adapter to help display direction
 
         private static SupportMapFragment mf; //fragment that displays map on < API 24
         private static Button completeTripBtn; //buttons to complete trip
@@ -74,15 +75,6 @@ namespace FootPatrol.Droid
         public string tag;
         public Android.Support.V4.App.Fragment fragment;
 
-        /// <summary>
-        /// Creates a new instance of the VolunteerActivity class
-        /// </summary>
-        public static VolunteerActivity newInstance()
-        {
-            va = new VolunteerActivity();
-            return va;
-        }
-
         ///  <summary>
         ///  Creates fragment view and initializes UI components used in the view
         ///  </summary>
@@ -115,7 +107,7 @@ namespace FootPatrol.Droid
                 MapsInitializer.Initialize(this.Context); //initialize the Google Maps Android API
             }
 
-            catch (Exception e)
+            catch (System.Exception e)
             {
                 createAlert("Unable to initialize the map, the error is: " + e);
             }
@@ -465,7 +457,7 @@ namespace FootPatrol.Droid
                 return requestArray; 
             }
 
-            catch (Exception error)
+            catch (System.Exception error)
             {
                 createAlert("The task to get user requests failed! The error is: " + error);
                 return null;
@@ -496,7 +488,7 @@ namespace FootPatrol.Droid
                 return volunteerArray;
             }
 
-            catch (Exception error)
+            catch (System.Exception error)
             {
                 createAlert("The task to get volunteers failed! The error is: " + error);
             }
@@ -578,7 +570,7 @@ namespace FootPatrol.Droid
                 response.EnsureSuccessStatusCode();
             }
 
-            catch (Exception error)
+            catch (System.Exception error)
             {
                 createAlert("The task to get user requests failed! The error is: " + error);
             }
@@ -612,7 +604,7 @@ namespace FootPatrol.Droid
                 response.EnsureSuccessStatusCode();
             }
 
-            catch (Exception error)
+            catch (System.Exception error)
             {
                 createAlert("The task failed with exception: " + error);
             }
@@ -998,7 +990,7 @@ namespace FootPatrol.Droid
                 }
             }
 
-            catch(Exception e)
+            catch(System.Exception e)
             {
                 createAlert("There was an exception " + e);
             }
@@ -1025,7 +1017,7 @@ namespace FootPatrol.Droid
                 return Int32.Parse(pairingID.ToString());
             }
 
-            catch(Exception e)
+            catch(System.Exception e)
             {
                 createAlert("There was an exception! The error was: " + e);
             }
@@ -1073,8 +1065,8 @@ namespace FootPatrol.Droid
             string userLocation = requestedTrip.fromLoc;
             string[] latLng = userLocation.Split(' ');
 
-            double latitude = Double.Parse(latLng[0]);
-            double longitude = Double.Parse(latLng[1]);
+            double latitude = System.Double.Parse(latLng[0]);
+            double longitude = System.Double.Parse(latLng[1]);
 
             userMarker = new MarkerOptions();
 
@@ -1138,7 +1130,7 @@ namespace FootPatrol.Droid
                 return "";
             }
 
-            catch (Exception e)
+            catch (System.Exception e)
             {
                 createAlert("There was an exception! The error was: " + e);
             }
@@ -1228,7 +1220,7 @@ namespace FootPatrol.Droid
                 response.EnsureSuccessStatusCode();
             }
 
-            catch(Exception e)
+            catch(System.Exception e)
             {
                 createAlert("The exception is: " + e);
             }
@@ -1265,7 +1257,7 @@ namespace FootPatrol.Droid
                 response.EnsureSuccessStatusCode();
             }
 
-            catch(Exception e)
+            catch(System.Exception e)
             {
                 createAlert("The task failed to complete due to exception " + e);
             }
