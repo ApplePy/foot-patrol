@@ -57,8 +57,6 @@ export class EditVolunteerComponent implements OnInit {
     this.checkValid(this.volunteer.first_name) === true &&
     this.checkValid(this.volunteer.last_name) === true) {
       const disabled = this.m_disabled === this.states[1];
-      console.log(disabled);
-      console.log(this.m_disabled);
       this.errorMsg = '';
       this.ftpService.updateVolunteer({uwo_id, first_name, last_name, disabled}, id).subscribe(() => {
         this.router.navigateByUrl('/volunteer-list');
