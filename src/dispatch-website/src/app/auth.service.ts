@@ -24,12 +24,12 @@ export class AuthService {
    */
   login(username: string, password: string) {
     if (username === 'root' && password === 'root') {
-      // sessionStorage.setItem('currentUser', 'Admin');
+      sessionStorage.setItem('currentUser', 'Admin');
       this.currentUser.next(true);
       this.loggedIn.next(true);
       this.router.navigateByUrl('/request-list');
     } else if (username !== '' && password !== '') {
-      // sessionStorage.setItem('currentUser', 'Dispatcher');
+      sessionStorage.setItem('currentUser', 'Dispatcher');
       this.currentUser.next(false);
       this.loggedIn.next(true);
       this.router.navigateByUrl('/request-list');
@@ -39,5 +39,6 @@ export class AuthService {
   logout() {
     this.loggedIn.next(false);
     this.router.navigateByUrl('/login');
+    sessionStorage.removeItem('currentUser');
   }
 }
