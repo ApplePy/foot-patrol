@@ -48,14 +48,41 @@ export class AddPairComponent implements OnInit {
       this.pair.volunteers[0] = this.pair.volunteers[1];
       this.pair.volunteers[1] = temp;
 
-      this.sendPair();
+      let tick = true;
+          // check all existing pairs for duplicates to prevent 500 error
+    this.ftpService.getVolunteerPairs().subscribe(pairs => {
+      pairs.pairs.forEach(element => {
+        if (element.volunteers[0].id === this.pair.volunteers[0].id && element.volunteers[1].id === this.pair.volunteers[1].id) {
+          tick = false;
+        }
+      });
+      if (tick) {
+        this.sendPair();
+      } else {
+        this.errorMsg = "ERROR: this pairing already exists. To reactivate this pairing, please set it's state to ACTIVE";
+      }
+    });
      } else {
 
-      this.sendPair();
+      let tick = true;
+          // check all existing pairs for duplicates to prevent 500 error
+    this.ftpService.getVolunteerPairs().subscribe(pairs => {
+      pairs.pairs.forEach(element => {
+        if (element.volunteers[0].id === this.pair.volunteers[0].id && element.volunteers[1].id === this.pair.volunteers[1].id) {
+          tick = false;
+        }
+      });
+      if (tick) {
+        this.sendPair();
+      } else {
+        this.errorMsg = "ERROR: this pairing already exists. To reactivate this pairing, please set it's state to ACTIVE";
+      }
+    });
      }
   }
 
   private sendPair() {
+
     this.errorMsg = '';
     if (this.pairState === 'Active') {this.pair.active = true; }
     if (this.pairState === 'Inactive') {this.pair.active = false; }
