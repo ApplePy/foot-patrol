@@ -27,6 +27,7 @@
 <h4>Volunteers</h4>
 <form #v="ngForm">
   <input type="radio" name="VolunteerView" (change)="changeVolunteerView('all')" class="radio"> View All Volunteers
+  <input type="radio" name="VolunteerView" (change)="changeVolunteerView('disabled')" class="radio"> View All Volunteers + Disabled Volunteers
   <input type="radio" name="VolunteerView" (change)="changeVolunteerView('active')" class="radio"> View Active Volunteers
   <input type="radio" name="VolunteerView" (change)="changeVolunteerView('inactive')" class="radio"> View Inactive Volunteers
 </form>

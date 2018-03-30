@@ -16,10 +16,12 @@ export class AddVolunteerComponent implements OnInit {
   last_name: string;
   m_disabled: string;
 
-  states: string[]= ['Not Disabled', 'Disabled'];
+  readonly states: string[]= ['Not Disabled', 'Disabled'];
   errorMsg: string;
 
-  constructor(public ftpService: FtpRequestService, public router: Router) { }
+  constructor(public ftpService: FtpRequestService, public router: Router) {
+    this.m_disabled = this.states[0];
+  }
 
   ngOnInit() {
   }
@@ -39,22 +41,11 @@ export class AddVolunteerComponent implements OnInit {
     const first_name = this.first_name;
     const last_name = this.last_name;
     if (this.checkValid(this.uwo_id) === true && this.checkValid(this.first_name) === true && this.checkValid(this.last_name) === true) {
+      const disabled = this.m_disabled === this.states[1];
       this.errorMsg = '';
-      if (this.m_disabled === 'Not Disabled') {
-        this.ftpService.createNewVolunteer({uwo_id, first_name, last_name}).subscribe(() => {
-          this.router.navigateByUrl('/volunteer-list');
-        });
-      } else if (this.m_disabled === 'Disabled') {
-        const disabled = true;
-        this.ftpService.createNewVolunteer({uwo_id, first_name, last_name, disabled}).subscribe(() => {
-          this.router.navigateByUrl('/volunteer-list');
-        });
-      } else {
-        this.ftpService.createNewVolunteer({uwo_id, first_name, last_name}).subscribe(() => {
-          this.router.navigateByUrl('/volunteer-list');
-        });
-      }
-      const data = {uwo_id, first_name, last_name};
+      this.ftpService.createNewVolunteer({uwo_id, first_name, last_name, disabled}).subscribe(() => {
+        this.router.navigateByUrl('/volunteer-list');
+      });
     } else {
       this.errorMsg = 'Invalid characters detected. Please remove all special characters';
     }

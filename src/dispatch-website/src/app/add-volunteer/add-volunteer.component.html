@@ -4,7 +4,7 @@
   <div>Last Name: <input type='text' [(ngModel)]=last_name></div><br>
   <div>UWO id: <input type='text' [(ngModel)]=uwo_id> @uwo.ca</div><br>
   <div>State (optional): <select id=volunteerTWO [(ngModel)]="m_disabled" class="ui dropdown">
-    <option *ngFor="let state of states" [ngValue]="m_disabled">{{state}}</option>
+    <option *ngFor="let state of states" [ngValue]="state">{{state}}</option>
   </select></div><br>
 </div>
 

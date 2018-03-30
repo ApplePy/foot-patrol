@@ -75,6 +75,13 @@ export class VolunteerListComponent implements OnInit {
         }
         // this.displayVolunteers = volunteers.volunteers;
       });
+    } else if (view === 'disabled') {
+      this.ftpService.getAllVolunteers(true).subscribe(volunteers => {
+        for (let i = 0; i < volunteers.volunteers.length; i++) {
+          this.displayVolunteers[i] = volunteers.volunteers[i];
+        }
+        // this.displayVolunteers = volunteers.volunteers;
+      });
     }
   }
 
