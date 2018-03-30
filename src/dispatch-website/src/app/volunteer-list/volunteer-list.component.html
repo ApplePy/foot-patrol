@@ -15,10 +15,10 @@
   </thead>
   <tbody>
     <tr *ngFor="let pair of volunteerPairs">
-      <td>{{pair?.id}}</td>
-      <td>{{pair?.volunteers[0].first_name}} {{pair?.volunteers[0].last_name}} and {{pair?.volunteers[1].first_name}} {{pair?.volunteers[1].last_name}}</td>
+      <td>{{pair?.pair.id}}</td>
+      <td>{{pair?.pair.volunteers[0].first_name}} {{pair?.pair.volunteers[0].last_name}} and {{pair?.pair.volunteers[1].first_name}} {{pair?.pair.volunteers[1].last_name}}</td>
       <td><button (click)="editVolunteerPair(pair.id)">Edit</button> </td>
-      <td ng-if="volunteer.active">ACTIVE</td>
+      <td>{{pair?.state}}</td>
     </tr>
   </tbody>
 </table>

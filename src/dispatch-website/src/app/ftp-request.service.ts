@@ -140,7 +140,7 @@ export class FtpRequestService {
    * @param inactive Optional: set whether to include inactive pairs. Default is false
    */
   getVolunteerPairs(inactive = false) {
-    return this.http.get(this.volunteerPairsURL)
+    return this.http.get(this.volunteerPairsURL + `?inactive=${inactive}`)
                   .pipe(
                     retry(3),
                     catchError(this.handleError)
