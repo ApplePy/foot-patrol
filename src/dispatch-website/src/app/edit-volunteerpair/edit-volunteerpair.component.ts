@@ -53,16 +53,42 @@ export class EditVolunteerpairComponent implements OnInit {
   }
 
   updatePair() {
-    this.pair.volunteers = [this.volunteerONE, this.volunteerTWO];
-     if (this.pair.volunteers[1].id === this.pair.volunteers[0].id) {
-      this.errorMsg = 'ERROR: The volunteers in the pair must be different';
-     } else if (this.pair.volunteers[0].id > this.pair.volunteers[1].id) {
-       // if the volunteer ids are not in ascending order, swap the volunteers
-      const temp = this.pair.volunteers[0];
-      this.pair.volunteers[0] = this.pair.volunteers[1];
-      this.pair.volunteers[1] = temp;
+    let go = true;
+    if (this.volunteerONE === undefined || this.volunteerTWO === undefined) {
+      this.errorMsg = 'ERROR: All fields must have values';
+      go = false;
+    } else {
+      this.pair.volunteers = [this.volunteerONE, this.volunteerTWO];
+    }
+    if (go) {
+      if (this.pair.volunteers[1].id === this.pair.volunteers[0].id) {
+        this.errorMsg = 'ERROR: The volunteers in the pair must be different';
+      } else if (this.pair.volunteers[0].id > this.pair.volunteers[1].id) {
 
-      let tick = true;
+
+          // if the volunteer ids are not in ascending order, swap the volunteers
+          const temp = this.pair.volunteers[0];
+          this.pair.volunteers[0] = this.pair.volunteers[1];
+          this.pair.volunteers[1] = temp;
+
+          let tick = true;
+              // check all existing pairs for duplicates to prevent 500 error
+          this.ftpService.getVolunteerPairs().subscribe(pairs => {
+            pairs.pairs.forEach(element => {
+              if (element.volunteers[0].id === this.pair.volunteers[0].id && element.volunteers[1].id === this.pair.volunteers[1].id) {
+                tick = false;
+              }
+            });
+            if (tick) {
+              this.sendPair();
+            } else {
+              this.pair.volunteers[0] = this.OGpair.volunteers[0];
+              this.pair.volunteers[1] = this.OGpair.volunteers[1];
+              this.errorMsg = "ERROR: this pairing already exists. To reactivate the other pairing, please set it's state to ACTIVE";
+            }
+          });
+        } else {
+          let tick = true;
           // check all existing pairs for duplicates to prevent 500 error
     this.ftpService.getVolunteerPairs().subscribe(pairs => {
       pairs.pairs.forEach(element => {
@@ -73,39 +99,21 @@ export class EditVolunteerpairComponent implements OnInit {
       if (tick) {
         this.sendPair();
       } else {
-        this.pair.volunteers[0] = this.OGpair.volunteers[0];
-        this.pair.volunteers[1] = this.OGpair.volunteers[1];
+        this.pair = this.OGpair;
         this.errorMsg = "ERROR: this pairing already exists. To reactivate the other pairing, please set it's state to ACTIVE";
       }
     });
-       } else {
-        let tick = true;
-        // check all existing pairs for duplicates to prevent 500 error
-  this.ftpService.getVolunteerPairs().subscribe(pairs => {
-    pairs.pairs.forEach(element => {
-      if (element.volunteers[0].id === this.pair.volunteers[0].id && element.volunteers[1].id === this.pair.volunteers[1].id) {
-        tick = false;
       }
-    });
-    if (tick) {
-      this.sendPair();
-    } else {
-      this.pair = this.OGpair;
-      this.errorMsg = "ERROR: this pairing already exists. To reactivate the other pairing, please set it's state to ACTIVE";
     }
-  });
-     }
   }
 
   sendPair() {
     this.errorMsg = '';
     if (this.pairState === 'Active') {this.pair.active = true; }
     if (this.pairState === 'Inactive') {this.pair.active = false; }
-
+    this.ftpService.toggleActiveVolunteerPair(this.pair.id, this.pair.active).subscribe(); // disable old pair
     this.ftpService.createNewVolunteerPair([this.pair.volunteers[0].id, this.pair.volunteers[1].id], this.pair.active).subscribe(() =>
       this.router.navigateByUrl('/volunteer-list')
     );
-
-
   }
 }

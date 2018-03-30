@@ -172,6 +172,17 @@ export class FtpRequestService {
                         );
   }
 
+  toggleActiveVolunteerPair(Pair_id, status) {
+    status = !status;
+    console.log(this.volunteerURL + `/${Pair_id}/active`);
+    console.log(status);
+    return this.http.post(this.volunteerURL + `/${Pair_id}/active`, status)
+                        .pipe(
+                          retry(3),
+                          catchError(this.handleError)
+                        );
+  }
+
   createNewVolunteerPair(volunteers, active) {
     const data = {volunteers, active};
     return this.http.post(this.volunteerPairsURL, data)
