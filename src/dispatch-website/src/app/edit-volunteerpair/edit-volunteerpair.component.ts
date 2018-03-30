@@ -14,6 +14,7 @@ import { VolunteerPair } from '../volunteer-pair';
 export class EditVolunteerpairComponent implements OnInit {
 
   pair: VolunteerPair;
+  OGpair: VolunteerPair = new VolunteerPair;
   volunteers: Volunteer[];
   volunteerONE: Volunteer;
   volunteerTWO: Volunteer;
@@ -36,8 +37,11 @@ export class EditVolunteerpairComponent implements OnInit {
     this.setupTwo(id);
   }
   setupTwo(id) {
+    this.OGpair.volunteers = [];
     this.ftpService.getSpecificVolunteerPair(id.toLocaleString()).subscribe(pair => {
       this.pair = pair;
+      this.OGpair.volunteers[0] = this.pair.volunteers[0];
+      this.OGpair.volunteers[1] = this.pair.volunteers[1];
       if (this.pair.active) {this.pairState = 'Active'; } else {this.pairState = 'Inactive'; }
     });
     this.ftpService.getAllActiveVolunteers().subscribe(volunteers => {
@@ -58,9 +62,38 @@ export class EditVolunteerpairComponent implements OnInit {
       this.pair.volunteers[0] = this.pair.volunteers[1];
       this.pair.volunteers[1] = temp;
 
+      let tick = true;
+          // check all existing pairs for duplicates to prevent 500 error
+    this.ftpService.getVolunteerPairs().subscribe(pairs => {
+      pairs.pairs.forEach(element => {
+        if (element.volunteers[0].id === this.pair.volunteers[0].id && element.volunteers[1].id === this.pair.volunteers[1].id) {
+          tick = false;
+        }
+      });
+      if (tick) {
+        this.sendPair();
+      } else {
+        this.pair.volunteers[0] = this.OGpair.volunteers[0];
+        this.pair.volunteers[1] = this.OGpair.volunteers[1];
+        this.errorMsg = "ERROR: this pairing already exists. To reactivate the other pairing, please set it's state to ACTIVE";
+      }
+    });
+       } else {
+        let tick = true;
+        // check all existing pairs for duplicates to prevent 500 error
+  this.ftpService.getVolunteerPairs().subscribe(pairs => {
+    pairs.pairs.forEach(element => {
+      if (element.volunteers[0].id === this.pair.volunteers[0].id && element.volunteers[1].id === this.pair.volunteers[1].id) {
+        tick = false;
+      }
+    });
+    if (tick) {
       this.sendPair();
-     } else {
-      this.sendPair();
+    } else {
+      this.pair = this.OGpair;
+      this.errorMsg = "ERROR: this pairing already exists. To reactivate the other pairing, please set it's state to ACTIVE";
+    }
+  });
      }
   }
 
@@ -68,9 +101,8 @@ export class EditVolunteerpairComponent implements OnInit {
     this.errorMsg = '';
     if (this.pairState === 'Active') {this.pair.active = true; }
     if (this.pairState === 'Inactive') {this.pair.active = false; }
-    // I don't know why I had this here, if everything works it should be removed
-    // this.ftpService.toggleActiveVolunteerPair(this.pair.id, this.pair.active).subscribe();
-    this.ftpService.createNewVolunteerPair(this.pair.volunteers, this.pair.active).subscribe(() =>
+
+    this.ftpService.createNewVolunteerPair([this.pair.volunteers[0].id, this.pair.volunteers[1].id], this.pair.active).subscribe(() =>
       this.router.navigateByUrl('/volunteer-list')
     );
 

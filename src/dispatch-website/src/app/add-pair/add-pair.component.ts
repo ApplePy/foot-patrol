@@ -34,12 +34,13 @@ export class AddPairComponent implements OnInit {
     });
     this.pairState = 'Active';
     this.pair = new VolunteerPair();
-
   }
 
   createPair() {
     this.pair.volunteers = [this.volunteerONE, this.volunteerTWO];
-    if (this.pair.volunteers[1].id === this.pair.volunteers[0].id) {
+    if (this.pair.volunteers[0] === undefined || this.pair.volunteers[1] === undefined) {
+      this.errorMsg = 'ERROR: All fields must have values';
+    } else if (this.pair.volunteers[1].id === this.pair.volunteers[0].id) {
       this.errorMsg = 'ERROR: The volunteers in the pair must be different';
      } else if (this.pair.volunteers[0].id > this.pair.volunteers[1].id) {
        // if the volunteer ids are not in ascending order, swap the volunteers
@@ -59,7 +60,7 @@ export class AddPairComponent implements OnInit {
       if (tick) {
         this.sendPair();
       } else {
-        this.errorMsg = "ERROR: this pairing already exists. To reactivate this pairing, please set it's state to ACTIVE";
+        this.errorMsg = "ERROR: this pairing already exists. To reactivate this specific pairing, please set it's state to ACTIVE";
       }
     });
      } else {
@@ -75,7 +76,7 @@ export class AddPairComponent implements OnInit {
       if (tick) {
         this.sendPair();
       } else {
-        this.errorMsg = "ERROR: this pairing already exists. To reactivate this pairing, please set it's state to ACTIVE";
+        this.errorMsg = "ERROR: this pairing already exists. To reactivate this specific pairing, please set it's state to ACTIVE";
       }
     });
      }
