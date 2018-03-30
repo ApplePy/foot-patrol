@@ -1,7 +1,7 @@
 <h2>Volunteers</h2>
 <h4>Volunteer Pairs</h4>
 <form #p="ngForm">
-  <input type="radio" name="PairView" (change)="changePairView('active')" class="radio"> View Active Pairs
+  <input type="radio" name="PairView" (change)="changePairView('active')" class="radio" checked="checked"> View Active Pairs
   <input type="radio" name="PairView" (change)="changePairView('all')" class="radio"> View All Pairs
 </form>
 <table #pt class="ui celled table">
@@ -26,7 +26,7 @@
 
 <h4>Volunteers</h4>
 <form #v="ngForm">
-  <input type="radio" name="VolunteerView" (change)="changeVolunteerView('all')" class="radio"> View All Volunteers
+  <input type="radio" name="VolunteerView" (change)="changeVolunteerView('all')" class="radio" checked="checked"> View All Volunteers
   <input type="radio" name="VolunteerView" (change)="changeVolunteerView('active')" class="radio"> View Active Volunteers
   <input type="radio" name="VolunteerView" (change)="changeVolunteerView('inactive')" class="radio"> View Inactive Volunteers
 </form>
