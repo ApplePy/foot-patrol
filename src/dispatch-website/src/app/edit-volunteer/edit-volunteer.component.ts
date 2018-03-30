@@ -15,7 +15,7 @@ export class EditVolunteerComponent implements OnInit {
 
   volunteer: Volunteer;
   errorMsg: string;
-  states: string[] = ['Not Disabled', 'Disabled'];
+  readonly states: string[] = ['Not Disabled', 'Disabled'];
   m_disabled: string;
   constructor(public route: ActivatedRoute,
   public ftpService: FtpRequestService,
@@ -34,9 +34,7 @@ export class EditVolunteerComponent implements OnInit {
   setupTwo(id) {
     this.ftpService.getVolunteer(id.toLocaleString()).subscribe(volunteer => {
       this.volunteer = volunteer;
-      if (this.volunteer.disabled) {
-        this.m_disabled = 'Disabled';
-      }
+      this.m_disabled = this.volunteer.disabled ? this.states[1] : this.states[0];
     });
   }
 
@@ -58,22 +56,13 @@ export class EditVolunteerComponent implements OnInit {
     if (this.checkValid(this.volunteer.uwo_id) === true &&
     this.checkValid(this.volunteer.first_name) === true &&
     this.checkValid(this.volunteer.last_name) === true) {
+      const disabled = this.m_disabled === this.states[1];
+      console.log(disabled);
+      console.log(this.m_disabled);
       this.errorMsg = '';
-      if (this.m_disabled === 'Not Disabled') {
-        this.ftpService.updateVolunteer({uwo_id, first_name, last_name}, id).subscribe(() => {
-          this.router.navigateByUrl('/volunteer-list');
-        });
-      } else if (this.m_disabled === 'Disabled') {
-        const tr = true;
-        this.ftpService.updateVolunteer({uwo_id, first_name, last_name, tr}, id).subscribe(() => {
-          this.router.navigateByUrl('/volunteer-list');
-        });
-      } else {
-        this.ftpService.updateVolunteer({uwo_id, first_name, last_name}, id).subscribe(() => {
-          this.router.navigateByUrl('/volunteer-list');
-        });
-      }
-      const data = {uwo_id, first_name, last_name};
+      this.ftpService.updateVolunteer({uwo_id, first_name, last_name, disabled}, id).subscribe(() => {
+        this.router.navigateByUrl('/volunteer-list');
+      });
     } else {
       this.errorMsg = 'Invalid characters detected. Please remove all special characters';
     }
