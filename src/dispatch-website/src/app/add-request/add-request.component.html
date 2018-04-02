@@ -1,13 +1,24 @@
 
 <h2>Add a Request</h2>
 
+<!--
+<div>Walk from (required): <select id=walkFrom [(ngModel)]="w" class="ui dropdown">
+    <option> </option>
+    <option *ngFor="let volunteer of volunteers" [ngValue]="volunteer">{{volunteer.first_name}} {{volunteer.last_name}}</option>
+  </select></div><br>
+ -->
+
 <div>
   Name:<br>
   <input type="text" id="name" class="ui input"><br>
-  Walk from (required):<br>
-  <input type="text" id="fromLocation" class="ui input"><br>
-  Walk to (required):<br>
-  <input type="text" id="toLocation" class="ui input"><br>
+  Walk from (required):<select id=walkFrom [(ngModel)]="walkFrom" class="ui dropdown">
+    <option> --- </option>
+    <option *ngFor="let location of locations" [ngValue]="location">{{location.location}}</option>
+  </select><br>
+  Walk to (required):<select id=walkTo [(ngModel)]="walkTo" class="ui dropdown">
+    <option> --- </option>
+    <option *ngFor="let location of locations" [ngValue]="location">{{location.location}}</option>
+  </select><br>
   Additional information:<br>
   <input type="text" id="additionalInfo" class="ui input"><br>
 </div>
