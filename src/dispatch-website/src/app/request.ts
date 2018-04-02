@@ -1,5 +1,4 @@
 import { Volunteer } from './volunteer';
-import * as Moment from 'moment';
 
 export class Request {
   id: number;
@@ -11,12 +10,4 @@ export class Request {
   timestamp: string;
   pairing: number;
   status: string; // ASSIGNED, COMPLETED, AVAILABLE, REJECTED. we can add more
-
-  timestampString() {
-    if (this.timestamp) {
-      return Moment(this.timestamp).format('MMMM Do YYYY, h:mm:ss a');
-    } else {
-      return this.timestamp;
-    }
-  }
 }
