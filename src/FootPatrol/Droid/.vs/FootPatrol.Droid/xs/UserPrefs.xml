@@ -1,10 +1,9 @@
 ﻿<Properties StartupConfiguration="{93578BFB-ED5E-4E94-B242-156162A0E1E8}|Default">
-  <MonoDevelop.Ide.Workbench ActiveDocument="LoginActivity.cs">
+  <MonoDevelop.Ide.Workbench>
     <Files>
-      <File FileName="VolunteerActivity.cs" Line="1020" Column="77" />
       <File FileName="NonEmergencyContactsActivity.cs" Line="1" Column="1" />
       <File FileName="MainActivity.cs" Line="22" Column="63" />
-      <File FileName="LoginActivity.cs" Line="53" Column="43" />
+      <File FileName="LoginActivity.cs" Line="28" Column="28" />
       <File FileName="CampusMapsActivity.cs" Line="1" Column="1" />
       <File FileName="UserRequests.cs" Line="21" Column="11" />
       <File FileName="RequestsActivity.cs" Line="1" Column="1" />
@@ -12,11 +11,8 @@
       <File FileName="Resources/drawable/BorderResource.xml" Line="3" Column="21" />
       <File FileName="DirectionsAdapter.cs" Line="1" Column="1" />
       <File FileName="DirectionsHolder.cs" Line="1" Column="1" />
-      <File FileName="UserActivity.cs" Line="79" Column="70" />
+      <File FileName="UserActivity.cs" Line="110" Column="23" />
       <File FileName="VolunteerPairs.cs" Line="1" Column="1" />
-      <File FileName="RequestStatus.cs" Line="1" Column="1" />
-      <File FileName="ContactUsActivity.cs" Line="1" Column="1" />
-      <File FileName="AboutUsActivity.cs" Line="1" Column="1" />
       <File FileName="WWDActivity.cs" Line="1" Column="1" />
       <File FileName="VolunteeringActivity.cs" Line="1" Column="1" />
       <File FileName="Resources/drawable/FormEntry.xml" Line="1" Column="1" />

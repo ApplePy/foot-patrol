@@ -85,6 +85,12 @@
                 p1:layout_marginBottom="10dp"
                 p1:layout_marginTop="5dp" />
         </RelativeLayout>
+        <com.google.android.gms.maps.MapView
+            p1:minWidth="25px"
+            p1:minHeight="25px"
+            p1:layout_width="match_parent"
+            p1:layout_height="match_parent"
+            p1:id="@+id/userMap" />
         <RelativeLayout
             p1:minWidth="25px"
             p1:minHeight="25px"
@@ -166,12 +172,6 @@
                 p1:background="#807F83"
                 p1:layout_marginBottom="10dp" />
         </RelativeLayout>
-        <com.google.android.gms.maps.MapView
-            p1:minWidth="25px"
-            p1:minHeight="25px"
-            p1:layout_width="match_parent"
-            p1:layout_height="match_parent"
-            p1:id="@+id/userMap" />
         <ImageButton
             p1:src="@drawable/ic_keyboard_arrow_right_black_24dp"
             p1:layout_width="30dp"

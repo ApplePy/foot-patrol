@@ -47,7 +47,7 @@ namespace FootPatrol.Droid
         private static ArrayAdapter<System.String> listAdapter, locationAdapter;
         private static Android.Widget.SearchView searchView;
         private static string[] menuItems, locationNames;
-        private string backendURI, postRequestURI, findPairsURI;
+        private static string backendURI, postRequestURI, findPairsURI;
         public int requestID, pairingID;
         private static Android.Widget.ProgressBar spinner;
         private static TimerCallback tc;
@@ -208,7 +208,7 @@ namespace FootPatrol.Droid
 
                 pickUpBtn.Click += (sender, e) =>
                 {
-                    pickUpBtnClicked();
+                    new spinnerTask(spinner, ua).Execute();
                 };
 
                 mfListView.ItemClick += (sender, e) =>
@@ -234,7 +234,6 @@ namespace FootPatrol.Droid
         public void OnConnected(Bundle connectionHint)
         {
             myLocation = location.GetLastLocation(client); //once the client is connected, get the last known location of the device
-            System.Diagnostics.Debug.WriteLine("My location is: " + myLocation.Latitude + " " + myLocation.Longitude);
             mapSetup(); //now that client is connected, attempt to setup map
             location.RequestLocationUpdates(client, locationRequest, this); //request location updates using the created client and locationRequest objects
         }
@@ -440,8 +439,6 @@ namespace FootPatrol.Droid
             //Submit the request so that it can be picked up and return the id
             requestID = Task.Run(() => submitRequest()).Result;
             System.Diagnostics.Debug.WriteLine("The request ID is: " + requestID);
-
-            spinner.Visibility = ViewStates.Gone;
 
             tc = new TimerCallback(retrieveRequestUpdate); //create a new timerCallback to be used in timer
             timer = new Timer(tc, 0, 0, 1000); //use the timerCallback to check for user requests every second
@@ -657,9 +654,6 @@ namespace FootPatrol.Droid
             List<string> returnedNames = new List<string>();
             returnedNames = Task.Run(() => getVolunteerNames()).Result;
 
-            System.Diagnostics.Debug.WriteLine("Volunteer one's position is: " + volunteerOneLatLng);
-            System.Diagnostics.Debug.WriteLine("Volunteer one's position is: " + volunteerTwoLatLng);
-
             pairOneMarker.SetIcon(BitmapDescriptorFactory.DefaultMarker(BitmapDescriptorFactory.HueRed)) //this is where the error occurred 
                          .SetPosition(volunteerOneLatLng);
             pairTwoMarker.SetIcon(BitmapDescriptorFactory.DefaultMarker(BitmapDescriptorFactory.HueGreen))
@@ -788,16 +782,27 @@ namespace FootPatrol.Droid
             _ua = ua;
         }
 
-        protected override Java.Lang.Object DoInBackground(params Java.Lang.Object[] @params)
+		protected override void OnPostExecute(Java.Lang.Object result)
+		{
+			base.OnPostExecute(result);
+            _pb.Visibility = ViewStates.Gone;
+		}
+
+		protected override Java.Lang.Object DoInBackground(params Java.Lang.Object[] @params)
         {
-            _ua.pickUpBtnClicked();
+            PublishProgress(null);
             return "";
         }
 
-        protected override void OnPreExecute()
+		protected override void OnProgressUpdate(params Java.Lang.Object[] values)
+		{
+            base.OnProgressUpdate(values);
+            _ua.pickUpBtnClicked();
+		}
+
+		protected override void OnPreExecute()
         {
             base.OnPreExecute();
-            System.Diagnostics.Debug.WriteLine("We're in here!");
             _pb.Visibility = ViewStates.Visible;
         }
 
