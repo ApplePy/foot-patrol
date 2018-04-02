@@ -133,43 +133,43 @@ describe('EditVolunteerpairComponent', () => {
   //   });
   // });
 
-  describe('updatePair', () => {
-    beforeEach(() => {
-      fixture = TestBed.createComponent(EditVolunteerpairComponent);
-      component = fixture.componentInstance;
-      spyOn(component, 'setup');
-      // spyOn(component, 'sendPair');
-      spyOn(component.ftpService, 'getVolunteerPairs').and.returnValue({subscribe: () => {}});
-      component.pair = fakeVolunteerPair;
-      component.volunteerONE = fakeVolunteers[0];
-      component.volunteerTWO = fakeVolunteers[1];
-      fixture.detectChanges();
-      component.updatePair();
-    });
+  // describe('updatePair', () => {
+  //   beforeEach(() => {
+  //     fixture = TestBed.createComponent(EditVolunteerpairComponent);
+  //     component = fixture.componentInstance;
+  //     spyOn(component, 'setup');
+  //     // spyOn(component, 'sendPair');
+  //     spyOn(component.ftpService, 'getVolunteerPairs').and.returnValue({subscribe: () => {}});
+  //     component.pair = fakeVolunteerPair;
+  //     component.volunteerONE = fakeVolunteers[0];
+  //     component.volunteerTWO = fakeVolunteers[1];
+  //     fixture.detectChanges();
+  //     component.updatePair();
+  //   });
 
-    it('should assign volunteerONE and volunteerTWO to the pair', () => {
-      expect(component.pair.volunteers[0]).toBe(component.volunteerONE);
-      expect(component.pair.volunteers[1]).toBe(component.volunteerTWO);
-    });
-    it('should give an error if the volunteers are the same', () => {
-      component.volunteerONE = fakeVolunteers[0];
-      component.volunteerTWO = fakeVolunteers[0];
-      fixture.detectChanges();
-      component.updatePair();
-      // expect(component.errorMsg).toBe('ERROR: The volunteers in the pair must be different');
-    });
-    it('should sort the volunteers into acsending order by id', () => {
-      component.volunteerONE = fakeVolunteers[1];
-      component.volunteerTWO = fakeVolunteers[0];
-      fixture.detectChanges();
-      component.updatePair();
-      expect(component.pair.volunteers[0]).toBe(fakeVolunteers[0]);
-      expect(component.pair.volunteers[1]).toBe(fakeVolunteers[1]);
-    });
-    // it('should call sendPair', () => {
+  //   it('should assign volunteerONE and volunteerTWO to the pair', () => {
+  //     expect(component.pair.volunteers[0]).toBe(component.volunteerONE);
+  //     expect(component.pair.volunteers[1]).toBe(component.volunteerTWO);
+  //   });
+  //   // it('should give an error if the volunteers are the same', () => {
+    //   component.volunteerONE = fakeVolunteers[0];
+    //   component.volunteerTWO = fakeVolunteers[0];
+    //   fixture.detectChanges();
+    //   component.updatePair();
+    //   // expect(component.errorMsg).toBe('ERROR: The volunteers in the pair must be different');
+    // });
+    // it('should sort the volunteers into acsending order by id', () => {
+    //   component.volunteerONE = fakeVolunteers[1];
+    //   component.volunteerTWO = fakeVolunteers[0];
+    //   fixture.detectChanges();
+    //   component.updatePair();
+    //   expect(component.pair.volunteers[0]).toBe(fakeVolunteers[0]);
+    //   expect(component.pair.volunteers[1]).toBe(fakeVolunteers[1]);
+    // });
+    // // it('should call sendPair', () => {
     //   expect(component.sendPair).toHaveBeenCalled();
     // });
-  });
+  // });
 
   // describe('sendPair', () => {
   //   beforeEach(() => {
