@@ -76,6 +76,7 @@ export class SchedulerTask implements ITask {
         0,
         Object.keys(pairLocations).length,
         new Map<string, any>([["status", TravelStatus.REQUESTED], ["archived", false]]))
+      .then((requests) => requests.filter((val) => new RegExp(/^\d+(\.\d+)? \d+(\.\d+)?$/).exec(val.from_location)))
       .then((requests) => ({pairLocations, requests}));
     })
     .then((data) => this.pairingAlgorithm(data.pairLocations, data.requests));
@@ -109,10 +110,11 @@ export class SchedulerTask implements ITask {
         // Create RequestPairing to save distance
         const newPairObj = new RequestPairing(req, this.calculateNYDistance(volPos, reqPos));
 
-        // If first distance or longer distance, save
+        // If valid output and either first distance or longer distance, save
         if (
-          !comparisons.has(req.id) ||
-          (comparisons.get(req.id) as RequestPairing).distance < newPairObj.distance
+          !isNaN(newPairObj.distance) &&
+          (!comparisons.has(req.id) ||
+          (comparisons.get(req.id) as RequestPairing).distance < newPairObj.distance)
         ) {
           comparisons.set(req.id, newPairObj);
         }
@@ -143,6 +145,11 @@ export class SchedulerTask implements ITask {
 
       // Remove matched volunteer pair
       delete volunteerPairs[minId];
+
+      // If no match, skip
+      if (minId === -1) {
+        continue;
+      }
 
       // Save to db
       pair.request.pairing = minId;
