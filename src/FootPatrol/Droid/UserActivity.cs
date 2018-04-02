@@ -20,7 +20,6 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Threading;
 using System.Collections.Generic;
-using Java.Lang;
 
 namespace FootPatrol.Droid
 {
@@ -597,11 +596,6 @@ namespace FootPatrol.Droid
 
             volunteerOneLatLng = new LatLng(System.Double.Parse(volunteerOneLat.ToString()), System.Double.Parse(volunteerOneLong.ToString()));
             volunteerTwoLatLng = new LatLng(System.Double.Parse(volunteerTwoLat.ToString()), System.Double.Parse(volunteerTwoLong.ToString()));
-
-            foreach (string name in names)
-            {
-                System.Diagnostics.Debug.WriteLine("The names are: " + names);
-            }
 
             return names;
         }
