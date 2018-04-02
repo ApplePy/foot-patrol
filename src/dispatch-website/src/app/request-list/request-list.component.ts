@@ -39,9 +39,9 @@ export class RequestListComponent implements OnInit {
    * @param request The request to be archived
    */
   archive(request): void {
-    request.request.archived = true;
+    request.archived = true;
    // request.status = 'ARCHIVED';
-    this.ftpRequestService.archiveRequest(request.request).subscribe(
+    this.ftpRequestService.archiveRequest(request).subscribe(
       // TODO: maybe add some kind of confirmation that the request was archived or a message when there's an error
      );
   }

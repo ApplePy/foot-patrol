@@ -15,7 +15,7 @@ import * as Moment from 'moment';
 export class VolunteerListComponent implements OnInit {
 
   displayVolunteers: Volunteer[] = [];
-  volunteerPairs: VolunteerPair[] = [];
+  volunteerPairs: DisplayPair[] = [];
   m_inactive: 'inactive';
   m_active: 'active';
 
@@ -34,12 +34,18 @@ export class VolunteerListComponent implements OnInit {
 
   changePairView(view) {
     this.volunteerPairs.length = 0;
-
     if (view === 'active') {
       this.ftpService.getVolunteerPairs().subscribe(pairs => {
         // this.volunteerPairs = pairs.pairs;
+        this.volunteerPairs = [];
         for (let i = 0; i < pairs.pairs.length; i++) {
-          this.volunteerPairs[i] = pairs.pairs[i];
+          this.volunteerPairs[i] = new DisplayPair;
+          this.volunteerPairs[i].pair = pairs.pairs[i];
+          if (pairs.pairs[i].active) {
+            this.volunteerPairs[i].state = 'ACTIVE';
+          } else {
+            this.volunteerPairs[i].state = 'INACTIVE';
+          }
         }
       });
     } else if (view === 'all') {
@@ -47,7 +53,13 @@ export class VolunteerListComponent implements OnInit {
         // this.volunteerPairs = pairs.pairs;
         this.volunteerPairs = [];
         for (let i = 0; i < pairs.pairs.length; i++) {
-          this.volunteerPairs[i] = pairs.pairs[i];
+          this.volunteerPairs[i] = new DisplayPair;
+          this.volunteerPairs[i].pair = pairs.pairs[i];
+          if (pairs.pairs[i].active) {
+            this.volunteerPairs[i].state = 'ACTIVE';
+          } else {
+            this.volunteerPairs[i].state = 'INACTIVE';
+          }
         }
       });
     }
@@ -109,4 +121,10 @@ export class VolunteerListComponent implements OnInit {
     //     });
     //   });
     // }
+}
+
+
+class DisplayPair {
+  state: string;
+  pair: VolunteerPair;
 }

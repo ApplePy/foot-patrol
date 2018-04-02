@@ -1,7 +1,7 @@
 <h2>Volunteers</h2>
 <h4>Volunteer Pairs</h4>
 <form #p="ngForm">
-  <input type="radio" name="PairView" (change)="changePairView('active')" class="radio"> View Active Pairs
+  <input type="radio" name="PairView" (change)="changePairView('active')" class="radio" checked="checked"> View Active Pairs
   <input type="radio" name="PairView" (change)="changePairView('all')" class="radio"> View All Pairs
 </form>
 <table #pt class="ui celled table">
@@ -15,10 +15,10 @@
   </thead>
   <tbody>
     <tr *ngFor="let pair of volunteerPairs">
-      <td>{{pair?.id}}</td>
-      <td>{{pair?.volunteers[0].first_name}} {{pair?.volunteers[0].last_name}} and {{pair?.volunteers[1].first_name}} {{pair?.volunteers[1].last_name}}</td>
-      <td><button (click)="editVolunteerPair(pair.id)">Edit</button> </td>
-      <td ng-if="volunteer.active">ACTIVE</td>
+      <td>{{pair?.pair.id}}</td>
+      <td>{{pair?.pair.volunteers[0].first_name}} {{pair?.pair.volunteers[0].last_name}} and {{pair?.pair.volunteers[1].first_name}} {{pair?.pair.volunteers[1].last_name}}</td>
+      <td><button (click)="editVolunteerPair(pair.pair.id)">Edit</button> </td>
+      <td>{{pair?.state}}</td>
     </tr>
   </tbody>
 </table>
@@ -26,7 +26,7 @@
 
 <h4>Volunteers</h4>
 <form #v="ngForm">
-  <input type="radio" name="VolunteerView" (change)="changeVolunteerView('all')" class="radio"> View All Volunteers
+  <input type="radio" name="VolunteerView" (change)="changeVolunteerView('all')" class="radio" checked="checked"> View All Volunteers
   <input type="radio" name="VolunteerView" (change)="changeVolunteerView('disabled')" class="radio"> View All Volunteers + Disabled Volunteers
   <input type="radio" name="VolunteerView" (change)="changeVolunteerView('active')" class="radio"> View Active Volunteers
   <input type="radio" name="VolunteerView" (change)="changeVolunteerView('inactive')" class="radio"> View Inactive Volunteers

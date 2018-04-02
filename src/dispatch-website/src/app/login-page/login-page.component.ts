@@ -16,7 +16,10 @@ export class LoginPageComponent implements OnInit {
   password: string;
 
   ngOnInit() {
-
+    if (sessionStorage.getItem('currentUser') === 'Dispatcher') {
+      this.authservice.login('John', 'Smith'); // pretend it's logging in with the dispatch credentials
+      // yes this is terrible design but demo
+    }
   }
 
   /**

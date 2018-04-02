@@ -20,28 +20,28 @@ export class MapGeneralComponent implements OnInit {
   /* tslint:enable:no-magic-numbers number-literal-format */
   getRepeat: number;
   // this list is here to show that the markers work. delete this once the server connunication stuff for volunteer info is written
-  TestList: DisplayVolunteer[] = [
-    { name: 'John Smith', late: 43.00849710000001, long: -81.27373360000001 , timestamp: '2017-10-26T06:51:05.000Z'},
-    { name: 'Jane Smithe', late: 43.00979710000001, long: -81.27373360000001 , timestamp: '2017-10-26T06:51:05.000Z'},
-    { name: 'Jack Schmit', late: 43.00969710000001, long: -81.27373360000001 , timestamp: '2017-10-26T06:51:05.000Z'}
-  ];
+  displayList: DisplayVolunteer[] = [ ];
 
   constructor(private ftpService: FtpRequestService, private router: Router) {
-    // router.events.subscribe((val) => {
+    router.events.subscribe((val) => {
     //   // when the user navigates away from the page, stop getting requests
-    //   clearInterval(this.getRepeat);
-    // });
+      clearInterval(this.getRepeat);
+    });
   }
 
   ngOnInit() {
-    // this.getVolunteers();
-    // this.getRepeat = setInterval(this.getVolunteers.bind(this), 1000);
+    this.getVolunteers();
+    this.getRepeat = setInterval(this.getVolunteers.bind(this), 1000);
   }
 
-  // getVolunteers() {
-  //   this.TestList = [];
-  //   this.ftpService.getAllActiveVolunteers().subscribe(
-  // }
+  getVolunteers() {
+    this.displayList = [];
+    this.ftpService.getAllActiveVolunteers().subscribe(volunteers => {
+      for (let i = 0; i < volunteers.volunteers.length; i++) {
+        this.displayList[i] = volunteers.volunteers[i];
+      }
+    });
+  }
 
 
 
