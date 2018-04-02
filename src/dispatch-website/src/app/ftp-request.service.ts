@@ -18,6 +18,7 @@ export class FtpRequestService {
   private requestURL = this.apiUrl + '/requests';
   private volunteerURL = this.apiUrl + '/volunteers';
   private volunteerPairsURL = this.apiUrl + '/volunteerpairs';
+  public errorMsg: string;
 
   constructor(private http: HttpClient) { }
 
@@ -210,6 +211,11 @@ export class FtpRequestService {
       console.error(
         `Backend returned code ${error.status}, ` +
         `body was: ${error.error}`);
+
+        // this is for the add volunteer pairing
+      if (error.status == 409) {
+        this.errorMsg = 'ERROR: One of these volunteers is already in an active pair.';
+      }
     }
     // return an ErrorObservable with a user-facing error message
     return new ErrorObservable('Something bad happened; please try again later.');

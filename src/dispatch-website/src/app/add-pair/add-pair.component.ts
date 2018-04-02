@@ -60,7 +60,7 @@ export class AddPairComponent implements OnInit {
       if (tick) {
         this.sendPair();
       } else {
-        this.errorMsg = "ERROR: this pairing already exists. To reactivate this specific pairing, please set it's state to ACTIVE";
+        this.errorMsg = 'ERROR: this pairing already exists. To reactivate this specific pairing, please set it\'s state to ACTIVE';
       }
     });
      } else {
@@ -76,7 +76,7 @@ export class AddPairComponent implements OnInit {
       if (tick) {
         this.sendPair();
       } else {
-        this.errorMsg = "ERROR: this pairing already exists. To reactivate this specific pairing, please set it's state to ACTIVE";
+        this.errorMsg = 'ERROR: this pairing already exists. To reactivate this specific pairing, please set it\'s state to ACTIVE';
       }
     });
      }
@@ -84,7 +84,7 @@ export class AddPairComponent implements OnInit {
 
   private sendPair() {
 
-    this.errorMsg = '';
+    this.ftpService.errorMsg = '';
     if (this.pairState === 'Active') {this.pair.active = true; }
     if (this.pairState === 'Inactive') {this.pair.active = false; }
 
