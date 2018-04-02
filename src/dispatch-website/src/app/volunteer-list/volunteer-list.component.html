@@ -46,7 +46,7 @@
       <td>{{volunteer?.id}}</td>
       <td>{{volunteer?.first_name}} {{volunteer?.last_name}}</td>
       <td>{{volunteer?.uwo_id}}</td>
-      <td>{{volunteer?.timestamp}}</td>
+      <td>{{timestampString(volunteer?.timestamp)}}</td>
       <td><button (click)="editVolunteer(volunteer.id)">Edit</button></td>
     </tr>
   </tbody>

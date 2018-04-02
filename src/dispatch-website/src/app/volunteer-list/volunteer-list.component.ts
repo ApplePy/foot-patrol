@@ -4,6 +4,7 @@ import {Volunteer} from '../volunteer';
 import {FormControl, FormGroup} from '@angular/forms';
 import {VolunteerPair} from '../volunteer-pair';
 import {Router} from '@angular/router';
+import * as Moment from 'moment';
 
 @Component({
   selector: 'app-volunteer-list',
@@ -92,6 +93,15 @@ export class VolunteerListComponent implements OnInit {
   editVolunteer(id) {
     this.router.navigateByUrl(`/edit-volunteer/${id}`);
   }
+
+  timestampString(timestamp: Date) {
+    if (timestamp) {
+      return Moment(timestamp).format('MMMM Do YYYY, h:mm:ss a');
+    } else {
+      return timestamp;
+    }
+  }
+
     // togglePair(id, active) {
     //   this.ftpService.toggleActiveVolunteerPair(id, active).subscribe(() => {
     //     this.ftpService.getVolunteerPairs().subscribe(pairs => {
