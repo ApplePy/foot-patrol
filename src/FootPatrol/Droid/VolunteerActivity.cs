@@ -445,23 +445,23 @@ namespace FootPatrol.Droid
             try
             {
                 response.EnsureSuccessStatusCode(); //make sure the response returns with the correct status code
-                List<string> requestArray = new List<string>(); //initialize a new list of requests
-                var responseContent = await response.Content.ReadAsStringAsync(); //get the content of the response
-                var o = JObject.Parse(responseContent); //parse the response using JObject from Newtonsoft JSON library
-                var requests = o.SelectToken("requests").ToList(); //get each request from JToken List
-                foreach (JToken a in requests)
-                {
-                    requestArray.Add(a.ToString()); //for each token in the list, add it to the newly created request array
-                }
-
-                return requestArray; 
             }
 
             catch (System.Exception error)
             {
                 createAlert("The task to get user requests failed! The error is: " + error);
-                return null;
             }
+
+            List<string> requestArray = new List<string>(); //initialize a new list of requests
+            var responseContent = await response.Content.ReadAsStringAsync(); //get the content of the response
+            var o = JObject.Parse(responseContent); //parse the response using JObject from Newtonsoft JSON library
+            var requests = o.SelectToken("requests").ToList(); //get each request from JToken List
+            foreach (JToken a in requests)
+            {
+                requestArray.Add(a.ToString()); //for each token in the list, add it to the newly created request array
+            }
+
+            return requestArray; 
         }
 
         private async Task<List<string>> getVolunteers()
@@ -473,19 +473,6 @@ namespace FootPatrol.Droid
             try 
             {
                 response.EnsureSuccessStatusCode(); //make sure the response returns with the correct status code
-                volunteerArray = new List<string>();
-                volunteerID = new List<int>();
-                var responseContent = await response.Content.ReadAsStringAsync();
-                var content = JObject.Parse(responseContent);
-                var volunteers = content.SelectToken("volunteers").ToList();
-
-                foreach(JToken a in volunteers)
-                {
-                    volunteerArray.Add(a.SelectToken("first_name").ToString() + " " + a.SelectToken("last_name").ToString());
-                    volunteerID.Add(Int32.Parse(a.SelectToken("id").ToString()));
-                }
-
-                return volunteerArray;
             }
 
             catch (System.Exception error)
@@ -493,7 +480,19 @@ namespace FootPatrol.Droid
                 createAlert("The task to get volunteers failed! The error is: " + error);
             }
 
-            return null;
+            volunteerArray = new List<string>();
+            volunteerID = new List<int>();
+            var responseContent = await response.Content.ReadAsStringAsync();
+            var content = JObject.Parse(responseContent);
+            var volunteers = content.SelectToken("volunteers").ToList();
+
+            foreach (JToken a in volunteers)
+            {
+                volunteerArray.Add(a.SelectToken("first_name").ToString() + " " + a.SelectToken("last_name").ToString());
+                volunteerID.Add(Int32.Parse(a.SelectToken("id").ToString()));
+            }
+
+            return volunteerArray;
         }
 
         /// <summary>
@@ -973,21 +972,6 @@ namespace FootPatrol.Droid
             try
             {
                 response.EnsureSuccessStatusCode();
-                var responseString = await response.Content.ReadAsStringAsync();
-                var parsedString = JObject.Parse(responseString);
-                var pairs = parsedString.SelectTokens("pairs[*]");
-                foreach(JToken pair in pairs)
-                {
-                    var firstID = pair.SelectToken("volunteers[0].id");
-                    var secondID = pair.SelectToken("volunteers[1].id");
-                    var pairingID = pair.SelectToken("id");
-
-                    //We've found a match
-                    if (Int32.Parse(firstID.ToString()) == myID && vID == Int32.Parse(secondID.ToString()))
-                    {
-                        return Int32.Parse(pairingID.ToString());
-                    }
-                }
             }
 
             catch(System.Exception e)
@@ -995,6 +979,22 @@ namespace FootPatrol.Droid
                 createAlert("There was an exception " + e);
             }
             //Otherwise create the new pairing and get the pairID
+
+            var resp = await response.Content.ReadAsStringAsync();
+            var parsedString = JObject.Parse(resp);
+            var pairs = parsedString.SelectTokens("pairs[*]");
+            foreach (JToken pair in pairs)
+            {
+                var firstID = pair.SelectToken("volunteers[0].id");
+                var secondID = pair.SelectToken("volunteers[1].id");
+                var pID = pair.SelectToken("id");
+
+                //We've found a match
+                if (Int32.Parse(firstID.ToString()) == myID && vID == Int32.Parse(secondID.ToString()))
+                {
+                    return Int32.Parse(pID.ToString());
+                }
+            }
 
             customURI = new Uri(backendURI + postPairURI);
             var content = new VolunteerPairs
@@ -1010,11 +1010,6 @@ namespace FootPatrol.Droid
             try 
             {
                 response.EnsureSuccessStatusCode();
-                var responseString = await response.Content.ReadAsStringAsync();
-                var jObj = JObject.Parse(responseString);
-                var pairingID = jObj.SelectToken("id");
-
-                return Int32.Parse(pairingID.ToString());
             }
 
             catch(System.Exception e)
@@ -1022,7 +1017,11 @@ namespace FootPatrol.Droid
                 createAlert("There was an exception! The error was: " + e);
             }
 
-            return 0;
+            var responseString = await response.Content.ReadAsStringAsync();
+            var jObj = JObject.Parse(responseString);
+            var pairingID = jObj.SelectToken("id");
+
+            return Int32.Parse(pairingID.ToString());
         }
 
         private void enableRequestUI()
@@ -1124,10 +1123,6 @@ namespace FootPatrol.Droid
             try
             {
                 response.EnsureSuccessStatusCode();
-                var responseString = await response.Content.ReadAsStringAsync();
-                var jObj = JObject.Parse(responseString);
-
-                return "";
             }
 
             catch (System.Exception e)
@@ -1135,7 +1130,10 @@ namespace FootPatrol.Droid
                 createAlert("There was an exception! The error was: " + e);
             }
 
-            return "";  
+            var responseString = await response.Content.ReadAsStringAsync();
+            var jObj = JObject.Parse(responseString);
+
+            return ""; 
         }
 
         private void userPickedUp()

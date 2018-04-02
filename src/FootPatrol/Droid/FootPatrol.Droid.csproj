@@ -162,7 +162,6 @@
     <Compile Include="UserRequests.cs" />
     <Compile Include="CampusMapsActivity.cs" />
     <Compile Include="NonEmergencyContactsActivity.cs" />
-    <Compile Include="CheckInActivity.cs" />
     <Compile Include="UserActivity.cs" />
     <Compile Include="VolunteerPairs.cs" />
     <Compile Include="RequestStatus.cs" />

@@ -551,15 +551,16 @@ namespace FootPatrol.Droid
             try
             {
                 response.EnsureSuccessStatusCode();
-                var res = await response.Content.ReadAsStringAsync();
-                JObject obj = JObject.Parse(res);
-                statusLine = obj.SelectToken("status");
             }
 
             catch(System.Exception e)
             {
                 createAlert("The request response failed with exception: " + e);
             }
+
+            var res = await response.Content.ReadAsStringAsync();
+            JObject obj = JObject.Parse(res);
+            statusLine = obj.SelectToken("status");
 
             return statusLine.ToString();
         }

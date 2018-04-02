@@ -1,9 +1,8 @@
 ﻿<Properties StartupConfiguration="{93578BFB-ED5E-4E94-B242-156162A0E1E8}|Default">
-  <MonoDevelop.Ide.Workbench ActiveDocument="MainActivity.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="LoginActivity.cs">
     <Files>
-      <File FileName="VolunteerActivity.cs" Line="780" Column="20" />
+      <File FileName="VolunteerActivity.cs" Line="1020" Column="77" />
       <File FileName="NonEmergencyContactsActivity.cs" Line="1" Column="1" />
-      <File FileName="CheckInActivity.cs" Line="1" Column="1" />
       <File FileName="MainActivity.cs" Line="22" Column="63" />
       <File FileName="LoginActivity.cs" Line="53" Column="43" />
       <File FileName="CampusMapsActivity.cs" Line="1" Column="1" />
@@ -13,7 +12,7 @@
       <File FileName="Resources/drawable/BorderResource.xml" Line="3" Column="21" />
       <File FileName="DirectionsAdapter.cs" Line="1" Column="1" />
       <File FileName="DirectionsHolder.cs" Line="1" Column="1" />
-      <File FileName="UserActivity.cs" Line="779" Column="18" />
+      <File FileName="UserActivity.cs" Line="79" Column="70" />
       <File FileName="VolunteerPairs.cs" Line="1" Column="1" />
       <File FileName="RequestStatus.cs" Line="1" Column="1" />
       <File FileName="ContactUsActivity.cs" Line="1" Column="1" />
@@ -23,11 +22,11 @@
       <File FileName="Resources/drawable/FormEntry.xml" Line="1" Column="1" />
       <File FileName="WalkRequest.cs" Line="1" Column="1" />
       <File FileName="UpdateVolunteer.cs" Line="1" Column="1" />
-      <File FileName="HttpClientExtensions.cs" Line="1" Column="1" />
+      <File FileName="HttpClientExtensions.cs" Line="23" Column="13" />
       <File FileName="VPairStatus.cs" Line="2" Column="1" />
       <File FileName="Properties/AndroidManifest.xml" Line="1" Column="1" />
       <File FileName="Properties/AssemblyInfo.cs" Line="1" Column="1" />
-      <File FileName="Resources/Resource.designer.cs" Line="5591" Column="4" />
+      <File FileName="Resources/Resource.designer.cs" Line="1" Column="1" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
