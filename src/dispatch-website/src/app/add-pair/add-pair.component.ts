@@ -51,7 +51,7 @@ export class AddPairComponent implements OnInit {
 
       let tick = true;
           // check all existing pairs for duplicates to prevent 500 error
-    this.ftpService.getVolunteerPairs().subscribe(pairs => {
+    this.ftpService.getVolunteerPairs(true).subscribe(pairs => {
       pairs.pairs.forEach(element => {
         if (element.volunteers[0].id === this.pair.volunteers[0].id && element.volunteers[1].id === this.pair.volunteers[1].id) {
           tick = false;
@@ -67,7 +67,7 @@ export class AddPairComponent implements OnInit {
 
       let tick = true;
           // check all existing pairs for duplicates to prevent 500 error
-    this.ftpService.getVolunteerPairs().subscribe(pairs => {
+    this.ftpService.getVolunteerPairs(true).subscribe(pairs => {
       pairs.pairs.forEach(element => {
         if (element.volunteers[0].id === this.pair.volunteers[0].id && element.volunteers[1].id === this.pair.volunteers[1].id) {
           tick = false;

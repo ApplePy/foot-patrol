@@ -5,12 +5,8 @@
     <option value='Active'>Active</option>
     <option value='Inactive'>Inactive</option>
   </select></div><br>
-  <div>Volunteer 1: {{pair.volunteers[0].first_name}} {{pair.volunteers[0].last_name}}<select id=volunteerONE [(ngModel)]="volunteerONE" class="ui dropdown">
-    <option *ngFor="let volunteer of volunteers"[ngValue]="volunteer">{{volunteer.first_name}} {{volunteer.last_name}}</option>
-  </select></div><br>
-  <div>Volunteer 2: {{pair.volunteers[1].first_name}} {{pair.volunteers[1].last_name}} <select id=volunteerTWO [(ngModel)]="volunteerTWO" class="ui dropdown">
-    <option *ngFor="let volunteer of volunteers" [ngValue]="volunteer">{{volunteer.first_name}} {{volunteer.last_name}}</option>
-  </select></div><br>
+  <div>Volunteer 1: {{pair.volunteers[0].first_name}} {{pair.volunteers[0].last_name}} <br>
+  <div>Volunteer 2: {{pair.volunteers[1].first_name}} {{pair.volunteers[1].last_name}} <br>
 </div>
 
 <div>
