@@ -55,7 +55,7 @@ namespace FootPatrol.Droid
         public static LatLng volunteerOneLatLng, volunteerTwoLatLng;
         private static PolylineOptions polyOptions;
         private static Polyline poly;
-        private UserActivity ua;
+        private static UserActivity ua;
 
         public string tag;
         public Android.Support.V4.App.Fragment fragment;
@@ -627,7 +627,6 @@ namespace FootPatrol.Droid
         private void retrieveRequestUpdate(object state)
         {
             string status = Task.Run(() => getRequestStatus()).Result;
-            System.Diagnostics.Debug.WriteLine("The status is: " + status);
 
             if (status == "IN_PROGRESS") //We know that the request has been accepted, we need to find the correct pairing ID
             {
@@ -683,15 +682,15 @@ namespace FootPatrol.Droid
                 response.EnsureSuccessStatusCode();
             }
 
-            catch (System.Exception error)
+            catch (Exception error)
             {
                 System.Diagnostics.Debug.WriteLine("The exception is: " + error);
             }
 
             var content = await response.Content.ReadAsStringAsync();
+            System.Diagnostics.Debug.WriteLine("The response is: " + content);
             JObject dir = JObject.Parse(content);
             string polyPattern = (string)dir.SelectToken("routes[0].overview_polyline.points");
-            var stepDirections = dir.SelectTokens("routes[0].legs[0].steps[*].html_instructions");
 
             return polyPattern;
         }
