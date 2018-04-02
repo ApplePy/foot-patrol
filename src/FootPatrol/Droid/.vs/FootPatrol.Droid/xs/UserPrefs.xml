@@ -1,11 +1,11 @@
 ﻿<Properties StartupConfiguration="{93578BFB-ED5E-4E94-B242-156162A0E1E8}|Default">
-  <MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.Workbench ActiveDocument="MainActivity.cs">
     <Files>
-      <File FileName="VolunteerActivity.cs" Line="714" Column="93" />
+      <File FileName="VolunteerActivity.cs" Line="780" Column="20" />
       <File FileName="NonEmergencyContactsActivity.cs" Line="1" Column="1" />
       <File FileName="CheckInActivity.cs" Line="1" Column="1" />
-      <File FileName="MainActivity.cs" Line="1" Column="1" />
-      <File FileName="LoginActivity.cs" Line="1" Column="1" />
+      <File FileName="MainActivity.cs" Line="22" Column="63" />
+      <File FileName="LoginActivity.cs" Line="53" Column="43" />
       <File FileName="CampusMapsActivity.cs" Line="1" Column="1" />
       <File FileName="UserRequests.cs" Line="21" Column="11" />
       <File FileName="RequestsActivity.cs" Line="1" Column="1" />
@@ -13,7 +13,7 @@
       <File FileName="Resources/drawable/BorderResource.xml" Line="3" Column="21" />
       <File FileName="DirectionsAdapter.cs" Line="1" Column="1" />
       <File FileName="DirectionsHolder.cs" Line="1" Column="1" />
-      <File FileName="UserActivity.cs" Line="211" Column="37" />
+      <File FileName="UserActivity.cs" Line="779" Column="18" />
       <File FileName="VolunteerPairs.cs" Line="1" Column="1" />
       <File FileName="RequestStatus.cs" Line="1" Column="1" />
       <File FileName="ContactUsActivity.cs" Line="1" Column="1" />
@@ -25,7 +25,9 @@
       <File FileName="UpdateVolunteer.cs" Line="1" Column="1" />
       <File FileName="HttpClientExtensions.cs" Line="1" Column="1" />
       <File FileName="VPairStatus.cs" Line="2" Column="1" />
-      <File FileName="Source Not Available" />
+      <File FileName="Properties/AndroidManifest.xml" Line="1" Column="1" />
+      <File FileName="Properties/AssemblyInfo.cs" Line="1" Column="1" />
+      <File FileName="Resources/Resource.designer.cs" Line="5591" Column="4" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
@@ -33,6 +35,6 @@
     <BreakpointStore />
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
   <MonoDevelop.Ide.DebuggingService.PinnedWatches />
-  <MonoDevelop.Ide.ItemProperties.FootPatrol.Droid AndroidDesignerPreferredDevice="Nexus 4" PreferredExecutionTarget="Android.021e38f7" />
+  <MonoDevelop.Ide.ItemProperties.FootPatrol.Droid AndroidDesignerPreferredDevice="Nexus 4" PreferredExecutionTarget="Android.nexus_7" />
   <MultiItemStartupConfigurations />
 </Properties>

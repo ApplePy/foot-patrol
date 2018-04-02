@@ -5,6 +5,7 @@ using Android.Graphics;
 using Android.Widget;
 using System.Windows;
 using Java.Lang;
+using Android.Gms.Common;
 
 namespace FootPatrol.Droid
 {
