@@ -44,8 +44,8 @@ export class EditVolunteerpairComponent implements OnInit {
   updatePair() {
     if (this.pairState === 'Active') {this.pair.active = true; }
     if (this.pairState === 'Inactive') {this.pair.active = false; }
-    this.ftpService.toggleActiveVolunteerPair(this.pair.id, this.pair.active).subscribe(() =>
-      this.router.navigateByUrl('/volunteer-list')
-    );
+      this.ftpService.toggleActiveVolunteerPair(this.pair.id, this.pair.active).subscribe(() =>
+        this.router.navigateByUrl('/volunteer-list')
+      );
   }
 }
