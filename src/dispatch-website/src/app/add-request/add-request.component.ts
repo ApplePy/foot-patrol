@@ -58,8 +58,6 @@ export class AddRequestComponent implements OnInit {
    */
   submitReq() {
     const Iname = (<HTMLInputElement>document.getElementById('name')).value;
-    // const IfromLocation = (<HTMLInputElement>document.getElementById('fromLocation')).value;
-    // const ItoLocation = (<HTMLInputElement>document.getElementById('toLocation')).value;
     const IadditionalInfo = (<HTMLInputElement>document.getElementById('additionalInfo')).value;
 
     if (this.checkValidSubmitReq(Iname, this.walkFrom.location, this.walkTo.location, IadditionalInfo)) {

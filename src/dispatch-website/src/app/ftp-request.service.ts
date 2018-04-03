@@ -18,7 +18,6 @@ export class FtpRequestService {
   private requestURL = this.apiUrl + '/requests';
   private volunteerURL = this.apiUrl + '/volunteers';
   private volunteerPairsURL = this.apiUrl + '/volunteerpairs';
-  // public errorMsg: string;
 
   constructor(private http: HttpClient) { }
 
