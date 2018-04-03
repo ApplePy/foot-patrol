@@ -458,10 +458,10 @@ namespace FootPatrol.Droid
             HttpClient httpClient = new HttpClient(); //create a new HttpClient
             //httpClient.Timeout = TimeSpan.FromMinutes(60); //set timeout to an hour
             Uri customURI = new Uri(backendURI + getRequestURI); //get the URI to the API
+            var response = await httpClient.GetAsync(customURI); //get the asynchronous response
 
             try
             {
-                var response = await httpClient.GetAsync(customURI); //get the asynchronous response
                 response.EnsureSuccessStatusCode(); //make sure the response returns with the correct status code
             }
 
@@ -486,10 +486,10 @@ namespace FootPatrol.Droid
         {
             HttpClient httpClient = new HttpClient();
             Uri customURI = new Uri(backendURI + getVolunteerURI);
+            var response = await httpClient.GetAsync(customURI); //get the asynchronous response
 
             try 
             {
-                var response = await httpClient.GetAsync(customURI); //get the asynchronous response
                 response.EnsureSuccessStatusCode(); //make sure the response returns with the correct status code
             }
 
