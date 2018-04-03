@@ -33,13 +33,13 @@ namespace FootPatrol.Droid
         private static GoogleMap map; //reference to created google map
         private static MapView mView; //mapView that displays map on >= API 24
         private static SupportMapFragment mf; //fragment that displays map on < API 24
-        private static ImageButton mSideTab, mfSideTab; //side tab buttons for each view
+        private static ImageButton sideTab; //side tab buttons for each view
         private static Android.Widget.Button pickUpBtn;
         private static EditText userName, destination, additionalInfo;
-        private static Android.Widget.ListView mListView, mfListView, searchListView;
+        private static Android.Widget.ListView listView, searchListView;
         private static MarkerOptions userMarker, pairOneMarker, pairTwoMarker;
         private static CircleOptions circle;
-        private static DrawerLayout mDrawerLayout, mfDrawerLayout;
+        private static DrawerLayout drawerLayout;
         private static Android.Widget.RelativeLayout relativeLayout, acceptedRequestLayout;
         private static Android.Views.View view; //the current view
         private static TextView svDescription;
@@ -96,9 +96,9 @@ namespace FootPatrol.Droid
             {
                 view = inflater.Inflate(Resource.Layout.UserScreen, container, false);
                 mView = (MapView)view.FindViewById(Resource.Id.userMap);
-                mSideTab = (ImageButton)view.FindViewById(Resource.Id.userSideTab);
-                mDrawerLayout = (DrawerLayout)view.FindViewById(Resource.Id.userdrawer);
-                mListView = (Android.Widget.ListView)view.FindViewById(Resource.Id.userListView);
+                sideTab = (ImageButton)view.FindViewById(Resource.Id.userSideTab);
+                drawerLayout = (DrawerLayout)view.FindViewById(Resource.Id.userdrawer);
+                listView = (Android.Widget.ListView)view.FindViewById(Resource.Id.userListView);
                 searchView = (Android.Widget.SearchView)view.FindViewById(Resource.Id.userSearchView);
                 searchListView = (Android.Widget.ListView)view.FindViewById(Resource.Id.userSearchListView);
                 svDescription = (TextView)view.FindViewById(Resource.Id.userSVDescription);
@@ -115,12 +115,12 @@ namespace FootPatrol.Droid
                 spinner.Visibility = ViewStates.Gone;
                 acceptedRequestLayout.Visibility = ViewStates.Gone;
 
-                mListView.Adapter = listAdapter;
+                listView.Adapter = listAdapter;
                 searchListView.Adapter = locationAdapter;
 
-                mSideTab.Click += (sender, e) =>
+                sideTab.Click += (sender, e) =>
                 {
-                    sideTabClicked(mSideTab, mDrawerLayout, mListView);
+                    sideTabClicked(sideTab, drawerLayout, listView);
                 };
 
                 searchView.SetQueryHint("Search for destination");
@@ -144,7 +144,7 @@ namespace FootPatrol.Droid
                     new spinnerTask(spinner, ua).Execute();
                 };
 
-                mListView.ItemClick += (sender, e) =>
+                listView.ItemClick += (sender, e) =>
                 {
                     selectItem(e.Position);
                 };
@@ -162,9 +162,9 @@ namespace FootPatrol.Droid
             {
                 view = inflater.Inflate(Resource.Layout.UserScreenMF, container, false);
                 mf = (SupportMapFragment)this.ChildFragmentManager.FindFragmentById(Resource.Id.userMapMF);
-                mfSideTab = (ImageButton)view.FindViewById(Resource.Id.userSideTabMF);
-                mfDrawerLayout = (DrawerLayout)view.FindViewById(Resource.Id.userdrawerMF);
-                mfListView = (Android.Widget.ListView)view.FindViewById(Resource.Id.userListViewMF);
+                sideTab = (ImageButton)view.FindViewById(Resource.Id.userSideTabMF);
+                drawerLayout = (DrawerLayout)view.FindViewById(Resource.Id.userdrawerMF);
+                listView = (Android.Widget.ListView)view.FindViewById(Resource.Id.userListViewMF);
                 searchView = (Android.Widget.SearchView)view.FindViewById(Resource.Id.userSearchViewMF);
                 searchListView = (Android.Widget.ListView)view.FindViewById(Resource.Id.userSearchListViewMF);
                 svDescription = (TextView)view.FindViewById(Resource.Id.userSVDescriptionMF);
@@ -181,12 +181,12 @@ namespace FootPatrol.Droid
                 spinner.Visibility = ViewStates.Gone;
                 acceptedRequestLayout.Visibility = ViewStates.Gone;
 
-                mfListView.Adapter = listAdapter;
+                listView.Adapter = listAdapter;
                 searchListView.Adapter = locationAdapter;
 
-                mfSideTab.Click += (sender, e) =>
+                sideTab.Click += (sender, e) =>
                 {
-                    sideTabClicked(mfSideTab, mfDrawerLayout, mfListView);
+                    sideTabClicked(sideTab, drawerLayout, listView);
                 };
 
                 searchView.SetQueryHint("Search for destination");
@@ -210,7 +210,7 @@ namespace FootPatrol.Droid
                     new spinnerTask(spinner, ua).Execute();
                 };
 
-                mfListView.ItemClick += (sender, e) =>
+                listView.ItemClick += (sender, e) =>
                 {
                     selectItem(e.Position);
                 };
@@ -372,9 +372,13 @@ namespace FootPatrol.Droid
             }
         }
 
+        /// <summary>
+        /// Selects the item from the clicked listview.
+        /// </summary>
+        /// <param name="position">Position clicked.</param>
         private void selectItem(int position)
         {
-            
+            //based on the position of the item selected add the selected fragment and tag
             switch(position)
             {
                 case 0:
@@ -402,20 +406,24 @@ namespace FootPatrol.Droid
                     tag = "VolunteeringActivity";
                     break;
             }
-
+            drawerLayout.CloseDrawer(listView);
             if (Int32.Parse(Build.VERSION.Sdk) > 23)
             {
-                mDrawerLayout.CloseDrawer(mListView);
                 switchFragment(fragment, Resource.Id.userdrawer, tag);
             }
             else
             {
-                mfDrawerLayout.CloseDrawer(mfListView);
                 switchFragment(fragment, Resource.Id.userdrawerMF, tag);
             }
 
         }
 
+        /// <summary>
+        /// Switches the fragment to the selected listview item.
+        /// </summary>
+        /// <param name="frag">Frag.</param>
+        /// <param name="resource">Resource.</param>
+        /// <param name="tag">Tag.</param>
         private void switchFragment(Android.Support.V4.App.Fragment frag, int resource, string tag)
         {
             Android.Support.V4.App.FragmentTransaction fragmentTransaction = this.Activity.SupportFragmentManager.BeginTransaction(); //begin the fragment transaction
@@ -425,8 +433,12 @@ namespace FootPatrol.Droid
             fragmentTransaction.Commit(); //commit the transaction
         }
 
+        /// <summary>
+        /// Once the user clicks the request pickup option.
+        /// </summary>
         public void pickUpBtnClicked()
         {
+            //update the UI
             clearInitialUI();
             circle = new CircleOptions();
             LatLng center = new LatLng(myLocation.Latitude, myLocation.Longitude);
@@ -437,46 +449,54 @@ namespace FootPatrol.Droid
 
             //Submit the request so that it can be picked up and return the id
             requestID = Task.Run(() => submitRequest()).Result;
-            System.Diagnostics.Debug.WriteLine("The request ID is: " + requestID);
 
             tc = new TimerCallback(retrieveRequestUpdate); //create a new timerCallback to be used in timer
             timer = new Timer(tc, 0, 0, 1000); //use the timerCallback to check for user requests every second
 
         }
 
+        /// <summary>
+        /// Clears the initial user interface.
+        /// </summary>
         private void clearInitialUI()
         {
             relativeLayout.Visibility = ViewStates.Gone;
             clearSearchUI();
         }
 
+        /// <summary>
+        /// Once the destination is selected from the list, update UI.
+        /// </summary>
+        /// <param name="dest">Destination.</param>
         private void itemSelected(string dest)
         {
+            searchListView.Visibility = ViewStates.Gone; 
+            clearSearchView();
             if (!string.IsNullOrWhiteSpace(destination.Text))
             {
-                searchListView.Visibility = ViewStates.Gone; 
                 showAlert(dest);
-                clearSearchView();
             }
 
             else
             {
-                searchListView.Visibility = ViewStates.Gone;
                 relativeLayout.Visibility = ViewStates.Visible;
-                clearSearchView();
                 destination.Text = dest;
                 destination.Enabled = false;
             }
         }
 
-        private void showAlert(string dest)
+        /// <summary>
+        /// Shows an alert based on the passed string.
+        /// </summary>
+        /// <param name="msg">The passed message.</param>
+        private void showAlert(string msg)
         {
             AlertDialog.Builder builder = new AlertDialog.Builder(this.Context);
             builder.SetMessage("Are you sure you would like to change your destination?")
                    .SetPositiveButton("Yes", (sender, e) =>
                    {
                        relativeLayout.Visibility = ViewStates.Visible;
-                       destination.Text = dest;
+                       destination.Text = msg;
                        destination.Enabled = false;
                    })
                    .SetNegativeButton("No", (sender, e) =>
@@ -488,24 +508,33 @@ namespace FootPatrol.Droid
             dialog.Show();
         }
 
+        /// <summary>
+        /// Clears the search user interface.
+        /// </summary>
         private void clearSearchUI()
         {
             searchView.Visibility = ViewStates.Gone;
             searchListView.Visibility = ViewStates.Gone;
         }
 
+        /// <summary>
+        /// Clears the search view.
+        /// </summary>
         private void clearSearchView()
         {
-            searchView.SetQuery("", true);
-            InputMethodManager manager = (InputMethodManager)this.Activity.GetSystemService(Context.InputMethodService);
-            manager.HideSoftInputFromWindow(searchView.WindowToken, 0);
+            searchView.SetQuery("", true); //set the query to empty
+            InputMethodManager manager = (InputMethodManager)this.Activity.GetSystemService(Context.InputMethodService); //get the keyboard manager
+            manager.HideSoftInputFromWindow(searchView.WindowToken, 0); //hide the keyboard
         }
 
+        /// <summary>
+        /// Submits the request.
+        /// </summary>
+        /// <returns>The request.</returns>
         private async Task<int> submitRequest()
         {
             HttpClient httpClient = new HttpClient();
             Uri customURI = new Uri(backendURI + postRequestURI);
-            System.Diagnostics.Debug.WriteLine("The URI is : " + customURI);
             string stringLocation = myLocation.Latitude.ToString() + " " + myLocation.Longitude.ToString();
             var content = new WalkRequest
             {
@@ -527,7 +556,6 @@ namespace FootPatrol.Droid
 
             catch(Exception e)
             {
-                System.Diagnostics.Debug.WriteLine("Caught an exception : " + e);
                 createAlert("The request response failed with exception: " + e);
             }
 
@@ -537,6 +565,10 @@ namespace FootPatrol.Droid
             return Int32.Parse(id.ToString());
         }
 
+        /// <summary>
+        /// Gets the request status.
+        /// </summary>
+        /// <returns>The request status.</returns>
         private async Task<string> getRequestStatus()
         {
             HttpClient httpClient = new HttpClient();
@@ -561,11 +593,14 @@ namespace FootPatrol.Droid
             return statusLine.ToString();
         }
 
+        /// <summary>
+        /// Gets the names of volunteers given a certain pair id.
+        /// </summary>
+        /// <returns>The volunteer names.</returns>
         private async Task<List<string>> getVolunteerNames()
         {
             HttpClient httpClient = new HttpClient();
             Uri customURI = new Uri(backendURI + findPairsURI + pairingID.ToString());
-            System.Diagnostics.Debug.WriteLine("The custom URI is: " + customURI);
             HttpResponseMessage httpResponse = await httpClient.GetAsync(customURI);
 
             List<string> names = new List<string>();
@@ -581,7 +616,8 @@ namespace FootPatrol.Droid
 
             var responseString = await httpResponse.Content.ReadAsStringAsync();
             JObject jObj = JObject.Parse(responseString);
-            System.Diagnostics.Debug.WriteLine("The request string is: " + jObj);
+
+            //get information to be returned and displayed
             var volunteerOneFN = jObj.SelectToken("volunteers[0].first_name");
             var volunteerOneLN = jObj.SelectToken("volunteers[0].last_name");
             var volunteerTwoFN = jObj.SelectToken("volunteers[1].first_name");
@@ -600,6 +636,10 @@ namespace FootPatrol.Droid
             return names;
         }
 
+        /// <summary>
+        /// Gets the pairing id of a given volunteer pair.
+        /// </summary>
+        /// <returns>The pairing identifier.</returns>
         public async Task<int> getPairingID()
         {
             HttpClient httpClient = new HttpClient();
@@ -618,12 +658,15 @@ namespace FootPatrol.Droid
 
             var res = await response.Content.ReadAsStringAsync();
             JObject obj = JObject.Parse(res);
-            System.Diagnostics.Debug.WriteLine("The response is: " + obj);
             var pairing = obj.SelectToken("pairing");
 
             return Int32.Parse(pairing.ToString());
         }
 
+        /// <summary>
+        /// Retrieves the request update based on a timer, and waits for status to be changed.
+        /// </summary>
+        /// <param name="state">State.</param>
         private void retrieveRequestUpdate(object state)
         {
             string status = Task.Run(() => getRequestStatus()).Result;
@@ -635,24 +678,32 @@ namespace FootPatrol.Droid
             }
         }
 
+        /// <summary>
+        /// Displays the volunteers once the request is accepted.
+        /// </summary>
         public void displayVolunteers()
         {
+            //update the UI
             acceptedRequestLayout.Visibility = ViewStates.Visible;
             svDescription.Visibility = ViewStates.Gone;
             mapCircle.Remove();
-            System.Diagnostics.Debug.WriteLine("The pairing ID is: " + pairingID);
+
             pairOneMarker = new MarkerOptions();
             pairTwoMarker = new MarkerOptions();
 
             List<string> returnedNames = new List<string>();
             returnedNames = Task.Run(() => getVolunteerNames()).Result;
 
-            pairOneMarker.SetIcon(BitmapDescriptorFactory.DefaultMarker(BitmapDescriptorFactory.HueRed)) //this is where the error occurred 
-                         .SetPosition(volunteerOneLatLng);
+            //get the locations of both volunteers that accepted the user request
+            pairOneMarker.SetIcon(BitmapDescriptorFactory.DefaultMarker(BitmapDescriptorFactory.HueRed))
+                         .SetPosition(volunteerOneLatLng)
+                         .SetTitle(returnedNames[0]);
             pairTwoMarker.SetIcon(BitmapDescriptorFactory.DefaultMarker(BitmapDescriptorFactory.HueGreen))
-                         .SetPosition(volunteerTwoLatLng);
+                         .SetPosition(volunteerTwoLatLng)
+                         .SetTitle(returnedNames[1]);
 
-            map.AddMarker(pairOneMarker);
+            //add marker to the map
+            map.AddMarker(pairOneMarker); 
             map.AddMarker(pairTwoMarker);
 
             string currentLocation = myLocation.Latitude.ToString() + "," + myLocation.Longitude.ToString();
@@ -671,6 +722,12 @@ namespace FootPatrol.Droid
             poly = map.AddPolyline(polyOptions); //display the polyline on the map
         }
 
+        /// <summary>
+        /// Gets the polyline pattern from the directions api.
+        /// </summary>
+        /// <returns>The poly pat.</returns>
+        /// <param name="start">Start location.</param>
+        /// <param name="dest">Destination.</param>
         private async Task<string> getPolyPat(string start, string dest)
         {
             HttpClient httpClient = new HttpClient();
@@ -684,11 +741,10 @@ namespace FootPatrol.Droid
 
             catch (Exception error)
             {
-                System.Diagnostics.Debug.WriteLine("The exception is: " + error);
+                createAlert("The exception is: " + error);
             }
 
             var content = await response.Content.ReadAsStringAsync();
-            System.Diagnostics.Debug.WriteLine("The response is: " + content);
             JObject dir = JObject.Parse(content);
             string polyPattern = (string)dir.SelectToken("routes[0].overview_polyline.points");
 
@@ -764,6 +820,9 @@ namespace FootPatrol.Droid
         }
     }
 
+    /// <summary>
+    /// The spinner task to be called asynchronously.
+    /// </summary>
     public class spinnerTask : AsyncTask
     {
         Android.Widget.ProgressBar _pb;
@@ -801,6 +860,9 @@ namespace FootPatrol.Droid
 
     }
 
+    /// <summary>
+    /// Update UI Task.
+    /// </summary>
     public class updateUITask : AsyncTask
     {
         UserActivity _ua;
