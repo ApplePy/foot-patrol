@@ -29,7 +29,7 @@ namespace FootPatrol.Droid
     public class UserActivity : Android.Support.V4.App.Fragment, GoogleApiClient.IOnConnectionFailedListener, GoogleApiClient.IConnectionCallbacks, Android.Gms.Location.ILocationListener, IOnMapReadyCallback
     {
         private static GoogleApiClient client; //the Google API client used to connect to Google Play Store
-        private static Location myLocation; //the volunteer's current location
+        private static Location myLocation, originalVolunteerLocation; //the volunteer's current location
         private IFusedLocationProviderApi location; //location of the volunteer
         private LocationRequest locationRequest; //a new location request object so that location can be updated
         private static GoogleMap map; //reference to created google map
@@ -46,20 +46,19 @@ namespace FootPatrol.Droid
         private static Android.Views.View view; //the current view
         private static TextView svDescription;
         private static ArrayAdapter<System.String> listAdapter, locationAdapter;
-        private static Android.Widget.SearchView searchView;
+        private static SearchView searchView;
         private static string[] menuItems, locationNames;
-        private static string backendURI, postRequestURI, findPairsURI;
+        private static string backendURI, postRequestURI, findPairsURI, numHours, numMinutes, ETA, expectedETA, volunteerETA;
         public int requestID, pairingID;
         private static Android.Widget.ProgressBar spinner;
-        private static TimerCallback tc, circleCB;
-        public static Timer timer, circleTimer;
+        private static TimerCallback tc, callback;
+        public static Timer timer, time;
         private static Circle mapCircle;
         public static LatLng volunteerOneLatLng, volunteerTwoLatLng;
         private static PolylineOptions polyOptions;
         private static Polyline poly;
         private static UserActivity ua;
         protected static FragmentActivity mActivity;
-        protected static volatile int counter = 0;
 
         public string tag;
         public Android.Support.V4.App.Fragment fragment;
@@ -103,7 +102,7 @@ namespace FootPatrol.Droid
                 sideTab = (ImageButton)view.FindViewById(Resource.Id.userSideTab);
                 drawerLayout = (DrawerLayout)view.FindViewById(Resource.Id.userdrawer);
                 listView = (Android.Widget.ListView)view.FindViewById(Resource.Id.userListView);
-                searchView = (Android.Widget.SearchView)view.FindViewById(Resource.Id.userSearchView);
+                searchView = (SearchView)view.FindViewById(Resource.Id.userSearchView);
                 searchListView = (Android.Widget.ListView)view.FindViewById(Resource.Id.userSearchListView);
                 svDescription = (TextView)view.FindViewById(Resource.Id.userSVDescription);
                 pickUpBtn = (Android.Widget.Button)view.FindViewById(Resource.Id.requestPickupBtn);
@@ -169,11 +168,11 @@ namespace FootPatrol.Droid
                 sideTab = (ImageButton)view.FindViewById(Resource.Id.userSideTabMF);
                 drawerLayout = (DrawerLayout)view.FindViewById(Resource.Id.userdrawerMF);
                 listView = (Android.Widget.ListView)view.FindViewById(Resource.Id.userListViewMF);
-                searchView = (Android.Widget.SearchView)view.FindViewById(Resource.Id.userSearchViewMF);
+                searchView = (SearchView)view.FindViewById(Resource.Id.userSearchViewMF);
                 searchListView = (Android.Widget.ListView)view.FindViewById(Resource.Id.userSearchListViewMF);
                 svDescription = (TextView)view.FindViewById(Resource.Id.userSVDescriptionMF);
                 pickUpBtn = (Android.Widget.Button)view.FindViewById(Resource.Id.requestPickupBtn1);
-                userName = (Android.Widget.EditText)view.FindViewById(Resource.Id.userName6);
+                userName = (EditText)view.FindViewById(Resource.Id.userName6);
                 destination = (EditText)view.FindViewById(Resource.Id.userToLocation1);
                 additionalInfo = (EditText)view.FindViewById(Resource.Id.userAdditionalInfo1);
                 relativeLayout = (Android.Widget.RelativeLayout)view.FindViewById(Resource.Id.userInnerRelativeMF);
@@ -720,6 +719,10 @@ namespace FootPatrol.Droid
             string currentLocation = myLocation.Latitude.ToString() + "," + myLocation.Longitude.ToString();
             string destinationLocation = volunteerOneLatLng.Latitude.ToString() + "," + volunteerOneLatLng.Longitude.ToString();
 
+            originalVolunteerLocation = new Location("");
+            originalVolunteerLocation.Latitude = volunteerOneLatLng.Latitude;
+            originalVolunteerLocation.Longitude = volunteerOneLatLng.Longitude;
+
             var polyPattern = Task.Run(() => getPolyPat(currentLocation, destinationLocation)).Result; //get the poly pattern character string
 
             List<LatLng> polyline = DecodePolyline(polyPattern); //decode the character string into a polyline that can be displayed on the map
@@ -731,6 +734,20 @@ namespace FootPatrol.Droid
             }
 
             poly = map.AddPolyline(polyOptions); //display the polyline on the map
+
+            callback = new TimerCallback(updateETA);
+            time = new Timer(callback, 0, 0, 1000);
+        }
+
+        private void updateETA(object state)
+        {
+            Location volunteerLocation = Task.Run(() => getVolunteerLocation()).Result;
+            float[] results = new float[3];
+            Location.DistanceBetween(originalVolunteerLocation.Latitude, originalVolunteerLocation.Longitude, volunteerLocation.Latitude, volunteerLocation.Longitude, results);
+            float distanceBetween = results[0];
+            float metresPerMinute = 80.4672f;
+            float timeTraveled = distanceBetween / metresPerMinute;
+            volunteerETA = (Float.ParseFloat(expectedETA) - timeTraveled).ToString();
         }
 
         /// <summary>
@@ -741,6 +758,7 @@ namespace FootPatrol.Droid
         /// <param name="dest">Destination.</param>
         private async Task<string> getPolyPat(string start, string dest)
         {
+            
             HttpClient httpClient = new HttpClient();
             Uri customURI = new Uri("https://maps.googleapis.com/maps/api/directions/json?origin=" + start + "&destination=" + dest + "&mode=walking&key=AIzaSyDQMcKBqfQwfRC88Lt02V8FP5yGPUqIq04");
             HttpResponseMessage response = await httpClient.GetAsync(customURI);
@@ -758,9 +776,53 @@ namespace FootPatrol.Droid
             var content = await response.Content.ReadAsStringAsync();
             JObject dir = JObject.Parse(content);
             string polyPattern = (string)dir.SelectToken("routes[0].overview_polyline.points");
+            string totalDuration = (string)dir.SelectToken("routes[0].legs[0].duration.text");
 
+            string[] hourMin = totalDuration.Split(' ');
+            if (totalDuration.Contains("hours"))
+            {
+                numHours = hourMin[0];
+                numMinutes = hourMin[2];
+                ETA = numHours + ":" + numMinutes + ":00";
+            }
+
+            else
+            {
+                numMinutes = hourMin[0];
+                ETA = "00"+ ":" + numMinutes + ":00";
+            }
+
+            expectedETA = TimeSpan.Parse(ETA).TotalMinutes.ToString();
+   
             return polyPattern;
         }
+
+        private async Task<Location> getVolunteerLocation()
+        {
+            HttpClient httpClient = new HttpClient();
+            Uri customURI = new Uri(backendURI + findPairsURI + pairingID.ToString());
+            HttpResponseMessage response = await httpClient.GetAsync(customURI);
+
+            try
+            {
+                response.EnsureSuccessStatusCode();
+            }
+
+            catch (System.Exception e)
+            {
+                createAlert("There was an exception thrown " + e);
+            }
+
+            var content = await response.Content.ReadAsStringAsync();
+            JObject jObj = JObject.Parse(content);
+            string latitude = (string)jObj.SelectToken("volunteers[0].latitude");
+            string longitude = (string)jObj.SelectToken("volunteers[0].longitude");
+            Location volunteerLocation = new Location("");
+            volunteerLocation.Latitude = System.Double.Parse(latitude);
+            volunteerLocation.Longitude = System.Double.Parse(longitude);
+            return volunteerLocation;
+        }
+
 
         /// <summary>
         /// Decodes the polyline from a mix of random characters to a list of latitude and longitude points.
