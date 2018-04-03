@@ -76,7 +76,7 @@ export class AddPairComponent implements OnInit {
       if (tick) {
         this.sendPair();
       } else {
-        this.errorMsg = 'ERROR: this pairing already exists. To reactivate this specific pairing, please set it\'s state to ACTIVE';
+        this.errorMsg = 'ERROR: This pairing already exists. To reactivate this specific pairing, please set it\'s state to ACTIVE';
       }
     });
      }
@@ -89,9 +89,14 @@ export class AddPairComponent implements OnInit {
     if (this.pairState === 'Inactive') {this.pair.active = false; }
 
     // this.ftpService.toggleActiveVolunteerPair(this.pair.id, this.pair.active).subscribe();
-    this.ftpService.createNewVolunteerPair([this.pair.volunteers[0].id, this.pair.volunteers[1].id], this.pair.active).subscribe(() =>
-      this.router.navigateByUrl('/volunteer-list')
-    );
+    this.ftpService.createNewVolunteerPair([this.pair.volunteers[0].id, this.pair.volunteers[1].id], this.pair.active).subscribe((data) => {
+      this.router.navigateByUrl('/volunteer-list');
+    }, (error) => {
+      if (error.status === 409) {
+        // tslint:disable-next-line:max-line-length
+        this.errorMsg = 'ERROR: One of these volunteers is already in an active pair. Please use only inactive volunteers or deactivate the existing pair';
+      }
+    });
   }
 
 }

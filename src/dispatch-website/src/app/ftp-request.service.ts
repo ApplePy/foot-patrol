@@ -211,13 +211,11 @@ export class FtpRequestService {
       console.error(
         `Backend returned code ${error.status}, ` +
         `body was: ${error.error}`);
-
-      //   // this is for the add volunteer pairing
-      // if (error.status == 409) {
-      //   this.errorMsg = 'ERROR: One of these volunteers is already in an active pair.';
-      // }
     }
     // return an ErrorObservable with a user-facing error message
-    return new ErrorObservable('Something bad happened; please try again later.');
+    const errorData = {
+      status: error.status
+    };
+    return new ErrorObservable(errorData);
   }
 }
