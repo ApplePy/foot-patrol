@@ -21,6 +21,7 @@ using Newtonsoft.Json.Linq;
 using System.Threading;
 using System.Collections.Generic;
 using Java.Lang;
+using Android.Support.V4.App;
 
 namespace FootPatrol.Droid
 {
@@ -57,7 +58,8 @@ namespace FootPatrol.Droid
         private static PolylineOptions polyOptions;
         private static Polyline poly;
         private static UserActivity ua;
-        public static volatile int counter;
+        protected static FragmentActivity mActivity;
+        protected static volatile int counter = 0;
 
         public string tag;
         public Android.Support.V4.App.Fragment fragment;
@@ -232,7 +234,15 @@ namespace FootPatrol.Droid
             return view;
         }
 
-        public void OnConnected(Bundle connectionHint)
+		public override void OnAttach(Context context)
+		{
+			base.OnAttach(context);
+            System.Diagnostics.Debug.WriteLine("The context is : " + context);
+            mActivity = (FragmentActivity)context;
+            System.Diagnostics.Debug.WriteLine("The activity is : " + mActivity);
+		}
+
+		public void OnConnected(Bundle connectionHint)
         {
             myLocation = location.GetLastLocation(client); //once the client is connected, get the last known location of the device
             mapSetup(); //now that client is connected, attempt to setup map
@@ -442,8 +452,10 @@ namespace FootPatrol.Droid
         {
             //update the UI
             clearInitialUI();
-            circleCB = new TimerCallback(circleUpdates);
-            circleTimer = new Timer(circleCB, 0, 0, 1000);
+            circle = new CircleOptions();
+            LatLng center = new LatLng(myLocation.Latitude, myLocation.Longitude);
+            circle.InvokeCenter(center).InvokeFillColor(Android.Graphics.Color.Purple).InvokeRadius(400).InvokeStrokeWidth(5);
+            mapCircle = map.AddCircle(circle);
             svDescription.Visibility = ViewStates.Visible;
             svDescription.Text = "SEARCHING FOR VOLUNTEERS";
 
@@ -452,27 +464,6 @@ namespace FootPatrol.Droid
 
             tc = new TimerCallback(retrieveRequestUpdate); //create a new timerCallback to be used in timer
             timer = new Timer(tc, 0, 0, 1000); //use the timerCallback to check for user requests every second
-
-        }
-
-        private void circleUpdates(object state)
-        {
-            counter += 50;
-            if(counter == 500)
-            {
-                counter = 0;
-            }
-
-            Task.Run(() => updateCircle());
-        }
-
-        private async Task<string> updateCircle()
-        {
-            circle = new CircleOptions();
-            LatLng center = new LatLng(myLocation.Latitude, myLocation.Longitude);
-            circle.InvokeCenter(center).InvokeFillColor(Android.Graphics.Color.Purple).InvokeRadius(counter).InvokeStrokeWidth(5);
-            mapCircle = map.AddCircle(circle);
-            return "";
         }
 
         /// <summary>
@@ -690,7 +681,7 @@ namespace FootPatrol.Droid
         private void retrieveRequestUpdate(object state)
         {
             string status = Task.Run(() => getRequestStatus()).Result;
-
+           
             if (status == "IN_PROGRESS") //We know that the request has been accepted, we need to find the correct pairing ID
             {
                 new updateUITask(ua).Execute();
