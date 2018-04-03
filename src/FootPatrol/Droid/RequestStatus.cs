@@ -20,5 +20,8 @@ namespace FootPatrol.Droid
 
         [JsonProperty(PropertyName = "status")]
         public string status { get; set; }
+
+        [JsonProperty(PropertyName = "pairing")]
+        public int pairing { get; set; }
     }
 }

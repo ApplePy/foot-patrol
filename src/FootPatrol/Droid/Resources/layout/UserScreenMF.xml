@@ -4,8 +4,6 @@
     p1:layout_width="match_parent"
     p1:layout_height="match_parent">
     <RelativeLayout
-        p1:minWidth="25px"
-        p1:minHeight="25px"
         p1:layout_width="match_parent"
         p1:fillViewport="true"
         p1:layout_height="match_parent"
@@ -206,8 +204,8 @@
             p1:textStyle="bold"
             p1:gravity="center_horizontal" />
         <ProgressBar
-            p1:layout_width="wrap_content"
-            p1:layout_height="wrap_content"
+            p1:layout_width="80dp"
+            p1:layout_height="80dp"
             p1:id="@+id/spinner3"
             p1:spinnerMode="dialog"
             style="?android:attr/progressBarStyleLarge"

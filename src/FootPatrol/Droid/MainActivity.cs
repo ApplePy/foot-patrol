@@ -1,4 +1,5 @@
 ﻿using Android.App;
+using Android.Gms.Common;
 using Android.OS;
 using Android.Support.V4.App;
 
@@ -7,6 +8,7 @@ namespace FootPatrol.Droid
     [Activity(Label = "Safe Walk", MainLauncher = true, Icon = "@drawable/WesternFootPatrol")]
     public class MainActivity : FragmentActivity
     {
+        const int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
         /// <summary>
         /// When the view is created, create a fragment transaction to transition to the login screen.
         /// </summary>
@@ -15,6 +17,10 @@ namespace FootPatrol.Droid
         {
             base.OnCreate(savedInstanceState);
             SetContentView(Resource.Layout.Main); //set the content view to the main layout
+
+            var code = GoogleApiAvailability.GooglePlayServicesVersionCode;
+            System.Diagnostics.Debug.WriteLine("The current version of google play services is: " + code.ToString());
+
             switchFragment();
         }
 

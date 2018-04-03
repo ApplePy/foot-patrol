@@ -1,4 +1,4 @@
-﻿<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="packages\Xamarin.Forms.2.5.0.280555\build\netstandard1.0\Xamarin.Forms.props" Condition="Exists('packages\Xamarin.Forms.2.5.0.280555\build\netstandard1.0\Xamarin.Forms.props')" />
   <Import Project="packages\Xamarin.Build.Download.0.4.9\build\Xamarin.Build.Download.props" Condition="Exists('packages\Xamarin.Build.Download.0.4.9\build\Xamarin.Build.Download.props')" />
   <Import Project="..\packages\Xamarin.Build.Download.0.4.7\build\Xamarin.Build.Download.props" Condition="Exists('..\packages\Xamarin.Build.Download.0.4.7\build\Xamarin.Build.Download.props')" />
@@ -28,8 +28,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AndroidLinkMode>None</AndroidLinkMode>
-    <AndroidHttpClientHandlerType>Xamarin.Android.Net.AndroidClientHandler</AndroidHttpClientHandlerType>
-    <AndroidTlsProvider>btls</AndroidTlsProvider>
+<AndroidTlsProvider>btls</AndroidTlsProvider>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -55,9 +54,6 @@
     <Reference Include="System.Net.Http" />
     <Reference Include="GoogleMapsUtilityBinding">
       <HintPath>packages\Xamarin.Android.Maps.Utils.0.5.0\lib\MonoAndroid10\GoogleMapsUtilityBinding.dll</HintPath>
-    </Reference>
-    <Reference Include="Newtonsoft.Json">
-      <HintPath>packages\Newtonsoft.Json.11.0.1\lib\netstandard2.0\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="Xamarin.Android.Support.Annotations">
       <HintPath>packages\Xamarin.Android.Support.Annotations.27.0.2\lib\MonoAndroid81\Xamarin.Android.Support.Annotations.dll</HintPath>
@@ -149,6 +145,9 @@
     <Reference Include="Xamarin.Forms.Maps">
       <HintPath>packages\Xamarin.Forms.Maps.2.5.0.280555\lib\MonoAndroid10\Xamarin.Forms.Maps.dll</HintPath>
     </Reference>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>packages\Newtonsoft.Json.11.0.2\lib\netstandard2.0\Newtonsoft.Json.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="MainActivity.cs" />
@@ -162,11 +161,9 @@
     <Compile Include="UserRequests.cs" />
     <Compile Include="CampusMapsActivity.cs" />
     <Compile Include="NonEmergencyContactsActivity.cs" />
-    <Compile Include="CheckInActivity.cs" />
     <Compile Include="UserActivity.cs" />
     <Compile Include="VolunteerPairs.cs" />
     <Compile Include="RequestStatus.cs" />
-    <Compile Include="PairActive.cs" />
     <Compile Include="ContactUsActivity.cs" />
     <Compile Include="AboutUsActivity.cs" />
     <Compile Include="WWDActivity.cs" />
@@ -174,6 +171,7 @@
     <Compile Include="WalkRequest.cs" />
     <Compile Include="UpdateVolunteer.cs" />
     <Compile Include="HttpClientExtensions.cs" />
+    <Compile Include="VPairStatus.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
