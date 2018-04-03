@@ -3,7 +3,7 @@
 <agm-map [latitude]="lat" [longitude]="lng" [zoom]="zoom">
   <agm-marker *ngFor="let vol of displayList" [latitude]="vol.late" [longitude]="vol.long">
     <agm-info-window>
-      Name: {{vol.name}}<br>
+      Name: {{vol.Vname}}<br>
       Last Checkin: {{vol.timestamp}}
     </agm-info-window>
   </agm-marker>

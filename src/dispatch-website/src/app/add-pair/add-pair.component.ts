@@ -84,7 +84,7 @@ export class AddPairComponent implements OnInit {
 
   private sendPair() {
 
-    this.ftpService.errorMsg = '';
+    // this.ftpService.errorMsg = '';
     if (this.pairState === 'Active') {this.pair.active = true; }
     if (this.pairState === 'Inactive') {this.pair.active = false; }
 
