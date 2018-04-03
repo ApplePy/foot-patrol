@@ -1,4 +1,4 @@
-﻿using Android.App;
+using Android.App;
 using Android.OS;
 using Android.Views;
 using Android.Gms.Common.Apis;
@@ -89,7 +89,7 @@ namespace FootPatrol.Droid
             listAdapter = new ArrayAdapter<string>(this.Context, Resource.Layout.ListElement, menuItems); //initializes ArrayAdapter to be displayed in listView
 
             layoutManager = new LinearLayoutManager(this.Context, LinearLayoutManager.Horizontal, false); //initializs the directions layout to be horizontal and sidescrolling
-            backendURI = "https://staging.capstone.incode.ca/api/v1";
+            backendURI = Resources.GetString(Resource.String.api_url);
             getRequestURI = "/requests/?offset=0&count=9&archived=false";
             getVolunteerURI = "/volunteers/inactive";
             postPairURI = "/volunteerpairs/";
@@ -458,10 +458,10 @@ namespace FootPatrol.Droid
             HttpClient httpClient = new HttpClient(); //create a new HttpClient
             //httpClient.Timeout = TimeSpan.FromMinutes(60); //set timeout to an hour
             Uri customURI = new Uri(backendURI + getRequestURI); //get the URI to the API
-            var response = await httpClient.GetAsync(customURI); //get the asynchronous response
 
             try
             {
+                var response = await httpClient.GetAsync(customURI); //get the asynchronous response
                 response.EnsureSuccessStatusCode(); //make sure the response returns with the correct status code
             }
 
@@ -486,10 +486,10 @@ namespace FootPatrol.Droid
         {
             HttpClient httpClient = new HttpClient();
             Uri customURI = new Uri(backendURI + getVolunteerURI);
-            var response = await httpClient.GetAsync(customURI); //get the asynchronous response
 
             try 
             {
+                var response = await httpClient.GetAsync(customURI); //get the asynchronous response
                 response.EnsureSuccessStatusCode(); //make sure the response returns with the correct status code
             }
 

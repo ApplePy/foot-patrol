@@ -2456,26 +2456,8 @@ namespace FootPatrol.Droid
 			// aapt resource value: 0x7f020055
 			public const int avd_hide_password = 2130837589;
 			
-			// aapt resource value: 0x7f02015e
-			public const int avd_hide_password_1 = 2130837854;
-			
-			// aapt resource value: 0x7f02015f
-			public const int avd_hide_password_2 = 2130837855;
-			
-			// aapt resource value: 0x7f020160
-			public const int avd_hide_password_3 = 2130837856;
-			
 			// aapt resource value: 0x7f020056
 			public const int avd_show_password = 2130837590;
-			
-			// aapt resource value: 0x7f020161
-			public const int avd_show_password_1 = 2130837857;
-			
-			// aapt resource value: 0x7f020162
-			public const int avd_show_password_2 = 2130837858;
-			
-			// aapt resource value: 0x7f020163
-			public const int avd_show_password_3 = 2130837859;
 			
 			// aapt resource value: 0x7f020057
 			public const int BorderResource = 2130837591;
@@ -4859,8 +4841,11 @@ namespace FootPatrol.Droid
 			// aapt resource value: 0x7f090036
 			public const int abc_toolbar_collapse_description = 2131296310;
 			
-			// aapt resource value: 0x7f09004e
-			public const int app_name = 2131296334;
+			// aapt resource value: 0x7f09004d
+			public const int api_url = 2131296333;
+			
+			// aapt resource value: 0x7f09004f
+			public const int app_name = 2131296335;
 			
 			// aapt resource value: 0x7f090044
 			public const int appbar_scrolling_view_behavior = 2131296324;
@@ -4922,8 +4907,8 @@ namespace FootPatrol.Droid
 			// aapt resource value: 0x7f090010
 			public const int common_signin_button_text_long = 2131296272;
 			
-			// aapt resource value: 0x7f09004d
-			public const int hello = 2131296333;
+			// aapt resource value: 0x7f09004e
+			public const int hello = 2131296334;
 			
 			// aapt resource value: 0x7f090011
 			public const int mr_button_content_description = 2131296273;
@@ -5009,8 +4994,8 @@ namespace FootPatrol.Droid
 			// aapt resource value: 0x7f09004c
 			public const int status_bar_notification_info_overflow = 2131296332;
 			
-			// aapt resource value: 0x7f09004f
-			public const int westernFootPatrolIsAFreeServiceAtWesternUniversityThatAssistsInKeepingCampusASafePlaceToStudyWorkAndLiveWeAreVolunteerDrivenServiceWithBetween250300VolunteersEachSchoolYearWeAreCommittedToProvidingASafeAndSecureEnvironmentForStudentsFacultyAndStaffOurMissionIsToRaiseAwarenessOfPersonalSafetyIssuesDeterCrimeThroughVisiblePatrolsAndToProvideSafeEscortsToCommunityMembersThisProactiveApproachToSafetyFocusesOnStudentsHelpingStudentsEngagingStudentVolunteersInTheDirectProvisionOfServicesCreatingASenseOfOwnershipAndResponsibility = 2131296335;
+			// aapt resource value: 0x7f090050
+			public const int westernFootPatrolIsAFreeServiceAtWesternUniversityThatAssistsInKeepingCampusASafePlaceToStudyWorkAndLiveWeAreVolunteerDrivenServiceWithBetween250300VolunteersEachSchoolYearWeAreCommittedToProvidingASafeAndSecureEnvironmentForStudentsFacultyAndStaffOurMissionIsToRaiseAwarenessOfPersonalSafetyIssuesDeterCrimeThroughVisiblePatrolsAndToProvideSafeEscortsToCommunityMembersThisProactiveApproachToSafetyFocusesOnStudentsHelpingStudentsEngagingStudentVolunteersInTheDirectProvisionOfServicesCreatingASenseOfOwnershipAndResponsibility = 2131296336;
 			
 			static String()
 			{

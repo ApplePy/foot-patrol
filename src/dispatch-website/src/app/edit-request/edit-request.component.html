@@ -1,23 +1,23 @@
 
 <h2>Edit Request {{request.id}}</h2>
 <div>
-  Name: {{request.name}}<br>
-  Walk from: {{request.from_location}}<br>
-  Walk to: {{request.to_location}}<br>
-  Volunteer Pair: {{volunteerPair?.volunteers[0]?.first_name}} {{volunteerPair?.volunteers[0]?.last_name}} and {{volunteerPair?.volunteers[1]?.first_name}} {{volunteerPair?.volunteers[1]?.last_name}} <select id=volunteerPairing [(ngModel)]="volunteerPair">
+  <div> Name: {{request.name}}</div><br>
+  <div>Walk from: {{request.from_location}}</div><br>
+  <div>Walk to: {{request.to_location}}</div><br>
+  <div>Volunteer Pair: {{volunteerPair?.volunteers[0]?.first_name}} {{volunteerPair?.volunteers[0]?.last_name}} and {{volunteerPair?.volunteers[1]?.first_name}} {{volunteerPair?.volunteers[1]?.last_name}} <select id=volunteerPairing [(ngModel)]="volunteerPair" class="ui dropdown">
     <option *ngFor="let pair of volunteerPairs" [ngValue]=pair>{{pair.volunteers[0].first_name}} {{pair.volunteers[0].last_name}} and {{pair.volunteers[1].first_name}} {{pair.volunteers[1].last_name}}</option>
-  </select><br>
-  Status: {{request.status}} <select id='stateReq' [(ngModel)]="request.status">
+  </select></div><br>
+  <div>Status: {{request.status}} <select id='stateReq' [(ngModel)]="request.status" class="ui dropdown">
     <option *ngFor="let state of states" [ngValue]="state">{{state}}</option>
-  </select><br>
-  Additional information:<br>
-  {{request.additional_info}}<br>
+  </select></div><br>
+  <div>Additional information:<br>
+  {{request.additional_info}}<br></div>
 </div>
 
 <div>
   <br>
-  <button (click)="updateRequest()" type="button">Update</button>
-  <button routerLink='/request-list' type="button">Cancel</button>
+  <button (click)="updateRequest()" type="button" class="ui green button">Update</button>
+  <button routerLink='/request-list' type="button" class="ui red button">Cancel</button>
 </div>
 
 <div>

@@ -26,5 +26,8 @@ export default {
     "An error has occurred."),
   NotFoundError: new ErrorString(
     "Not Found Error",
-    "The requested data was not found.")
+    "The requested data was not found."),
+  ConflictError: new ErrorString(
+    "Conflict Error",
+    "The change you have requested will cause a data conflict and was rejected.")
 };

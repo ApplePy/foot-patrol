@@ -140,7 +140,7 @@ export class FtpRequestService {
    * @param inactive Optional: set whether to include inactive pairs. Default is false
    */
   getVolunteerPairs(inactive = false) {
-    return this.http.get(this.volunteerPairsURL)
+    return this.http.get(this.volunteerPairsURL + `?inactive=${inactive}`)
                   .pipe(
                     retry(3),
                     catchError(this.handleError)
@@ -172,18 +172,16 @@ export class FtpRequestService {
                         );
   }
 
-  // toggleActiveVolunteerPair(id, status) {
-  //   status = !status;
-  //   return this.http.post(this.volunteerURL + `/${id}/active`, status)
-  //                       .pipe(
-  //                         retry(3),
-  //                         catchError(this.handleError)
-  //                       );
-  // }
+  toggleActiveVolunteerPair(Pair_id, status) {
+    return this.http.post(this.volunteerPairsURL + `/${Pair_id}/active`, {active: status})
+                        .pipe(
+                          retry(3),
+                          catchError(this.handleError)
+                        );
+  }
 
   createNewVolunteerPair(volunteers, active) {
     const data = {volunteers, active};
-    // console.log(data);
     return this.http.post(this.volunteerPairsURL, data)
                           .pipe(
                             retry(3),

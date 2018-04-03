@@ -290,7 +290,15 @@ build_review_mobile:
   script:
   - pushd .
   - cd src/FootPatrol/Droid
-  - msbuild FootPatrol.Droid.sln "/p:Configuration=Debug" "/p:AndroidSdkDirectory=/usr/local/share/android-sdk" "/t:PackageForAndroid"
+  - pushd .
+  - cd Resources/values
+  - if [ $CI_COMMIT_REF_NAME == "master" ]; then export PUBLIC_URL="$DOMAIN"; elif [ $CI_COMMIT_REF_NAME == "develop" ]; then export PUBLIC_URL="staging.$DOMAIN"; else export PUBLIC_URL="$CI_COMMIT_REF_SLUG.$DOMAIN"; fi
+  - if [ $CI_COMMIT_REF_NAME == "master" ]; then export PROTO="https"; elif [ $CI_COMMIT_REF_NAME == "develop" ]; then export PROTO="https"; else export PROTO="http"; fi
+  - sed 's#<string name="api_url">.*</string>#<string name="api_url">${PROTO}://${PUBLIC_URL}/api/v1</string>#g' API.xml > API2.xml
+  - envsubst < API2.xml > API.xml # Do a replacement of environment variables
+  - rm API2.xml
+  - popd
+  - msbuild FootPatrol.Droid.csproj "/p:Configuration=Release" "/p:AndroidSdkDirectory=/usr/local/share/android-sdk" "/t:SignAndroidPackage"
   - popd
   - find . -name \*.apk -exec cp -r {} mobile_output \;
   - find . -type d -name \*.mSYM -exec cp -r {} mobile_output \;
@@ -321,7 +329,15 @@ build_mobile:
   script:
   - pushd .
   - cd src/FootPatrol/Droid
-  - msbuild FootPatrol.Droid.sln "/p:Configuration=Release" "/p:AndroidSdkDirectory=/usr/local/share/android-sdk" "/t:PackageForAndroid"
+  - pushd .
+  - cd Resources/values
+  - if [ $CI_COMMIT_REF_NAME == "master" ]; then export PUBLIC_URL="$DOMAIN"; elif [ $CI_COMMIT_REF_NAME == "develop" ]; then export PUBLIC_URL="staging.$DOMAIN"; else export PUBLIC_URL="$CI_COMMIT_REF_SLUG.$DOMAIN"; fi
+  - if [ $CI_COMMIT_REF_NAME == "master" ]; then export PROTO="https"; elif [ $CI_COMMIT_REF_NAME == "develop" ]; then export PROTO="https"; else export PROTO="http"; fi
+  - sed 's#<string name="api_url">.*</string>#<string name="api_url">${PROTO}://${PUBLIC_URL}/api/v1</string>#g' API.xml > API2.xml
+  - envsubst < API2.xml > API.xml # Do a replacement of environment variables
+  - rm API2.xml
+  - popd
+  - msbuild FootPatrol.Droid.csproj "/p:Configuration=Release" "/p:AndroidSdkDirectory=/usr/local/share/android-sdk" "/t:SignAndroidPackage"
   - popd
   - find . -name \*.apk -exec cp -r {} mobile_output \;
   - find . -type d -name \*.mSYM -exec cp -r {} mobile_output \;

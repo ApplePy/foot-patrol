@@ -1,0 +1,18 @@
+h2{
+  font-family: Arial, Helvetica, sans-serif;
+  color: #369;
+  font-size: 160%;
+}
+h4{
+  font-family: Arial, Helvetica, sans-serif;
+  color: #369;
+  font-size: 120%;
+}
+p{
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.radio{
+  margin-right: 10px;
+  margin-left: 10px;
+}

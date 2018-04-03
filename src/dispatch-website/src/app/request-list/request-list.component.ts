@@ -7,6 +7,7 @@ import 'rxjs/add/operator/catch';
 import { Observable } from 'rxjs/Observable';
 import { of } from 'rxjs/observable/of';
 import { Volunteer } from '../volunteer';
+import * as Moment from 'moment';
 // import { request } from 'http';
 
 @Component({
@@ -38,9 +39,9 @@ export class RequestListComponent implements OnInit {
    * @param request The request to be archived
    */
   archive(request): void {
-    request.request.archived = true;
+    request.archived = true;
    // request.status = 'ARCHIVED';
-    this.ftpRequestService.archiveRequest(request.request).subscribe(
+    this.ftpRequestService.archiveRequest(request).subscribe(
       // TODO: maybe add some kind of confirmation that the request was archived or a message when there's an error
      );
   }
@@ -106,6 +107,14 @@ export class RequestListComponent implements OnInit {
       return 1;
     } else if (a.timestamp > b.timestamp) {
       return -1;
+    }
+  }
+
+  timestampString(timestamp: Date) {
+    if (timestamp) {
+      return Moment(timestamp).format('MMMM Do YYYY, h:mm:ss a');
+    } else {
+      return timestamp;
     }
   }
 }

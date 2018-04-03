@@ -100,14 +100,31 @@ export class SQLVolunteerPairingManager extends SQLAbstractManager implements IV
       return Promise.reject("Requesting save of invalid Pairing");
     }
 
-    return this.db.makeQuery(
+    // TODO: Race condition between concurrent toggle requests
+
+    // Check if the volunteers to pair aren't already paired together
+    return this.db.makeQuery("SELECT * FROM `volunteer_pairing` WHERE " +
+      "(volunteer_one=? OR volunteer_two=? OR volunteer_one=? " +
+      "OR volunteer_two=?) AND active=1",
+      [
+       pairing.volunteer_one.id,
+       pairing.volunteer_one.id,
+       pairing.volunteer_two.id,
+       pairing.volunteer_two.id
+      ])
+    .then((results) => {
+      if (results.length > 0 && pairing.active === true) {
+        throw new Error("Conflict");
+      }
+    })
+    .then(() => this.db.makeQuery(
       "INSERT INTO `volunteer_pairing` (volunteer_one, volunteer_two, active) VALUES(?,?,?)",
       [
         pairing.volunteer_one.id,
         pairing.volunteer_two.id,
         pairing.active
       ])
-    .then((results: any) => results.insertId as number);
+    .then((results: any) => results.insertId as number));
   }
 
   // NOTE: Not supporting deleting a volunteer pairing due to references from other tables.
@@ -119,11 +136,46 @@ export class SQLVolunteerPairingManager extends SQLAbstractManager implements IV
    * @param active The new active state of the pairing.
    */
   public toggleActive(id: number, active: boolean) {
-    return this.db.makeQuery(`UPDATE \`volunteer_pairing\` SET active=? WHERE id=?`,
-    [active, id])
-    .then((result) => (result.affectedRows > 0) ?
-                      Promise.resolve() :
-                      Promise.reject(new Error("Not Found")));
+    // TODO: Race condition between concurrent toggle requests
+
+    // Get volunteers in the pair
+    return this.db.makeQuery("SELECT * FROM `volunteer_pairing` WHERE id=?", [id])
+    .then((results) => {
+      // Catch a pairing that doesn't exist
+      if (results.length === 0) {
+        throw new Error("Not Found");
+      }
+
+      // Pass on the IDs
+      return [results[0].volunteer_one, results[0].volunteer_two];
+    })
+    .then((volunteerIds) =>
+      // Check that the IDs retrieved aren't part of an active pair
+      this.db.makeQuery("SELECT * FROM `volunteer_pairing` WHERE " +
+        "(volunteer_one=? OR volunteer_two=? OR volunteer_one=? " +
+        "OR volunteer_two=?) AND active=1",
+        [
+        volunteerIds[0],
+        volunteerIds[0],
+        volunteerIds[1],
+        volunteerIds[1]
+        ]))
+    .then((results) => {
+      // If there active pairs where the volunteers are part of and we want to set a pair active, throw conflict
+      if (results.length > 0 && active === true) {
+        throw new Error("Conflict");
+      }
+    })
+    .then((volunteerIds) =>
+      // Set this pair to active, since no other pairs with these volunteers are active
+      this.db.makeQuery(`UPDATE \`volunteer_pairing\` SET active=? WHERE id=?`,
+      [active, id]))
+    .then((result) => {
+      // If there was no volunteer pairing updated, then there was no pairing to edit
+      if (result.affectedRows === 0) {
+        throw new Error("Not Found");
+      }
+    });
   }
 
   /**

@@ -1,8 +1,8 @@
 <h2>Add Dispatcher</h2>
 <div>
-  Name: <input type='text' [(ngModel)]='dispatcher.name'><br>
-  UWO id: <input type='text' [(ngModel)]='dispatcher.uwo_id'><br>
+  <div>Name: <input type='text' [(ngModel)]='dispatcher.name'></div><br>
+  <div>UWO id: <input type='text' [(ngModel)]='dispatcher.uwo_id'></div><br>
 </div>
 
-<button (click)='addDisp()'>Add</button>
-<button routerLink='dispatcher-list'>Cancel</button>
+<button (click)='addDisp()' class="ui green button">Add</button>
+<button routerLink='dispatcher-list' class="ui red button">Cancel</button>

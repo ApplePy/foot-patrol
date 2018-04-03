@@ -1,4 +1,4 @@
-﻿using Android.App;
+using Android.App;
 using Android.OS;
 using Android.Views;
 using Android.Gms.Common.Apis;
@@ -75,7 +75,7 @@ namespace FootPatrol.Droid
                 "BROUGHDALE HALL (KING'S UNIVERSITY COLLEGE)", "FACULTY BUILDING (KING'S UNIVERSITY COLLEGE)", "WEMPLE HALL (KING'S UNIVERSITY COLLEGE)", "LABATT HALL (KING'S UNIVERSITY COLLEGE)",
                 "DANTE LENARDON HALL (KING'S UNIVERSITY COLLEGE"};
 
-            backendURI = "https://staging.capstone.incode.ca/api/v1";
+            backendURI = Resources.GetString(Resource.String.api_url);
             postRequestURI = "/requests";
             findPairsURI = "/volunteerPairs/";
 
