@@ -6,6 +6,8 @@ using Android.Widget;
 using System.Windows;
 using Java.Lang;
 using Android.Gms.Common;
+using Android.Views.InputMethods;
+using Android.Content;
 
 namespace FootPatrol.Droid
 {
@@ -82,11 +84,21 @@ namespace FootPatrol.Droid
             return views;
         }
 
+        /// <summary>
+        /// Sets the font.
+        /// </summary>
+        /// <param name="font">Font.</param>
+        /// <param name="text">Text.</param>
         private void setFont(Typeface font, TextView text)
         {
             text.SetTypeface(font, TypefaceStyle.Normal);
         }
 
+        /// <summary>
+        /// Switches the fragment.
+        /// </summary>
+        /// <param name="frag">Frag.</param>
+        /// <param name="tag">Tag.</param>
         public void switchFragment(Android.Support.V4.App.Fragment frag, string tag)
         {
             Android.Support.V4.App.Fragment newFrag = frag; //create a new instance of VolunteerActivity and save it
@@ -99,6 +111,9 @@ namespace FootPatrol.Droid
 
     }
 
+    /// <summary>
+    /// Login spinner task.
+    /// </summary>
     public class loginSpinnerTask : AsyncTask
     {
         ProgressBar progressBar;

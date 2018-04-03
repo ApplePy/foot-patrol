@@ -20,6 +20,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Threading;
 using System.Collections.Generic;
+using Java.Lang;
 
 namespace FootPatrol.Droid
 {
@@ -49,13 +50,14 @@ namespace FootPatrol.Droid
         private static string backendURI, postRequestURI, findPairsURI;
         public int requestID, pairingID;
         private static Android.Widget.ProgressBar spinner;
-        private static TimerCallback tc;
-        public static Timer timer;
+        private static TimerCallback tc, circleCB;
+        public static Timer timer, circleTimer;
         private static Circle mapCircle;
         public static LatLng volunteerOneLatLng, volunteerTwoLatLng;
         private static PolylineOptions polyOptions;
         private static Polyline poly;
         private static UserActivity ua;
+        public static volatile int counter;
 
         public string tag;
         public Android.Support.V4.App.Fragment fragment;
@@ -440,10 +442,8 @@ namespace FootPatrol.Droid
         {
             //update the UI
             clearInitialUI();
-            circle = new CircleOptions();
-            LatLng center = new LatLng(myLocation.Latitude, myLocation.Longitude);
-            circle.InvokeCenter(center).InvokeFillColor(Android.Graphics.Color.Purple).InvokeRadius(500).InvokeStrokeWidth(5);
-            mapCircle = map.AddCircle(circle);
+            circleCB = new TimerCallback(circleUpdates);
+            circleTimer = new Timer(circleCB, 0, 0, 1000);
             svDescription.Visibility = ViewStates.Visible;
             svDescription.Text = "SEARCHING FOR VOLUNTEERS";
 
@@ -453,6 +453,26 @@ namespace FootPatrol.Droid
             tc = new TimerCallback(retrieveRequestUpdate); //create a new timerCallback to be used in timer
             timer = new Timer(tc, 0, 0, 1000); //use the timerCallback to check for user requests every second
 
+        }
+
+        private void circleUpdates(object state)
+        {
+            counter += 50;
+            if(counter == 500)
+            {
+                counter = 0;
+            }
+
+            Task.Run(() => updateCircle());
+        }
+
+        private async Task<string> updateCircle()
+        {
+            circle = new CircleOptions();
+            LatLng center = new LatLng(myLocation.Latitude, myLocation.Longitude);
+            circle.InvokeCenter(center).InvokeFillColor(Android.Graphics.Color.Purple).InvokeRadius(counter).InvokeStrokeWidth(5);
+            mapCircle = map.AddCircle(circle);
+            return "";
         }
 
         /// <summary>
@@ -554,7 +574,7 @@ namespace FootPatrol.Droid
                 response.EnsureSuccessStatusCode();
             }
 
-            catch(Exception e)
+            catch(System.Exception e)
             {
                 createAlert("The request response failed with exception: " + e);
             }
@@ -581,7 +601,7 @@ namespace FootPatrol.Droid
                 response.EnsureSuccessStatusCode();
             }
 
-            catch(Exception e)
+            catch(System.Exception e)
             {
                 createAlert("The request response failed with exception: " + e);
             }
@@ -651,7 +671,7 @@ namespace FootPatrol.Droid
                 response.EnsureSuccessStatusCode();
             }
 
-            catch (Exception e)
+            catch (System.Exception e)
             {
                 createAlert("The request failed in the task. The exception is: " + e);
             }
@@ -739,7 +759,7 @@ namespace FootPatrol.Droid
                 response.EnsureSuccessStatusCode();
             }
 
-            catch (Exception error)
+            catch (System.Exception error)
             {
                 createAlert("The exception is: " + error);
             }
@@ -843,7 +863,7 @@ namespace FootPatrol.Droid
 		protected override Java.Lang.Object DoInBackground(params Java.Lang.Object[] @params)
         {
             PublishProgress(null);
-            return "";
+            return null;
         }
 
 		protected override void OnProgressUpdate(params Java.Lang.Object[] values)
@@ -874,7 +894,7 @@ namespace FootPatrol.Droid
 
         protected override Java.Lang.Object DoInBackground(params Java.Lang.Object[] @params)
         {
-            return "";
+            return null;
         }
 
 		protected override void OnPreExecute()
@@ -889,5 +909,4 @@ namespace FootPatrol.Droid
             _ua.displayVolunteers();
 		}
 	}
-
 }
