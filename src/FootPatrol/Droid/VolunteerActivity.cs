@@ -52,7 +52,7 @@ namespace FootPatrol.Droid
         private static RelativeLayout mRelativeLayout, mfRelativeLayout; //relative layouts to display status of complete, cancel and pickup on trip
         private static Android.Widget.SearchView searchView;
 
-        private static string backendURI, getRequestURI, getVolunteerURI, postPairURI, postInactivePairURI, setPairActiveURI, updateVolunteerURI;
+        private static string backendURI, getRequestURI, getVolunteerURI, postPairURI, postInactivePairURI, updateVolunteerURI;
 
         public static List<string> request, steps, fpNames, volunteerArray; //lists to hold information on requests and direction steps, and volunteer names
         public static List<int> volunteerID;
@@ -81,6 +81,8 @@ namespace FootPatrol.Droid
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
+
+            va = new VolunteerActivity();
 
             menuItems = new string[] { "NON-EMERGENCY CONTACTS", "CAMPUS MAPS", "PAIR/UNPAIR FOOT PATROLLERS"}; //initializes list to displayed in listView 
          
@@ -357,7 +359,7 @@ namespace FootPatrol.Droid
         }
 
         /// <summary>
-        /// If the volunteer's location has changed, get the new GPS coordinates and set the marker and camera to the new location.
+        /// If the volunteer's location has changed, get the new GPS coordinates and set the marker to the new location
         /// </summary>
         /// <param name="location">Current location</param>
         public void OnLocationChanged(Location location)
@@ -426,6 +428,21 @@ namespace FootPatrol.Droid
                                                                             .Build();
                 volunteerMark = map.AddMarker(volunteerMarker); //add the marker on the map
                 map.AnimateCamera(CameraUpdateFactory.NewCameraPosition(cameraPosition));
+
+                var volunteerName = Task.Run(() => findFootPatrolPair()).Result; //check to see that the volunteer is not already part of an active pair, if they are then return volunteer name
+                if (!string.IsNullOrEmpty(volunteerName)) //if the volunteer is already part of an active pair
+                {
+                    isPaired = true; //set isPaired to true
+                    pairMarker = new MarkerOptions();
+                    pairMarker.SetTitle(volunteerName)
+                              .SetIcon(BitmapDescriptorFactory.DefaultMarker(BitmapDescriptorFactory.HueGreen));
+                    if (myLocation != null)
+                    {
+                        pairMarker.SetPosition(new LatLng(myLocation.Latitude, myLocation.Longitude + 0.0005));
+                    }
+
+                    pairMark = map.AddMarker(pairMarker);
+                }
             }
 
             else
@@ -439,6 +456,7 @@ namespace FootPatrol.Droid
         private async Task<List<string>> getRequests()
         {
             HttpClient httpClient = new HttpClient(); //create a new HttpClient
+            //httpClient.Timeout = TimeSpan.FromMinutes(60); //set timeout to an hour
             Uri customURI = new Uri(backendURI + getRequestURI); //get the URI to the API
             var response = await httpClient.GetAsync(customURI); //get the asynchronous response
 
@@ -869,12 +887,21 @@ namespace FootPatrol.Droid
 
                 case 2:
                     if (!isPaired)
+                    {
+                        fpNames = Task.Run(() => getVolunteers()).Result; //get new set of volunteers
+                        fpAdapter.Clear();
+                        foreach (string fpName in fpNames)
+                        {
+                            fpAdapter.Add(fpName);
+                        }
+
+                        fpAdapter.NotifyDataSetChanged(); //update adapter data
                         updateSearchUI();
+                    }
                     else
                     {
                         Task.Run(() => setPairActive(false));
                         isPaired = false;
-                        pairID = 0;
                         pairMark.Remove();
                     }
                     break;
@@ -912,15 +939,18 @@ namespace FootPatrol.Droid
                        {
                            startTrip(acceptedRequest);
                        }
+
                        else
                        {
                            enableRequestUI();
                        }
+
                        pairMarker = new MarkerOptions();
                        pairMarker.SetTitle(fpName)
                                  .SetIcon(BitmapDescriptorFactory.DefaultMarker(BitmapDescriptorFactory.HueGreen))
                                  .SetPosition(new LatLng(myLocation.Latitude, myLocation.Longitude + 0.0005));
                        pairMark = map.AddMarker(pairMarker);
+                   
                        removeSearchUI();
                       
                        isPaired = true;
@@ -962,6 +992,43 @@ namespace FootPatrol.Droid
             searchViewDescription.Visibility = ViewStates.Visible;
         }
 
+        private async Task<string> findFootPatrolPair()
+        {
+            HttpClient httpClient = new HttpClient();
+            Uri customURI = new Uri(backendURI + postPairURI);
+            HttpResponseMessage response = await httpClient.GetAsync(customURI);
+
+            try
+            {
+                response.EnsureSuccessStatusCode();
+            }
+
+            catch(System.Exception e)
+            {
+                createAlert("There was an exception " + e); 
+            }
+
+            var httpResponse = await response.Content.ReadAsStringAsync();
+            var parsedString = JObject.Parse(httpResponse);
+            var pairs = parsedString.SelectTokens("pairs[*]");
+            List<string> pairList = new List<string>();
+            foreach(JToken pair in pairs)
+            {
+                var firstID = pair.SelectToken("volunteers[0].id");
+                var secondID = pair.SelectToken("volunteers[1].id");
+
+                if(Int32.Parse(firstID.ToString()) == myID)
+                {
+                    pairID = Int32.Parse(pair.SelectToken("id").ToString());
+                    System.Diagnostics.Debug.WriteLine("The pairID is: " + pairID.ToString());
+                    return pair.SelectToken("volunteers[1].first_name").ToString() + " " + pair.SelectToken("volunteers[1].last_name");
+                }
+            }
+
+            return ""; //if the volunteer is not yet in a pair return -1
+        }
+
+
         private async Task<int> pairFootPatrollers(int vID)
         {
             //First check whether the pair already exists
@@ -978,8 +1045,8 @@ namespace FootPatrol.Droid
             {
                 createAlert("There was an exception " + e);
             }
-            //Otherwise create the new pairing and get the pairID
 
+            //Otherwise create the new pairing and get the pairID
             var resp = await response.Content.ReadAsStringAsync();
             var parsedString = JObject.Parse(resp);
             var pairs = parsedString.SelectTokens("pairs[*]");
@@ -1204,6 +1271,7 @@ namespace FootPatrol.Droid
         {
             HttpClient httpClient = new HttpClient();
             Uri customURI = new Uri(backendURI + postPairURI + pairID.ToString() + "/active");
+            System.Diagnostics.Debug.WriteLine("The custom uri is: " + customURI);
 
             var content = new VPairStatus {
                 active = isActive

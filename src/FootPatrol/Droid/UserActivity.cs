@@ -525,7 +525,7 @@ namespace FootPatrol.Droid
                 response.EnsureSuccessStatusCode();
             }
 
-            catch(System.Exception e)
+            catch(Exception e)
             {
                 System.Diagnostics.Debug.WriteLine("Caught an exception : " + e);
                 createAlert("The request response failed with exception: " + e);
@@ -549,7 +549,7 @@ namespace FootPatrol.Droid
                 response.EnsureSuccessStatusCode();
             }
 
-            catch(System.Exception e)
+            catch(Exception e)
             {
                 createAlert("The request response failed with exception: " + e);
             }
@@ -611,7 +611,7 @@ namespace FootPatrol.Droid
                 response.EnsureSuccessStatusCode();
             }
 
-            catch (System.Exception e)
+            catch (Exception e)
             {
                 createAlert("The request failed in the task. The exception is: " + e);
             }
