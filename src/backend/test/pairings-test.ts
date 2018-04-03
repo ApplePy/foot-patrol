@@ -41,7 +41,11 @@ class PairingsAPITest {
     .then(() => sqlSrv.makeQuery("DELETE FROM volunteers"))
 
     // Create volunteers
-    .then(() => TestReplaceHelper.replaceParallel(sqlSrv.makeQuery.bind(sqlSrv), "volunteers", this.VOLUNTEERS))
+    .then(() => TestReplaceHelper.dateReplace(
+      sqlSrv.makeQuery.bind(sqlSrv),
+      "volunteers",
+      this.VOLUNTEERS,
+      "timestamp"))
     .then(() => done())
     .catch((err) => {
       if (err.name !== "FakeSQLError") {
@@ -130,8 +134,8 @@ class PairingsAPITest {
       }
       return [PairingsAPITest.VOLUNTEERS.find((x) => x.id === values[0])];
     };
-    TestReplaceHelper.dateReplace(sqlQuery, "volunteers", DB_DATA, "timestamp")
-    .then(() => TestReplaceHelper.replaceParallel(sqlQuery, "volunteer_pairing", DB_DATA))
+
+    TestReplaceHelper.replaceParallel(sqlQuery, "volunteer_pairing", DB_DATA)
     .then(() => {
 
     // Start request
@@ -186,8 +190,8 @@ class PairingsAPITest {
       }
       return [PairingsAPITest.VOLUNTEERS.find((x) => x.id === values[0])];
     };
-    TestReplaceHelper.dateReplace(sqlQuery, "volunteers", DB_DATA, "timestamp")
-    .then(() => TestReplaceHelper.replaceParallel(sqlQuery, "volunteer_pairing", DB_DATA))
+
+    TestReplaceHelper.replaceParallel(sqlQuery, "volunteer_pairing", DB_DATA)
     .then(() => {
 
     // Start request
@@ -242,8 +246,8 @@ class PairingsAPITest {
       }
       return [PairingsAPITest.VOLUNTEERS.find((x) => x.id === values[0])];
     };
-    TestReplaceHelper.dateReplace(sqlQuery, "volunteers", DB_DATA, "timestamp")
-    .then(() => TestReplaceHelper.replaceParallel(sqlQuery, "volunteer_pairing", DB_DATA))
+
+    TestReplaceHelper.replaceParallel(sqlQuery, "volunteer_pairing", DB_DATA)
     .then(() => {
 
     // Start request
@@ -337,8 +341,9 @@ class PairingsAPITest {
       }
       return [PairingsAPITest.VOLUNTEERS.find((x) => x.id === values[0])];
     };
-    TestReplaceHelper.dateReplace(sqlQuery, "volunteers", DB_DATA, "timestamp")
-    .then(() => TestReplaceHelper.replaceParallel(sqlQuery, "volunteer_pairing", DB_DATA))
+
+    // Insert data to MySQL
+    TestReplaceHelper.replaceParallel(sqlQuery, "volunteer_pairing", DB_DATA)
     .then(() => {
 
     // Start request
@@ -534,17 +539,19 @@ class PairingsAPITest {
 
     // Fake data
     const DB_DATA = [
-      { id: 1, volunteer_one: 1, volunteer_two: 2, active: true },
-      { id: 2, volunteer_one: 2, volunteer_two: 3, active: true },
-      { id: 3, volunteer_one: 1, volunteer_two: 3, active: false}
+      {id: 1, volunteer_one: 1, volunteer_two: 2, active: false},
+      {id: 2, volunteer_one: 2, volunteer_two: 3, active: false},
+      {id: 3, volunteer_one: 1, volunteer_two: 3, active: false}
     ];
 
     // Setup fake data
     const INPUT = { active: true };
     FakeSQL.response = (query: string, values: any[]) => {
       if (query.search("UPDATE") >= 0) {
-        values.should.contain(2);
+        values.should.contain(3);
         return {affectedRows: 1};
+      } else if (query.search("SELECT") >= 0) {
+        return (values[0] === 3) ? [DB_DATA[2]] : [];
       }
       throw {name: "FakeSQLError", sqlMessage: "Query not supported."};
     };
@@ -554,7 +561,7 @@ class PairingsAPITest {
 
       // Start request
       chai.request(serverEnv.nodeServer)
-        .post(pathPrefix + "/volunteerpairs/2/active")
+        .post(pathPrefix + "/volunteerpairs/3/active")
         .send(INPUT)
         .end((err, res) => {
           // Verify results
@@ -605,7 +612,7 @@ class PairingsAPITest {
   public togglePostBadId(done: MochaDone) {
     // Setup fake data
     const INPUT = { active: true };
-    const REQUESTS_DATA = {affectedRows: 0};
+    const REQUESTS_DATA: any[] = [];
     FakeSQL.response = REQUESTS_DATA;
 
     // Start request
@@ -640,5 +647,111 @@ class PairingsAPITest {
         res.body.should.not.contain.property("stack");
         done();
       });
+  }
+
+  @test("Toggle POST should fail on active conflict")
+  public toggleFailConflict(done: MochaDone) {
+    // Get SQL connector instance
+    const sqlInstance = serverEnv.container.get<ISQLService>(IFACES.ISQLSERVICE);
+    const sqlQuery = sqlInstance.makeQuery.bind(sqlInstance);
+
+    // Fake data
+    const DB_DATA = [
+      { id: 1, volunteer_one: 1, volunteer_two: 2, active: true },
+      { id: 2, volunteer_one: 2, volunteer_two: 3, active: false},
+      { id: 3, volunteer_one: 1, volunteer_two: 3, active: false}
+    ];
+
+    // Setup fake data
+    const INPUT = { active: true };
+    FakeSQL.response = (query: string, values: any[]) => {
+      if (query.search("UPDATE") >= 0) {
+        values.should.contain(2);
+        return {affectedRows: 1};
+      } else if (query.search("SELECT") >= 0) {
+        console.log(query, values);
+        return (values[0] === 2 && values.length === 1) ? [DB_DATA[1]] : DB_DATA;
+      }
+      throw {name: "FakeSQLError", sqlMessage: "Query not supported."};
+    };
+
+    TestReplaceHelper.replaceParallel(sqlQuery, "volunteer_pairing", DB_DATA)
+    .then(() => {
+
+      // Start request
+      chai.request(serverEnv.nodeServer)
+        .post(pathPrefix + "/volunteerpairs/2/active")
+        .send(INPUT)
+        .end((err, res) => {
+          // Verify results
+          res.should.have.status(409);
+          res.body.should.contain.property("error");
+          res.body.should.contain.property("message");
+          res.body.should.not.contain.property("stack");
+          done();
+        });
+    });
+  }
+
+  @test("POST should fail to create a new object due to active conflict")
+  public postConflict(done: MochaDone) {
+    // Get SQL connector instance
+    const sqlInstance = serverEnv.container.get<ISQLService>(IFACES.ISQLSERVICE);
+    const sqlQuery = sqlInstance.makeQuery.bind(sqlInstance);
+
+    // Fake data
+    const DB_DATA = [
+      { id: 1, volunteer_one: 1, volunteer_two: 2, active: true }
+    ];
+
+    // Setup fake input data
+    const INPUT = { id: 5, volunteers: [2, 3], active: true, extra: false };
+    const NEW_RECORD = { volunteer_one: 2, volunteer_two: 3, active: false };
+
+    // Setup fake data processing
+    const REQUESTS_DATA = (query: string, values: any[]) => {
+      const newId = 2;
+      if (query.search("`volunteers`") >= 0) {
+        return [PairingsAPITest.VOLUNTEERS.find((vol) => vol.id === values[0])];
+      } else if (values.length === 4) {
+        return [DB_DATA.find((x) =>
+          x.volunteer_one === values[0] ||
+          x.volunteer_one === values[2] ||
+          x.volunteer_two === values[0] ||
+          x.volunteer_two === values[2]
+        )];
+      } else if (query.search("^INSERT") >= 0) {
+        // Ensure unwanted properties are not being added
+        ["id", "extra"].forEach((val) => query.search(val).should.equal(-1));
+        return {insertId: newId};
+      }
+
+      values.should.contain(newId); // Ensure correct ID was requested
+      return [{...NEW_RECORD, id: newId}];
+    };
+    FakeSQL.response = REQUESTS_DATA;
+
+    TestReplaceHelper.replaceParallel(sqlQuery, "volunteer_pairing", DB_DATA)
+    .then(() => {
+    // Start request
+      chai.request(serverEnv.nodeServer)
+        .post(pathPrefix + "/volunteerpairs")
+        .send(INPUT)
+        .end((err, res) => {
+          // Foreach to fix date formatting error
+          const expRes = [
+            new Volunteer(PairingsAPITest.VOLUNTEERS.find((vol) => vol.id === 1)),
+            new Volunteer(PairingsAPITest.VOLUNTEERS.find((vol) => vol.id === 2))
+          ];
+          expRes.forEach((element: any) => element.timestamp = element.timestamp.toJSON());
+
+          // Verify results
+          res.should.have.status(409);
+          res.body.should.contain.property("error");
+          res.body.should.contain.property("message");
+          res.body.should.not.contain.property("stack");
+          done();
+        });
+    });
   }
 }

@@ -520,3 +520,96 @@
  *        message: "Request ID 1 was not found."
  *     }
  */
+/**
+ * Toggle active state of a volunteer pairing record.
+ *
+ * @param req {Request} The express Request object.
+ * @param res {Response} The express Response object.
+ * @param next {NextFunction} Execute the next method.
+ *
+ * @api {post} /api/v1/volunteerpairs/:id/active Toggle active state of a volunteer pairing record
+ * @apiVersion 1.2.0
+ * @apiName ToggleVolunteerPairState
+ * @apiGroup VolunteerPairs
+ *
+ * @apiParam (URL Parameter) {number} id The id of the volunter pairing record to replace.
+ *
+ * @apiParam {boolean} active Designates if the pair is currently working.
+ *
+ * @apiSuccessExample Success Response:
+ *     HTTP/1.1 204 NO CONTENT
+ *
+ * @apiError (Error 400) InvalidURLParameter The ID was invalid.
+ * @apiError (Error 400) InvalidBodyParameter One of the request parameters was missing or invalid.
+ * @apiError (Error 404) NotFoundError The request ID was not found.
+ * @apiErrorExample Error Response:
+ *     HTTP/1.1 400 BAD REQUEST
+ *     {
+ *        error: "Invalid Body Parameter",
+ *        message: "A required body parameter is missing or out of range."
+ *     }
+ */
+/**
+ * Post new volunteer pair
+ *
+ * @param req {Request} The express Request object.
+ * @param res {Response} The express Response object.
+ * @param next {NextFunction} Execute the next method.
+ *
+ * @api {post} /api/v1/volunteerpairs Create a new volunteer pair
+ * @apiVersion 1.2.0
+ * @apiName PostVolunteerPair
+ * @apiGroup VolunteerPairs
+ *
+ * @apiParam {boolean} active Designates if the pair is currently working.
+ * @apiParam {number[]} volunteers The IDs of the volunteers in the pair (must be 2, in ascending order).
+ *
+ * @apiSuccess (Created 201) {number} id The record ID.
+ * @apiSuccess (Created 201) {boolean} active Designates if the pair is currently working.
+ * @apiSuccess (Created 201) {object[]} volunteers The volunteers in the pair.
+ * @apiSuccess (Created 201) {number} volunteers.id The record ID.
+ * @apiSuccess (Created 201) {string} volunteers.uwo_id UWO ID of the volunter.
+ * @apiSuccess (Created 201) {string} volunteers.first_name First name of the volunteer.
+ * @apiSuccess (Created 201) {string} volunteers.last_name First name of the volunteer.
+ * @apiSuccess (Created 201) {boolean} volunteers.disabled Designates if the volunteer has left Foot Patrol.
+ * @apiSuccess (Created 201) {string} volunteers.latitude Last known volunteer latitude.
+ * @apiSuccess (Created 201) {string} volunteers.longitude Last known volunteer longitude.
+ * @apiSuccess (Created 201) {string} volunteers.timestamp Timestamp of last update to volunteer location.
+ *
+ * @apiSuccessExample Success Response:
+ *     HTTP/1.1 201 CREATED
+ *     {
+ *        id: 1,
+ *        active: true
+ *        volunteers: [
+ *          {
+ *            id: 1,
+ *            uwo_id: "jdoe37",
+ *            first_name: "John",
+ *            last_name: "Doe",
+ *            disabled: false,
+ *            latitude: "42.9849",
+ *            longitude: "81.2453",
+ *            timestamp: "2017-10-26T06:51:05.000Z"
+ *          },
+ *          {
+ *            id: 2,
+ *            uwo_id: "jdoe38",
+ *            first_name: "Jane",
+ *            last_name: "Doe",
+ *            disabled: false,
+ *            latitude: "42.9849",
+ *            longitude: "81.2453",
+ *            timestamp: "2017-10-26T06:51:05.000Z"
+ *          }
+ *        ]
+ *     }
+ *
+ * @apiError (Error 400) InvalidBodyParameter One of the post request parameters was missing or invalid.
+ * @apiErrorExample Error Response:
+ *     HTTP/1.1 400 BAD REQUEST
+ *     {
+ *        error: "Invalid Body Parameter",
+ *        message: "A required body parameter is missing or out of range."
+ *     }
+ */
