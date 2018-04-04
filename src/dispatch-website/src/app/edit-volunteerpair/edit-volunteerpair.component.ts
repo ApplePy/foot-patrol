@@ -17,6 +17,7 @@ export class EditVolunteerpairComponent implements OnInit {
   volunteers: Volunteer[];
   volunteerONE: Volunteer;
   volunteerTWO: Volunteer;
+  errorMsg: string;
 
   pairState: string;
 
@@ -44,8 +45,13 @@ export class EditVolunteerpairComponent implements OnInit {
   updatePair() {
     if (this.pairState === 'Active') {this.pair.active = true; }
     if (this.pairState === 'Inactive') {this.pair.active = false; }
-    this.ftpService.toggleActiveVolunteerPair(this.pair.id, this.pair.active).subscribe(() =>
-      this.router.navigateByUrl('/volunteer-list')
-    );
+      this.ftpService.toggleActiveVolunteerPair(this.pair.id, this.pair.active).subscribe((data) => {
+        this.router.navigateByUrl('/volunteer-list');
+      },
+      (error) => {
+        if (error.status === 409) {
+          this.errorMsg = 'ERROR: One of these volunteers is already in an active pair. Deactivate the existing pair to proceed';
+        }
+      });
   }
 }

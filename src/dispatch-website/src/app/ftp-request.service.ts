@@ -63,11 +63,6 @@ export class FtpRequestService {
   updateRequest(request: Request): Observable<any> {
     const patchURL = this.requestURL + '/' + request.id;
     return this.http.patch(patchURL, {
-      // name: request.name,
-      from_location: request.from_location,
-      to_location: request.to_location,
-      additional_info: request.additional_info,
-      archived: request.archived,
       pairing: request.pairing,
       status: request.status
     }).pipe(
@@ -217,6 +212,9 @@ export class FtpRequestService {
         `body was: ${error.error}`);
     }
     // return an ErrorObservable with a user-facing error message
-    return new ErrorObservable('Something bad happened; please try again later.');
+    const errorData = {
+      status: error.status
+    };
+    return new ErrorObservable(errorData);
   }
 }

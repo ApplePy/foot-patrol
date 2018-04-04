@@ -3,6 +3,7 @@ import {NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { AgmCoreModule } from '@agm/core/core.module';
 import { FtpRequestService } from '../ftp-request.service';
 import { Router } from '@angular/router';
+import { Volunteer } from '../volunteer';
 
 
 @Component({
@@ -13,11 +14,12 @@ import { Router } from '@angular/router';
 
 export class MapGeneralComponent implements OnInit {
 
-  /* tslint:disable:no-magic-numbers number-literal-format */
+  // tslint:disable-next-line:no-inferrable-types
   lat: number = 43.00959710000001;
+  // tslint:disable-next-line:no-inferrable-types
   lng: number = -81.27373360000001;
+  // tslint:disable-next-line:no-inferrable-types
   zoom: number = 15;
-  /* tslint:enable:no-magic-numbers number-literal-format */
   getRepeat: number;
   // this list is here to show that the markers work. delete this once the server connunication stuff for volunteer info is written
   displayList: DisplayVolunteer[] = [ ];
@@ -35,10 +37,14 @@ export class MapGeneralComponent implements OnInit {
   }
 
   getVolunteers() {
-    this.displayList = [];
-    this.ftpService.getAllActiveVolunteers().subscribe(volunteers => {
-      for (let i = 0; i < volunteers.volunteers.length; i++) {
-        this.displayList[i] = volunteers.volunteers[i];
+    const displayV = new DisplayVolunteer;
+    this.ftpService.getAllActiveVolunteers().subscribe(data => {
+      for (let i = 0; i < data.volunteers.length; i++) {
+        displayV.Vname = data.volunteers[i].first_name + ' ' + data.volunteers[i].last_name;
+        displayV.timestamp = data.volunteers[i].timestamp;
+        displayV.late = data.volunteers[i].latitude;
+        displayV.long = data.volunteers[i].longitude;
+        this.displayList[i] = displayV;
       }
     });
   }
@@ -48,7 +54,7 @@ export class MapGeneralComponent implements OnInit {
 }
 
 class DisplayVolunteer {
-  name: string;
+  Vname: string;
   late: number;
   long: number;
   timestamp: string;
