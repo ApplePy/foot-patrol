@@ -33,17 +33,17 @@ export class MapGeneralComponent implements OnInit {
 
   ngOnInit() {
     this.getVolunteers();
-    this.getRepeat = setInterval(this.getVolunteers.bind(this), 1000);
+    this.getRepeat = setInterval(this.getVolunteers.bind(this), 15000);
   }
 
   getVolunteers() {
-    const displayV = new DisplayVolunteer;
     this.ftpService.getAllActiveVolunteers().subscribe(data => {
       for (let i = 0; i < data.volunteers.length; i++) {
-        displayV.Vname = data.volunteers[i].first_name + ' ' + data.volunteers[i].last_name;
-        displayV.timestamp = data.volunteers[i].timestamp;
-        displayV.late = data.volunteers[i].latitude;
-        displayV.long = data.volunteers[i].longitude;
+        const IVname = data.volunteers[i].first_name + ' ' + data.volunteers[i].last_name;
+        const Itimestamp = data.volunteers[i].timestamp;
+        const Ilate = data.volunteers[i].latitude;
+        const Ilong = data.volunteers[i].longitude;
+        const displayV = new DisplayVolunteer(IVname, Ilate, Ilong, Itimestamp);
         this.displayList[i] = displayV;
       }
     });
@@ -54,6 +54,14 @@ export class MapGeneralComponent implements OnInit {
 }
 
 class DisplayVolunteer {
+
+  constructor(vn: string, la: number, lo: number, ts: string) {
+    this.Vname = vn;
+    this.timestamp = ts;
+    this.late = +la;
+    this.long = +lo;
+  }
+
   Vname: string;
   late: number;
   long: number;
