@@ -21,11 +21,11 @@ using Android.Support.V7.Widget;
 using Android.Support.V4.Widget;
 using Android.Content;
 using System.Threading;
-using static Android.Widget.AdapterView;
 using System.Text.RegularExpressions;
 using Newtonsoft.Json;
 using Android.Views.InputMethods;
-using Java.Lang;
+using Android.Net;
+using Android.Support.V4.App;
 
 namespace FootPatrol.Droid
 {
@@ -71,6 +71,8 @@ namespace FootPatrol.Droid
         private static MarkerOptions volunteerMarker, userMarker, pairMarker; //marker options to be used for each marker on map
         private PolylineOptions polyOptions; //polyline options for the following polyline
         private static Polyline poly; //polyline to display directions on the map
+        public static FragmentActivity mActivity;
+        public static ConnectivityManager connectivityManager;
 
         public string tag;
         public Android.Support.V4.App.Fragment fragment;
@@ -98,10 +100,16 @@ namespace FootPatrol.Droid
             request = new List<string>();
             fpNames = new List<string>();
 
-            TimerCallback time = new TimerCallback(retrieveRequests); //create a new timerCallback to be used in timer
-            Timer timer = new Timer(time, 0, 0, 1000); //use the timerCallback to check for user requests every second
+            if (checkInternetConnection())
+            {
+                TimerCallback time = new TimerCallback(retrieveRequests); //create a new timerCallback to be used in timer
+                Timer timer = new Timer(time, 0, 0, 1000); //use the timerCallback to check for user requests every second
+                fpNames = Task.Run(() => getVolunteers()).Result;
+            }
 
-            fpNames = Task.Run(() => getVolunteers()).Result;
+            else
+                Toast.MakeText(mActivity, "There is no internet connection!", ToastLength.Long).Show();
+            
             fpAdapter = new ArrayAdapter<string>(this.Context, Resource.Layout.ListElement, fpNames);
 
             try
@@ -114,8 +122,14 @@ namespace FootPatrol.Droid
                 createAlert("Unable to initialize the map, the error is: " + e);
             }
 
-            createLocationRequest(); //create new location request to continuously update volunteer request
-            clientSetup(); //set up the Google client 
+            if (checkInternetConnection())
+            {
+                createLocationRequest(); //create new location request to continuously update volunteer request
+                clientSetup(); //set up the Google client 
+            }
+
+            else
+                Toast.MakeText(mActivity, "There is no internet connection!", ToastLength.Long).Show();
 
             if (Int32.Parse(Build.VERSION.Sdk) > 23) //if the user is using a build version of >= API 24 (use mapView)
             {
@@ -284,6 +298,12 @@ namespace FootPatrol.Droid
             return view;
         }
 
+        public override void OnAttach(Context context)
+        {
+            base.OnAttach(context);
+            mActivity = (FragmentActivity)context;
+        }
+
         /// <summary>
         /// Start the map display and connect client if it isn't already connected from clientSetup() call
         /// </summary>
@@ -344,9 +364,15 @@ namespace FootPatrol.Droid
         /// <param name="connectionHint">Connection Hint</param>
         public void OnConnected(Bundle connectionHint)
         {
-            myLocation = location.GetLastLocation(client); //once the client is connected, get the last known location of the device
-            mapSetup(); //now that client is connected, attempt to setup map
-            location.RequestLocationUpdates(client, locationRequest, this); //request location updates using the created client and locationRequest objects
+            if (checkInternetConnection())
+            {
+                myLocation = location.GetLastLocation(client); //once the client is connected, get the last known location of the device
+                mapSetup(); //now that client is connected, attempt to setup map
+                location.RequestLocationUpdates(client, locationRequest, this); //request location updates using the created client and locationRequest objects
+            }
+
+            else
+                Toast.MakeText(mActivity, "There is no internet connection!", ToastLength.Long).Show();
         }
 
         /// <summary>
@@ -364,16 +390,21 @@ namespace FootPatrol.Droid
         /// <param name="location">Current location</param>
         public void OnLocationChanged(Location location)
         {
-            LatLng userPosition = new LatLng(location.Latitude, location.Longitude);
-            volunteerMarker.SetPosition(userPosition);
-            Task.Run(() => updateLatLng(myID, userPosition.Latitude.ToString(), userPosition.Longitude.ToString()));
-
-            if (isPaired)
+            if (checkInternetConnection())
             {
-                LatLng pairPosition = new LatLng(location.Latitude, location.Longitude + 0.0005);
-                pairMarker.SetPosition(pairPosition);
-                Task.Run(() => updateLatLng(vlnteerID, pairPosition.Latitude.ToString(), pairPosition.Longitude.ToString()));
+                LatLng userPosition = new LatLng(location.Latitude, location.Longitude);
+                volunteerMarker.SetPosition(userPosition);
+                Task.Run(() => updateLatLng(myID, userPosition.Latitude.ToString(), userPosition.Longitude.ToString()));
+
+                if (isPaired)
+                {
+                    LatLng pairPosition = new LatLng(location.Latitude, location.Longitude + 0.0005);
+                    pairMarker.SetPosition(pairPosition);
+                    Task.Run(() => updateLatLng(vlnteerID, pairPosition.Latitude.ToString(), pairPosition.Longitude.ToString()));
+                }
             }
+            else
+                Toast.MakeText(mActivity, "There is no internet connection!", ToastLength.Long).Show(); 
         }
 
         /// <summary>
@@ -429,20 +460,27 @@ namespace FootPatrol.Droid
                 volunteerMark = map.AddMarker(volunteerMarker); //add the marker on the map
                 map.AnimateCamera(CameraUpdateFactory.NewCameraPosition(cameraPosition));
 
-                var volunteerName = Task.Run(() => findFootPatrolPair()).Result; //check to see that the volunteer is not already part of an active pair, if they are then return volunteer name
-                if (!string.IsNullOrEmpty(volunteerName)) //if the volunteer is already part of an active pair
+                if (checkInternetConnection())
                 {
-                    isPaired = true; //set isPaired to true
-                    pairMarker = new MarkerOptions();
-                    pairMarker.SetTitle(volunteerName)
-                              .SetIcon(BitmapDescriptorFactory.DefaultMarker(BitmapDescriptorFactory.HueGreen));
-                    if (myLocation != null)
+                    var volunteerName = Task.Run(() => findFootPatrolPair()).Result; //check to see that the volunteer is not already part of an active pair, if they are then return volunteer name
+                    if (!string.IsNullOrEmpty(volunteerName)) //if the volunteer is already part of an active pair
                     {
-                        pairMarker.SetPosition(new LatLng(myLocation.Latitude, myLocation.Longitude + 0.0005));
-                    }
+                        isPaired = true; //set isPaired to true
+                        pairMarker = new MarkerOptions();
+                        pairMarker.SetTitle(volunteerName)
+                                  .SetIcon(BitmapDescriptorFactory.DefaultMarker(BitmapDescriptorFactory.HueGreen));
+                        if (myLocation != null)
+                        {
+                            pairMarker.SetPosition(new LatLng(myLocation.Latitude, myLocation.Longitude + 0.0005));
+                        }
 
-                    pairMark = map.AddMarker(pairMarker);
+                        pairMark = map.AddMarker(pairMarker);
+                    }
                 }
+
+                else
+                    Toast.MakeText(mActivity, "There is no internet connection!", ToastLength.Long).Show();
+
             }
 
             else
@@ -456,8 +494,8 @@ namespace FootPatrol.Droid
         private async Task<List<string>> getRequests()
         {
             HttpClient httpClient = new HttpClient(); //create a new HttpClient
-            //httpClient.Timeout = TimeSpan.FromMinutes(60); //set timeout to an hour
-            Uri customURI = new Uri(backendURI + getRequestURI); //get the URI to the API
+                                                      //httpClient.Timeout = TimeSpan.FromMinutes(60); //set timeout to an hour
+            System.Uri customURI = new System.Uri(backendURI + getRequestURI); //get the URI to the API
             var response = await httpClient.GetAsync(customURI); //get the asynchronous response
 
             try
@@ -485,7 +523,7 @@ namespace FootPatrol.Droid
         private async Task<List<string>> getVolunteers()
         {
             HttpClient httpClient = new HttpClient();
-            Uri customURI = new Uri(backendURI + getVolunteerURI);
+            System.Uri customURI = new System.Uri(backendURI + getVolunteerURI);
             var response = await httpClient.GetAsync(customURI); //get the asynchronous response
 
             try
@@ -577,7 +615,7 @@ namespace FootPatrol.Droid
         private async Task<string[]> getPositionForAddress(string address)
         {
             HttpClient httpClient = new HttpClient();
-            Uri customURI = new Uri("https://maps.googleapis.com/maps/api/geocode/json?address=" + address +
+            System.Uri customURI = new System.Uri("https://maps.googleapis.com/maps/api/geocode/json?address=" + address +
                                     "&key=AIzaSyCMJ3Pw9W7IVXtT0AWi8Vb6iL9Y9JZJnZw");
 
             HttpResponseMessage response = await httpClient.GetAsync(customURI);
@@ -613,7 +651,7 @@ namespace FootPatrol.Droid
         private async Task<string> getPolyPat(string start, string dest)
         {
             HttpClient httpClient = new HttpClient();
-            Uri customURI = new Uri("https://maps.googleapis.com/maps/api/directions/json?origin=" + start + "&destination=" + dest + "&mode=walking&key=AIzaSyDQMcKBqfQwfRC88Lt02V8FP5yGPUqIq04");
+            System.Uri customURI = new System.Uri("https://maps.googleapis.com/maps/api/directions/json?origin=" + start + "&destination=" + dest + "&mode=walking&key=AIzaSyDQMcKBqfQwfRC88Lt02V8FP5yGPUqIq04");
             HttpResponseMessage response = await httpClient.GetAsync(customURI);
 
             try
@@ -758,7 +796,10 @@ namespace FootPatrol.Droid
                        .SetPositiveButton("Yes", (sender, e) =>
                 {
                     disableUI();
-                    Task.Run(() => updateRequestStatus("COMPLETED", true));
+                    if(checkInternetConnection())
+                        Task.Run(() => updateRequestStatus("COMPLETED", true));
+                    else
+                        Toast.MakeText(mActivity, "There is no internet connection!", ToastLength.Long).Show();
                     listView.GetChildAt(2).Enabled = true;
                 }).SetNegativeButton("No", (sender, e) =>
                 {
@@ -876,19 +917,31 @@ namespace FootPatrol.Droid
                 case 2:
                     if (!isPaired)
                     {
-                        fpNames = Task.Run(() => getVolunteers()).Result; //get new set of volunteers
-                        fpAdapter.Clear(); //clear the current list of adapter names for update
-                        foreach (string fpName in fpNames) //get each volunteer name
+                        if (checkInternetConnection())
                         {
-                            fpAdapter.Add(fpName); //add it to the adapter
-                        }
+                            fpNames = Task.Run(() => getVolunteers()).Result; //get new set of volunteers
+                            fpAdapter.Clear(); //clear the current list of adapter names for update
+                            foreach (string fpName in fpNames) //get each volunteer name
+                            {
+                                fpAdapter.Add(fpName); //add it to the adapter
+                            }
 
-                        fpAdapter.NotifyDataSetChanged(); //update adapter data
-                        updateSearchUI(); //add search bar for new pair to be creative
+                            fpAdapter.NotifyDataSetChanged(); //update adapter data
+                            updateSearchUI(); //add search bar for new pair to be creative
+                        }
+                        else
+                            Toast.MakeText(mActivity, "There is no internet connection!", ToastLength.Long).Show();
+
                     }
                     else
                     {
-                        Task.Run(() => setPairActive(false)); //set the old pair to inactive
+                        if (checkInternetConnection())
+                        {
+                            Task.Run(() => setPairActive(false)); //set the old pair to inactive
+                        }
+                        else
+                            Toast.MakeText(mActivity, "There is no internet connection!", ToastLength.Long).Show();
+                        
                         isPaired = false;
                         pairMark.Remove(); //remove the paired marker from the UI
                     }
@@ -922,8 +975,14 @@ namespace FootPatrol.Droid
                        int position = findPosition(fpName); //find the position of the volunteer in the volunteer list
                        int vID = volunteerID[position]; //locate their ID
                        vlnteerID = vID; //store the volunteerID for latitude and longitude to be stored
-                       pairID = Task.Run(() => pairFootPatrollers(vID)).Result; //pair the foot patroller
-                       Task.Run(() => setPairActive(true)); //set the pair to active
+                       if (checkInternetConnection())
+                       {
+                           pairID = Task.Run(() => pairFootPatrollers(vID)).Result; //pair the foot patroller
+                           Task.Run(() => setPairActive(true)); //set the pair to active
+                       }
+                       else
+                            Toast.MakeText(mActivity, "There is no internet connection!", ToastLength.Long).Show();
+                
                        clearSearchView(); //clear the search bar
 
                        if (pickupPending) //if there was already a request accepted
@@ -984,7 +1043,7 @@ namespace FootPatrol.Droid
         private async Task<string> findFootPatrolPair()
         {
             HttpClient httpClient = new HttpClient();
-            Uri customURI = new Uri(backendURI + postPairURI);
+            System.Uri customURI = new System.Uri(backendURI + postPairURI);
             HttpResponseMessage response = await httpClient.GetAsync(customURI);
 
             try
@@ -1031,7 +1090,7 @@ namespace FootPatrol.Droid
         {
             //First check whether the pair already exists
             HttpClient httpClient = new HttpClient();
-            Uri customURI = new Uri(backendURI + postInactivePairURI);
+            System.Uri customURI = new System.Uri(backendURI + postInactivePairURI);
             HttpResponseMessage response = await httpClient.GetAsync(customURI);
 
             try
@@ -1062,7 +1121,7 @@ namespace FootPatrol.Droid
             }
             
             //if we do not find a pair match, create a new pair
-            customURI = new Uri(backendURI + postPairURI);
+            customURI = new System.Uri(backendURI + postPairURI);
             var content = new VolunteerPairs //use volunteer pair schema to create a new volunteer pairing
             {
                 active = true,
@@ -1131,7 +1190,11 @@ namespace FootPatrol.Droid
             addInfo.Text = "Additional Information: " + requestedTrip.addInfo;
             pickupInfo.Text = "Pickup Information";
 
-            Task.Run(() => updateRequestStatus("IN_PROGRESS", false));
+            if(checkInternetConnection())
+                Task.Run(() => updateRequestStatus("IN_PROGRESS", false));
+            else
+                Toast.MakeText(mActivity, "There is no internet connection!", ToastLength.Long).Show();
+
             listView.GetChildAt(2).Enabled = false;
 
             string userLocation = requestedTrip.fromLoc;
@@ -1151,18 +1214,23 @@ namespace FootPatrol.Droid
             string currentLocation = myLocation.Latitude.ToString() + "," + myLocation.Longitude.ToString();
             string destinationLocation = latitude.ToString() + "," + longitude.ToString();
 
-            var polyPattern = Task.Run(() => getPolyPat(currentLocation, destinationLocation)).Result; //get the poly pattern character string
-
-            List<LatLng> polyline = DecodePolyline(polyPattern); //decode the character string into a polyline that can be displayed on the map
-            polyOptions = new PolylineOptions().InvokeColor(Color.Blue).InvokeWidth(10); //create the new polyline as a blue line of 10 thickness
-
-            foreach (LatLng point in polyline)
+            if (checkInternetConnection())
             {
-                polyOptions.Add(point); //for each point in the LatLng list, add the separate polyline to the polyline options
+                var polyPattern = Task.Run(() => getPolyPat(currentLocation, destinationLocation)).Result; //get the poly pattern character string
+                List<LatLng> polyline = DecodePolyline(polyPattern); //decode the character string into a polyline that can be displayed on the map
+                polyOptions = new PolylineOptions().InvokeColor(Color.Blue).InvokeWidth(10); //create the new polyline as a blue line of 10 thickness
+
+                foreach (LatLng point in polyline)
+                {
+                    polyOptions.Add(point); //for each point in the LatLng list, add the separate polyline to the polyline options
+                }
+
+                poly = map.AddPolyline(polyOptions); //display the polyline on the map
             }
 
-            poly = map.AddPolyline(polyOptions); //display the polyline on the map
-
+            else
+                Toast.MakeText(mActivity, "There is no internet connection!", ToastLength.Long).Show();
+            
             updateDirections();
         }
         
@@ -1175,7 +1243,7 @@ namespace FootPatrol.Droid
         private async Task<string> updateRequestStatus(string status, bool archived)
         {
             HttpClient httpClient = new HttpClient();
-            Uri customURI = new Uri(backendURI + "/requests/" + acceptedRequest.id.ToString());
+            System.Uri customURI = new System.Uri(backendURI + "/requests/" + acceptedRequest.id.ToString());
 
             var content = new RequestStatus
             {
@@ -1235,17 +1303,22 @@ namespace FootPatrol.Droid
             string currentLocation = myLocation.Latitude.ToString() + "," + myLocation.Longitude.ToString();
             string destinationLocation = userCoordinates.Latitude.ToString() + "," + userCoordinates.Longitude.ToString();
 
-            var polyPattern = Task.Run(() => getPolyPat(currentLocation, destinationLocation)).Result; //get the poly pattern character string
-
-            List<LatLng> polyline = DecodePolyline(polyPattern); //decode the character string into a polyline that can be displayed on the map
-            polyOptions = new PolylineOptions().InvokeColor(Color.Blue).InvokeWidth(10); //create the new polyline as a blue line of 10 thickness
-
-            foreach (LatLng point in polyline)
+            if (checkInternetConnection())
             {
-                polyOptions.Add(point); //for each point in the LatLng list, add the separate polyline to the polyline options
-            }
+                var polyPattern = Task.Run(() => getPolyPat(currentLocation, destinationLocation)).Result; //get the poly pattern character string
 
-            poly = map.AddPolyline(polyOptions); //display the polyline on the map
+                List<LatLng> polyline = DecodePolyline(polyPattern); //decode the character string into a polyline that can be displayed on the map
+                polyOptions = new PolylineOptions().InvokeColor(Color.Blue).InvokeWidth(10); //create the new polyline as a blue line of 10 thickness
+
+                foreach (LatLng point in polyline)
+                {
+                    polyOptions.Add(point); //for each point in the LatLng list, add the separate polyline to the polyline options
+                }
+
+                poly = map.AddPolyline(polyOptions); //display the polyline on the map
+            }
+            else
+                Toast.MakeText(mActivity, "There is no internet connection!", ToastLength.Long).Show();
 
             //Depending on Android version, display the directions in the UI and set the adapter and add complete and cancel trip buttons to UI also
             updateDirections();
@@ -1270,7 +1343,7 @@ namespace FootPatrol.Droid
         private async Task<string> setPairActive(bool isActive)
         {
             HttpClient httpClient = new HttpClient();
-            Uri customURI = new Uri(backendURI + postPairURI + pairID.ToString() + "/active");
+            System.Uri customURI = new System.Uri(backendURI + postPairURI + pairID.ToString() + "/active");
 
             var content = new VPairStatus
             {
@@ -1314,7 +1387,7 @@ namespace FootPatrol.Droid
         private async Task<string> updateLatLng(int ID, string lat, string lng)
         {
             HttpClient httpClient = new HttpClient();
-            Uri customURI = new Uri(backendURI + updateVolunteerURI + ID.ToString());
+            System.Uri customURI = new System.Uri(backendURI + updateVolunteerURI + ID.ToString());
             var Timestamp = new DateTimeOffset(DateTime.UtcNow).ToUnixTimeSeconds().ToString(); //create a new timestamp
 
             var content = new UpdateVolunteer
@@ -1350,7 +1423,20 @@ namespace FootPatrol.Droid
             recyclerView.SetAdapter(new DirectionsAdapter(steps));
             relativeLayout.Visibility = ViewStates.Visible;
         }
+
+        public bool checkInternetConnection()
+        {
+            connectivityManager = (ConnectivityManager)mActivity.GetSystemService(Context.ConnectivityService);
+            if (connectivityManager.ActiveNetworkInfo != null && connectivityManager.ActiveNetworkInfo.IsAvailable &&
+               connectivityManager.ActiveNetworkInfo.IsConnected)
+            {
+                return true;
+            }
+
+            else
+            {
+                return false;
+            }
+        }
     }
-
-
 }

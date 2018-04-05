@@ -22,6 +22,7 @@ using System.Threading;
 using System.Collections.Generic;
 using Java.Lang;
 using Android.Support.V4.App;
+using Android.Net;
 
 namespace FootPatrol.Droid
 {
@@ -29,37 +30,38 @@ namespace FootPatrol.Droid
     public class UserActivity : Android.Support.V4.App.Fragment, GoogleApiClient.IOnConnectionFailedListener, GoogleApiClient.IConnectionCallbacks, Android.Gms.Location.ILocationListener, IOnMapReadyCallback
     {
         private static GoogleApiClient client; //the Google API client used to connect to Google Play Store
-        private static Location myLocation; //the volunteer's current location
+        private static Location myLocation, originalVolunteerLocation; //the volunteer's current location
         private IFusedLocationProviderApi location; //location of the volunteer
         private LocationRequest locationRequest; //a new location request object so that location can be updated
         private static GoogleMap map; //reference to created google map
         private static MapView mView; //mapView that displays map on >= API 24
         private static SupportMapFragment mf; //fragment that displays map on < API 24
         private static ImageButton sideTab; //side tab buttons for each view
-        private static Android.Widget.Button pickUpBtn;
+        private static Android.Widget.Button pickUpBtn, finishTripBtn;
         private static EditText userName, destination, additionalInfo;
         private static Android.Widget.ListView listView, searchListView;
         private static MarkerOptions userMarker, pairOneMarker, pairTwoMarker;
+        private static Marker pairOneMark, pairTwoMark;
         private static CircleOptions circle;
         private static DrawerLayout drawerLayout;
         private static Android.Widget.RelativeLayout relativeLayout, acceptedRequestLayout;
         private static Android.Views.View view; //the current view
-        private static TextView svDescription;
+        private static TextView svDescription, etaText;
         private static ArrayAdapter<System.String> listAdapter, locationAdapter;
-        private static Android.Widget.SearchView searchView;
+        private static SearchView searchView;
         private static string[] menuItems, locationNames;
-        private static string backendURI, postRequestURI, findPairsURI;
+        private static string backendURI, postRequestURI, findPairsURI, numHours, numMinutes, ETA, expectedETA, volunteerETA;
         public int requestID, pairingID;
-        private static Android.Widget.ProgressBar spinner;
-        private static TimerCallback tc, circleCB;
-        public static Timer timer, circleTimer;
+        private static TimerCallback tc, callback;
+        public static Timer timer, time;
         private static Circle mapCircle;
         public static LatLng volunteerOneLatLng, volunteerTwoLatLng;
         private static PolylineOptions polyOptions;
         private static Polyline poly;
         private static UserActivity ua;
-        protected static FragmentActivity mActivity;
-        protected static volatile int counter = 0;
+        public static FragmentActivity mActivity;
+        private static string approximateETA;
+        public static bool isDestinationSelected = false;
 
         public string tag;
         public Android.Support.V4.App.Fragment fragment;
@@ -102,21 +104,21 @@ namespace FootPatrol.Droid
                 mView = (MapView)view.FindViewById(Resource.Id.userMap);
                 sideTab = (ImageButton)view.FindViewById(Resource.Id.userSideTab);
                 drawerLayout = (DrawerLayout)view.FindViewById(Resource.Id.userdrawer);
+                etaText = (TextView)view.FindViewById(Resource.Id.etaText);
                 listView = (Android.Widget.ListView)view.FindViewById(Resource.Id.userListView);
-                searchView = (Android.Widget.SearchView)view.FindViewById(Resource.Id.userSearchView);
+                searchView = (SearchView)view.FindViewById(Resource.Id.userSearchView);
                 searchListView = (Android.Widget.ListView)view.FindViewById(Resource.Id.userSearchListView);
                 svDescription = (TextView)view.FindViewById(Resource.Id.userSVDescription);
                 pickUpBtn = (Android.Widget.Button)view.FindViewById(Resource.Id.requestPickupBtn);
+                finishTripBtn = (Android.Widget.Button)view.FindViewById(Resource.Id.finishTripBtn);
                 userName = (EditText)view.FindViewById(Resource.Id.userName5);
                 destination = (EditText)view.FindViewById(Resource.Id.userToLocation);
                 additionalInfo = (EditText)view.FindViewById(Resource.Id.userAdditionalInfo);
                 relativeLayout = (Android.Widget.RelativeLayout)view.FindViewById(Resource.Id.userInnerRelative);
-                spinner = (Android.Widget.ProgressBar)view.FindViewById(Resource.Id.spinner2);
                 acceptedRequestLayout = (Android.Widget.RelativeLayout)view.FindViewById(Resource.Id.acceptedRequestLayout);
 
                 searchListView.Visibility = ViewStates.Gone;
                 relativeLayout.Visibility = ViewStates.Gone;
-                spinner.Visibility = ViewStates.Gone;
                 acceptedRequestLayout.Visibility = ViewStates.Gone;
 
                 listView.Adapter = listAdapter;
@@ -125,6 +127,11 @@ namespace FootPatrol.Droid
                 sideTab.Click += (sender, e) =>
                 {
                     sideTabClicked(sideTab, drawerLayout, listView);
+                };
+
+                finishTripBtn.Click += (sender, e) =>
+                {
+                    finishBtnClicked();
                 };
 
                 searchView.SetQueryHint("Search for destination");
@@ -145,7 +152,7 @@ namespace FootPatrol.Droid
 
                 pickUpBtn.Click += (sender, e) =>
                 {
-                    new spinnerTask(spinner, ua).Execute();
+                    new addTextTask(ua, mActivity).Execute();
                 };
 
                 listView.ItemClick += (sender, e) =>
@@ -169,20 +176,20 @@ namespace FootPatrol.Droid
                 sideTab = (ImageButton)view.FindViewById(Resource.Id.userSideTabMF);
                 drawerLayout = (DrawerLayout)view.FindViewById(Resource.Id.userdrawerMF);
                 listView = (Android.Widget.ListView)view.FindViewById(Resource.Id.userListViewMF);
-                searchView = (Android.Widget.SearchView)view.FindViewById(Resource.Id.userSearchViewMF);
+                searchView = (SearchView)view.FindViewById(Resource.Id.userSearchViewMF);
                 searchListView = (Android.Widget.ListView)view.FindViewById(Resource.Id.userSearchListViewMF);
+                etaText = (TextView)view.FindViewById(Resource.Id.etaText2);
                 svDescription = (TextView)view.FindViewById(Resource.Id.userSVDescriptionMF);
                 pickUpBtn = (Android.Widget.Button)view.FindViewById(Resource.Id.requestPickupBtn1);
-                userName = (Android.Widget.EditText)view.FindViewById(Resource.Id.userName6);
+                finishTripBtn = (Android.Widget.Button)view.FindViewById(Resource.Id.finishTripBtn2);
+                userName = (EditText)view.FindViewById(Resource.Id.userName6);
                 destination = (EditText)view.FindViewById(Resource.Id.userToLocation1);
                 additionalInfo = (EditText)view.FindViewById(Resource.Id.userAdditionalInfo1);
                 relativeLayout = (Android.Widget.RelativeLayout)view.FindViewById(Resource.Id.userInnerRelativeMF);
-                spinner = (Android.Widget.ProgressBar)view.FindViewById(Resource.Id.spinner3);
                 acceptedRequestLayout = (Android.Widget.RelativeLayout)view.FindViewById(Resource.Id.acceptedRequestLayout2);
 
                 searchListView.Visibility = ViewStates.Gone;
                 relativeLayout.Visibility = ViewStates.Gone;
-                spinner.Visibility = ViewStates.Gone;
                 acceptedRequestLayout.Visibility = ViewStates.Gone;
 
                 listView.Adapter = listAdapter;
@@ -191,6 +198,11 @@ namespace FootPatrol.Droid
                 sideTab.Click += (sender, e) =>
                 {
                     sideTabClicked(sideTab, drawerLayout, listView);
+                };
+
+                finishTripBtn.Click += (sender, e) =>
+                {
+                    finishBtnClicked();
                 };
 
                 searchView.SetQueryHint("Search for destination");
@@ -211,7 +223,7 @@ namespace FootPatrol.Droid
 
                 pickUpBtn.Click += (sender, e) =>
                 {
-                    new spinnerTask(spinner, ua).Execute();
+                    new addTextTask(ua, mActivity).Execute();
                 };
 
                 listView.ItemClick += (sender, e) =>
@@ -228,8 +240,14 @@ namespace FootPatrol.Droid
                 mf.OnStart(); //start loading the map into the mapView
             }
 
-            createLocationRequest(); //create new location request to continuously update volunteer request
-            clientSetup(); //set up the Google client 
+            if (checkInternetConnection())
+            {
+                createLocationRequest(); //create new location request to continuously update volunteer request
+                clientSetup(); //set up the Google client 
+            }
+
+            else
+                Toast.MakeText(mActivity, "There is no internet connection!", ToastLength.Long).Show();
 
             return view;
         }
@@ -237,9 +255,7 @@ namespace FootPatrol.Droid
 		public override void OnAttach(Context context)
 		{
 			base.OnAttach(context);
-            System.Diagnostics.Debug.WriteLine("The context is : " + context);
             mActivity = (FragmentActivity)context;
-            System.Diagnostics.Debug.WriteLine("The activity is : " + mActivity);
 		}
 
 		public void OnConnected(Bundle connectionHint)
@@ -263,6 +279,16 @@ namespace FootPatrol.Droid
         {
             LatLng userPosition = new LatLng(location.Latitude, location.Longitude);
             userMarker.SetPosition(userPosition);
+
+            if(pairOneMarker != null)
+            {
+                pairOneMarker.SetPosition(volunteerOneLatLng);
+            }
+
+            if(pairTwoMarker != null)
+            {
+                pairTwoMarker.SetPosition(volunteerTwoLatLng);
+            }
         }
 
         public void OnMapReady(GoogleMap googleMap)
@@ -450,6 +476,7 @@ namespace FootPatrol.Droid
         /// </summary>
         public void pickUpBtnClicked()
         {
+            isDestinationSelected = false;
             //update the UI
             clearInitialUI();
             circle = new CircleOptions();
@@ -483,7 +510,8 @@ namespace FootPatrol.Droid
         {
             searchListView.Visibility = ViewStates.Gone; 
             clearSearchView();
-            if (!string.IsNullOrWhiteSpace(destination.Text))
+            isDestinationSelected = true;
+            if (!string.IsNullOrWhiteSpace(destination.Text) && isDestinationSelected)
             {
                 showAlert(dest);
             }
@@ -534,7 +562,7 @@ namespace FootPatrol.Droid
         private void clearSearchView()
         {
             searchView.SetQuery("", true); //set the query to empty
-            InputMethodManager manager = (InputMethodManager)this.Activity.GetSystemService(Context.InputMethodService); //get the keyboard manager
+            InputMethodManager manager = (InputMethodManager)mActivity.GetSystemService(Context.InputMethodService); //get the keyboard manager
             manager.HideSoftInputFromWindow(searchView.WindowToken, 0); //hide the keyboard
         }
 
@@ -545,7 +573,7 @@ namespace FootPatrol.Droid
         private async Task<int> submitRequest()
         {
             HttpClient httpClient = new HttpClient();
-            Uri customURI = new Uri(backendURI + postRequestURI);
+            System.Uri customURI = new System.Uri(backendURI + postRequestURI);
             string stringLocation = myLocation.Latitude.ToString() + " " + myLocation.Longitude.ToString();
             var content = new WalkRequest
             {
@@ -583,7 +611,7 @@ namespace FootPatrol.Droid
         private async Task<string> getRequestStatus()
         {
             HttpClient httpClient = new HttpClient();
-            Uri customURI = new Uri(backendURI + postRequestURI + "/" + requestID.ToString());
+            System.Uri customURI = new System.Uri(backendURI + postRequestURI + "/" + requestID.ToString());
             HttpResponseMessage response = await httpClient.GetAsync(customURI);
 
             JToken statusLine = null;
@@ -611,7 +639,7 @@ namespace FootPatrol.Droid
         private async Task<List<string>> getVolunteerNames()
         {
             HttpClient httpClient = new HttpClient();
-            Uri customURI = new Uri(backendURI + findPairsURI + pairingID.ToString());
+            System.Uri customURI = new System.Uri(backendURI + findPairsURI + pairingID.ToString());
             HttpResponseMessage httpResponse = await httpClient.GetAsync(customURI);
 
             List<string> names = new List<string>();
@@ -654,7 +682,7 @@ namespace FootPatrol.Droid
         public async Task<int> getPairingID()
         {
             HttpClient httpClient = new HttpClient();
-            Uri customURI = new Uri(backendURI + postRequestURI + "/" + requestID.ToString());
+            System.Uri customURI = new System.Uri(backendURI + postRequestURI + "/" + requestID.ToString());
             HttpResponseMessage response = await httpClient.GetAsync(customURI);
 
             try
@@ -680,13 +708,19 @@ namespace FootPatrol.Droid
         /// <param name="state">State.</param>
         private void retrieveRequestUpdate(object state)
         {
-            string status = Task.Run(() => getRequestStatus()).Result;
-           
-            if (status == "IN_PROGRESS") //We know that the request has been accepted, we need to find the correct pairing ID
+            if (checkInternetConnection())
             {
-                new updateUITask(ua).Execute();
-                timer.Change(Timeout.Infinite, Timeout.Infinite);
+                string status = Task.Run(() => getRequestStatus()).Result;
+
+                if (status == "IN_PROGRESS") //We know that the request has been accepted, we need to find the correct pairing ID
+                {
+                    new updateUITask(ua, mActivity).Execute();
+                    timer.Change(Timeout.Infinite, Timeout.Infinite);
+                }
             }
+
+            else
+                Toast.MakeText(mActivity, "There is no internet connection!", ToastLength.Long).Show();
         }
 
         /// <summary>
@@ -695,7 +729,6 @@ namespace FootPatrol.Droid
         public void displayVolunteers()
         {
             //update the UI
-            acceptedRequestLayout.Visibility = ViewStates.Visible;
             svDescription.Visibility = ViewStates.Gone;
             mapCircle.Remove();
 
@@ -714,14 +747,17 @@ namespace FootPatrol.Droid
                          .SetTitle(returnedNames[1]);
 
             //add marker to the map
-            map.AddMarker(pairOneMarker); 
-            map.AddMarker(pairTwoMarker);
+            pairOneMark = map.AddMarker(pairOneMarker);
+            pairTwoMark = map.AddMarker(pairTwoMarker);
 
             string currentLocation = myLocation.Latitude.ToString() + "," + myLocation.Longitude.ToString();
             string destinationLocation = volunteerOneLatLng.Latitude.ToString() + "," + volunteerOneLatLng.Longitude.ToString();
 
-            var polyPattern = Task.Run(() => getPolyPat(currentLocation, destinationLocation)).Result; //get the poly pattern character string
+            originalVolunteerLocation = new Location("");
+            originalVolunteerLocation.Latitude = volunteerOneLatLng.Latitude;
+            originalVolunteerLocation.Longitude = volunteerOneLatLng.Longitude;
 
+            var polyPattern = Task.Run(() => getPolyPat(currentLocation, destinationLocation)).Result; //get the poly pattern character string
             List<LatLng> polyline = DecodePolyline(polyPattern); //decode the character string into a polyline that can be displayed on the map
             polyOptions = new PolylineOptions().InvokeColor(Android.Graphics.Color.Blue).InvokeWidth(10); //create the new polyline as a blue line of 10 thickness
 
@@ -731,7 +767,42 @@ namespace FootPatrol.Droid
             }
 
             poly = map.AddPolyline(polyOptions); //display the polyline on the map
+
+            callback = new TimerCallback(updateETA);
+            time = new Timer(callback, 0, 0, 1000);
+
+            acceptedRequestLayout.Visibility = ViewStates.Visible;
         }
+
+
+        private void updateETA(object state)
+        {
+            if (checkInternetConnection())
+            {
+                Location volunteerLocation = Task.Run(() => getVolunteerLocation()).Result;
+                float[] results = new float[3];
+                Location.DistanceBetween(originalVolunteerLocation.Latitude, originalVolunteerLocation.Longitude, volunteerLocation.Latitude, volunteerLocation.Longitude, results);
+                float distanceBetween = results[0];
+                float metresPerMinute = 80.4672f;
+                float timeTraveled = distanceBetween / metresPerMinute;
+                volunteerETA = (Float.ParseFloat(expectedETA) - timeTraveled).ToString();
+                Message msg = Message.Obtain();
+                msg.Obj = "APPROXIMATE ETA: " + volunteerETA + " minutes";
+                msg.Target = handler;
+                msg.SendToTarget();
+            }
+            else
+                Toast.MakeText(mActivity, "There is no internet connection!", ToastLength.Long).Show();
+        }
+
+        /// <summary>
+        /// The handler to modify the badgecounter total amount of requests in the requests UI.
+        /// </summary>
+        protected Handler handler = new Handler((Message obj) =>
+        {
+            string ETA = (string)obj.Obj;
+            etaText.Text = ETA;
+        });
 
         /// <summary>
         /// Gets the polyline pattern from the directions api.
@@ -741,8 +812,9 @@ namespace FootPatrol.Droid
         /// <param name="dest">Destination.</param>
         private async Task<string> getPolyPat(string start, string dest)
         {
+            
             HttpClient httpClient = new HttpClient();
-            Uri customURI = new Uri("https://maps.googleapis.com/maps/api/directions/json?origin=" + start + "&destination=" + dest + "&mode=walking&key=AIzaSyDQMcKBqfQwfRC88Lt02V8FP5yGPUqIq04");
+            System.Uri customURI = new System.Uri("https://maps.googleapis.com/maps/api/directions/json?origin=" + start + "&destination=" + dest + "&mode=walking&key=AIzaSyDQMcKBqfQwfRC88Lt02V8FP5yGPUqIq04");
             HttpResponseMessage response = await httpClient.GetAsync(customURI);
 
             try
@@ -758,8 +830,51 @@ namespace FootPatrol.Droid
             var content = await response.Content.ReadAsStringAsync();
             JObject dir = JObject.Parse(content);
             string polyPattern = (string)dir.SelectToken("routes[0].overview_polyline.points");
+            string totalDuration = (string)dir.SelectToken("routes[0].legs[0].duration.text");
 
+            string[] hourMin = totalDuration.Split(' ');
+            if (totalDuration.Contains("hours"))
+            {
+                numHours = hourMin[0];
+                numMinutes = hourMin[2];
+                ETA = numHours + ":" + numMinutes + ":00";
+            }
+
+            else
+            {
+                numMinutes = hourMin[0];
+                ETA = "00"+ ":" + numMinutes + ":00";
+            }
+
+            expectedETA = TimeSpan.Parse(ETA).TotalMinutes.ToString();
+   
             return polyPattern;
+        }
+
+        private async Task<Location> getVolunteerLocation()
+        {
+            HttpClient httpClient = new HttpClient();
+            System.Uri customURI = new System.Uri(backendURI + findPairsURI + pairingID.ToString());
+            HttpResponseMessage response = await httpClient.GetAsync(customURI);
+
+            try
+            {
+                response.EnsureSuccessStatusCode();
+            }
+
+            catch (System.Exception e)
+            {
+                createAlert("There was an exception thrown " + e);
+            }
+
+            var content = await response.Content.ReadAsStringAsync();
+            JObject jObj = JObject.Parse(content);
+            string latitude = (string)jObj.SelectToken("volunteers[0].latitude");
+            string longitude = (string)jObj.SelectToken("volunteers[0].longitude");
+            Location volunteerLocation = new Location("");
+            volunteerLocation.Latitude = System.Double.Parse(latitude);
+            volunteerLocation.Longitude = System.Double.Parse(longitude);
+            return volunteerLocation;
         }
 
         /// <summary>
@@ -829,46 +944,53 @@ namespace FootPatrol.Droid
             }
             return polyline;
         }
-    }
 
-    /// <summary>
-    /// The spinner task to be called asynchronously.
-    /// </summary>
-    public class spinnerTask : AsyncTask
-    {
-        Android.Widget.ProgressBar _pb;
-        UserActivity _ua;
-
-        public spinnerTask(Android.Widget.ProgressBar pb, UserActivity ua)
+        private void finishBtnClicked()
         {
-            _pb = pb;
-            _ua = ua;
+            AlertDialog.Builder builder = new AlertDialog.Builder(this.Context);
+            builder.SetTitle("Complete Trip")
+                   .SetMessage("Are you sure you want to complete the trip?")
+                   .SetPositiveButton("Yes", (sender, e) =>
+                   {
+                       pairOneMark.Remove();
+                       pairTwoMark.Remove();
+                       poly.Remove();
+                       acceptedRequestLayout.Visibility = ViewStates.Gone;
+                       searchView.Visibility = ViewStates.Visible;
+                       searchListView.Visibility = ViewStates.Visible;
+                       clearSearchView();
+                       locationAdapter.Clear();
+                       svDescription.Visibility = ViewStates.Visible;
+                       svDescription.Text = "SEARCH FOR LOCATION";
+                       LatLng position = new LatLng(myLocation.Latitude, myLocation.Longitude);
+                       CameraPosition cameraPosition = new CameraPosition.Builder().Target(position)
+                                                                                       .Zoom(15)
+                                                                                       .Tilt(45)
+                                                                                       .Build();
+                       map.AnimateCamera(CameraUpdateFactory.NewCameraPosition(cameraPosition));
+                   }).SetNegativeButton("No", (sender, e) =>
+                   {
+                           //Do nothing
+                       });
+
+            Dialog dialog = builder.Create();
+            dialog.Show(); //show the dialog
         }
 
-		protected override void OnPostExecute(Java.Lang.Object result)
-		{
-			base.OnPostExecute(result);
-            _pb.Visibility = ViewStates.Gone;
-		}
-
-		protected override Java.Lang.Object DoInBackground(params Java.Lang.Object[] @params)
+        public bool checkInternetConnection()
         {
-            PublishProgress(null);
-            return null;
+            ConnectivityManager connectivityManager = (ConnectivityManager)mActivity.GetSystemService(Context.ConnectivityService);
+            if (connectivityManager.ActiveNetworkInfo != null && connectivityManager.ActiveNetworkInfo.IsAvailable &&
+               connectivityManager.ActiveNetworkInfo.IsConnected)
+            {
+                return true;
+            }
+
+            else
+            {
+                return false;
+            }
         }
-
-		protected override void OnProgressUpdate(params Java.Lang.Object[] values)
-		{
-            base.OnProgressUpdate(values);
-            _ua.pickUpBtnClicked();
-		}
-
-		protected override void OnPreExecute()
-        {
-            base.OnPreExecute();
-            _pb.Visibility = ViewStates.Visible;
-        }
-
     }
 
     /// <summary>
@@ -877,10 +999,12 @@ namespace FootPatrol.Droid
     public class updateUITask : AsyncTask
     {
         UserActivity _ua;
+        FragmentActivity _fa;
 
-        public updateUITask(UserActivity ua)
+        public updateUITask(UserActivity ua, FragmentActivity fa)
         {
             _ua = ua;
+            _fa = fa;
         }
 
         protected override Java.Lang.Object DoInBackground(params Java.Lang.Object[] @params)
@@ -891,13 +1015,55 @@ namespace FootPatrol.Droid
 		protected override void OnPreExecute()
 		{
 			base.OnPreExecute();
-            _ua.pairingID = Task.Run(() => _ua.getPairingID()).Result;
+            if(_ua.checkInternetConnection())
+                _ua.pairingID = Task.Run(() => _ua.getPairingID()).Result;
+            else
+                Toast.MakeText(_fa, "There is no internet connection!", ToastLength.Long).Show();
 		}
 
 		protected override void OnPostExecute(Java.Lang.Object result)
 		{
 			base.OnPostExecute(result);
-            _ua.displayVolunteers();
+            if(_ua.checkInternetConnection())
+                _ua.displayVolunteers();
+            else
+                Toast.MakeText(_fa, "There is no internet connection!", ToastLength.Long).Show();
 		}
 	}
+
+    /// <summary>
+    /// Update UI Task.
+    /// </summary>
+    public class addTextTask : AsyncTask
+    {
+        UserActivity _ua;
+        FragmentActivity fragmentActivity;
+
+        public addTextTask(UserActivity ua, FragmentActivity fa)
+        {
+            _ua = ua;
+            fragmentActivity = fa;
+        }
+
+        protected override void OnPostExecute(Java.Lang.Object result)
+        {
+            if(_ua.checkInternetConnection())
+                _ua.pickUpBtnClicked();
+            else
+                Toast.MakeText(fragmentActivity, "There is no internet connection!", ToastLength.Long).Show();  
+        }   
+
+        protected override Java.Lang.Object DoInBackground(params Java.Lang.Object[] @params)
+        {
+            return null;
+        }
+
+        protected override void OnPreExecute()
+        {
+            base.OnPreExecute();
+            Toast toast = Toast.MakeText(fragmentActivity, "Request sending...", ToastLength.Long);
+            toast.SetGravity(GravityFlags.CenterVertical, 0, 0);
+            toast.Show();
+        }
+    }  
 }
