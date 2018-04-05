@@ -4,11 +4,13 @@
 <div>
   Name:<br>
   <input type="text" id="name" class="ui input"><br>
-  Walk from (required):<select id=walkFrom [(ngModel)]="walkFrom" class="ui dropdown">
+  Walk from (required):<br>
+  <select id=walkFrom [(ngModel)]="walkFrom" class="ui dropdown">
     <option> --- </option>
     <option *ngFor="let location of locations" [ngValue]="location">{{location.location}}</option>
   </select><br>
-  Walk to (required):<select id=walkTo [(ngModel)]="walkTo" class="ui dropdown">
+  Walk to (required):<br>
+  <select id=walkTo [(ngModel)]="walkTo" class="ui dropdown">
     <option> --- </option>
     <option *ngFor="let location of locations" [ngValue]="location">{{location.location}}</option>
   </select><br>

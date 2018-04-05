@@ -17,7 +17,7 @@ export class AddPairComponent implements OnInit {
   volunteerTWO: Volunteer;
   pairState: string;
   errorMsg: string;
-  
+
   ngOnInit() {
     this.setup();
   }
