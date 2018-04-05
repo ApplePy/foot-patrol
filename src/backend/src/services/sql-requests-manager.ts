@@ -62,7 +62,7 @@ export class SQLRequestsManager extends SQLAbstractManager implements IRequestsM
 
     // Query for data
     return this.db.makeQuery(
-      `SELECT * FROM \`requests\`${(questionMarks.length > 0) ? " WHERE " : ""}${questionMarks} LIMIT ?, ?`,
+      `SELECT * FROM \`requests\`${(questionMarks.length > 0) ? " WHERE " : ""}${questionMarks} ORDER BY \`timestamp\` DESC LIMIT ?, ?`,
       [...filterArray, offset, count])
     .then((requests) => requests.map((x: any) => new TravelRequest(x)) as TravelRequest[]);
   }
