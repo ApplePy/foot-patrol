@@ -285,17 +285,19 @@ namespace FootPatrol.Droid
                 userMark = map.AddMarker(userMarker);
             }
 
-            if(pairOneMark != null && map != null)
+            if(pairOneMark != null && map != null && volunteerLocation != null)
             {
                 pairOneMark.Remove();
-                pairOneMarker.SetPosition(new LatLng(volunteerLocation.Latitude,volunteerLocation.Longitude));
+                pairOneMarker.SetPosition(new LatLng(volunteerLocation.Latitude, volunteerLocation.Longitude))
+                             .SetIcon(BitmapDescriptorFactory.DefaultMarker(BitmapDescriptorFactory.HueBlue));
                 pairOneMark = map.AddMarker(pairOneMarker);
             }
 
-            if(pairTwoMark != null && map != null)
+            if(pairTwoMark != null && map != null && volunteerLocation != null)
             {
                 pairTwoMark.Remove();
-                pairTwoMarker.SetPosition(new LatLng(volunteerLocation.Latitude, volunteerLocation.Longitude + 0.000005));
+                pairTwoMarker.SetPosition(new LatLng(volunteerLocation.Latitude, volunteerLocation.Longitude + 0.000005))
+                             .SetIcon(BitmapDescriptorFactory.DefaultMarker(BitmapDescriptorFactory.HueGreen));
                 pairTwoMark = map.AddMarker(pairTwoMarker);
             }
         }
@@ -748,7 +750,7 @@ namespace FootPatrol.Droid
             returnedNames = Task.Run(() => getVolunteerNames()).Result;
 
             //get the locations of both volunteers that accepted the user request
-            pairOneMarker.SetIcon(BitmapDescriptorFactory.DefaultMarker(BitmapDescriptorFactory.HueRed))
+            pairOneMarker.SetIcon(BitmapDescriptorFactory.DefaultMarker(BitmapDescriptorFactory.HueBlue))
                          .SetPosition(volunteerOneLatLng)
                          .SetTitle(returnedNames[0]);
             pairTwoMarker.SetIcon(BitmapDescriptorFactory.DefaultMarker(BitmapDescriptorFactory.HueGreen))
