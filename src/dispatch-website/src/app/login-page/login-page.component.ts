@@ -11,7 +11,6 @@ import {AuthService} from '../auth.service';
 export class LoginPageComponent implements OnInit {
 
   constructor(public router: Router, public authservice: AuthService) { }
-
   username: string;
   password: string;
 
@@ -30,6 +29,4 @@ export class LoginPageComponent implements OnInit {
   login() {
     this.authservice.login(this.username, this.password);
   }
-
 }
-
