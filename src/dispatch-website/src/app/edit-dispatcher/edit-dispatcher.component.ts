@@ -12,9 +12,7 @@ import { FormsModule } from '@angular/forms';
   providers: [DemoDispatchService]
 })
 export class EditDispatcherComponent implements OnInit {
-
   dispatcher: Dispatcher;
-
   errorMsg: string;
 
   constructor(public route: ActivatedRoute,

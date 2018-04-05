@@ -92,17 +92,14 @@ export class AddRequestComponent implements OnInit {
     strAdditionalInfo = strAdditionalInfo.replace(regWhi, '');
     charCheck = charCheck || regVal.test(strName);
     charCheck = charCheck || regVal.test(strAdditionalInfo);
-
     if (charCheck === true) {
       this.errorMsg = 'Error: Invalid characters detected. Remove any special characters other than "." and "," from the input fields';
       check = false;
     }
-
     if (strFromLocation === strToLocation) {
       this.errorMsg = 'Error: To and From locations must be different';
       check = false;
     }
-
     return check;
   }
 }

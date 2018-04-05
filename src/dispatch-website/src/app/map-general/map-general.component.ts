@@ -21,12 +21,11 @@ export class MapGeneralComponent implements OnInit {
   // tslint:disable-next-line:no-inferrable-types
   zoom: number = 15;
   getRepeat: number;
-  // this list is here to show that the markers work. delete this once the server connunication stuff for volunteer info is written
   displayList: DisplayVolunteer[] = [ ];
 
   constructor(private ftpService: FtpRequestService, private router: Router) {
     router.events.subscribe((val) => {
-    //   // when the user navigates away from the page, stop getting requests
+      // when the user navigates away from the page, stop getting requests
       clearInterval(this.getRepeat);
     });
   }
@@ -48,13 +47,9 @@ export class MapGeneralComponent implements OnInit {
       }
     });
   }
-
-
-
 }
 
 class DisplayVolunteer {
-
   constructor(vn: string, la: number, lo: number, ts: string) {
     this.Vname = vn;
     this.timestamp = ts;

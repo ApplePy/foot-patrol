@@ -10,17 +10,14 @@ import { Router } from '@angular/router';
   styleUrls: ['./add-pair.component.css']
 })
 export class AddPairComponent implements OnInit {
-
   constructor(public ftpService: FtpRequestService, private router: Router) { }
-
   volunteers: Volunteer[ ];
   pair: VolunteerPair;
   volunteerONE: Volunteer;
   volunteerTWO: Volunteer;
   pairState: string;
-
   errorMsg: string;
-
+  
   ngOnInit() {
     this.setup();
   }
@@ -43,8 +40,8 @@ export class AddPairComponent implements OnInit {
     } else if (this.pair.volunteers[1].id === this.pair.volunteers[0].id) {
       this.errorMsg = 'ERROR: The volunteers in the pair must be different';
      } else if (this.pair.volunteers[0].id > this.pair.volunteers[1].id) {
-       // if the volunteer ids are not in ascending order, swap the volunteers
 
+      // if the volunteer ids are not in ascending order, swap the volunteers
        const temp = this.pair.volunteers[0];
       this.pair.volunteers[0] = this.pair.volunteers[1];
       this.pair.volunteers[1] = temp;
@@ -83,12 +80,8 @@ export class AddPairComponent implements OnInit {
   }
 
   private sendPair() {
-
-    // this.ftpService.errorMsg = '';
     if (this.pairState === 'Active') {this.pair.active = true; }
     if (this.pairState === 'Inactive') {this.pair.active = false; }
-
-    // this.ftpService.toggleActiveVolunteerPair(this.pair.id, this.pair.active).subscribe();
     this.ftpService.createNewVolunteerPair([this.pair.volunteers[0].id, this.pair.volunteers[1].id], this.pair.active).subscribe((data) => {
       this.router.navigateByUrl('/volunteer-list');
     }, (error) => {

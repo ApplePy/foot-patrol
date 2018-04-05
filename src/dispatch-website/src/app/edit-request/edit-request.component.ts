@@ -12,18 +12,10 @@ import {Volunteer} from '../volunteer';
   templateUrl: './edit-request.component.html',
   styleUrls: ['./edit-request.component.css']
 })
-    // remeber to add some sort of check to make sure that the edited request is still not archived
-    // when the user returns to the main list page
-    // like, in the editRequest component call the getRequest function
-    // and check that the edited request is still there before sending the patch request
-    // can probably still do the edits though
-    //
-    // this might not be a problem
 
 export class EditRequestComponent implements OnInit {
   private apiUrl = environment.apiUrl;
   private requestURL = this.apiUrl + '/requests';
-
   request: Request;
   errorMsg: string;
   volunteerPair: Pair;
@@ -91,8 +83,6 @@ export class EditRequestComponent implements OnInit {
   }
 }
 
-// this is here becuase ts gets pissy if you try to call on variables that don't exist in the normal object type,
-// but do exist in the object type that the method will be called on when the method is called
 class Pair {
   id: number;
   active: boolean;

@@ -8,7 +8,6 @@ import { Observable } from 'rxjs/Observable';
 import { of } from 'rxjs/observable/of';
 import { Volunteer } from '../volunteer';
 import * as Moment from 'moment';
-// import { request } from 'http';
 
 @Component({
   selector: 'app-request-list',
@@ -17,7 +16,6 @@ import * as Moment from 'moment';
   providers: [FtpRequestService]
 })
 export class RequestListComponent implements OnInit {
-  // requests in displayRequests are displayed in the view
   displayRequests: Request[] = [ ];
   getRepeat: number;
 
@@ -40,10 +38,7 @@ export class RequestListComponent implements OnInit {
    */
   archive(request): void {
     request.archived = true;
-   // request.status = 'ARCHIVED';
-    this.ftpRequestService.archiveRequest(request).subscribe(
-      // TODO: maybe add some kind of confirmation that the request was archived or a message when there's an error
-     );
+    this.ftpRequestService.archiveRequest(request).subscribe();
   }
 
   /**
@@ -55,7 +50,7 @@ export class RequestListComponent implements OnInit {
         const requests  = data.requests;
         this.displayGetRequests(requests);
       }
-  );
+    );
   }
 
   /**
@@ -74,26 +69,12 @@ export class RequestListComponent implements OnInit {
     // clear displayRequests
     this.displayRequests.length = 0;
 
-    // move requests to displayRequests to display them
-    // this.displayRequests = requests.slice();
-
     // go through the requests and ask the server to send their volunteers to be displayed.
     // if the request has no volunteers then display an empty string
-    // let j = 0;
     this.displayRequests = [];
     for (let i = 0; i < requests.length; i++) {
       this.displayRequests[i] = requests[i];
     }
-      // this.displayRequests[i].request = requests[i];
-      // this.ftpRequestService.getRequestsVolunteers(requests[i].id).subscribe(volunteers => {
-      //   if (volunteers.volunteers.length === 2) {
-      //     this.displayRequests[j].volunteers =
-      //     `${volunteers[0].first_name} ${volunteers[0].last_name} and ${volunteers[1].first_name} ${volunteers[1].last_name}`;
-      //   } else {
-      //     this.displayRequests[j].volunteers = '';
-      //   }
-      //   j++;
-      // });
   }
 
   /**
@@ -118,9 +99,3 @@ export class RequestListComponent implements OnInit {
     }
   }
 }
-// hacky new display request type
-// has all the elements of the request type as well as the assigned volunteer info
- class DisplayRequestType {
-  request: Request;
-  volunteers: string;
- }
