@@ -41,7 +41,7 @@ namespace FootPatrol.Droid
         private static EditText userName, destination, additionalInfo;
         private static Android.Widget.ListView listView, searchListView;
         private static MarkerOptions userMarker, pairOneMarker, pairTwoMarker;
-        private static Marker pairOneMark, pairTwoMark;
+        private static Marker pairOneMark, pairTwoMark, userMark;
         private static CircleOptions circle;
         private static DrawerLayout drawerLayout;
         private static Android.Widget.RelativeLayout relativeLayout, acceptedRequestLayout;
@@ -278,20 +278,24 @@ namespace FootPatrol.Droid
 
         public void OnLocationChanged(Location location)
         {
-            LatLng userPosition = new LatLng(location.Latitude, location.Longitude);
-            userMarker.SetPosition(userPosition);
+            if (userMark != null && map != null)
+            {
+                userMark.Remove();
+                userMarker.SetPosition(new LatLng(location.Latitude, location.Longitude));
+                userMark = map.AddMarker(userMarker);
+            }
 
             if(pairOneMark != null && map != null)
             {
                 pairOneMark.Remove();
-                pairOneMarker.SetPosition(volunteerOneLatLng);
+                pairOneMarker.SetPosition(new LatLng(originalVolunteerLocation.Latitude,originalVolunteerLocation.Longitude));
                 pairOneMark = map.AddMarker(pairOneMarker);
             }
 
             if(pairTwoMark != null && map != null)
             {
                 pairTwoMark.Remove();
-                pairTwoMarker.SetPosition(volunteerTwoLatLng);
+                pairTwoMarker.SetPosition(new LatLng(originalVolunteerLocation.Latitude, originalVolunteerLocation.Longitude + 0.000005));
                 pairTwoMark = map.AddMarker(pairTwoMarker);
             }
         }
@@ -313,7 +317,7 @@ namespace FootPatrol.Droid
                                                                             .Zoom(15)
                                                                             .Tilt(45)
                                                                             .Build();
-                map.AddMarker(userMarker); //add the marker on the map
+                userMark = map.AddMarker(userMarker); //add the marker on the map
                 map.AnimateCamera(CameraUpdateFactory.NewCameraPosition(cameraPosition));
             }
 
@@ -363,7 +367,7 @@ namespace FootPatrol.Droid
         {
             locationRequest = LocationRequest.Create(); //create a new location request
             locationRequest.SetPriority(LocationRequest.PriorityHighAccuracy) //set the location request priority to high
-                           .SetInterval(10000) //set the interval for location updates to every minute
+                           .SetInterval(1000) //set the interval for location updates to every minute
                            .SetFastestInterval(1000); //set the fastest interval for location updates to every second
         }
 
@@ -774,7 +778,7 @@ namespace FootPatrol.Droid
             poly = map.AddPolyline(polyOptions); //display the polyline on the map
 
             callback = new TimerCallback(updateETA);
-            time = new Timer(callback, 0, 0, 1000);
+            time = new Timer(callback, 0, 0, 500);
 
             acceptedRequestLayout.Visibility = ViewStates.Visible;
         }
@@ -784,7 +788,7 @@ namespace FootPatrol.Droid
         {
             if (checkInternetConnection())
             {
-                Location volunteerLocation = Task.Run(() => getVolunteerLocation()).Result;
+                originalVolunteerLocation = Task.Run(() => getVolunteerLocation()).Result;
                 float[] results = new float[3];
                 Location.DistanceBetween(originalVolunteerLocation.Latitude, originalVolunteerLocation.Longitude, volunteerLocation.Latitude, volunteerLocation.Longitude, results);
                 float distanceBetween = results[0];
