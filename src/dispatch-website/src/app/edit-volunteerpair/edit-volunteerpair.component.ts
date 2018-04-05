@@ -12,13 +12,11 @@ import { VolunteerPair } from '../volunteer-pair';
   styleUrls: ['./edit-volunteerpair.component.css']
 })
 export class EditVolunteerpairComponent implements OnInit {
-
   pair: VolunteerPair;
   volunteers: Volunteer[];
   volunteerONE: Volunteer;
   volunteerTWO: Volunteer;
   errorMsg: string;
-
   pairState: string;
 
   constructor(public route: ActivatedRoute,

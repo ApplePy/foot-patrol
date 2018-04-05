@@ -10,12 +10,10 @@ import { Router } from '@angular/router';
   providers: [FtpRequestService]
 })
 export class AddVolunteerComponent implements OnInit {
-
   uwo_id: string;
   first_name: string;
   last_name: string;
   m_disabled: string;
-
   readonly states: string[]= ['Not Disabled', 'Disabled'];
   errorMsg: string;
 
@@ -50,5 +48,4 @@ export class AddVolunteerComponent implements OnInit {
       this.errorMsg = 'Invalid characters detected. Please remove all special characters';
     }
   }
-
 }

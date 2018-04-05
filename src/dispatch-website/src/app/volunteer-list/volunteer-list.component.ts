@@ -13,7 +13,6 @@ import * as Moment from 'moment';
   providers: [FtpRequestService]
 })
 export class VolunteerListComponent implements OnInit {
-
   displayVolunteers: Volunteer[] = [];
   volunteerPairs: DisplayPair[] = [];
   m_inactive: 'inactive';
@@ -36,7 +35,6 @@ export class VolunteerListComponent implements OnInit {
     this.volunteerPairs.length = 0;
     if (view === 'active') {
       this.ftpService.getVolunteerPairs().subscribe(pairs => {
-        // this.volunteerPairs = pairs.pairs;
         this.volunteerPairs = [];
         for (let i = 0; i < pairs.pairs.length; i++) {
           this.volunteerPairs[i] = new DisplayPair;
@@ -50,7 +48,6 @@ export class VolunteerListComponent implements OnInit {
       });
     } else if (view === 'all') {
       this.ftpService.getVolunteerPairs(true).subscribe(pairs => {
-        // this.volunteerPairs = pairs.pairs;
         this.volunteerPairs = [];
         for (let i = 0; i < pairs.pairs.length; i++) {
           this.volunteerPairs[i] = new DisplayPair;
@@ -79,21 +76,18 @@ export class VolunteerListComponent implements OnInit {
         for (let i = 0; i < volunteers.volunteers.length; i++) {
           this.displayVolunteers[i] = volunteers.volunteers[i];
         }
-        // this.displayVolunteers = volunteers.volunteers;
       });
     } else if (view === 'inactive') {
       this.ftpService.getAllInactiveVolunteers().subscribe(volunteers => {
         for (let i = 0; i < volunteers.volunteers.length; i++) {
           this.displayVolunteers[i] = volunteers.volunteers[i];
         }
-        // this.displayVolunteers = volunteers.volunteers;
       });
     } else if (view === 'disabled') {
       this.ftpService.getAllVolunteers(true).subscribe(volunteers => {
         for (let i = 0; i < volunteers.volunteers.length; i++) {
           this.displayVolunteers[i] = volunteers.volunteers[i];
         }
-        // this.displayVolunteers = volunteers.volunteers;
       });
     }
   }
@@ -113,16 +107,7 @@ export class VolunteerListComponent implements OnInit {
       return timestamp;
     }
   }
-
-    // togglePair(id, active) {
-    //   this.ftpService.toggleActiveVolunteerPair(id, active).subscribe(() => {
-    //     this.ftpService.getVolunteerPairs().subscribe(pairs => {
-    //       this.volunteerPairs = pairs.pairs;
-    //     });
-    //   });
-    // }
 }
-
 
 class DisplayPair {
   state: string;
