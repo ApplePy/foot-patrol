@@ -30,7 +30,7 @@ namespace FootPatrol.Droid
     public class UserActivity : Android.Support.V4.App.Fragment, GoogleApiClient.IOnConnectionFailedListener, GoogleApiClient.IConnectionCallbacks, Android.Gms.Location.ILocationListener, IOnMapReadyCallback
     {
         private static GoogleApiClient client; //the Google API client used to connect to Google Play Store
-        private static Location myLocation, originalVolunteerLocation; //the volunteer's current location
+        private static Location myLocation, originalVolunteerLocation, volunteerLocation; //the volunteer's current location
         private IFusedLocationProviderApi location; //location of the volunteer
         private LocationRequest locationRequest; //a new location request object so that location can be updated
         private static GoogleMap map; //reference to created google map
@@ -288,14 +288,14 @@ namespace FootPatrol.Droid
             if(pairOneMark != null && map != null)
             {
                 pairOneMark.Remove();
-                pairOneMarker.SetPosition(new LatLng(originalVolunteerLocation.Latitude,originalVolunteerLocation.Longitude));
+                pairOneMarker.SetPosition(new LatLng(volunteerLocation.Latitude,volunteerLocation.Longitude));
                 pairOneMark = map.AddMarker(pairOneMarker);
             }
 
             if(pairTwoMark != null && map != null)
             {
                 pairTwoMark.Remove();
-                pairTwoMarker.SetPosition(new LatLng(originalVolunteerLocation.Latitude, originalVolunteerLocation.Longitude + 0.000005));
+                pairTwoMarker.SetPosition(new LatLng(volunteerLocation.Latitude, volunteerLocation.Longitude + 0.000005));
                 pairTwoMark = map.AddMarker(pairTwoMarker);
             }
         }
@@ -783,12 +783,11 @@ namespace FootPatrol.Droid
             acceptedRequestLayout.Visibility = ViewStates.Visible;
         }
 
-
         private void updateETA(object state)
         {
             if (checkInternetConnection())
             {
-                originalVolunteerLocation = Task.Run(() => getVolunteerLocation()).Result;
+                volunteerLocation = Task.Run(() => getVolunteerLocation()).Result;
                 float[] results = new float[3];
                 Location.DistanceBetween(originalVolunteerLocation.Latitude, originalVolunteerLocation.Longitude, volunteerLocation.Latitude, volunteerLocation.Longitude, results);
                 float distanceBetween = results[0];
@@ -881,10 +880,10 @@ namespace FootPatrol.Droid
             JObject jObj = JObject.Parse(content);
             string latitude = (string)jObj.SelectToken("volunteers[0].latitude");
             string longitude = (string)jObj.SelectToken("volunteers[0].longitude");
-            Location volunteerLocation = new Location("");
-            volunteerLocation.Latitude = System.Double.Parse(latitude);
-            volunteerLocation.Longitude = System.Double.Parse(longitude);
-            return volunteerLocation;
+            Location vLocation = new Location("");
+            vLocation.Latitude = System.Double.Parse(latitude);
+            vLocation.Longitude = System.Double.Parse(longitude);
+            return vLocation;
         }
 
         /// <summary>
