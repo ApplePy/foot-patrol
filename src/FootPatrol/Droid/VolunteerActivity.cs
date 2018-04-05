@@ -333,7 +333,7 @@ namespace FootPatrol.Droid
         {
             locationRequest = LocationRequest.Create(); //create a new location request
             locationRequest.SetPriority(LocationRequest.PriorityHighAccuracy) //set the location request priority to high
-                           .SetInterval(10000) //set the interval for location updates to every minute
+                           .SetInterval(1000) //set the interval for location updates to every minute
                            .SetFastestInterval(1000); //set the fastest interval for location updates to every second
         }
 
