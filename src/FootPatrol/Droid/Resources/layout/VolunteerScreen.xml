@@ -109,8 +109,7 @@
                 p1:id="@+id/pickupInfo"
                 p1:text="Pickup Information"
                 p1:layout_above="@+id/userName1"
-                p1:layout_centerHorizontal="true"
-                p1:layout_marginBottom="5dp" />
+                p1:layout_centerHorizontal="true" />
             <TextView
                 p1:id="@+id/line"
                 p1:paddingTop="5dip"

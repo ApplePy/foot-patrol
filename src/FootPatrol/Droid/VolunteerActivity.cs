@@ -393,13 +393,24 @@ namespace FootPatrol.Droid
             if (checkInternetConnection())
             {
                 LatLng userPosition = new LatLng(location.Latitude, location.Longitude);
-                volunteerMarker.SetPosition(userPosition);
+                if (volunteerMark != null && map != null)
+                {
+                    volunteerMark.Remove();
+                    volunteerMarker.SetPosition(userPosition);
+                    volunteerMark = map.AddMarker(volunteerMarker);
+                }
+
                 Task.Run(() => updateLatLng(myID, userPosition.Latitude.ToString(), userPosition.Longitude.ToString()));
 
                 if (isPaired)
                 {
                     LatLng pairPosition = new LatLng(location.Latitude, location.Longitude + 0.000005);
-                    pairMarker.SetPosition(pairPosition);
+                    if (pairMark != null && map != null)
+                    {
+                        pairMark.Remove();
+                        pairMarker.SetPosition(pairPosition);
+                        pairMark = map.AddMarker(pairMarker);
+                    }
                     Task.Run(() => updateLatLng(vlnteerID, pairPosition.Latitude.ToString(), pairPosition.Longitude.ToString()));
                 }
             }
@@ -1285,7 +1296,7 @@ namespace FootPatrol.Droid
             pickupInfo.Text = "Pickup Information";
 
             var address = to_location; //set the starting user destination as the address
-            address = address + " Western University"; //concatenate the address with Western University to narrow the search
+            address = address + " Western University London Ontario"; //concatenate the address with Western University to narrow the search
             var approximateLocation = Task.Run(() => getPositionForAddress(address)).Result; //get GPS coordinates of the approximate location
 
             //store the latitude and longitude in separate double variables

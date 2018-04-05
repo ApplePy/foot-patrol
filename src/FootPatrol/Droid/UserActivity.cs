@@ -50,7 +50,7 @@ namespace FootPatrol.Droid
         private static ArrayAdapter<System.String> listAdapter, locationAdapter;
         private static SearchView searchView;
         private static string[] menuItems, locationNames;
-        private static string backendURI, postRequestURI, findPairsURI, numHours, numMinutes, ETA, expectedETA, volunteerETA;
+        private static string backendURI, postRequestURI, findPairsURI, numHours, numMinutes, ETA, expectedETA;
         public int requestID, pairingID;
         private static TimerCallback tc, callback;
         public static Timer timer, time;
@@ -62,6 +62,7 @@ namespace FootPatrol.Droid
         public static FragmentActivity mActivity;
         private static string approximateETA;
         public static bool isDestinationSelected = false;
+        public float volunteerETA;
 
         public string tag;
         public Android.Support.V4.App.Fragment fragment;
@@ -280,14 +281,18 @@ namespace FootPatrol.Droid
             LatLng userPosition = new LatLng(location.Latitude, location.Longitude);
             userMarker.SetPosition(userPosition);
 
-            if(pairOneMarker != null)
+            if(pairOneMark != null && map != null)
             {
+                pairOneMark.Remove();
                 pairOneMarker.SetPosition(volunteerOneLatLng);
+                pairOneMark = map.AddMarker(pairOneMarker);
             }
 
-            if(pairTwoMarker != null)
+            if(pairTwoMark != null && map != null)
             {
+                pairTwoMark.Remove();
                 pairTwoMarker.SetPosition(volunteerTwoLatLng);
+                pairTwoMark = map.AddMarker(pairTwoMarker);
             }
         }
 
@@ -785,9 +790,10 @@ namespace FootPatrol.Droid
                 float distanceBetween = results[0];
                 float metresPerMinute = 80.4672f;
                 float timeTraveled = distanceBetween / metresPerMinute;
-                volunteerETA = (Float.ParseFloat(expectedETA) - timeTraveled).ToString();
+                volunteerETA = Float.ParseFloat(expectedETA) - timeTraveled;
+                string myETA = volunteerETA.ToString("n2");
                 Message msg = Message.Obtain();
-                msg.Obj = "APPROXIMATE ETA: " + volunteerETA + " minutes";
+                msg.Obj = "APPROXIMATE ETA: " + myETA + " minutes";
                 msg.Target = handler;
                 msg.SendToTarget();
             }
