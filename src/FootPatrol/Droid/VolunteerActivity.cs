@@ -21,11 +21,9 @@ using Android.Support.V7.Widget;
 using Android.Support.V4.Widget;
 using Android.Content;
 using System.Threading;
-using static Android.Widget.AdapterView;
 using System.Text.RegularExpressions;
 using Newtonsoft.Json;
 using Android.Views.InputMethods;
-using Java.Lang;
 
 namespace FootPatrol.Droid
 {
@@ -1351,6 +1349,4 @@ namespace FootPatrol.Droid
             relativeLayout.Visibility = ViewStates.Visible;
         }
     }
-
-
 }
