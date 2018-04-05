@@ -398,7 +398,7 @@ namespace FootPatrol.Droid
 
                 if (isPaired)
                 {
-                    LatLng pairPosition = new LatLng(location.Latitude, location.Longitude + 0.0005);
+                    LatLng pairPosition = new LatLng(location.Latitude, location.Longitude + 0.000005);
                     pairMarker.SetPosition(pairPosition);
                     Task.Run(() => updateLatLng(vlnteerID, pairPosition.Latitude.ToString(), pairPosition.Longitude.ToString()));
                 }
