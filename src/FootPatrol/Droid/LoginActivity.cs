@@ -3,7 +3,6 @@ using Android.OS;
 using Android.Views;
 using Android.Graphics;
 using Android.Widget;
-using System.Windows;
 
 namespace FootPatrol.Droid
 {
@@ -13,19 +12,9 @@ namespace FootPatrol.Droid
         TextView continueAsUser;
         Button signIn;
         EditText userName, password;
-        ProgressBar spinner;
+        private static Android.Support.V4.App.FragmentManager fragmentManager;
 
         private Typeface bentonSans; //font to be used
-
-        /// <summary>
-        /// Creates a new instance of LoginActivity
-        /// </summary>
-        /// <returns>The instance.</returns>
-        public static LoginActivity newInstance()
-        {
-            LoginActivity la = new LoginActivity();
-            return la;
-        }
 
         /// <summary>
         /// Creates the LoginActivity view.
@@ -44,9 +33,8 @@ namespace FootPatrol.Droid
             signIn = (Button)views.FindViewById(Resource.Id.loginBtn);
             userName = (EditText)views.FindViewById(Resource.Id.usernameField);
             password = (EditText)views.FindViewById(Resource.Id.passwordField);
-            spinner = (ProgressBar)views.FindViewById(Resource.Id.progressBar1);
 
-            spinner.Visibility = ViewStates.Gone; //set the loading spinner to gone
+            fragmentManager = this.Activity.SupportFragmentManager;
 
             //set the fonts of each UI element
             bentonSans = Typeface.CreateFromAsset(this.Activity.Application.Assets, "BentonSansRegular.otf");
@@ -73,29 +61,39 @@ namespace FootPatrol.Droid
 
                 else
                 {
-                    spinner.Visibility = ViewStates.Visible; //make the spinner visible
+                    Toast.MakeText(this.Activity, "Loading Map...", ToastLength.Long).Show();
                     switchFragment(new VolunteerActivity(), "VolunteerActivity");
                 }
             };
 
             continueAsUser.Click += (sender, e) =>
             {
-                spinner.Visibility = ViewStates.Visible; //make the spinner visible
+                Toast.MakeText(this.Activity, "Loading Map...", ToastLength.Long).Show();
                 switchFragment(new UserActivity(), "UserActivity");
             };
 
             return views;
         }
 
+        /// <summary>
+        /// Sets the font.
+        /// </summary>
+        /// <param name="font">Font.</param>
+        /// <param name="text">Text.</param>
         private void setFont(Typeface font, TextView text)
         {
             text.SetTypeface(font, TypefaceStyle.Normal);
         }
 
-        private void switchFragment(Android.Support.V4.App.Fragment frag, string tag)
+        /// <summary>
+        /// Switches the fragment.
+        /// </summary>
+        /// <param name="frag">Frag.</param>
+        /// <param name="tag">Tag.</param>
+        public void switchFragment(Android.Support.V4.App.Fragment frag, string tag)
         {
             Android.Support.V4.App.Fragment newFrag = frag; //create a new instance of VolunteerActivity and save it
-            Android.Support.V4.App.FragmentTransaction fragmentTransaction = this.Activity.SupportFragmentManager.BeginTransaction(); //begin the fragment transaction
+            Android.Support.V4.App.FragmentTransaction fragmentTransaction = fragmentManager.BeginTransaction(); //begin the fragment transaction
             fragmentTransaction.SetCustomAnimations(Resource.Layout.EnterAnimation, Resource.Layout.ExitAnimation); //add animation to slide new fragment to the left
             fragmentTransaction.Replace(Resource.Id.frameLayout2, newFrag, tag); //replace the old fragment with the new on
             fragmentTransaction.AddToBackStack("LoginActivity");

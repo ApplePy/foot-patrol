@@ -5,9 +5,15 @@
   Name:<br>
   <input type="text" id="name" class="ui input"><br>
   Walk from (required):<br>
-  <input type="text" id="fromLocation" class="ui input"><br>
+  <select id=walkFrom [(ngModel)]="walkFrom" class="ui dropdown">
+    <option> --- </option>
+    <option *ngFor="let location of locations" [ngValue]="location">{{location.location}}</option>
+  </select><br>
   Walk to (required):<br>
-  <input type="text" id="toLocation" class="ui input"><br>
+  <select id=walkTo [(ngModel)]="walkTo" class="ui dropdown">
+    <option> --- </option>
+    <option *ngFor="let location of locations" [ngValue]="location">{{location.location}}</option>
+  </select><br>
   Additional information:<br>
   <input type="text" id="additionalInfo" class="ui input"><br>
 </div>

@@ -1,17 +1,17 @@
 <h2>Edit Volunteer</h2>
-<div>
-  First Name: <input type='text' [(ngModel)]=volunteer.first_name><br>
-  Last Name: <input type='text' [(ngModel)]=volunteer.last_name><br>
-  UWO id: <input type='text' [(ngModel)]=volunteer.uwo_id><br>
-  State (optional): <select id=volunteerTWO [(ngModel)]="m_disabled">
-    <option *ngFor="let state of states" [ngValue]="m_disabled">{{state}}</option>
+
+  <div>First Name: <input type='text' [(ngModel)]=volunteer.first_name></div><br>
+  <div>Last Name: <input type='text' [(ngModel)]=volunteer.last_name></div><br>
+  <div>UWO id: <input type='text' [(ngModel)]=volunteer.uwo_id></div><br>
+  <div>State (optional): <select id=volunteerTWO [(ngModel)]="m_disabled" class="ui dropdown">
+    <option *ngFor="let state of states" [ngValue]="state" [selected]="(state == 'Disabled') == volunteer.disabled">{{state}}</option>
   </select><br>
-</div>
+  </div>
 
 <div>
   <br>
-  <button (click)="updateVolunteer()" type="button">Edit Volunteer</button>
-  <button routerLink='/volunteer-list' type="button">Cancel</button>
+  <button (click)="updateVolunteer()" type="button" class="ui green button">Edit Volunteer</button>
+  <button routerLink='/volunteer-list' type="button" class="ui red button">Cancel</button>
 </div>
 
 <div>

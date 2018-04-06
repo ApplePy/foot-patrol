@@ -4,6 +4,7 @@ import {Volunteer} from '../volunteer';
 import {FormControl, FormGroup} from '@angular/forms';
 import {VolunteerPair} from '../volunteer-pair';
 import {Router} from '@angular/router';
+import * as Moment from 'moment';
 
 @Component({
   selector: 'app-volunteer-list',
@@ -12,9 +13,8 @@ import {Router} from '@angular/router';
   providers: [FtpRequestService]
 })
 export class VolunteerListComponent implements OnInit {
-
   displayVolunteers: Volunteer[] = [];
-  volunteerPairs: VolunteerPair[] = [];
+  volunteerPairs: DisplayPair[] = [];
   m_inactive: 'inactive';
   m_active: 'active';
 
@@ -33,20 +33,30 @@ export class VolunteerListComponent implements OnInit {
 
   changePairView(view) {
     this.volunteerPairs.length = 0;
-
     if (view === 'active') {
       this.ftpService.getVolunteerPairs().subscribe(pairs => {
-        // this.volunteerPairs = pairs.pairs;
+        this.volunteerPairs = [];
         for (let i = 0; i < pairs.pairs.length; i++) {
-          this.volunteerPairs[i] = pairs.pairs[i];
+          this.volunteerPairs[i] = new DisplayPair;
+          this.volunteerPairs[i].pair = pairs.pairs[i];
+          if (pairs.pairs[i].active) {
+            this.volunteerPairs[i].state = 'ACTIVE';
+          } else {
+            this.volunteerPairs[i].state = 'INACTIVE';
+          }
         }
       });
     } else if (view === 'all') {
       this.ftpService.getVolunteerPairs(true).subscribe(pairs => {
-        // this.volunteerPairs = pairs.pairs;
         this.volunteerPairs = [];
         for (let i = 0; i < pairs.pairs.length; i++) {
-          this.volunteerPairs[i] = pairs.pairs[i];
+          this.volunteerPairs[i] = new DisplayPair;
+          this.volunteerPairs[i].pair = pairs.pairs[i];
+          if (pairs.pairs[i].active) {
+            this.volunteerPairs[i].state = 'ACTIVE';
+          } else {
+            this.volunteerPairs[i].state = 'INACTIVE';
+          }
         }
       });
     }
@@ -66,14 +76,18 @@ export class VolunteerListComponent implements OnInit {
         for (let i = 0; i < volunteers.volunteers.length; i++) {
           this.displayVolunteers[i] = volunteers.volunteers[i];
         }
-        // this.displayVolunteers = volunteers.volunteers;
       });
     } else if (view === 'inactive') {
       this.ftpService.getAllInactiveVolunteers().subscribe(volunteers => {
         for (let i = 0; i < volunteers.volunteers.length; i++) {
           this.displayVolunteers[i] = volunteers.volunteers[i];
         }
-        // this.displayVolunteers = volunteers.volunteers;
+      });
+    } else if (view === 'disabled') {
+      this.ftpService.getAllVolunteers(true).subscribe(volunteers => {
+        for (let i = 0; i < volunteers.volunteers.length; i++) {
+          this.displayVolunteers[i] = volunteers.volunteers[i];
+        }
       });
     }
   }
@@ -85,11 +99,17 @@ export class VolunteerListComponent implements OnInit {
   editVolunteer(id) {
     this.router.navigateByUrl(`/edit-volunteer/${id}`);
   }
-    // togglePair(id, active) {
-    //   this.ftpService.toggleActiveVolunteerPair(id, active).subscribe(() => {
-    //     this.ftpService.getVolunteerPairs().subscribe(pairs => {
-    //       this.volunteerPairs = pairs.pairs;
-    //     });
-    //   });
-    // }
+
+  timestampString(timestamp: Date) {
+    if (timestamp) {
+      return Moment(timestamp).format('MMMM Do YYYY, h:mm:ss a');
+    } else {
+      return timestamp;
+    }
+  }
+}
+
+class DisplayPair {
+  state: string;
+  pair: VolunteerPair;
 }

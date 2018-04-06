@@ -26,7 +26,7 @@ const routes: Routes = [
   {path: 'editRequest/:id', component: EditRequestComponent, canActivate: [AuthGuard]},
   {path: 'add-volunteer', component: AddVolunteerComponent, canActivate: [AuthGuard]},
   {path: 'edit-volunteer/:id', component: EditVolunteerComponent, canActivate: [AuthGuard]},
-  
+
   {path: 'request-list', component: RequestListComponent, canActivate: [AuthGuard]},
   {path: 'add-request', component: AddRequestComponent, canActivate: [AuthGuard]},
   {path: 'map', component: MapGeneralComponent, canActivate: [AuthGuard]},
@@ -34,7 +34,8 @@ const routes: Routes = [
   {path: 'dispatcher-list', component: DispatcherListComponent, canActivate: [AuthGuard]},
   {path: 'edit-dispatcher/:id', component: EditDispatcherComponent, canActivate: [AuthGuard]},
   {path: 'add-dispatcher', component: AddDispatcherComponent, canActivate: [AuthGuard]},
-  {path: '', redirectTo: '/request-list', pathMatch: 'full'}
+  {path: '', redirectTo: '/request-list', pathMatch: 'full'},
+  {path: '**', redirectTo: '/login', pathMatch: 'full' }
 ];
 
 @NgModule({

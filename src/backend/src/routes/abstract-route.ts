@@ -21,7 +21,11 @@ export abstract class AbstractRoute {
       return new StatusError(404,
         errStrings.NotFoundError.Title,
         errStrings.NotFoundError.Msg);
-    } else {
+      } else if (err.message === "Conflict") {
+        return new StatusError(409,
+          errStrings.ConflictError.Title,
+          errStrings.ConflictError.Msg);
+      } else {
       return new StatusError(500,
         errStrings.InternalServerError.Title,
         errStrings.InternalServerError.Msg);

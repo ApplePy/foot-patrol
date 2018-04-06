@@ -1,6 +1,13 @@
-<div>
-  <div style="font-size: 20px; font-weight: bold;"> Username:</div> <input style="margin: 10px 10px 10px 10px;" type='text' id='username' [(ngModel)]='username'><br>
-  <div style="font-size: 20px; font-weight: bold;"> Password:</div> <input style="margin: 10px 10px 10px 10px;" type='password' id='password' [(ngModel)]='password'><br>
-</div>
+<div class="ui center aligned basic fitted segment">
 
-<button (click)='login()' type='button' class="ui green button">Login</button>
+  <div style="font-size: 20px; font-weight: bold; color: #369;"> Username:</div>
+  <input style="margin: 10px 10px 10px 10px;" type='text' id='username' [(ngModel)]='username'>
+  <br>
+
+  <div style="font-size: 20px; font-weight: bold; color: #369;"> Password:</div>
+  <input style="margin: 10px 10px 10px 10px;" type='password' id='password' [(ngModel)]='password'>
+  <br>
+
+  <button (click)='login()' type='button' class="ui green button">Login</button>
+
+</div>

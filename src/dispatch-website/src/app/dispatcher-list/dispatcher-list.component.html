@@ -1,17 +1,20 @@
 <h2>Dispatcher List</h2>
 <button (click)='addDispatcher()'>Add Dispatcher</button>
-<table>
-  <tr>
-    <th>Id</th>
-    <th>Name</th>
-    <th>UWO Id</th>
-    <th>Edit</th>
-  </tr>
-
-  <tr *ngFor='let dispatcher of dispatchers'>
-    <td>{{dispatcher.id}}</td>
-    <td>{{dispatcher.name}}</td>
-    <td>{{dispatcher.uwo_id}}</td>
-    <td><button (click)=editDispatcher(dispatcher.id)>Edit</button></td>
-  </tr>
+<table class="ui celled table">
+  <thead>
+    <tr>
+      <th>Id</th>
+      <th>Name</th>
+      <th>UWO Id</th>
+      <th>Edit</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor='let dispatcher of dispatchers'>
+      <td>{{dispatcher.id}}</td>
+      <td>{{dispatcher.name}}</td>
+      <td>{{dispatcher.uwo_id}}</td>
+      <td><button (click)=editDispatcher(dispatcher.id) class="ui button">Edit</button></td>
+    </tr>
+  </tbody>
 </table>

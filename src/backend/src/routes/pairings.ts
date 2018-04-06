@@ -232,7 +232,7 @@ export class VolunteerPairingsRoute extends AbstractRoute implements IRoute {
    * @param next {NextFunction} Execute the next method.
    *
    * @api {post} /api/v1/volunteerpairs Create a new volunteer pair
-   * @apiVersion 1.2.0
+   * @apiVersion 1.2.1
    * @apiName PostVolunteerPair
    * @apiGroup VolunteerPairs
    *
@@ -281,6 +281,7 @@ export class VolunteerPairingsRoute extends AbstractRoute implements IRoute {
    *     }
    *
    * @apiError (Error 400) InvalidBodyParameter One of the post request parameters was missing or invalid.
+   * @apiError (Error 409) ConflictError One of the volunteers to be paired is already in an active pairing.
    * @apiErrorExample Error Response:
    *     HTTP/1.1 400 BAD REQUEST
    *     {
@@ -323,7 +324,7 @@ export class VolunteerPairingsRoute extends AbstractRoute implements IRoute {
    * @param next {NextFunction} Execute the next method.
    *
    * @api {post} /api/v1/volunteerpairs/:id/active Toggle active state of a volunteer pairing record
-   * @apiVersion 1.2.0
+   * @apiVersion 1.2.1
    * @apiName ToggleVolunteerPairState
    * @apiGroup VolunteerPairs
    *
@@ -337,6 +338,7 @@ export class VolunteerPairingsRoute extends AbstractRoute implements IRoute {
    * @apiError (Error 400) InvalidURLParameter The ID was invalid.
    * @apiError (Error 400) InvalidBodyParameter One of the request parameters was missing or invalid.
    * @apiError (Error 404) NotFoundError The request ID was not found.
+   * @apiError (Error 409) ConflictError One of the volunteers in this pair is already in an active pairing.
    * @apiErrorExample Error Response:
    *     HTTP/1.1 400 BAD REQUEST
    *     {

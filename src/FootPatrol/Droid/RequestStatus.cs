@@ -1,5 +1,4 @@
-﻿
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -20,5 +19,8 @@ namespace FootPatrol.Droid
 
         [JsonProperty(PropertyName = "status")]
         public string status { get; set; }
+
+        [JsonProperty(PropertyName = "pairing")]
+        public int pairing { get; set; }
     }
 }

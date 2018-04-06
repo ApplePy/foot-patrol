@@ -11,12 +11,14 @@ import {AuthService} from '../auth.service';
 export class LoginPageComponent implements OnInit {
 
   constructor(public router: Router, public authservice: AuthService) { }
-
   username: string;
   password: string;
 
   ngOnInit() {
-
+    if (sessionStorage.getItem('currentUser') === 'Dispatcher') {
+      this.authservice.login('John', 'Smith'); // pretend it's logging in with the dispatch credentials
+      // yes this is terrible design but demo
+    }
   }
 
   /**
@@ -27,6 +29,4 @@ export class LoginPageComponent implements OnInit {
   login() {
     this.authservice.login(this.username, this.password);
   }
-
 }
-

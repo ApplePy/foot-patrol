@@ -4,8 +4,6 @@
     p1:layout_width="match_parent"
     p1:layout_height="match_parent">
     <RelativeLayout
-        p1:minWidth="25px"
-        p1:minHeight="25px"
         p1:layout_width="match_parent"
         p1:fillViewport="true"
         p1:layout_height="match_parent"
@@ -32,7 +30,7 @@
                 p1:layout_height="wrap_content"
                 p1:id="@+id/volunteersText"
                 p1:layout_centerHorizontal="true"
-                p1:text="Volunteers" />
+                p1:text="VOLUNTEERS" />
             <ImageButton
                 p1:src="@drawable/mike"
                 p1:layout_width="150dp"
@@ -89,9 +87,26 @@
                 p1:layout_below="@+id/patrollerName1"
                 p1:layout_width="match_parent"
                 p1:layout_height="1dp"
+                p1:background="#807F83" />
+            <TextView
+                p1:layout_width="wrap_content"
+                p1:layout_height="wrap_content"
+                p1:id="@+id/etaText2"
+                p1:text="APPROXIMATE ETA:"
+                p1:layout_below="@id/line3"
+                p1:textSize="16sp"
+                p1:layout_marginLeft="10dp"
+                p1:layout_marginTop="8dp" />
+            <Button
+                p1:layout_width="wrap_content"
+                p1:layout_height="30dp"
+                p1:id="@+id/finishTripBtn2"
+                p1:text="Finish Trip"
+                p1:layout_below="@id/line3"
+                p1:layout_alignParentRight="true"
+                p1:layout_marginRight="10dp"
                 p1:background="#807F83"
-                p1:layout_marginBottom="10dp"
-                p1:layout_marginTop="5dp" />
+                p1:layout_marginTop="3dp" />
         </RelativeLayout>
         <RelativeLayout
             p1:minWidth="25px"
@@ -172,7 +187,7 @@
                 p1:layout_width="match_parent"
                 p1:layout_height="1dp"
                 p1:background="#807F83"
-                p1:layout_marginBottom="10dp" />
+                p1:layout_marginBottom="5dp" />
         </RelativeLayout>
         <ImageButton
             p1:src="@drawable/ic_keyboard_arrow_right_black_24dp"
@@ -205,14 +220,6 @@
             p1:textAllCaps="true"
             p1:textStyle="bold"
             p1:gravity="center_horizontal" />
-        <ProgressBar
-            p1:layout_width="wrap_content"
-            p1:layout_height="wrap_content"
-            p1:id="@+id/spinner3"
-            p1:spinnerMode="dialog"
-            style="?android:attr/progressBarStyleLarge"
-            p1:layout_centerHorizontal="true"
-            p1:layout_centerVertical="true" />
     </RelativeLayout>
     <ListView
         p1:id="@+id/userListViewMF"

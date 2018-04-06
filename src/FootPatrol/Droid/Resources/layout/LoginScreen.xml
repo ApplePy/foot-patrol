@@ -47,14 +47,6 @@
         p1:layout_below="@+id/frameLayout3"
         p1:layout_centerHorizontal="true"
         p1:layout_marginTop="20dp" />
-    <ProgressBar
-        style="?android:attr/progressBarStyleLarge"
-        p1:layout_width="wrap_content"
-        p1:layout_height="wrap_content"
-        p1:id="@+id/progressBar1"
-        p1:layout_centerHorizontal="true"
-        p1:spinnerMode="dialog"
-        p1:layout_below="@id/WesternLogo" />
     <FrameLayout
         p1:orientation="vertical"
         p1:minWidth="25px"

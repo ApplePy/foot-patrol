@@ -8,13 +8,10 @@ import { AuthService } from '../auth.service';
   styleUrls: ['./header.component.css']
 })
 export class HeaderComponent implements OnInit {
-
   isLoggedIn: Observable<boolean>;
   isAdmin: Observable<boolean>;
 
-  constructor(private authService: AuthService) {
-
-  }
+  constructor(private authService: AuthService) { }
 
   ngOnInit() {
     this.isLoggedIn = this.authService.isLoggedIn;
@@ -24,5 +21,4 @@ export class HeaderComponent implements OnInit {
   onLogout() {
     this.authService.logout();
   }
-
 }

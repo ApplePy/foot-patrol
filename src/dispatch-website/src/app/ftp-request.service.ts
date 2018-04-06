@@ -63,11 +63,6 @@ export class FtpRequestService {
   updateRequest(request: Request): Observable<any> {
     const patchURL = this.requestURL + '/' + request.id;
     return this.http.patch(patchURL, {
-      // name: request.name,
-      from_location: request.from_location,
-      to_location: request.to_location,
-      additional_info: request.additional_info,
-      archived: request.archived,
       pairing: request.pairing,
       status: request.status
     }).pipe(
@@ -140,7 +135,7 @@ export class FtpRequestService {
    * @param inactive Optional: set whether to include inactive pairs. Default is false
    */
   getVolunteerPairs(inactive = false) {
-    return this.http.get(this.volunteerPairsURL)
+    return this.http.get(this.volunteerPairsURL + `?inactive=${inactive}`)
                   .pipe(
                     retry(3),
                     catchError(this.handleError)
@@ -172,18 +167,16 @@ export class FtpRequestService {
                         );
   }
 
-  // toggleActiveVolunteerPair(id, status) {
-  //   status = !status;
-  //   return this.http.post(this.volunteerURL + `/${id}/active`, status)
-  //                       .pipe(
-  //                         retry(3),
-  //                         catchError(this.handleError)
-  //                       );
-  // }
+  toggleActiveVolunteerPair(Pair_id, status) {
+    return this.http.post(this.volunteerPairsURL + `/${Pair_id}/active`, {active: status})
+                        .pipe(
+                          retry(3),
+                          catchError(this.handleError)
+                        );
+  }
 
   createNewVolunteerPair(volunteers, active) {
     const data = {volunteers, active};
-    // console.log(data);
     return this.http.post(this.volunteerPairsURL, data)
                           .pipe(
                             retry(3),
@@ -219,6 +212,9 @@ export class FtpRequestService {
         `body was: ${error.error}`);
     }
     // return an ErrorObservable with a user-facing error message
-    return new ErrorObservable('Something bad happened; please try again later.');
+    const errorData = {
+      status: error.status
+    };
+    return new ErrorObservable(errorData);
   }
 }

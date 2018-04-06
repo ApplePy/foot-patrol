@@ -3303,17 +3303,17 @@ namespace FootPatrol.Droid
 			// aapt resource value: 0x7f0c0097
 			public const int aboutUsText = 2131493015;
 			
-			// aapt resource value: 0x7f0c0104
-			public const int acceptRequest = 2131493124;
+			// aapt resource value: 0x7f0c0103
+			public const int acceptRequest = 2131493123;
 			
-			// aapt resource value: 0x7f0c010b
-			public const int acceptedRequestLayout = 2131493131;
+			// aapt resource value: 0x7f0c010a
+			public const int acceptedRequestLayout = 2131493130;
 			
 			// aapt resource value: 0x7f0c0122
 			public const int acceptedRequestLayout2 = 2131493154;
 			
-			// aapt resource value: 0x7f0c00ef
-			public const int action0 = 2131493103;
+			// aapt resource value: 0x7f0c00ee
+			public const int action0 = 2131493102;
 			
 			// aapt resource value: 0x7f0c0087
 			public const int action_bar = 2131492999;
@@ -3336,17 +3336,17 @@ namespace FootPatrol.Droid
 			// aapt resource value: 0x7f0c0065
 			public const int action_bar_title = 2131492965;
 			
-			// aapt resource value: 0x7f0c00ec
-			public const int action_container = 2131493100;
+			// aapt resource value: 0x7f0c00eb
+			public const int action_container = 2131493099;
 			
 			// aapt resource value: 0x7f0c0088
 			public const int action_context_bar = 2131493000;
 			
-			// aapt resource value: 0x7f0c00f3
-			public const int action_divider = 2131493107;
+			// aapt resource value: 0x7f0c00f2
+			public const int action_divider = 2131493106;
 			
-			// aapt resource value: 0x7f0c00ed
-			public const int action_image = 2131493101;
+			// aapt resource value: 0x7f0c00ec
+			public const int action_image = 2131493100;
 			
 			// aapt resource value: 0x7f0c0003
 			public const int action_menu_divider = 2131492867;
@@ -3363,11 +3363,11 @@ namespace FootPatrol.Droid
 			// aapt resource value: 0x7f0c0067
 			public const int action_mode_close_button = 2131492967;
 			
-			// aapt resource value: 0x7f0c00ee
-			public const int action_text = 2131493102;
+			// aapt resource value: 0x7f0c00ed
+			public const int action_text = 2131493101;
 			
-			// aapt resource value: 0x7f0c00fc
-			public const int actions = 2131493116;
+			// aapt resource value: 0x7f0c00fb
+			public const int actions = 2131493115;
 			
 			// aapt resource value: 0x7f0c0068
 			public const int activity_chooser_view_content = 2131492968;
@@ -3375,8 +3375,8 @@ namespace FootPatrol.Droid
 			// aapt resource value: 0x7f0c0033
 			public const int add = 2131492915;
 			
-			// aapt resource value: 0x7f0c0103
-			public const int additionalInfo = 2131493123;
+			// aapt resource value: 0x7f0c0102
+			public const int additionalInfo = 2131493122;
 			
 			// aapt resource value: 0x7f0c0023
 			public const int adjust_height = 2131492899;
@@ -3402,14 +3402,14 @@ namespace FootPatrol.Droid
 			// aapt resource value: 0x7f0c0028
 			public const int auto = 2131492904;
 			
-			// aapt resource value: 0x7f0c015d
-			public const int awarenessText = 2131493213;
+			// aapt resource value: 0x7f0c015e
+			public const int awarenessText = 2131493214;
 			
-			// aapt resource value: 0x7f0c0137
-			public const int badgeCounter = 2131493175;
+			// aapt resource value: 0x7f0c0138
+			public const int badgeCounter = 2131493176;
 			
-			// aapt resource value: 0x7f0c0148
-			public const int badgeCounter2 = 2131493192;
+			// aapt resource value: 0x7f0c0149
+			public const int badgeCounter2 = 2131493193;
 			
 			// aapt resource value: 0x7f0c003b
 			public const int beginning = 2131492923;
@@ -3432,11 +3432,11 @@ namespace FootPatrol.Droid
 			// aapt resource value: 0x7f0c0096
 			public const int campusMapView = 2131493014;
 			
-			// aapt resource value: 0x7f0c00eb
-			public const int campusPoliceBtn = 2131493099;
+			// aapt resource value: 0x7f0c00ea
+			public const int campusPoliceBtn = 2131493098;
 			
-			// aapt resource value: 0x7f0c00f0
-			public const int cancel_action = 2131493104;
+			// aapt resource value: 0x7f0c00ef
+			public const int cancel_action = 2131493103;
 			
 			// aapt resource value: 0x7f0c0050
 			public const int center = 2131492944;
@@ -3450,8 +3450,8 @@ namespace FootPatrol.Droid
 			// aapt resource value: 0x7f0c007e
 			public const int checkbox = 2131492990;
 			
-			// aapt resource value: 0x7f0c00f8
-			public const int chronometer = 2131493112;
+			// aapt resource value: 0x7f0c00f7
+			public const int chronometer = 2131493111;
 			
 			// aapt resource value: 0x7f0c0059
 			public const int clip_horizontal = 2131492953;
@@ -3459,17 +3459,17 @@ namespace FootPatrol.Droid
 			// aapt resource value: 0x7f0c005a
 			public const int clip_vertical = 2131492954;
 			
-			// aapt resource value: 0x7f0c0107
-			public const int closeButton = 2131493127;
+			// aapt resource value: 0x7f0c0106
+			public const int closeButton = 2131493126;
 			
 			// aapt resource value: 0x7f0c0045
 			public const int collapseActionView = 2131492933;
 			
-			// aapt resource value: 0x7f0c0139
-			public const int completeTripBtn = 2131493177;
+			// aapt resource value: 0x7f0c013a
+			public const int completeTripBtn = 2131493178;
 			
-			// aapt resource value: 0x7f0c014a
-			public const int completeTripBtn1 = 2131493194;
+			// aapt resource value: 0x7f0c014b
+			public const int completeTripBtn1 = 2131493195;
 			
 			// aapt resource value: 0x7f0c00a7
 			public const int contactUsText = 2131493031;
@@ -3525,11 +3525,11 @@ namespace FootPatrol.Droid
 			// aapt resource value: 0x7f0c002d
 			public const int disableHome = 2131492909;
 			
-			// aapt resource value: 0x7f0c0132
-			public const int drawer_layout = 2131493170;
+			// aapt resource value: 0x7f0c0133
+			public const int drawer_layout = 2131493171;
 			
-			// aapt resource value: 0x7f0c0143
-			public const int drawer_layout1 = 2131493187;
+			// aapt resource value: 0x7f0c0144
+			public const int drawer_layout1 = 2131493188;
 			
 			// aapt resource value: 0x7f0c0089
 			public const int edit_query = 2131493001;
@@ -3537,14 +3537,14 @@ namespace FootPatrol.Droid
 			// aapt resource value: 0x7f0c00b4
 			public const int emailText = 2131493044;
 			
-			// aapt resource value: 0x7f0c00e9
-			public const int emergencyImage = 2131493097;
+			// aapt resource value: 0x7f0c00e8
+			public const int emergencyImage = 2131493096;
 			
 			// aapt resource value: 0x7f0c003c
 			public const int end = 2131492924;
 			
-			// aapt resource value: 0x7f0c00fe
-			public const int end_padder = 2131493118;
+			// aapt resource value: 0x7f0c00fd
+			public const int end_padder = 2131493117;
 			
 			// aapt resource value: 0x7f0c004b
 			public const int enterAlways = 2131492939;
@@ -3552,11 +3552,17 @@ namespace FootPatrol.Droid
 			// aapt resource value: 0x7f0c004c
 			public const int enterAlwaysCollapsed = 2131492940;
 			
-			// aapt resource value: 0x7f0c0157
-			public const int escort = 2131493207;
+			// aapt resource value: 0x7f0c0158
+			public const int escort = 2131493208;
 			
-			// aapt resource value: 0x7f0c0156
-			public const int escortsText = 2131493206;
+			// aapt resource value: 0x7f0c0157
+			public const int escortsText = 2131493207;
+			
+			// aapt resource value: 0x7f0c0111
+			public const int etaText = 2131493137;
+			
+			// aapt resource value: 0x7f0c0123
+			public const int etaText2 = 2131493155;
 			
 			// aapt resource value: 0x7f0c00aa
 			public const int eveningHoursText = 2131493034;
@@ -3579,11 +3585,17 @@ namespace FootPatrol.Droid
 			// aapt resource value: 0x7f0c0053
 			public const int fill_vertical = 2131492947;
 			
+			// aapt resource value: 0x7f0c0112
+			public const int finishTripBtn = 2131493138;
+			
+			// aapt resource value: 0x7f0c0124
+			public const int finishTripBtn2 = 2131493156;
+			
 			// aapt resource value: 0x7f0c005f
 			public const int @fixed = 2131492959;
 			
-			// aapt resource value: 0x7f0c00ea
-			public const int footPatrolHQBtn = 2131493098;
+			// aapt resource value: 0x7f0c00e9
+			public const int footPatrolHQBtn = 2131493097;
 			
 			// aapt resource value: 0x7f0c00b5
 			public const int footPatrolLocation = 2131493045;
@@ -3600,8 +3612,8 @@ namespace FootPatrol.Droid
 			// aapt resource value: 0x7f0c0063
 			public const int forever = 2131492963;
 			
-			// aapt resource value: 0x7f0c00ce
-			public const int frameLayout1 = 2131493070;
+			// aapt resource value: 0x7f0c00cd
+			public const int frameLayout1 = 2131493069;
 			
 			// aapt resource value: 0x7f0c00c7
 			public const int frameLayout2 = 2131493063;
@@ -3609,8 +3621,8 @@ namespace FootPatrol.Droid
 			// aapt resource value: 0x7f0c00cb
 			public const int frameLayout3 = 2131493067;
 			
-			// aapt resource value: 0x7f0c0101
-			public const int fromLocation = 2131493121;
+			// aapt resource value: 0x7f0c0100
+			public const int fromLocation = 2131493120;
 			
 			// aapt resource value: 0x7f0c000a
 			public const int ghost_view = 2131492874;
@@ -3633,8 +3645,8 @@ namespace FootPatrol.Droid
 			// aapt resource value: 0x7f0c006d
 			public const int icon = 2131492973;
 			
-			// aapt resource value: 0x7f0c00fd
-			public const int icon_group = 2131493117;
+			// aapt resource value: 0x7f0c00fc
+			public const int icon_group = 2131493116;
 			
 			// aapt resource value: 0x7f0c0025
 			public const int icon_only = 2131492901;
@@ -3648,14 +3660,14 @@ namespace FootPatrol.Droid
 			// aapt resource value: 0x7f0c00a0
 			public const int imageView1 = 2131493024;
 			
-			// aapt resource value: 0x7f0c00f9
-			public const int info = 2131493113;
+			// aapt resource value: 0x7f0c00f8
+			public const int info = 2131493112;
 			
-			// aapt resource value: 0x7f0c0138
-			public const int innerRelative = 2131493176;
+			// aapt resource value: 0x7f0c0139
+			public const int innerRelative = 2131493177;
 			
-			// aapt resource value: 0x7f0c0149
-			public const int innerRelative1 = 2131493193;
+			// aapt resource value: 0x7f0c014a
+			public const int innerRelative1 = 2131493194;
 			
 			// aapt resource value: 0x7f0c009a
 			public const int introductionText = 2131493018;
@@ -3672,23 +3684,23 @@ namespace FootPatrol.Droid
 			// aapt resource value: 0x7f0c0054
 			public const int left = 2131492948;
 			
-			// aapt resource value: 0x7f0c0105
-			public const int leftArrow = 2131493125;
+			// aapt resource value: 0x7f0c0104
+			public const int leftArrow = 2131493124;
 			
 			// aapt resource value: 0x7f0c002a
 			public const int light = 2131492906;
 			
-			// aapt resource value: 0x7f0c015c
-			public const int lightingText = 2131493212;
+			// aapt resource value: 0x7f0c015d
+			public const int lightingText = 2131493213;
 			
-			// aapt resource value: 0x7f0c0118
-			public const int line = 2131493144;
+			// aapt resource value: 0x7f0c011a
+			public const int line = 2131493146;
 			
 			// aapt resource value: 0x7f0c0017
 			public const int line1 = 2131492887;
 			
-			// aapt resource value: 0x7f0c0111
-			public const int line2 = 2131493137;
+			// aapt resource value: 0x7f0c0110
+			public const int line2 = 2131493136;
 			
 			// aapt resource value: 0x7f0c0018
 			public const int line3 = 2131492888;
@@ -3699,14 +3711,14 @@ namespace FootPatrol.Droid
 			// aapt resource value: 0x7f0c002b
 			public const int listMode = 2131492907;
 			
-			// aapt resource value: 0x7f0c0154
-			public const int listView1 = 2131493204;
+			// aapt resource value: 0x7f0c0155
+			public const int listView1 = 2131493205;
 			
-			// aapt resource value: 0x7f0c0140
-			public const int listView2 = 2131493184;
+			// aapt resource value: 0x7f0c0141
+			public const int listView2 = 2131493185;
 			
-			// aapt resource value: 0x7f0c0152
-			public const int listView3 = 2131493202;
+			// aapt resource value: 0x7f0c0153
+			public const int listView3 = 2131493203;
 			
 			// aapt resource value: 0x7f0c006c
 			public const int list_item = 2131492972;
@@ -3717,29 +3729,29 @@ namespace FootPatrol.Droid
 			// aapt resource value: 0x7f0c00b2
 			public const int locationTextView = 2131493042;
 			
-			// aapt resource value: 0x7f0c00cd
-			public const int loginBtn = 2131493069;
+			// aapt resource value: 0x7f0c00cc
+			public const int loginBtn = 2131493068;
+			
+			// aapt resource value: 0x7f0c015a
+			public const int lostAndFound = 2131493210;
 			
 			// aapt resource value: 0x7f0c0159
-			public const int lostAndFound = 2131493209;
+			public const int lostAndFoundText = 2131493209;
 			
-			// aapt resource value: 0x7f0c0158
-			public const int lostAndFoundText = 2131493208;
+			// aapt resource value: 0x7f0c0135
+			public const int map = 2131493173;
 			
-			// aapt resource value: 0x7f0c0134
-			public const int map = 2131493172;
+			// aapt resource value: 0x7f0c0145
+			public const int map2 = 2131493189;
 			
-			// aapt resource value: 0x7f0c0144
-			public const int map2 = 2131493188;
+			// aapt resource value: 0x7f0c0160
+			public const int masked = 2131493216;
 			
-			// aapt resource value: 0x7f0c015f
-			public const int masked = 2131493215;
+			// aapt resource value: 0x7f0c00f1
+			public const int media_actions = 2131493105;
 			
-			// aapt resource value: 0x7f0c00f2
-			public const int media_actions = 2131493106;
-			
-			// aapt resource value: 0x7f0c0109
-			public const int message = 2131493129;
+			// aapt resource value: 0x7f0c0108
+			public const int message = 2131493128;
 			
 			// aapt resource value: 0x7f0c003d
 			public const int middle = 2131492925;
@@ -3750,86 +3762,86 @@ namespace FootPatrol.Droid
 			// aapt resource value: 0x7f0c009b
 			public const int missionText = 2131493019;
 			
-			// aapt resource value: 0x7f0c00db
-			public const int mr_art = 2131493083;
-			
-			// aapt resource value: 0x7f0c00d0
-			public const int mr_chooser_list = 2131493072;
-			
-			// aapt resource value: 0x7f0c00d3
-			public const int mr_chooser_route_desc = 2131493075;
-			
-			// aapt resource value: 0x7f0c00d1
-			public const int mr_chooser_route_icon = 2131493073;
-			
-			// aapt resource value: 0x7f0c00d2
-			public const int mr_chooser_route_name = 2131493074;
+			// aapt resource value: 0x7f0c00da
+			public const int mr_art = 2131493082;
 			
 			// aapt resource value: 0x7f0c00cf
-			public const int mr_chooser_title = 2131493071;
+			public const int mr_chooser_list = 2131493071;
 			
-			// aapt resource value: 0x7f0c00d8
-			public const int mr_close = 2131493080;
+			// aapt resource value: 0x7f0c00d2
+			public const int mr_chooser_route_desc = 2131493074;
 			
-			// aapt resource value: 0x7f0c00de
-			public const int mr_control_divider = 2131493086;
+			// aapt resource value: 0x7f0c00d0
+			public const int mr_chooser_route_icon = 2131493072;
 			
-			// aapt resource value: 0x7f0c00e4
-			public const int mr_control_playback_ctrl = 2131493092;
+			// aapt resource value: 0x7f0c00d1
+			public const int mr_chooser_route_name = 2131493073;
 			
-			// aapt resource value: 0x7f0c00e7
-			public const int mr_control_subtitle = 2131493095;
-			
-			// aapt resource value: 0x7f0c00e6
-			public const int mr_control_title = 2131493094;
-			
-			// aapt resource value: 0x7f0c00e5
-			public const int mr_control_title_container = 2131493093;
-			
-			// aapt resource value: 0x7f0c00d9
-			public const int mr_custom_control = 2131493081;
-			
-			// aapt resource value: 0x7f0c00da
-			public const int mr_default_control = 2131493082;
-			
-			// aapt resource value: 0x7f0c00d5
-			public const int mr_dialog_area = 2131493077;
-			
-			// aapt resource value: 0x7f0c00d4
-			public const int mr_expandable_area = 2131493076;
-			
-			// aapt resource value: 0x7f0c00e8
-			public const int mr_group_expand_collapse = 2131493096;
-			
-			// aapt resource value: 0x7f0c00dc
-			public const int mr_media_main_control = 2131493084;
+			// aapt resource value: 0x7f0c00ce
+			public const int mr_chooser_title = 2131493070;
 			
 			// aapt resource value: 0x7f0c00d7
-			public const int mr_name = 2131493079;
+			public const int mr_close = 2131493079;
 			
 			// aapt resource value: 0x7f0c00dd
-			public const int mr_playback_control = 2131493085;
-			
-			// aapt resource value: 0x7f0c00d6
-			public const int mr_title_bar = 2131493078;
-			
-			// aapt resource value: 0x7f0c00df
-			public const int mr_volume_control = 2131493087;
-			
-			// aapt resource value: 0x7f0c00e0
-			public const int mr_volume_group_list = 2131493088;
-			
-			// aapt resource value: 0x7f0c00e2
-			public const int mr_volume_item_icon = 2131493090;
+			public const int mr_control_divider = 2131493085;
 			
 			// aapt resource value: 0x7f0c00e3
-			public const int mr_volume_slider = 2131493091;
+			public const int mr_control_playback_ctrl = 2131493091;
+			
+			// aapt resource value: 0x7f0c00e6
+			public const int mr_control_subtitle = 2131493094;
+			
+			// aapt resource value: 0x7f0c00e5
+			public const int mr_control_title = 2131493093;
+			
+			// aapt resource value: 0x7f0c00e4
+			public const int mr_control_title_container = 2131493092;
+			
+			// aapt resource value: 0x7f0c00d8
+			public const int mr_custom_control = 2131493080;
+			
+			// aapt resource value: 0x7f0c00d9
+			public const int mr_default_control = 2131493081;
+			
+			// aapt resource value: 0x7f0c00d4
+			public const int mr_dialog_area = 2131493076;
+			
+			// aapt resource value: 0x7f0c00d3
+			public const int mr_expandable_area = 2131493075;
+			
+			// aapt resource value: 0x7f0c00e7
+			public const int mr_group_expand_collapse = 2131493095;
+			
+			// aapt resource value: 0x7f0c00db
+			public const int mr_media_main_control = 2131493083;
+			
+			// aapt resource value: 0x7f0c00d6
+			public const int mr_name = 2131493078;
+			
+			// aapt resource value: 0x7f0c00dc
+			public const int mr_playback_control = 2131493084;
+			
+			// aapt resource value: 0x7f0c00d5
+			public const int mr_title_bar = 2131493077;
+			
+			// aapt resource value: 0x7f0c00de
+			public const int mr_volume_control = 2131493086;
+			
+			// aapt resource value: 0x7f0c00df
+			public const int mr_volume_group_list = 2131493087;
+			
+			// aapt resource value: 0x7f0c00e1
+			public const int mr_volume_item_icon = 2131493089;
+			
+			// aapt resource value: 0x7f0c00e2
+			public const int mr_volume_slider = 2131493090;
 			
 			// aapt resource value: 0x7f0c0034
 			public const int multiply = 2131492916;
 			
-			// aapt resource value: 0x7f0c0142
-			public const int navigationList1 = 2131493186;
+			// aapt resource value: 0x7f0c0143
+			public const int navigationList1 = 2131493187;
 			
 			// aapt resource value: 0x7f0c00be
 			public const int navigation_header_container = 2131493054;
@@ -3843,29 +3855,29 @@ namespace FootPatrol.Droid
 			// aapt resource value: 0x7f0c0020
 			public const int normal = 2131492896;
 			
+			// aapt resource value: 0x7f0c0137
+			public const int notificationBadge = 2131493175;
+			
+			// aapt resource value: 0x7f0c0148
+			public const int notificationBadge2 = 2131493192;
+			
 			// aapt resource value: 0x7f0c0136
-			public const int notificationBadge = 2131493174;
+			public const int notificationBase = 2131493174;
 			
 			// aapt resource value: 0x7f0c0147
-			public const int notificationBadge2 = 2131493191;
+			public const int notificationBase2 = 2131493191;
 			
-			// aapt resource value: 0x7f0c0135
-			public const int notificationBase = 2131493173;
-			
-			// aapt resource value: 0x7f0c0146
-			public const int notificationBase2 = 2131493190;
-			
-			// aapt resource value: 0x7f0c00fb
-			public const int notification_background = 2131493115;
-			
-			// aapt resource value: 0x7f0c00f5
-			public const int notification_main_column = 2131493109;
+			// aapt resource value: 0x7f0c00fa
+			public const int notification_background = 2131493114;
 			
 			// aapt resource value: 0x7f0c00f4
-			public const int notification_main_column_container = 2131493108;
+			public const int notification_main_column = 2131493108;
 			
-			// aapt resource value: 0x7f0c015a
-			public const int otherServicesText = 2131493210;
+			// aapt resource value: 0x7f0c00f3
+			public const int notification_main_column_container = 2131493107;
+			
+			// aapt resource value: 0x7f0c015b
+			public const int otherServicesText = 2131493211;
 			
 			// aapt resource value: 0x7f0c0099
 			public const int ourMissionText = 2131493017;
@@ -3882,35 +3894,32 @@ namespace FootPatrol.Droid
 			// aapt resource value: 0x7f0c00ca
 			public const int passwordField = 2131493066;
 			
-			// aapt resource value: 0x7f0c010f
-			public const int patrollerName1 = 2131493135;
+			// aapt resource value: 0x7f0c010e
+			public const int patrollerName1 = 2131493134;
 			
-			// aapt resource value: 0x7f0c0110
-			public const int patrollerName2 = 2131493136;
+			// aapt resource value: 0x7f0c010f
+			public const int patrollerName2 = 2131493135;
+			
+			// aapt resource value: 0x7f0c010c
+			public const int patrollerPicture1 = 2131493132;
 			
 			// aapt resource value: 0x7f0c010d
-			public const int patrollerPicture1 = 2131493133;
+			public const int patrollerPicture2 = 2131493133;
 			
-			// aapt resource value: 0x7f0c010e
-			public const int patrollerPicture2 = 2131493134;
-			
-			// aapt resource value: 0x7f0c015b
-			public const int patrolsText = 2131493211;
+			// aapt resource value: 0x7f0c015c
+			public const int patrolsText = 2131493212;
 			
 			// aapt resource value: 0x7f0c00b3
 			public const int phoneText = 2131493043;
 			
-			// aapt resource value: 0x7f0c0117
-			public const int pickupInfo = 2131493143;
+			// aapt resource value: 0x7f0c0119
+			public const int pickupInfo = 2131493145;
 			
-			// aapt resource value: 0x7f0c014f
-			public const int pickupInfo1 = 2131493199;
+			// aapt resource value: 0x7f0c0150
+			public const int pickupInfo1 = 2131493200;
 			
 			// aapt resource value: 0x7f0c0058
 			public const int pin = 2131492952;
-			
-			// aapt resource value: 0x7f0c00cc
-			public const int progressBar1 = 2131493068;
 			
 			// aapt resource value: 0x7f0c0006
 			public const int progress_circular = 2131492870;
@@ -3921,35 +3930,35 @@ namespace FootPatrol.Droid
 			// aapt resource value: 0x7f0c0080
 			public const int radio = 2131492992;
 			
-			// aapt resource value: 0x7f0c0133
-			public const int recyclerView1 = 2131493171;
+			// aapt resource value: 0x7f0c0134
+			public const int recyclerView1 = 2131493172;
 			
-			// aapt resource value: 0x7f0c0145
-			public const int recyclerView2 = 2131493189;
+			// aapt resource value: 0x7f0c0146
+			public const int recyclerView2 = 2131493190;
 			
 			// aapt resource value: 0x7f0c00ad
 			public const int regularOperations = 2131493037;
 			
-			// aapt resource value: 0x7f0c00ff
-			public const int relativeLayout = 2131493119;
+			// aapt resource value: 0x7f0c00fe
+			public const int relativeLayout = 2131493118;
 			
-			// aapt resource value: 0x7f0c0113
-			public const int requestPickupBtn = 2131493139;
+			// aapt resource value: 0x7f0c0115
+			public const int requestPickupBtn = 2131493141;
 			
-			// aapt resource value: 0x7f0c0124
-			public const int requestPickupBtn1 = 2131493156;
+			// aapt resource value: 0x7f0c0126
+			public const int requestPickupBtn1 = 2131493158;
 			
 			// aapt resource value: 0x7f0c0055
 			public const int right = 2131492949;
 			
-			// aapt resource value: 0x7f0c0106
-			public const int rightArrow = 2131493126;
+			// aapt resource value: 0x7f0c0105
+			public const int rightArrow = 2131493125;
 			
-			// aapt resource value: 0x7f0c00fa
-			public const int right_icon = 2131493114;
+			// aapt resource value: 0x7f0c00f9
+			public const int right_icon = 2131493113;
 			
-			// aapt resource value: 0x7f0c00f6
-			public const int right_side = 2131493110;
+			// aapt resource value: 0x7f0c00f5
+			public const int right_side = 2131493109;
 			
 			// aapt resource value: 0x7f0c0021
 			public const int satellite = 2131492897;
@@ -3984,11 +3993,11 @@ namespace FootPatrol.Droid
 			// aapt resource value: 0x7f0c0060
 			public const int scrollable = 2131492960;
 			
-			// aapt resource value: 0x7f0c013f
-			public const int searchView = 2131493183;
+			// aapt resource value: 0x7f0c0140
+			public const int searchView = 2131493184;
 			
-			// aapt resource value: 0x7f0c0151
-			public const int searchView1 = 2131493201;
+			// aapt resource value: 0x7f0c0152
+			public const int searchView1 = 2131493202;
 			
 			// aapt resource value: 0x7f0c008b
 			public const int search_badge = 2131493003;
@@ -4038,11 +4047,11 @@ namespace FootPatrol.Droid
 			// aapt resource value: 0x7f0c0031
 			public const int showTitle = 2131492913;
 			
-			// aapt resource value: 0x7f0c013e
-			public const int sideTabBtn = 2131493182;
+			// aapt resource value: 0x7f0c013f
+			public const int sideTabBtn = 2131493183;
 			
-			// aapt resource value: 0x7f0c0150
-			public const int sideTabBtn1 = 2131493200;
+			// aapt resource value: 0x7f0c0151
+			public const int sideTabBtn1 = 2131493201;
 			
 			// aapt resource value: 0x7f0c00b6
 			public const int smallLabel = 2131493046;
@@ -4062,14 +4071,8 @@ namespace FootPatrol.Droid
 			// aapt resource value: 0x7f0c006f
 			public const int spacer = 2131492975;
 			
-			// aapt resource value: 0x7f0c0108
-			public const int spinner1 = 2131493128;
-			
-			// aapt resource value: 0x7f0c011e
-			public const int spinner2 = 2131493150;
-			
-			// aapt resource value: 0x7f0c012c
-			public const int spinner3 = 2131493164;
+			// aapt resource value: 0x7f0c0107
+			public const int spinner1 = 2131493127;
 			
 			// aapt resource value: 0x7f0c0008
 			public const int split_action_bar = 2131492872;
@@ -4089,8 +4092,8 @@ namespace FootPatrol.Droid
 			// aapt resource value: 0x7f0c0056
 			public const int start = 2131492950;
 			
-			// aapt resource value: 0x7f0c00f1
-			public const int status_bar_latest_event_content = 2131493105;
+			// aapt resource value: 0x7f0c00f0
+			public const int status_bar_latest_event_content = 2131493104;
 			
 			// aapt resource value: 0x7f0c0081
 			public const int submenuarrow = 2131492993;
@@ -4131,8 +4134,8 @@ namespace FootPatrol.Droid
 			// aapt resource value: 0x7f0c0015
 			public const int textinput_error = 2131492885;
 			
-			// aapt resource value: 0x7f0c00f7
-			public const int time = 2131493111;
+			// aapt resource value: 0x7f0c00f6
+			public const int time = 2131493110;
 			
 			// aapt resource value: 0x7f0c001c
 			public const int title = 2131492892;
@@ -4143,8 +4146,8 @@ namespace FootPatrol.Droid
 			// aapt resource value: 0x7f0c007a
 			public const int title_template = 2131492986;
 			
-			// aapt resource value: 0x7f0c0102
-			public const int toLocation = 2131493122;
+			// aapt resource value: 0x7f0c0101
+			public const int toLocation = 2131493121;
 			
 			// aapt resource value: 0x7f0c009c
 			public const int toOurVolunteers = 2131493020;
@@ -4185,95 +4188,95 @@ namespace FootPatrol.Droid
 			// aapt resource value: 0x7f0c0032
 			public const int useLogo = 2131492914;
 			
-			// aapt resource value: 0x7f0c013d
-			public const int userAddInfo = 2131493181;
+			// aapt resource value: 0x7f0c013e
+			public const int userAddInfo = 2131493182;
 			
-			// aapt resource value: 0x7f0c014e
-			public const int userAddInfo1 = 2131493198;
+			// aapt resource value: 0x7f0c014f
+			public const int userAddInfo1 = 2131493199;
 			
-			// aapt resource value: 0x7f0c0116
-			public const int userAdditionalInfo = 2131493142;
+			// aapt resource value: 0x7f0c0118
+			public const int userAdditionalInfo = 2131493144;
 			
-			// aapt resource value: 0x7f0c0127
-			public const int userAdditionalInfo1 = 2131493159;
+			// aapt resource value: 0x7f0c0129
+			public const int userAdditionalInfo1 = 2131493161;
 			
-			// aapt resource value: 0x7f0c013b
-			public const int userFromLoc = 2131493179;
+			// aapt resource value: 0x7f0c013c
+			public const int userFromLoc = 2131493180;
 			
-			// aapt resource value: 0x7f0c014c
-			public const int userFromLoc1 = 2131493196;
+			// aapt resource value: 0x7f0c014d
+			public const int userFromLoc1 = 2131493197;
 			
-			// aapt resource value: 0x7f0c0112
-			public const int userInnerRelative = 2131493138;
+			// aapt resource value: 0x7f0c0114
+			public const int userInnerRelative = 2131493140;
 			
-			// aapt resource value: 0x7f0c0123
-			public const int userInnerRelativeMF = 2131493155;
+			// aapt resource value: 0x7f0c0125
+			public const int userInnerRelativeMF = 2131493157;
 			
 			// aapt resource value: 0x7f0c011f
 			public const int userListView = 2131493151;
 			
-			// aapt resource value: 0x7f0c012d
-			public const int userListViewMF = 2131493165;
+			// aapt resource value: 0x7f0c012e
+			public const int userListViewMF = 2131493166;
 			
-			// aapt resource value: 0x7f0c0119
-			public const int userMap = 2131493145;
+			// aapt resource value: 0x7f0c0113
+			public const int userMap = 2131493139;
 			
 			// aapt resource value: 0x7f0c0121
 			public const int userMapMF = 2131493153;
 			
-			// aapt resource value: 0x7f0c0100
-			public const int userName = 2131493120;
+			// aapt resource value: 0x7f0c00ff
+			public const int userName = 2131493119;
 			
-			// aapt resource value: 0x7f0c013a
-			public const int userName1 = 2131493178;
+			// aapt resource value: 0x7f0c013b
+			public const int userName1 = 2131493179;
 			
-			// aapt resource value: 0x7f0c014b
-			public const int userName2 = 2131493195;
+			// aapt resource value: 0x7f0c014c
+			public const int userName2 = 2131493196;
 			
-			// aapt resource value: 0x7f0c0114
-			public const int userName5 = 2131493140;
+			// aapt resource value: 0x7f0c0116
+			public const int userName5 = 2131493142;
 			
-			// aapt resource value: 0x7f0c0125
-			public const int userName6 = 2131493157;
+			// aapt resource value: 0x7f0c0127
+			public const int userName6 = 2131493159;
+			
+			// aapt resource value: 0x7f0c011e
+			public const int userSVDescription = 2131493150;
+			
+			// aapt resource value: 0x7f0c012d
+			public const int userSVDescriptionMF = 2131493165;
 			
 			// aapt resource value: 0x7f0c011d
-			public const int userSVDescription = 2131493149;
+			public const int userSearchListView = 2131493149;
 			
-			// aapt resource value: 0x7f0c012b
-			public const int userSVDescriptionMF = 2131493163;
+			// aapt resource value: 0x7f0c012c
+			public const int userSearchListViewMF = 2131493164;
 			
 			// aapt resource value: 0x7f0c011c
-			public const int userSearchListView = 2131493148;
+			public const int userSearchView = 2131493148;
 			
-			// aapt resource value: 0x7f0c012a
-			public const int userSearchListViewMF = 2131493162;
+			// aapt resource value: 0x7f0c012b
+			public const int userSearchViewMF = 2131493163;
 			
 			// aapt resource value: 0x7f0c011b
-			public const int userSearchView = 2131493147;
+			public const int userSideTab = 2131493147;
 			
-			// aapt resource value: 0x7f0c0129
-			public const int userSearchViewMF = 2131493161;
+			// aapt resource value: 0x7f0c012a
+			public const int userSideTabMF = 2131493162;
 			
-			// aapt resource value: 0x7f0c011a
-			public const int userSideTab = 2131493146;
+			// aapt resource value: 0x7f0c013d
+			public const int userToLoc = 2131493181;
+			
+			// aapt resource value: 0x7f0c014e
+			public const int userToLoc1 = 2131493198;
+			
+			// aapt resource value: 0x7f0c0117
+			public const int userToLocation = 2131493143;
 			
 			// aapt resource value: 0x7f0c0128
-			public const int userSideTabMF = 2131493160;
+			public const int userToLocation1 = 2131493160;
 			
-			// aapt resource value: 0x7f0c013c
-			public const int userToLoc = 2131493180;
-			
-			// aapt resource value: 0x7f0c014d
-			public const int userToLoc1 = 2131493197;
-			
-			// aapt resource value: 0x7f0c0115
-			public const int userToLocation = 2131493141;
-			
-			// aapt resource value: 0x7f0c0126
-			public const int userToLocation1 = 2131493158;
-			
-			// aapt resource value: 0x7f0c010a
-			public const int userdrawer = 2131493130;
+			// aapt resource value: 0x7f0c0109
+			public const int userdrawer = 2131493129;
 			
 			// aapt resource value: 0x7f0c0120
 			public const int userdrawerMF = 2131493152;
@@ -4284,38 +4287,38 @@ namespace FootPatrol.Droid
 			// aapt resource value: 0x7f0c0016
 			public const int view_offset_helper = 2131492886;
 			
-			// aapt resource value: 0x7f0c015e
-			public const int visible = 2131493214;
+			// aapt resource value: 0x7f0c015f
+			public const int visible = 2131493215;
 			
-			// aapt resource value: 0x7f0c00e1
-			public const int volume_item_container = 2131493089;
+			// aapt resource value: 0x7f0c00e0
+			public const int volume_item_container = 2131493088;
+			
+			// aapt resource value: 0x7f0c0130
+			public const int volunteer = 2131493168;
+			
+			// aapt resource value: 0x7f0c0142
+			public const int volunteerSVDescription = 2131493186;
+			
+			// aapt resource value: 0x7f0c0154
+			public const int volunteerSVDescriptionMF = 2131493204;
 			
 			// aapt resource value: 0x7f0c012f
-			public const int volunteer = 2131493167;
+			public const int volunteerText = 2131493167;
 			
-			// aapt resource value: 0x7f0c0141
-			public const int volunteerSVDescription = 2131493185;
-			
-			// aapt resource value: 0x7f0c0153
-			public const int volunteerSVDescriptionMF = 2131493203;
-			
-			// aapt resource value: 0x7f0c012e
-			public const int volunteerText = 2131493166;
-			
-			// aapt resource value: 0x7f0c010c
-			public const int volunteersText = 2131493132;
+			// aapt resource value: 0x7f0c010b
+			public const int volunteersText = 2131493131;
 			
 			// aapt resource value: 0x7f0c009f
 			public const int webview = 2131493023;
 			
-			// aapt resource value: 0x7f0c0155
-			public const int whatWeDoText = 2131493205;
+			// aapt resource value: 0x7f0c0156
+			public const int whatWeDoText = 2131493206;
+			
+			// aapt resource value: 0x7f0c0132
+			public const int whyVolunteer = 2131493170;
 			
 			// aapt resource value: 0x7f0c0131
-			public const int whyVolunteer = 2131493169;
-			
-			// aapt resource value: 0x7f0c0130
-			public const int whyVolunteerText = 2131493168;
+			public const int whyVolunteerText = 2131493169;
 			
 			// aapt resource value: 0x7f0c0027
 			public const int wide = 2131492903;
@@ -4859,8 +4862,11 @@ namespace FootPatrol.Droid
 			// aapt resource value: 0x7f090036
 			public const int abc_toolbar_collapse_description = 2131296310;
 			
-			// aapt resource value: 0x7f09004e
-			public const int app_name = 2131296334;
+			// aapt resource value: 0x7f09004d
+			public const int api_url = 2131296333;
+			
+			// aapt resource value: 0x7f09004f
+			public const int app_name = 2131296335;
 			
 			// aapt resource value: 0x7f090044
 			public const int appbar_scrolling_view_behavior = 2131296324;
@@ -4922,8 +4928,8 @@ namespace FootPatrol.Droid
 			// aapt resource value: 0x7f090010
 			public const int common_signin_button_text_long = 2131296272;
 			
-			// aapt resource value: 0x7f09004d
-			public const int hello = 2131296333;
+			// aapt resource value: 0x7f09004e
+			public const int hello = 2131296334;
 			
 			// aapt resource value: 0x7f090011
 			public const int mr_button_content_description = 2131296273;
@@ -5009,8 +5015,8 @@ namespace FootPatrol.Droid
 			// aapt resource value: 0x7f09004c
 			public const int status_bar_notification_info_overflow = 2131296332;
 			
-			// aapt resource value: 0x7f09004f
-			public const int westernFootPatrolIsAFreeServiceAtWesternUniversityThatAssistsInKeepingCampusASafePlaceToStudyWorkAndLiveWeAreVolunteerDrivenServiceWithBetween250300VolunteersEachSchoolYearWeAreCommittedToProvidingASafeAndSecureEnvironmentForStudentsFacultyAndStaffOurMissionIsToRaiseAwarenessOfPersonalSafetyIssuesDeterCrimeThroughVisiblePatrolsAndToProvideSafeEscortsToCommunityMembersThisProactiveApproachToSafetyFocusesOnStudentsHelpingStudentsEngagingStudentVolunteersInTheDirectProvisionOfServicesCreatingASenseOfOwnershipAndResponsibility = 2131296335;
+			// aapt resource value: 0x7f090050
+			public const int westernFootPatrolIsAFreeServiceAtWesternUniversityThatAssistsInKeepingCampusASafePlaceToStudyWorkAndLiveWeAreVolunteerDrivenServiceWithBetween250300VolunteersEachSchoolYearWeAreCommittedToProvidingASafeAndSecureEnvironmentForStudentsFacultyAndStaffOurMissionIsToRaiseAwarenessOfPersonalSafetyIssuesDeterCrimeThroughVisiblePatrolsAndToProvideSafeEscortsToCommunityMembersThisProactiveApproachToSafetyFocusesOnStudentsHelpingStudentsEngagingStudentVolunteersInTheDirectProvisionOfServicesCreatingASenseOfOwnershipAndResponsibility = 2131296336;
 			
 			static String()
 			{

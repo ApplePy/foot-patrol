@@ -1,4 +1,5 @@
 ﻿using Android.App;
+using Android.Gms.Common;
 using Android.OS;
 using Android.Support.V4.App;
 
@@ -15,6 +16,7 @@ namespace FootPatrol.Droid
         {
             base.OnCreate(savedInstanceState);
             SetContentView(Resource.Layout.Main); //set the content view to the main layout
+
             switchFragment();
         }
 

@@ -1,22 +1,18 @@
 
 <h2>Edit Pair {{pair.id}}</h2>
 <div>
-  State: {{pairState}} <select id=pairState [(ngModel)]="pairState">
+  <div>State: {{pairState}} <select id=pairState [(ngModel)]="pairState" class="ui dropdown">
     <option value='Active'>Active</option>
     <option value='Inactive'>Inactive</option>
-  </select><br>
-  Volunteer 1: {{pair.volunteers[0].first_name}} {{pair.volunteers[0].last_name}}<select id=volunteerONE [(ngModel)]="volunteerONE">
-    <option *ngFor="let volunteer of volunteers"[ngValue]="volunteer">{{volunteer.first_name}} {{volunteer.last_name}}</option>
-  </select><br>
-  Volunteer 2: {{pair.volunteers[1].first_name}} {{pair.volunteers[1].last_name}} <select id=volunteerTWO [(ngModel)]="volunteerTWO">
-    <option *ngFor="let volunteer of volunteers" [ngValue]="volunteer">{{volunteer.first_name}} {{volunteer.last_name}}</option>
-  </select><br>
+  </select></div><br>
+  <div>Volunteer 1: {{pair.volunteers[0].first_name}} {{pair.volunteers[0].last_name}} <br>
+  <div>Volunteer 2: {{pair.volunteers[1].first_name}} {{pair.volunteers[1].last_name}} <br>
 </div>
 
 <div>
   <br>
-  <button (click)="updatePair()" type="button">Update</button>
-  <button routerLink='/volunteer-list' type="button">Cancel</button>
+  <button (click)="updatePair()" type="button" class="ui green button">Update</button>
+  <button routerLink='/volunteer-list' type="button" class="ui red button">Cancel</button>
 </div>
 
 <div>
